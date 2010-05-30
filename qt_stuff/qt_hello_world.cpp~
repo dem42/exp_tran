@@ -1,0 +1,19 @@
+#include <qapplication.h>
+#include <qpushbutton.h>
+
+int main(int argc, char** argv)
+{
+  QApplication appl(argc, argv);
+
+  //the 0 denotes that the button is a window of its own
+  QPushButton hello("Hello World!",0);
+  hello.resize(100,30);
+    
+  //if we close the hello widget we close the whole thing
+  appl.setMainWidget(&hello);
+  hello.show();
+  
+  return appl.exec();
+}
+
+  
