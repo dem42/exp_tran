@@ -1,0 +1,175 @@
+#include <iostream>
+#include <cmath>
+
+#include <QApplication>
+#include <QGLFormat>
+
+#include <QMouseEvent>
+
+#define PI 3.14159265
+
+using namespace std;
+
+class MyWidget : public QGLWidget
+{
+public:
+  MyWidget(QGLWidget *parent = 0);
+  void initializeGL(void);  
+  void paintGL(void);
+  void resizeGL(int w, int h);
+
+  void mousePressEvent(QMouseEvent *event);  
+  void mouseMoveEvent(QMouseEvent *event);
+private:
+  QPoint lastPos;
+  float rot_x;
+  float rot_y;
+};
+
+MyWidget::MyWidget(QGLWidget *parent) : QGLWidget(parent)
+{
+  cout << "building" << endl;
+
+  setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
+  
+  rot_x = 0;
+  rot_y = 0;
+}
+
+void MyWidget::mousePressEvent(QMouseEvent *event)
+{
+  lastPos = event->pos();
+  //cout << "in press .. location: " << event->pos().x() << " " << event->pos().y() << endl;
+}
+
+void MyWidget::mouseMoveEvent(QMouseEvent *event)
+{
+  QPoint p = event->pos();
+  int d_x = p.x() - lastPos.x();
+  int d_y = p.y() - lastPos.y();
+
+  cout << d_x << endl;
+  
+  //set up the angles of rotation around the axis (in degrees not radians)
+  //we are setting this up like this with the idea being that we are interested in how the center
+  //or any point which is at z = 1.0 from us, should get transformed if we move the mouse as if it was the camera
+  rot_x = atan(d_y) * 180.0/PI;
+  rot_y = atan(1.0/d_x) * 180.0/PI;
+
+  //updateGL to call pain again
+  updateGL();    
+  lastPos = p;
+  
+  //cout << "in move .. location: " << event->pos().x() << " " << event->pos().y() << endl;
+}
+
+void MyWidget::initializeGL(void)
+{
+  cout << "initializing" << endl;
+  
+  qglClearColor(Qt::black);
+  glShadeModel(GL_FLAT);
+  glEnable(GL_DEPTH_TEST);
+}
+
+void MyWidget::paintGL(void)
+{
+  //cout << "in paint" << endl;
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
+  glLoadIdentity();
+  gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+  //rotations which will be updated anytime the values of rot_x, rot_y change
+  glRotatef(rot_x, 1.0, 0.0, 0.0);
+  glRotatef(rot_y, 0.0, 1.0, 0.0);
+      
+  glBegin(GL_QUADS);
+
+  glVertex3f(-1.0f, -1.0f, 0.0f);
+  
+  glVertex3f(1.0f, -1.0f, 0.0f);
+
+  glVertex3f(1.0f, 1.0f, 0.0f);
+
+  glVertex3f(-1.0f, 1.0f, 0.0f);
+
+  glEnd();
+
+
+  qglColor(Qt::blue);
+  
+  glBegin(GL_QUADS);
+
+  glVertex3f(-1.0f, -1.0f, 1.0f);
+  
+  glVertex3f(1.0f, -1.0f, 1.0f);
+
+  glVertex3f(1.0f, 1.0f, 1.0f);
+
+  glVertex3f(-1.0f, 1.0f, 1.0f);
+
+  glEnd();
+
+  qglColor(Qt::red);
+
+  glBegin(GL_QUADS);
+
+  glVertex3f(-1.0f, 1.0f, -1.0f);
+  
+  glVertex3f(1.0f, 1.0f, -1.0f);
+
+  glVertex3f(1.0f, 1.0f, 1.0f);
+
+  glVertex3f(-1.0f, 1.0f, 1.0f);
+
+  glEnd();
+
+  qglColor(Qt::green);
+
+  glBegin(GL_QUADS);
+
+  glVertex3f(-1.0f, -1.0f, -1.0f);
+  
+  glVertex3f(1.0f, -1.0f, -1.0f);
+
+  glVertex3f(1.0f, -1.0f, 1.0f);
+
+  glVertex3f(-1.0f, -1.0f, 1.0f);
+
+  glEnd();
+}
+
+void MyWidget::resizeGL(int width, int height)
+{
+  cout << "in resize" << endl;
+  
+  //coordinates of 2D plane (the one we're projecting to)
+  glViewport(0, 0, (GLsizei)width, (GLsizei)height);
+  
+  //switch to projection matrix
+  glMatrixMode(GL_PROJECTION);
+  //reset to identity matrix
+  glLoadIdentity();
+  //now set projection coordinates .. FOV, aspect ratio, near, far plane
+  gluPerspective(60, (GLfloat)width/(GLfloat)height, 1.0, 100.0);
+  
+  //switch back to transformation matrix
+  glMatrixMode(GL_MODELVIEW);
+}
+
+
+int main(int argc, char** argv)
+{
+
+  QApplication appl(argc, argv);
+  
+  if(!QGLFormat::hasOpenGL())
+    {
+      cerr << "No support for OpenGL" << endl;
+      return 1;
+    }
+  MyWidget m;
+  m.show();
+  
+  return appl.exec();  
+}
