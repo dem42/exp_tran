@@ -38,12 +38,12 @@ void Matrix::setElem(int i,int j,long double elem)
     mat[i][j] = elem;
 }
 
-int Matrix::getM() const
+inline int Matrix::getM() const
 {
     return m;
 }
 
-int Matrix::getN() const
+inline int Matrix::getN() const
 {
     return n;
 }
@@ -327,18 +327,40 @@ void Matrix::scalar_mult(double scalar)
                         mat[i][j] = scalar*mat[i][j];
 }
 
-long double & Matrix::Row::operator[](int col)
+/*********************************/
+/* overloaded operators */
+/*********************************/
+
+inline long double & Matrix::Row::operator[](int col)
 {
    return parent_matrix(row,col);
 }
-long double & Matrix::operator()(int row, int col)
+inline long double & Matrix::ConstRow::operator[](int col)
 {
-    return mat[row][col];
+   return parent_matrix(row,col);
 }
-Matrix::Row Matrix::operator[](int row)
+//we had a problem calling the first [] on a const Matrix
+//it said passing qualifiers discards constness so we added
+//a version which passes a const this (by overloading the const operator)
+inline Matrix::ConstRow Matrix::operator[](int row) const
+{
+    return Matrix::ConstRow(*this,row);
+}
+//the above also required const overloading :
+inline Matrix::Row Matrix::operator[](int row)
 {
     return Matrix::Row(*this,row);
 }
+
+inline long double & Matrix::operator()(int row, int col)
+{
+    return mat[row][col];
+}
+inline long double & Matrix::operator()(int row, int col) const
+{
+    return mat[row][col];
+}
+
 
 void Matrix::test(void)
 {

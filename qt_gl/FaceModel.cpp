@@ -30,7 +30,8 @@ FaceModel::FaceModel(string filename,string dir,string db_list,int f,int e,int v
 }
 
 FaceModel::~FaceModel()
-{       
+{
+    delete[] strs;
 }
 
 void FaceModel::initializeDbStrings()

@@ -43,14 +43,16 @@ void VectorFieldQLabel::paintEvent( QPaintEvent * )
         cout << "there is no pixmap" << endl;
         return;
     }
+    int x_shift = getXShift();
+    int y_shift = getYShift();
 
-    paint.drawPixmap(0,0,pmap,20,120,600,450);
-    vector<Point2f> curPoints = getMarked();
+    paint.drawPixmap(0,0,pmap,x_shift,y_shift,600,650);
+    vector<Point2f> curPoints = getMarked();    
     QPointF p1, p2;
     Vec2f v;
     float angle;
     const float PI = 3.1415926f;
-    for(int i=0;i<curPoints.size();i++)
+    for(unsigned int i=0;i<curPoints.size();i++)
     {
         v = vectorField[i];
 

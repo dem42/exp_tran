@@ -4,18 +4,42 @@
 #include <cmath>
 #include <new>
 #include "Face.h"
+#include "FaceModel.h"
+#include <QColor>
+#include <QGLWidget>
 
 //not too happy about having glut here too :(
 #include <GL/glut.h>
 
 using namespace std;
 
+//possibly add an xml config file for the stuff like exp and database dir
+Face::Face()
+{
+    int expr = 56, id = 7, ver = 5090;
+
+    model = new SVD("svd_result_object_2",expr,id,ver);
+//    model = new FaceModel("svd_result_object_2",
+//                                     "/home/martin/project/JaceyBinghamtonVTKFiles",
+//                                     "out_here.txt",
+//                                     56,7,5090);
+
+
+    //we always need to load at least the topology data (which triangles are joined up)
+    //this happens in the load method which also allocates the vertexes array
+    load("/home/martin/project/JaceyBinghamtonVTKFiles/M0014_HA01WH.vtk","../face.ppm");
+
+    gl_display_style = GL_POLYGON;
+}
 
 Face::~Face()
 {
-  delete[] vertexes;
+  delete[] vertexes;  
   delete[] vertex_normals;
   delete[] triangles;
+  cout << "face destroyed" << endl;
+  delete model;
+
   //delete[] vertex_texture;
   //delete[] texture_2d_coord;
 }
@@ -35,18 +59,178 @@ Color3 Face::interpolate_color(Color3 a,Color3 b,Color3 c,Color3 d,float r,float
   return result;
 }
 
+//brute interpolate doesnt try to create believable expressions
+//the weights are not multiplied with the U2 and U3 singular value
+//vectors before they are mode multiplied with the core tensor
+
+//standard interpolate where w_id and w_exp are multiplied with
+//the singular value matricies U2 and U3
+void Face::interpolate(long double *w_id,long double *w_exp,bool brute)
+{
+    long double sum = 0;
+    for(int i=0;i<7;i++)
+    {
+        cout << "w_exp["<<i<<"] = " << w_exp[i] << endl;
+        sum += w_exp[i];
+    }
+    //normalize:
+    //if no exp set make it neutral
+    if(sum == 0)
+       w_exp[4] = 1;
+    else
+        for(int i=0;i<7;i++)
+            w_exp[i] = w_exp[i]/sum;
+
+
+    sum = 0;
+
+    for(int i=0;i<56;i++)
+    {
+        sum += w_id[i];
+    }
+    std::cerr << sum <<  " the sum" << std::endl;
+
+    if(sum == 0)
+       w_id[28] = 1;
+    else
+        for(int i=0;i<56;i++)
+            w_id[i] = w_id[i]/sum;
+
+    model->interpolate_expression(vertexes,w_id,w_exp,brute);
+    //now recalculate the vertex normals for the newly interpolated face
+    generate_vertex_normals();
+}
+
+
+
+void Face::draw()
+{
+    static const GLfloat P1[3] = { -10.0, -11.0, -8.0 };
+    static const GLfloat P2[3] = { -9.17, -11.0, -11.0 };
+    static const GLfloat P3[3] = { -11.73205081, -1.0, -1.0 };
+    static const GLfloat P4[3] = { -10.0, -8.0, -10.0 };
+
+    static const GLfloat * const coords[4][3] = {
+        { P1, P2, P3 }, { P1, P3, P4 }, { P1, P4, P2 }, { P2, P4, P3 }
+    };
+
+
+    for (int i = 0; i < 4; ++i) {
+        glLoadName(i);
+        glBegin(GL_TRIANGLES);
+        //qglColor(faceColors[i]);
+        for (int j = 0; j < 3; ++j) {
+            glVertex3f(coords[i][j][0], coords[i][j][1],
+                       coords[i][j][2]);
+        }
+        glEnd();
+    }
+}
+
+void Face::setWireFrame(bool on)
+{
+    if(on == true)
+        gl_display_style = GL_LINE_LOOP;
+    else
+        gl_display_style = GL_POLYGON;
+}
+
+//right now we are merely selecting the first point in the polygon
+//perhaps it would be better to average?
+//on one hand we perhaps want points we can generate .. from the model
+//thats a con for the average
+//on the other if we average we always have distinct points
+Point3 Face::getPointFromPolygon(int index)
+{
+    int p_index = triangles[index][0];
+    return vertexes[p_index];
+}
+
+void Face::setColor(int index)
+{
+    this->index = index;
+}
+
+void Face::calculateBoundingSphere() const
+{
+    int v1,v2,v3;
+    float v;
+    float bx_u,bx_d,by_u,by_d,bz_u,bz_d;
+    bx_u = by_u = bz_u = -5000;
+    bx_d = by_d = bz_d = 5000;
+
+    for(int i=0; i<poly_num; i++)
+    {
+        v1 = triangles[i][0];
+        v2 = triangles[i][1];
+        v3 = triangles[i][2];
+
+        v = vertexes[v1].x;
+        bx_u = (v>bx_u)?v:bx_u;
+        bx_d = (v<bx_d)?v:bx_d;
+        v = vertexes[v1].y;
+        by_u = (v>by_u)?v:by_u;
+        by_d = (v<by_d)?v:by_d;
+        v = vertexes[v1].z;
+        bz_u = (v>bz_u)?v:bz_u;
+        bz_d = (v<bz_d)?v:bz_d;
+
+        v = vertexes[v2].x;
+        bx_u = (v>bx_u)?v:bx_u;
+        bx_d = (v<bx_d)?v:bx_d;
+        v = vertexes[v2].y;
+        by_u = (v>by_u)?v:by_u;
+        by_d = (v<by_d)?v:by_d;
+        v = vertexes[v2].z;
+        bz_u = (v>bz_u)?v:bz_u;
+        bz_d = (v<bz_d)?v:bz_d;
+
+        v = vertexes[v3].x;
+        bx_u = (v>bx_u)?v:bx_u;
+        bx_d = (v<bx_d)?v:bx_d;
+        v = vertexes[v3].y;
+        by_u = (v>by_u)?v:by_u;
+        by_d = (v<by_d)?v:by_d;
+        v = vertexes[v3].z;
+        bz_u = (v>bz_u)?v:bz_u;
+        bz_d = (v<bz_d)?v:bz_d;
+    }
+
+    std::cout << bx_u <<" " << bx_d <<" " << by_u <<" " << by_d <<" " << bz_u <<" " << bz_d << std::endl;
+    std::cout << "bounding sphere" << std::endl;
+    std::cout <<(bx_u + bx_d)/2.0 << " " << (by_u + by_d)/2.0 << " " << (bz_u+bz_d)/2.0 << std::endl;
+}
+
 void Face::display(void)
 {
   cout << "in my display with " << poly_num << endl;
   int v1,v2,v3;
-  
 
   for(int i=0; i<poly_num; i++)
     {
       v1 = triangles[i][0];
       v2 = triangles[i][1];
       v3 = triangles[i][2];
-      glBegin(GL_POLYGON);      
+
+      if(i == index)
+      {
+          // enable color tracking
+          glEnable(GL_COLOR_MATERIAL);
+          // set material properties which will be assigned by glColor
+          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+          glColor3f(1.0f, 0.0f, 0.0f); // blue reflective properties
+      }
+      else
+      {
+          glEnable(GL_COLOR_MATERIAL);
+          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+          glColor3f(0.0f, 0.4f, 0.2f);
+      }
+      //calls to glLoadName are ignored if we arent in GL_SELECT render mode
+      //its used to tell us what the user clicked on
+      glLoadName(i);
+      glBegin(gl_display_style);
 
       // glTexCoord2f(vertex_texture[v1],vertex_texture[v1]);
       //glColor3f(vertex_texture[v1].r,vertex_texture[v1].g,vertex_texture[v1].b);
@@ -62,26 +246,10 @@ void Face::display(void)
       //glColor3f(vertex_texture[v3].r,vertex_texture[v3].g,vertex_texture[v3].b);
       glNormal3f(vertex_normals[v3].x,vertex_normals[v3].y,vertex_normals[v3].z);
       glVertex3f(vertexes[v3].x,vertexes[v3].y,vertexes[v3].z);
-      glEnd();      
-    }
-  glFlush();
-  
-    /*
-  for (all polygons)
-    glBegin(GL_POLYGON);
-    for (all vertices of polygon)
-      // Define texture coordinates of vertex
-      glTexCoord2f(...);
-      // Define normal of vertex
-      glNormal3f(...);
-      // Define coordinates of vertex
-      glVertex3f(...);
-    }
-    glEnd();
-  }
-  glFlush ();
-  */
+      glEnd();
 
+    }
+  //glFlush();
 }
 
   
@@ -135,7 +303,7 @@ void Face::test(void)
   cout << vec1 << " normalized is = " << vec1.normalize() << endl;
 
 }
-
+//needs triangles AND the computed vertices
  void Face::generate_vertex_normals(void)
  {
    Vector3 *surface_normals = new (nothrow) Vector3[poly_num];
@@ -197,12 +365,11 @@ void Face::test(void)
  }
 
 
-void Face::load(const char* filename, const char *tex_map_filename) 
+void Face::load(string filename, const char *tex_map_filename)
 {
   string str;
-  int dont_need_int;  
-  float f1,f2,f3;
-  fstream file_op(filename,ios::in);
+  int dont_need_int;
+  fstream file_op(filename.c_str(),ios::in);
 
   /*vtk files begin with several unimportant lines*/
   char line[256];
@@ -218,23 +385,22 @@ void Face::load(const char* filename, const char *tex_map_filename)
   /**************************************************/
   /** load POINTS ***/
   /**************************************************/
-  file_op >> str >> point_num;
+  file_op >> str >> point_num;  
   //error if wrong label
   if(str.compare("POINTS") != 0) 
-    {
+  {
       cerr << "did not match the label POINTS got " << str << endl;
       return;
-    }
-
-  //one more line telling us its float
-  file_op >> str;  
-
+  }
   vertexes = new (nothrow) Point3[point_num];
   if(vertexes == NULL)
-    {
+  {
       cerr << "error allocating memory for vertexes" << endl;
       return;
-    }
+  }
+
+  //one more line telling us its float
+  file_op >> str;
 
   for(int i=0; i<point_num; i++)
     file_op >> vertexes[i].x >> vertexes[i].y >> vertexes[i].z;

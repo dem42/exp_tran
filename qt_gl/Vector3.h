@@ -1,3 +1,6 @@
+#ifndef VECTOR3_H
+#define VECTOR3_H
+
 #include <iostream>
 
 using namespace std;
@@ -44,4 +47,4 @@ class Vector3
 
 ostream& operator<<(ostream& stream, Vector3 v);
 
-  
+#endif /*VECTOR3_H*/

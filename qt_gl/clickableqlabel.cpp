@@ -6,15 +6,31 @@ using namespace std;
 
 ClickableQLabel::ClickableQLabel(bool draw) : drawable(draw), drawing(false)
 {
-    this->setText("test text");
-    this->adjustSize();
-    this->setScaledContents(true);
-    cout << this->hasScaledContents() << endl;
+    x_shift = 0;
+    y_shift = 0;
 }
 
 ClickableQLabel::~ClickableQLabel()
 {
     marked.clear();
+}
+
+void ClickableQLabel::setXShift(int x)
+{
+    x_shift = x;
+}
+
+void ClickableQLabel::setYShift(int y)
+{
+    y_shift = y;
+}
+int ClickableQLabel::getXShift() const
+{
+    return x_shift;
+}
+int ClickableQLabel::getYShift() const
+{
+    return y_shift;
 }
 
 vector<cv::Point2f> ClickableQLabel::getMarked() const
@@ -82,7 +98,8 @@ void ClickableQLabel::paintEvent ( QPaintEvent * e)
     }
     else
     {
-        paint.drawPixmap(0,0,pmap,20,120,600,450);
+        paint.drawPixmap(0,0,pmap,x_shift,y_shift,600,650);
+
         QPointF *points = new QPointF[marked.size()];
         for(int i=0; i < marked.size(); i++)
         {

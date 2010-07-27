@@ -509,15 +509,14 @@ SVD::SVD(string filename,int f,int e,int v) : filename(filename), n_f(f), n_e(e)
 
 SVD::~SVD()
 {
-	delete[] core;
+	delete[] core;        
 	delete[] u2;
-	delete[] u3;
-        //do we need it?
-	delete[] K;
+	delete[] u3;        
 }
 
 
-void SVD::interpolate_expression(Point3 *face,long double *w_id,long double *w_ex)
+//@param brute .. whether we interpolate using U2 and U3 or just the weights right away
+void SVD::interpolate_expression(Point3 *face,long double *w_id,long double *w_ex,bool brute)
 {	
 	long double *row1, *row2;
 	long double **m1i,**m1e,**kr;
@@ -526,16 +525,30 @@ void SVD::interpolate_expression(Point3 *face,long double *w_id,long double *w_e
 	row1 = new long double[n_f];
 	row2 = new long double[n_e];
 
-	matrix_vector_mult(w_id,u2,row1,n_f,n_f);
-        matrix_vector_mult(w_ex,u3,row2,n_e,n_e);
-	
-	m1i = new long double*[1];
-	m1i[0] = new long double[n_f];
-	m1e = new long double*[1];
-	m1e[0] = new long double[n_e];
-	kr = new long double*[1];
-	kr[0] = new long double[n_e*n_f];
-	for(i=0;i<n_f;i++)
+        if(brute == false)
+        {
+            //multiply with u2 and u3
+            matrix_vector_mult(w_id,u2,row1,n_f,n_f);
+            matrix_vector_mult(w_ex,u3,row2,n_e,n_e);
+        }
+        else
+        {
+            //brute == true so
+            //just copy w_id and w_exp over from the output
+            for(i=0;i<n_f;i++)
+                row1[i] = w_id[i];
+            for(i=0;i<n_e;i++)
+                row2[i] = w_ex[i];
+        }
+
+        m1i = new long double*[1];
+        m1i[0] = new long double[n_f];
+        m1e = new long double*[1];
+        m1e[0] = new long double[n_e];
+
+        kr = new long double*[1];
+        kr[0] = new long double[n_e*n_f];
+        for(i=0;i<n_f;i++)
 		m1i[0][i] = row1[i];
 	
 	for(i=0;i<n_e;i++)
@@ -791,8 +804,6 @@ bool SVD::load()
     //if it is false we set our state to
     fstream fstr(filename.c_str(),fstream::in);
 
-
-    cerr << "wtf " << endl;
     if(fstr.is_open() == false)
     {
         cerr << "file doesnt exist so we have to calculate .. this will take a minute" << endl;
