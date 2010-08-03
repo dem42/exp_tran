@@ -1,0 +1,153 @@
+\documentclass[11pt,a4paper]{book}
+\usepackage{listings,textcomp,graphicx,float,verbatim,extsizes}
+\usepackage{amsmath,amssymb,mathrsfs}
+\usepackage{sectsty}
+\usepackage[left=3.2cm, right=3.2cm, top=3cm, bottom=4cm]{geometry}
+
+\usepackage{fancyhdr}
+
+\pagestyle{fancy}
+\setlength{\headheight}{15.2pt}
+\fancyhead[LE,RO]{\slshape \rightmark}
+\fancyhead[LO,RE]{\slshape \leftmark}
+\fancyfoot[C]{\thepage}
+\begin{comment}
+
+\lhead{}
+\chead{}
+\rhead{}
+\lfoot{}
+\cfoot{\thepage}
+\rfoot{}
+\end{comment}
+
+\makeatletter
+\renewcommand{\@makechapterhead}[1]{%
+\vspace*{50 pt}%
+{\setlength{\parindent}{0pt} \raggedright \normalfont
+\bfseries\Huge
+\ifnum \value{secnumdepth}>1
+   \if@mainmatter\thechapter.\ \fi%
+\fi
+#1\par\nobreak\vspace{40 pt}}}
+\makeatother
+
+\title{Individual Project\\Expression Transfer}
+\author{Martin Papanek (mp5309)}
+\date{}
+
+
+\begin{document}
+
+\maketitle
+
+\begin{center}
+\LARGE \textbf{Abstract}
+\end{center}
+
+\newpage
+
+\begin{center}
+\LARGE \textbf{Acknowledgements}
+\end{center}
+
+
+\newpage
+
+\tableofcontents
+\listoftables
+
+\chapter{Introduction}
+\section{Motivation}
+Allowing computers to understand the world around them is one of the most
+intriguing goals of computer science. In order to aid humans in day-to-day
+tasks,the ideal computer should perceive his surroundings, correctly identify the objects and beings around him and act based
+on this information. Achieving this level of sophisticated, environment aware
+behaviour is the focus of popular computer science fields such as machine
+learning, computer vision and logic.
+
+The problem of understanding the surrounding world can be broken down into a
+number of sub-problems. First the machine must obtain and process the information on
+its sensors. Then it has to utilize the data gleaned from its sensors to find
+objects in the image. Finally, the machine has to obtain contextual information
+from the configuration of these objects. Possessing this contextual information can be seen
+as equivalent to understanding the scene. The computer uses the contextual
+information to understand what state the environment is in and can then act based on
+simple if-then rules.
+
+For humans, all of the aforementioned sub-problems seem simple. However, programming
+machines to do the same is quite difficult. Computers often do
+possess better sensors than most humans and thus are readily able to obtain data
+from sensors. Yet, they are sorely lacking when it comes to locating objects
+in this sensory input and correctly assessing the properties and configuration
+of these objects. While it is possible to locate circles and lines, joining
+these to locate a face or a tree can only be done if the machine knows what a
+face or a tree should look like. To instruct machines about the properties of
+the various objects, which could potentially be present in the surroundings, we
+use \textit{models}. A model describes the expected structure of the object.
+This, in turn, allows the machine to explain aspects of its sensory input as the
+occurence of that object. Finding objects by means of locating an instance of a
+model in the input is called \textit{model-based tracking}.
+
+Certain objects may also change their shape or
+appearance. For example a face may transition from a closed eyed state to an
+open eyed state. An even better example is the body of a human, which is also
+highly dynamic. These deformable objects are often of special interest to us in
+our everyday life. A machine should therefore be able to recognize an arbitrarily deformed
+object and also correctly identify the shape or appearence of this dynamic
+object. The challenge thus lies in constructing an appropriate \textit{deformable
+model}. 
+
+Furthermore, the computer has to be able to find an instance of this
+model in its surroundings if and only if this object is present. This task is
+known as \textit{model extraction}. When extracting deformable models, it is
+necessary to also estimate what state the model is in. This means we have to not
+only locate the object but also estimate the values of parameters which govern how this
+object changes.
+
+Hence, in this paper we are interested in describing convenient dynamical shape
+and appearence models and effective algorithms for locating these models. For our
+sensory snapshots, we will focus exclusively on images. Since we will be dealing
+with images we will investigate motion tracking and feature detection
+algorithms. These are necessary to obtain cues from our input image which allow
+us to locate the model in the image.
+
+ The area where deformable models
+are applicable is quite large. This paper will focus on one very interesting application of dynamical
+models and model extraction which is
+\textit{expression transfer}.  The purpose of expression transfer is to capture the expressions and visemes
+(speech related mouth articulations) from a video recording of one individual and
+generate a video of another individual mimicking these
+expressions and visemes. The alternative to transferring these expressions would
+be to construct a physical model of the face and simulate the observed
+expressions and visemes using the model. However, transferring the dynamics of a subjects face to that of another enables us to
+create very realistic animations without much difficulty. On the other hand, it
+is quite difficult to generate realistic expressions by setting the appropriate
+parameters of a physical model simply because of the complexity of the physics
+behind the movement that is responsible for expressions.
+
+\section{Contributions}
+
+\section{Report Overview}
+
+\newpage
+
+\chapter{Background}
+Using models to characterise and locate a dynamic object such as a face remains
+a very fundamental challenge of computer vision and graphics. In this chapter we
+will examine various model extraction techniques. Likewise, we will discuss
+computer vision algorithms that will allow us to locate objects in images and
+observe how the objects change between several images.
+\section{Model-based object recognition}
+\section{Shape Modelling}
+A \textit{shape model} describes the boundaries of an object. figure 111 For example a
+shape model of a face which denotes the location and measures of the defining
+contours of a face. To locate an object in an image the shape model must be able to
+account for the following
+\begin{itemize}
+\item variations of shape due to deformations of the object
+\item arbitrary scaling of the object
+\item arbitrary rotations of the object
+\item some measure of gaussian input noise tolerance
+\end{itemize}
+\end{document}
