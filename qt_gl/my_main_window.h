@@ -10,6 +10,8 @@
 
 class FaceWidget;
 
+class TransferWidget;
+
 class MyMainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -25,7 +27,7 @@ private:
     TransferWidget *trans_widget;
     //menu dialogs
     QFileDialog *f_dialog;
-    QFileDialog *v_dialog;
+    QFileDialog *v_dialog;    
 };
 
 #endif // MY_MAIN_WINDOW_H

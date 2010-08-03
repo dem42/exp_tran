@@ -43,6 +43,7 @@ void ClickableQLabel::setMarked(std::vector<cv::Point2f> &input)
     marked.clear();
     for(vector<cv::Point2f>::iterator it=input.begin();it<input.end();it++)
         marked.push_back(*it);
+    this->update();
 }
 
 void ClickableQLabel::clearMarked()

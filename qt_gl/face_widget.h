@@ -18,6 +18,16 @@ class FaceWidget : public QGLWidget
 public:
   FaceWidget(MyMainWindow *win, QGLWidget *parent = 0);
   enum ExprType { ANGRY=0, DISGUST=1, FEAR=2, HAPPY=3, NEUTRAL=4, SAD=5, SURPRISE=6 };
+  void setTransParams(double r_x, double r_y, double r_z, double t_x, double t_y, double t_z);
+
+   struct Pose {
+        double rot_x;
+        double rot_y;
+        double rot_z;
+        double trans_x;
+        double trans_y;
+        double trans_z;
+    };
 
 protected:
   void initializeGL(void);
@@ -54,6 +64,10 @@ private:
   float trans_x;
   float trans_y;
   float trans_z;
+  //center
+  float center_x;
+  float center_y;
+  float center_z;
 
   QString face_filename;
   std::map<QString,ExprType> expr_map;

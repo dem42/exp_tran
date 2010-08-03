@@ -52,6 +52,7 @@ void VectorFieldQLabel::paintEvent( QPaintEvent * )
     Vec2f v;
     float angle;
     const float PI = 3.1415926f;
+
     for(unsigned int i=0;i<curPoints.size();i++)
     {
         v = vectorField[i];

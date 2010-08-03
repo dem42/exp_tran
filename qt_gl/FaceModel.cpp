@@ -8,6 +8,21 @@
 
 using namespace std;
 
+FaceModel *FaceModel::instance = 0;
+
+FaceModel * FaceModel::getInstance()
+{
+    //lazy initialization
+    if(instance == NULL)
+    {
+        instance = new FaceModel("svd_result_object_2",
+                                 "/home/martin/project/JaceyBinghamtonVTKFiles",
+                                 "out_here.txt",
+                                  56,7,5090);
+    }
+    return instance;
+}
+
 //chain constructors of U2,U3,core
 FaceModel::FaceModel(string filename,string dir,string db_list,int f,int e,int v) :
         filename(filename), dir_name(dir), db_list(db_list),
@@ -29,8 +44,11 @@ FaceModel::FaceModel(string filename,string dir,string db_list,int f,int e,int v
     core.test();
 }
 
-FaceModel::~FaceModel()
+//we do not explicitly call this .. rather we rely on the OS
+//to clean up the process .. possible memory leak?
+FaceModel::~FaceModel()        
 {
+    std::cout << "destructor FaceModel" << std::endl;
     delete[] strs;
 }
 

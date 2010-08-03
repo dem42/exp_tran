@@ -18,7 +18,8 @@ Face::Face()
 {
     int expr = 56, id = 7, ver = 5090;
 
-    model = new SVD("svd_result_object_2",expr,id,ver);
+    //model = new SVD("svd_result_object_2",expr,id,ver);
+    model = FaceModel::getInstance();
 //    model = new FaceModel("svd_result_object_2",
 //                                     "/home/martin/project/JaceyBinghamtonVTKFiles",
 //                                     "out_here.txt",
@@ -38,12 +39,17 @@ Face::~Face()
   delete[] vertex_normals;
   delete[] triangles;
   cout << "face destroyed" << endl;
-  delete model;
+  //singleton so we do not explicitly call its destructor
+  //delete model
 
   //delete[] vertex_texture;
   //delete[] texture_2d_coord;
 }
   
+int Face::getPolyNum() const
+{
+    return poly_num;
+}
 
 /**** this is how we interpolate
   c ---- d
@@ -225,7 +231,7 @@ void Face::display(void)
       {
           glEnable(GL_COLOR_MATERIAL);
           glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-          glColor3f(0.0f, 0.4f, 0.2f);
+          glColor3f(1.0f, 1.0f, 1.0f);
       }
       //calls to glLoadName are ignored if we arent in GL_SELECT render mode
       //its used to tell us what the user clicked on
@@ -235,17 +241,17 @@ void Face::display(void)
       // glTexCoord2f(vertex_texture[v1],vertex_texture[v1]);
       //glColor3f(vertex_texture[v1].r,vertex_texture[v1].g,vertex_texture[v1].b);
       glNormal3f(vertex_normals[v1].x,vertex_normals[v1].y,vertex_normals[v1].z);      
-      glVertex3f(vertexes[v1].x,vertexes[v1].y,vertexes[v1].z);
+      glVertex3f(vertexes[v1].x,vertexes[v1].y,vertexes[v1].z+1500.0);
       
       //glTexCoord2f(vertex_texture[v2],vertex_texture[v2]);
       //glColor3f(vertex_texture[v2].r,vertex_texture[v2].g,vertex_texture[v2].b);
       glNormal3f(vertex_normals[v2].x,vertex_normals[v2].y,vertex_normals[v2].z);
-      glVertex3f(vertexes[v2].x,vertexes[v2].y,vertexes[v2].z);
+      glVertex3f(vertexes[v2].x,vertexes[v2].y,vertexes[v2].z+1500.0);
       
       //glTexCoord2f(vertex_texture[v3],vertex_texture[v3]);
       //glColor3f(vertex_texture[v3].r,vertex_texture[v3].g,vertex_texture[v3].b);
       glNormal3f(vertex_normals[v3].x,vertex_normals[v3].y,vertex_normals[v3].z);
-      glVertex3f(vertexes[v3].x,vertexes[v3].y,vertexes[v3].z);
+      glVertex3f(vertexes[v3].x,vertexes[v3].y,vertexes[v3].z+1500.0);
       glEnd();
 
     }

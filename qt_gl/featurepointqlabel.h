@@ -16,7 +16,7 @@ protected:
     void paintEvent( QPaintEvent * );
 private:
     //static attributes
-    static const QString label_msgs[13];
+    static const QString label_msgs[20];
     static const int msgs_size;
 };
 

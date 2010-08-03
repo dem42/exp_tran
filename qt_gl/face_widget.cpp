@@ -52,17 +52,33 @@ FaceWidget::FaceWidget(MyMainWindow *win, QGLWidget *parent) : QGLWidget(parent)
   current_ident = 33;
 
   //initialize camera parameters
-  rot_x = -1.28462;
-  rot_y = 2.64523;
-  rot_z =  -2.23753;
-//
-//  trans_x = -1427.35;
-//  trans_y = 333.736;
-//  trans_z =  -405.445;
-  
-  trans_x = -2.8741;
-  trans_y = 19.915;
-  trans_z =  1518;
+  rot_x = 0;
+  rot_y = 0;
+  rot_z = 0;
+  trans_x = 0;
+  trans_y = 0;
+  trans_z = 0;
+
+//  trans_x = -77.04;
+//  trans_y = -14.157;
+//  trans_z = +140.0 + 1500.0;
+//-0.31989 -0.914053 -0.249355 -0.922929 0.360119 -0.136078 0.21418 0.186607 -0.958804
+  //0.479993 0.0882419 -0.872801 0.00623718
+  center_x = -2.8741;
+  center_y = 19.915;
+  center_z =  1518-1500;
+}
+
+void FaceWidget::setTransParams(double r_x, double r_y, double r_z, double t_x, double t_y, double t_z)
+{
+    rot_x = r_x;
+    rot_y = r_y;
+    rot_z = r_z;
+    cout << rot_x << " " << rot_y << " " << rot_z << endl;
+    trans_x = t_x;
+    trans_y = t_y;
+    trans_z = t_z;
+    cout << trans_x << " " << trans_y << " " << trans_z << endl;
 }
 
 void FaceWidget::face_file_changed(const QString str)
@@ -131,7 +147,7 @@ void FaceWidget::initializeGL(void)
 
   //scary lighting
   //GLfloat LightPosition[] =  { 2.8741, -19.915, 1.0, 0.0 };
-  GLfloat LightPosition[] =  { 0.0, 0.0, 1.0, 0.0 };
+  GLfloat LightPosition[] =  { 0.0, 0.0, -1.0, 0.0 };
   GLfloat LightSpecular[] = { 1.0, 1.0, 1.0 };
   GLfloat LightAmbient[] = { 0.0, 0.0, 0.0 };
   GLfloat LightDiffuse[] = { 1.0, 1.0, 1.0 };
@@ -170,16 +186,23 @@ void FaceWidget::paintGL(void)
   //ok the 4th, 5th and 6th parameter are what im looking at and they should
   //be the center of the sphere bounding my scene
   //2.8741 -19.915 -1518.46
-  //gluLookAt(0,0, -1000.0, 2.8741, -19.915, -1518.46, 0.0, 1.0, 0.0);
-  glTranslatef(0,0,-200);
+
   //rotations which will be updated anytime the values of rot_x, rot_y change
   //to get the rotations around the object (which isnt at 0,0,0) we need to
   //not turn just around 1,0,0 and 0,1,0 as usual
-  glRotatef(rot_x, 1.0, 0.0, 0.0);
-  glRotatef(rot_y, 0.0, 1.0, 0.0);
   glRotatef(rot_z, 0.0, 0.0, 1.0);
-  glTranslatef(trans_x, trans_y, trans_z);
+  glRotatef(rot_y, 0.0, 1.0, 0.0);
+  glRotatef(rot_x, 1.0, 0.0, 0.0);
 
+  //move the objects by:
+  glTranslatef(trans_x,trans_y,trans_z);
+  //gluLookAt(0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+  glTranslatef(0,0,-1000);
+
+  //rotate around norm(r) and r which is the rotation vector
+  //glRotatef(145.89, 0.64663, 1.10562, 2.20011);
+
+  //glTranslatef(center_x, center_y, center_z);
   //does the open gl glBegin(GL_POLYGON) glEnd() stuff
   face_ptr->display();
 }
@@ -337,8 +360,8 @@ void FaceWidget::resizeGL(int width, int height)
   cout << "in resize" << endl;
 
 
-  width = 360;
-  height = 288;
+//  width = 360;
+//  height = 288;
   //coordinates of 2D plane (the one we're projecting to)
   glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 

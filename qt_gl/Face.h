@@ -18,6 +18,7 @@ class Face
   void interpolate(long double *w_id,long double *w_exp,bool brute=false);  
   void setWireFrame(bool);
 
+  int getPolyNum() const;
   Point3 getPointFromPolygon(int);
 
   void setColor(int index);
@@ -46,8 +47,8 @@ private:
   //whether we display using (line loop)wireframe or polygon (default)
   int gl_display_style;
 
-  SVD *model;
-  //FaceModel *model;
+  //SVD *model;
+  FaceModel *model;
 
  protected:
   void generate_vertex_normals(void);

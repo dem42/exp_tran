@@ -12,10 +12,10 @@ MyMainWindow::MyMainWindow(QMainWindow *window)
     my_widget = new FaceWidget(this);
     ui.verticalLayout->addWidget(my_widget);
     f_dialog = new QFileDialog();
-    v_dialog = new QFileDialog();
+    v_dialog = new QFileDialog();    
 
     //intialize transfer widget    
-    trans_widget = new TransferWidget("/home/martin/project/test/optical_flow_input.avi");    
+    trans_widget = new TransferWidget("/home/martin/project/test/optical_flow_input.avi",my_widget);
     //ui.verticalLayout_3->addWidget(trans_widget->getVideoWidget());
 
     ui.verticalLayout_3->addWidget(trans_widget->getPicLabel());    
@@ -28,7 +28,7 @@ MyMainWindow::MyMainWindow(QMainWindow *window)
     //tracking determines when value change signal is emitted
     //either after the user lets go (false) or as its being dragged (true)
     ui.expSlider->setTracking(true);
-    ui.expSlider->setSliderPosition(0.5*100);
+    ui.expSlider->setSliderPosition(0.5*100);  
 
     /*********************/
     /* connect signals and slots*/
@@ -51,11 +51,13 @@ MyMainWindow::MyMainWindow(QMainWindow *window)
 
     //transfer widget connects
     connect(ui.restartButton,SIGNAL(clicked()),trans_widget,SLOT(restartCapturing()));
-    connect(ui.playButton,SIGNAL(clicked()),trans_widget,SLOT(playTransfer()));    
+    connect(ui.playButton,SIGNAL(clicked()),trans_widget,SLOT(playTransfer()));
+    connect(ui.pauseButton,SIGNAL(clicked()),trans_widget,SLOT(pauseTransfer()));
     connect(ui.flowButton,SIGNAL(clicked()),trans_widget,SLOT(findGoodFeaturePoints()));
     connect(ui.drawRadio,SIGNAL(clicked(bool)),trans_widget,SLOT(toggleDrawable(bool)));
-    connect(ui.extractBtn,SIGNAL(clicked()),trans_widget,SLOT(startFaceTransfer()));
-    connect(ui.dropButton,SIGNAL(clicked()),trans_widget,SLOT(dropFrame()));
+    connect(ui.extractBtn,SIGNAL(clicked()),trans_widget,SLOT(startFaceTransfer()));    
+    connect(ui.dropButton,SIGNAL(clicked()),trans_widget,SLOT(dropFrame()));    
+    connect(ui.modelButton,SIGNAL(clicked()),trans_widget,SLOT(playBack()));
 }
 
 

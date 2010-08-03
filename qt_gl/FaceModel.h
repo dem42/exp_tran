@@ -5,22 +5,23 @@
 #include "Matrix.h"
 #include <string>
 
-//persistable tensor
-
+//singleton persistable class
 class FaceModel
 {
  public:
 
+    static FaceModel *getInstance();
+
     enum Mode_space_t {IDENTITY, EXPRESSION, VERTEX};
 
-    FaceModel(std::string filename,std::string dir,std::string db_list,int f,int e,int v);
-    ~FaceModel();
     void read_flat_vertex(long double **a, int m, int n,
                            const int first_dim, const int second_dim, Mode_space_t flag);
     void read_flat(long double **a, int m, int n,
                            const int first_dim, const int second_dim, Mode_space_t flag);
     void interpolate_expression(Point3 *face,long double *w_id,long double *w_ex,bool brute);
  protected:
+    FaceModel(std::string filename,std::string dir,std::string db_list,int f,int e,int v);
+    ~FaceModel();
     void persist();
     bool load();
 private:
@@ -28,6 +29,8 @@ private:
     void computeIdentitySingularVectors(int m,int n);
     void computeExpressionSingularVectors(int m,int n);
     void initializeDbStrings();
+
+    static FaceModel *instance;
 
     std::string **strs;
     const std::string filename;
