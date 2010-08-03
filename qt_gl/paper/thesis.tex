@@ -4,6 +4,17 @@
 \usepackage{sectsty}
 \usepackage[left=3.2cm, right=3.2cm, top=3cm, bottom=4cm]{geometry}
 
+%setup links
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks,
+    citecolor=black,
+    filecolor=black,
+    linkcolor=black,
+    urlcolor=black
+}
+%\hypersetup{linktocpage} to only make page number in toc clickable
+
 \usepackage{fancyhdr}
 
 \pagestyle{fancy}
@@ -133,13 +144,21 @@ behind the movement that is responsible for expressions.
 \newpage
 
 \chapter{Background}
-Using models to characterise and locate a dynamic object such as a face remains
+Using models to characterise a deformable object and locate it in an image remains
 a very fundamental challenge of computer vision and graphics. In this chapter we
 will examine various model extraction techniques. Likewise, we will discuss
-computer vision algorithms that will allow us to locate objects in images and
-observe how the objects change between several images.
+computer vision algorithms that will allow us to locate the parts that make up
+our objects and observe how the objects change between several images.
 \section{Model-based object recognition}
-\section{Shape Modelling}
+The goal of model-based object recognition is to fit an instance of a model to
+an the appropriate object in the image. The problem of fitting the model to the
+image is in essence an optimization problem. In order to fit the model we need to
+correctly adjust parameters that control the model. In addition to determining
+the intrinsic parameters of the model it is necessary to also find how the
+object is rotated, moved and scaled. The parameters which determine the
+orientation are called \textit{pose parameters}. 
+
+\subsection{Shape Model}
 A \textit{shape model} describes the boundaries of an object. figure 111 For example a
 shape model of a face which denotes the location and measures of the defining
 contours of a face. To locate an object in an image the shape model must be able to
@@ -150,4 +169,67 @@ account for the following
 \item arbitrary rotations of the object
 \item some measure of gaussian input noise tolerance
 \end{itemize}
+
+
+   
+
+\subsection{PCA and Eigenfaces}
+In 1991, Turk and Pentland \cite{eigenfaces91} pioneered a face recognition approach
+based on the mathematical
+technique called principal component analysis (PCA). Their face recognition
+scheme uses a data set of images to learn what they call
+\textit{eigenfaces}. Expressed in mathematical terms - the eigenfaces are principal components of the 2D image
+space. They represent the vectors of the 2D data set that are responsible for any
+significant variation. 
+As such these vectors are the eigenvectors of the covariance matrix of the face
+images. To obtain the eigenfaces it is necessary to compute the SVD decomposition of this
+covariance matrix. Any individual face from the training data set can then be
+exactly represented as a linear combination all the eigenfaces.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{images/eigenfaces_comb_from_nn_vienna.png}
+\caption{ Using the eigenfaces we can represent an image as a linear combination of the
+  eigenfaces. Taken from \cite{vienna} }
+\label{gr:eigenfaces}
+\end{figure}
+
+The weight of each eigenface in the linear combination is computed from the
+projection of the face image onto this eigenface. To recognize a face we
+ first calculate these weights. Then we calculate the euclidean distance of the vector
+of weights to the weights of faces from our training data set. The face from
+the data set with weights which are closest to the new image's weights is chosen
+as a match.
+
+In an image of 256 by 256 we have a 65,536 dimensional vector that
+represents the face image. This means we would require 65,536 eigenfaces to be
+able to exactly represent every face. However, images of faces are very similar
+in their configuration which means that the underlying principal subspace of
+faces has a lower dimension than 65,536. Once the eigenfaces which span this
+principal subspace are found we can
+effectively encode a 65,536 dimensional vector using a vector of much smaller
+dimensions. 
+
+The main advantage of the eigenfaces is that we can approximate a face very well
+by a linear combination of only the eigenfaces that account for the largest
+variance. The set of $M$ eigenfaces that represent the $M$ largest variances is called
+the \textit{face space}.
+
+The drawback of a PCA based model is that the recognition rate drops significantly once
+independent sources of variation are introduced. Turk and
+Pentland noted that the eigenfaces approach has issues with variations in lighting,
+head size, head orientation or faces exhibiting expressions \cite{eigenfaces91}. Likewise, when
+faces are partially occluded in images it causes difficulties to the technique. 
+
+The eigenfaces approach is based heavily information and coding theory
+\cite{eigenfaces91}. With the PCA it is possible to encapsulate a face image
+using low dimensional vector. As such PCA and eigenfaces are often used to
+reduce dimensionality in more sophisticated modelling approaches.
+
+\section{Model-based tracking}
+
+
+\bibliographystyle{plain}
+\bibliography{references}
+
 \end{document}
