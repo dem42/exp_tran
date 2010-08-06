@@ -52,6 +52,20 @@ FaceModel::~FaceModel()
     delete[] strs;
 }
 
+Matrix FaceModel::getCoreTensor() const
+{
+    return core;
+}
+
+Matrix FaceModel::getUIdentity() const
+{
+    return U_id;
+}
+Matrix FaceModel::getUExpression() const
+{
+    return U_ex;
+}
+
 void FaceModel::initializeDbStrings()
 {
     FILE *fid;
@@ -68,8 +82,8 @@ void FaceModel::initializeDbStrings()
             << std::numeric_limits<float>::max() << std::endl;
     std::cout << "max(double): "
             << std::numeric_limits<double>::max() << std::endl;
-    std::cout << "max(long double): "
-            << std::numeric_limits<long double>::max() << std::endl;
+    std::cout << "max(double): "
+            << std::numeric_limits<double>::max() << std::endl;
 
     fscanf(fid,"%d",&num);
     if(num != n_f * n_e) printf("problem\n");
@@ -89,7 +103,7 @@ void FaceModel::initializeDbStrings()
 
 
 //@param brute .. whether we interpolate using U2 and U3 or just the weights right away
-void FaceModel::interpolate_expression(Point3 *face,long double *w_id,long double *w_ex,bool brute)
+void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bool brute)
 {
     Matrix m_wid(1,n_f);
     Matrix m_wex(1,n_e);
@@ -123,7 +137,7 @@ void FaceModel::interpolate_expression(Point3 *face,long double *w_id,long doubl
 
     Matrix K(1,n_f*n_e), KT(n_f*n_e,1), f(3*n_v,1);
 
-    Matrix::kron(row_id,row_ex,K);
+    K = Matrix::kron(row_id,row_ex);
     K.transpose(KT);
 
     //core * kron( (w2*u2), (w3*u3) )' = f
@@ -155,7 +169,7 @@ void FaceModel::computeIdentitySingularVectors(int m,int n)
     A.transpose(AT);
     Matrix::matrix_mult(A,AT,A2);
 
-    long double *d = new long double[n];
+    double *d = new double[n];
 
     Matrix::svd(m,m,1,0,0.000001,0.000001,A2.mat,d,U_id.mat,NULL);
 
@@ -176,7 +190,7 @@ void FaceModel::computeExpressionSingularVectors(int m,int n)
     A.transpose(AT);
     Matrix::matrix_mult(A,AT,A2);
 
-    long double *d = new long double[n];
+    double *d = new double[n];
 
     Matrix::svd(m,m,1,0,0.000001,0.000001,A2.mat,d,U_ex.mat,NULL);
 
@@ -184,8 +198,7 @@ void FaceModel::computeExpressionSingularVectors(int m,int n)
 }
 
 void FaceModel::compute_core_tensor(void)
-{
-    int i,j;
+{    
     int m,n;
 
     m = n_f;
@@ -219,16 +232,16 @@ void FaceModel::compute_core_tensor(void)
     /********************************/
     /*********calculate flat core tensor core = a1_flat*kron(u2,u3)*/
     /********************************/
-    Matrix::kron(U_id,U_ex,K);
+    K = Matrix::kron(U_id,U_ex);
     Matrix::matrix_mult(a_flat,K,core);
 
     /**** test
-    at = new long double*[1];
-    at[0] = new long double[n];
+    at = new double*[1];
+    at[0] = new double[n];
 
-    v = new long double*[n];
+    v = new double*[n];
     for(i=0;i<n;i++)
-        v[i] = new long double[1];
+        v[i] = new double[1];
 
     for(i=0;i<n;i++)
         at[0][i] = K[5][i];
@@ -236,9 +249,9 @@ void FaceModel::compute_core_tensor(void)
 
     matrix_transpose(at,v,1,n);
     delete[] at;
-    at = new long double*[m];
+    at = new double*[m];
     for(i=0;i<m;i++)
-        at[i] = new long double[1];
+        at[i] = new double[1];
 
     matrix_mult(core,v,at,m,n,1);
     ***/
@@ -310,7 +323,7 @@ bool FaceModel::load()
     return true;
 }
 
-void FaceModel::read_flat(long double **a, int m, int n,
+void FaceModel::read_flat(double **a, int m, int n,
                           const int first_dim, const int second_dim, Mode_space_t flag)
 {
     FILE *fid;
@@ -340,7 +353,7 @@ void FaceModel::read_flat(long double **a, int m, int n,
             fscanf(fid,"%s",str_dont_care);
 
             for(k=0;k<n;k++)
-                fscanf(fid,"%Lf",&a[i][j*n+k]);
+                fscanf(fid,"%lf",&a[i][j*n+k]);
 
             fclose(fid);
         }
@@ -348,7 +361,7 @@ void FaceModel::read_flat(long double **a, int m, int n,
 }
 
 
-void FaceModel::read_flat_vertex(long double **a, int m, int n,
+void FaceModel::read_flat_vertex(double **a, int m, int n,
                                  const int first_dim, const int second_dim, Mode_space_t flag)
 {
     FILE *fid;
@@ -376,7 +389,7 @@ void FaceModel::read_flat_vertex(long double **a, int m, int n,
             fscanf(fid,"%s",str_dont_care);
 
             for(k=0;k<n;k++)
-                fscanf(fid,"%Lf",&a[k][i*second_dim+j]);
+                fscanf(fid,"%lf",&a[k][i*second_dim+j]);
 
             fclose(fid);
         }

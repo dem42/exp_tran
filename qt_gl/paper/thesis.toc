@@ -6,4 +6,5 @@
 \contentsline {section}{\numberline {2.1}Model-based object recognition}{11}{section.2.1}
 \contentsline {subsection}{\numberline {2.1.1}Shape Model}{11}{subsection.2.1.1}
 \contentsline {subsection}{\numberline {2.1.2}PCA and Eigenfaces}{11}{subsection.2.1.2}
-\contentsline {section}{\numberline {2.2}Model-based tracking}{12}{section.2.2}
+\contentsline {section}{\numberline {2.2}Model-based tracking}{13}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Nelder Mead Downhill Simplex}{13}{subsection.2.2.1}

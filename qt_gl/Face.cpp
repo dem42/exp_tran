@@ -71,9 +71,9 @@ Color3 Face::interpolate_color(Color3 a,Color3 b,Color3 c,Color3 d,float r,float
 
 //standard interpolate where w_id and w_exp are multiplied with
 //the singular value matricies U2 and U3
-void Face::interpolate(long double *w_id,long double *w_exp,bool brute)
+void Face::interpolate(double *w_id,double *w_exp,bool brute)
 {
-    long double sum = 0;
+    double sum = 0;
     for(int i=0;i<7;i++)
     {
         cout << "w_exp["<<i<<"] = " << w_exp[i] << endl;
@@ -90,17 +90,17 @@ void Face::interpolate(long double *w_id,long double *w_exp,bool brute)
 
     sum = 0;
 
-    for(int i=0;i<56;i++)
-    {
-        sum += w_id[i];
-    }
-    std::cerr << sum <<  " the sum" << std::endl;
-
-    if(sum == 0)
-       w_id[28] = 1;
-    else
-        for(int i=0;i<56;i++)
-            w_id[i] = w_id[i]/sum;
+//    for(int i=0;i<56;i++)
+//    {
+//        sum += w_id[i];
+//    }
+//    std::cerr << sum <<  " the sum" << std::endl;
+//
+//    if(sum == 0)
+//       w_id[28] = 1;
+//    else
+//        for(int i=0;i<56;i++)
+//            w_id[i] = w_id[i]/sum;
 
     model->interpolate_expression(vertexes,w_id,w_exp,brute);
     //now recalculate the vertex normals for the newly interpolated face
@@ -150,6 +150,11 @@ Point3 Face::getPointFromPolygon(int index)
 {
     int p_index = triangles[index][0];
     return vertexes[p_index];
+}
+
+int Face::getPointIndexFromPolygon(int index)
+{
+    return triangles[index][0];
 }
 
 void Face::setColor(int index)

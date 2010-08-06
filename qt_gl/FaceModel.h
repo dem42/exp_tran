@@ -14,11 +14,15 @@ class FaceModel
 
     enum Mode_space_t {IDENTITY, EXPRESSION, VERTEX};
 
-    void read_flat_vertex(long double **a, int m, int n,
+    void read_flat_vertex(double **a, int m, int n,
                            const int first_dim, const int second_dim, Mode_space_t flag);
-    void read_flat(long double **a, int m, int n,
+    void read_flat(double **a, int m, int n,
                            const int first_dim, const int second_dim, Mode_space_t flag);
-    void interpolate_expression(Point3 *face,long double *w_id,long double *w_ex,bool brute);
+    void interpolate_expression(Point3 *face,double *w_id,double *w_ex,bool brute);
+
+    Matrix getCoreTensor() const;
+    Matrix getUIdentity() const;
+    Matrix getUExpression() const;
  protected:
     FaceModel(std::string filename,std::string dir,std::string db_list,int f,int e,int v);
     ~FaceModel();

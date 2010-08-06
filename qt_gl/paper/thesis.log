@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  3 AUG 2010 13:18
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  4 AUG 2010 22:04
 entering extended mode
  %&-line parsing enabled.
 **thesis.tex
@@ -440,34 +440,67 @@ File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
 Chapter 1.
 [9] [10]
 Chapter 2.
-<images/eigenfaces_comb_from_nn_vienna.png, id=104, 770.88pt x 362.85562pt>
+<images/eigenfaces_comb_from_nn_vienna.png, id=109, 770.88pt x 362.85562pt>
 File: images/eigenfaces_comb_from_nn_vienna.png Graphic file (type png)
 
 <use images/eigenfaces_comb_from_nn_vienna.png> [11
 
-] (./thesis.bbl [12 <./images/eigenfaces_comb_from_nn_vienna.png (PNG copy)>]) 
-[13
+]
+Underfull \vbox (badness 10000) has occurred while \output is active []
 
-] (./thesis.aux) ) 
+ [12 <./images/eigenfaces_comb_from_nn_vienna.png (PNG copy)>]
+Underfull \hbox (badness 10000) in paragraph at lines 271--279
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 286--295
+
+ []
+
+[13]
+Underfull \hbox (badness 10000) in paragraph at lines 296--305
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 319--323
+
+ []
+
+<images/amoeba.png, id=145, 602.25pt x 602.25pt>
+File: images/amoeba.png Graphic file (type png)
+ <use images/amoeba.png>
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [14]
+(./thesis.bbl [15 <./images/amoeba.png>] [16
+
+]) [17] (./thesis.aux) ) 
 Here is how much of TeX's memory you used:
- 5730 strings out of 95086
- 81065 string characters out of 1183256
- 137210 words of memory out of 1500000
- 8778 multiletter control sequences out of 10000+50000
- 13973 words of font info for 53 fonts, out of 1200000 for 2000
+ 5757 strings out of 95086
+ 81423 string characters out of 1183256
+ 138271 words of memory out of 1500000
+ 8788 multiletter control sequences out of 10000+50000
+ 14274 words of font info for 54 fonts, out of 1200000 for 2000
  28 hyphenation exceptions out of 8191
- 27i,11n,43p,244b,371s stack positions out of 5000i,500n,6000p,200000b,5000s
- </home/martin/.texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm109
-5.600pk></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmbx10.pfb></usr/share
-/texmf-texlive/fonts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf-texlive/font
-s/type1/bluesky/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/
-cmr10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr12.pfb></usr/shar
-e/texmf-texlive/fonts/type1/bluesky/cm/cmr17.pfb></usr/share/texmf-texlive/font
-s/type1/bluesky/cm/cmsl10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/
-cmti10.pfb>
-Output written on thesis.pdf (13 pages, 181848 bytes).
+ 27i,12n,43p,244b,371s stack positions out of 5000i,500n,6000p,200000b,5000s
+ </home/martin/.texmf-var/fonts/pk/ljfour/jknappen/ec/t
+crm1095.600pk></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmbx10.pfb></usr
+/share/texmf-texlive/fonts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf-texliv
+e/fonts/type1/bluesky/cm/cmcsc10.pfb></usr/share/texmf-texlive/fonts/type1/blue
+sky/cm/cmex10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmmi10.pfb><
+/usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmmi8.pfb></usr/share/texmf-tex
+live/fonts/type1/bluesky/cm/cmr10.pfb></usr/share/texmf-texlive/fonts/type1/blu
+esky/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr17.pfb></
+usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr8.pfb></usr/share/texmf-texli
+ve/fonts/type1/bluesky/cm/cmsl10.pfb></usr/share/texmf-texlive/fonts/type1/blue
+sky/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmsy8.pfb></
+usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmti10.pfb></usr/share/texmf-tex
+live/fonts/type1/bluesky/ams/msbm10.pfb>
+Output written on thesis.pdf (17 pages, 293694 bytes).
 PDF statistics:
- 166 PDF objects out of 1000 (max. 8388607)
- 29 named destinations out of 1000 (max. 131072)
- 94 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 241 PDF objects out of 1000 (max. 8388607)
+ 44 named destinations out of 1000 (max. 131072)
+ 107 words of extra memory for PDF output out of 10000 (max. 10000000)
 

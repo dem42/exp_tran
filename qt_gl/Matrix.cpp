@@ -8,9 +8,9 @@ Matrix::Matrix(int m,int n) : m(m), n(n)
 {
     try
     {        
-        mat = new long double*[m];
+        mat = new double*[m];
         for(int i=0;i<m;i++)
-             mat[i] = new long double[n];
+             mat[i] = new double[n];
 
     }catch(std::bad_alloc& a)
     {
@@ -22,18 +22,68 @@ Matrix::Matrix(int m,int n) : m(m), n(n)
             mat[i][j] = 0.0;
 
 }
+//not possible to delegate constructors (chain) in c++
+Matrix::Matrix()
+{
+}
+
+Matrix::Matrix(std::vector<double> &in)
+{
+    m = 1;
+    n = in.size();
+    mat = new double*[1];
+    mat[0] = new double[in.size()];
+    for(unsigned int i=0;i<in.size();i++)
+    {        
+        mat[0][i] = in[i];
+    }
+}
+
+
+Matrix::Matrix(Matrix &matrix)
+{    
+    m = matrix.getM();
+    n = matrix.getN();
+
+
+    mat = new double*[matrix.getM()];
+    for(int i=0;i<matrix.getM(); ++i)
+    {
+        mat[i] = new double[matrix.getN()];
+        for(int j=0;j<matrix.getN(); ++j)
+        {
+            mat[i][j] = matrix.mat[i][j];
+        }
+    }
+}
+
+Matrix::Matrix(const Matrix &matrix)
+{    
+    m = matrix.getM();
+    n = matrix.getN();
+
+    mat = new double*[matrix.getM()];
+    for(int i=0;i<matrix.getM(); ++i)
+    {
+        mat[i] = new double[matrix.getN()];
+        for(int j=0;j<matrix.getN(); ++j)
+        {
+            mat[i][j] = matrix.mat[i][j];
+        }
+    }
+}
 
 Matrix::~Matrix()
 {
     delete[] mat;
 }
 
-long double Matrix::getElem(int i,int j) const
+double Matrix::getElem(int i,int j) const
 {    
     return mat[i][j];
 }
 
-void Matrix::setElem(int i,int j,long double elem)
+void Matrix::setElem(int i,int j,double elem)
 {
     mat[i][j] = elem;
 }
@@ -49,15 +99,15 @@ inline int Matrix::getN() const
 }
 
 //static is only in the declaration
-int Matrix::svd(int m,int n,int withu,int withv,long double eps,long double tol,
-        long double **a,long double *q,long double **u,long double **v)
+int Matrix::svd(int m,int n,int withu,int withv,double eps,double tol,
+        double **a,double *q,double **u,double **v)
 {
         int i,j,k,l,l1,iter,retval;
-        long double c,f,g,h,s,x,y,z;
-        long double *e;
+        double c,f,g,h,s,x,y,z;
+        double *e;
         i = j = k = l = l1 = iter = retval = 0;
-        //e = calloc(n,sizeof(long double));
-        e = new long double[n];
+        //e = calloc(n,sizeof(double));
+        e = new double[n];
         if(e == NULL)fprintf(stderr,"error callocing e");
 
         retval = 0;
@@ -283,8 +333,10 @@ convergence:
 
 /*nothing better than a tasty kronecker (product) to wash down the singular value matrices*/
 /* c (m*p x n*q) = a (mxn) * b(pxq)*/
-void Matrix::kron(const Matrix &a,const Matrix &b, Matrix &c)
+Matrix Matrix::kron(const Matrix &a,const Matrix &b)
 {
+        Matrix c(a.getM()*b.getM(),a.getN()*b.getN());
+
         int i,j,k,l;
         int m,n,p,q;
         m = a.getM();
@@ -297,6 +349,7 @@ void Matrix::kron(const Matrix &a,const Matrix &b, Matrix &c)
                         for(k=0;k<p;k++)
                                 for(l=0;l<q;l++)
                                         c.mat[i*p+k][j*q+l] = a.mat[i][j]*b.mat[k][l];
+        return c;
 }
 
 //mult c (mxr) = a (mxn) * b (nxr)
@@ -327,36 +380,65 @@ void Matrix::scalar_mult(double scalar)
                         mat[i][j] = scalar*mat[i][j];
 }
 
+Matrix Matrix::submatrix(int rowstart, int rowend) const
+{
+    //from rowstart to rowend including the row with index rowend
+    int size = rowend - rowstart + 1;
+    Matrix sub(size,getN());
+    for(int i=0, ri = rowstart; i<size; ++i, ++ri)
+        for(int j=0; j<getN(); ++j)
+            sub[i][j] = mat[ri][j];
+    return sub;
+}
+
 /*********************************/
 /* overloaded operators */
 /*********************************/
 
-inline long double & Matrix::Row::operator[](int col)
+Matrix& Matrix::operator=(const Matrix& matrix)
+{
+    std::cout << "assignment" << std::endl;
+    m = matrix.getM();
+    n = matrix.getN();
+
+    mat = new double*[matrix.getM()];
+    for(int i=0;i<matrix.getM(); ++i)
+    {
+        mat[i] = new double[matrix.getN()];
+        for(int j=0;j<matrix.getN(); ++j)
+        {
+            mat[i][j] = matrix.mat[i][j];
+        }
+    }
+    return *this;
+}
+
+double & Matrix::Row::operator[](int col)
 {
    return parent_matrix(row,col);
 }
-inline long double & Matrix::ConstRow::operator[](int col)
+double & Matrix::ConstRow::operator[](int col)
 {
    return parent_matrix(row,col);
 }
 //we had a problem calling the first [] on a const Matrix
 //it said passing qualifiers discards constness so we added
 //a version which passes a const this (by overloading the const operator)
-inline Matrix::ConstRow Matrix::operator[](int row) const
+Matrix::ConstRow Matrix::operator[](int row) const
 {
     return Matrix::ConstRow(*this,row);
 }
 //the above also required const overloading :
-inline Matrix::Row Matrix::operator[](int row)
+Matrix::Row Matrix::operator[](int row)
 {
     return Matrix::Row(*this,row);
 }
 
-inline long double & Matrix::operator()(int row, int col)
+double & Matrix::operator()(int row, int col)
 {
     return mat[row][col];
 }
-inline long double & Matrix::operator()(int row, int col) const
+double & Matrix::operator()(int row, int col) const
 {
     return mat[row][col];
 }
@@ -412,12 +494,14 @@ void Matrix::test(void)
 
         std::cout << "now Kronecker product" << std::endl;
 
-        Matrix::kron(A,B,K);
+        K = Matrix::kron(A,B);
+
+        std::cout << "product calced " << K.getM() << " " << K.getN()  << std::endl;
 
         for(i=0;i<2*3;i++)
                 {
                         for(j=0;j<3*2;j++)
-                                std::cout << K[i][j] << " ";
+                                std::cout << K.mat[i][j] << " ";
                         std::cout << std::endl;
                 }
 }

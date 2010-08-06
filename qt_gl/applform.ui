@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>949</width>
-    <height>810</height>
+    <width>1129</width>
+    <height>705</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -22,8 +22,8 @@
      <rect>
       <x>10</x>
       <y>20</y>
-      <width>931</width>
-      <height>741</height>
+      <width>1111</width>
+      <height>731</height>
      </rect>
     </property>
     <property name="currentIndex">
@@ -172,8 +172,8 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>441</width>
-        <height>641</height>
+        <width>621</width>
+        <height>541</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_3"/>
@@ -181,10 +181,10 @@
      <widget class="QWidget" name="verticalLayoutWidget_4">
       <property name="geometry">
        <rect>
-        <x>460</x>
+        <x>640</x>
         <y>10</y>
         <width>461</width>
-        <height>641</height>
+        <height>541</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_4">
@@ -196,8 +196,8 @@
      <widget class="QWidget" name="horizontalLayoutWidget">
       <property name="geometry">
        <rect>
-        <x>20</x>
-        <y>660</y>
+        <x>70</x>
+        <y>560</y>
         <width>381</width>
         <height>31</height>
        </rect>
@@ -213,6 +213,19 @@
          </property>
          <property name="text">
           <string>play</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pauseButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>pause</string>
          </property>
         </widget>
        </item>
@@ -234,13 +247,26 @@
      <widget class="QWidget" name="horizontalLayoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>460</x>
-        <y>660</y>
-        <width>461</width>
+        <x>620</x>
+        <y>560</y>
+        <width>476</width>
         <height>31</height>
        </rect>
       </property>
       <layout class="QHBoxLayout" name="horizontalLayout_2">
+       <item>
+        <widget class="QPushButton" name="modelButton">
+         <property name="sizePolicy">
+          <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+           <horstretch>0</horstretch>
+           <verstretch>0</verstretch>
+          </sizepolicy>
+         </property>
+         <property name="text">
+          <string>model start</string>
+         </property>
+        </widget>
+       </item>
        <item>
         <widget class="QPushButton" name="restartButton">
          <property name="sizePolicy">
@@ -303,7 +329,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>949</width>
+     <width>1129</width>
      <height>27</height>
     </rect>
    </property>

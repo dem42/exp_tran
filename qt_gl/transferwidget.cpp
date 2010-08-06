@@ -11,6 +11,11 @@
 #include <cmath>
 #include <ctime>
 
+#include "errorfunction.h"
+#include "modelimageerror.h"
+#include "rosenerror.h"
+#include "mysimplex.h"
+
 using namespace cv;
 using namespace std;
 
@@ -112,6 +117,11 @@ ClickableQLabel* TransferWidget::getFlowLabel() const
 void TransferWidget::calcIntrinsicParams()
 {    
     Mat img = imread("../../chessboard.jpg");
+
+    cout << " CALIBRATE SIZE" << endl;
+    cout << img.size().height << " " << img.size().width << endl;
+
+
     vector<Point2f> corners;
     //the size here is very important .. it cannot be a subset
     //of the inner corners in the image but the max number in there
@@ -228,8 +238,8 @@ void TransferWidget::processVideo()
     /*estimate model parameters + pose*/
     /**********************/    
     //make a face guess
-    long double *w_id = new long double[56];
-    long double *w_exp = new long double[7];
+    double *w_id = new double[56];
+    double *w_exp = new double[7];
     Face *face_ptr = new Face();
 
     for(int i=0;i<56;i++)
@@ -277,13 +287,14 @@ void TransferWidget::processVideo()
     double low = 0;
     double high = face_ptr->getPolyNum();
     vector<Point2f> imagePoints;
+
     vector<int> indices;
+    vector<vector<int> >point_indices_for_frame;
+    vector<int> point_indices;
     Point3f p;    
     Mat_<double> point3dMat(3,1);
     Mat_<double> point2dMat(3,1);
 
-    double m[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}};
-    Mat_<double> camera = Mat(3,3,CV_64F,m);
 
     double l[1][5] = {{-0.0865513, 0.197476, 0.00430749, 0.0072667, -0.114125}};
     Mat lens(1,5,CV_64F,l);
@@ -293,12 +304,22 @@ void TransferWidget::processVideo()
 
     vector<Point3f> objectPoints;
 
+    double m[2][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076}};
+    Mat camera(2,3,CV_64F,m);
+
+//
+//    double m[3][3] = {{1, 0, 337.789},{0, 1, 299.076}};
+//    Mat_<double> camera = Mat(2,3,CV_64F,m);
+
+
     //using the transformations generate a 1000 new points on the 2d image
     for(unsigned int j=0; j<frameTranslation.size(); j++)
     {
         cout << "frame : " << j << endl;
         imagePoints.clear();
         objectPoints.clear();
+        point_indices.clear();
+
 
         for(int i=0;i<fPoints_size;i++)
         {
@@ -311,6 +332,7 @@ void TransferWidget::processVideo()
             cout << "is random: " << random << endl;
             indices.push_back(random);
             p = face_ptr->getPointFromPolygon(fPoints[i]);
+            point_indices.push_back(face_ptr->getPointIndexFromPolygon(fPoints[i]));
 
             point3dMat(0,0) = p.x;
             point3dMat(1,0) = p.y;
@@ -325,9 +347,9 @@ void TransferWidget::processVideo()
 
             point2dMat = camera*((rmatrix * point3dMat) + transpose);
 
-//            //homogenous coord
-            point2dMat(0,0) /= point2dMat(2,0);
-            point2dMat(1,0) /= point2dMat(2,0);
+////            //homogenous coord
+//            point2dMat(0,0) /= point2dMat(2,0);
+//            point2dMat(1,0) /= point2dMat(2,0);
 
             //objectPoints.push_back(Point3f(p.x,p.y,p.z+1500.0));
 
@@ -335,6 +357,7 @@ void TransferWidget::processVideo()
         }
         //projectPoints(Mat(objectPoints),frameRotation[j],frameTranslation[j],camera,lens,imagePoints);
 
+        point_indices_for_frame.push_back(point_indices);
         generatedPoints.push_back(imagePoints);
     }
 
@@ -344,7 +367,49 @@ void TransferWidget::processVideo()
     /* calculate how to change shape */
     /***********************/
 
+    cout << "TESTING MYSIMPLEX (nelder mead impl) with ROSEN function" << endl;
+    RosenError rosen;
 
+    double start_array[] = {-1.2,1.0}; //,2.3,-1.3};
+    vector<double> start;
+    double min;
+    int i;
+    int size_t = sizeof(start_array) / sizeof(double);
+
+    start.assign(start_array, start_array + size_t);
+    min = rosen(start);
+    cout << "min before simplex : " << min << endl;
+
+    min=mysimplex(rosen,start,start.size(),1);
+    //min=mysimplex(rosen,start,start.size(),0.55);
+    cout <<  "min after simplex : " << min << endl;
+
+
+    for (i=0;i<2;i++) {
+        printf("%f\n",start[i]);
+    }
+    min = rosen(start);
+    cout << min << endl;
+
+    ModelImageError error;
+    vector<double> weights_id;
+    vector<double> weights_ex;
+    weights_id.assign(w_id,w_id+56);
+    weights_ex.assign(w_exp,w_exp+7);
+//sizeof(w_exp)/sizeof(double)
+
+    //TODO smaller coz its too slow
+//    for(unsigned int i=0; i<1; i++)
+//    {
+//        Rodrigues(frameRotation[i],rmatrix);
+//        error = ModelImageError(camera,rmatrix,frameTranslation[i]);
+//        error.setWeights(weights_id);
+//        error.setPoints(featurePoints[i]);
+//        error.setPointIndices(point_indices_for_frame[i]);
+//
+//        min=mysimplex(error,weights_ex,weights_ex.size(),1);
+//
+//    }
 
     timerReplay = new QTimer(this);
     connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
@@ -462,8 +527,8 @@ void TransferWidget::startFaceTransfer()
 
 
     //face guess
-    long double *w_id = new long double[56];
-    long double *w_exp = new long double[7];
+    double *w_id = new double[56];
+    double *w_exp = new double[7];
     Face *face_ptr = new Face();
 
     for(int i=0;i<56;i++)
@@ -593,6 +658,18 @@ void TransferWidget::startFaceTransfer()
     vector<Point2f> output;
     projectPoints(Mat(objectPoints),rvec,tvec,cameraMatrix,lensDist,output);
 
+    Mat frame = frames[frames.size()-1];
+
+    cout << "FOCAL LENGTH : " <<  frame.size().height << " "
+         <<  frame.size().width << endl;
+
+//
+//    cout << "FOCAL LENGTH : " <<  cameraMatrix.at<double>(0,0)*frame.size().height << " "
+//         <<  cameraMatrix.at<double>(1,1)*frame.size().width << endl;
+
+//    cout << "FOCAL LENGTH : " <<  cameraMatrix.at<double>(0,0) << " "
+//         <<  cameraMatrix.at<double>(1,1) << endl;
+
     cout << "reprojection" << endl;
     vector<Point2f>::iterator iter = output.begin(), iter_end = output.end();
     for(;iter!=iter_end;++iter)
@@ -651,22 +728,41 @@ void TransferWidget::startFaceTransfer()
     cout << endl;
 
     Point3f p;
-    Mat_<double> point3dMat(4,1);
+    Mat_<double> point3dMat(3,1);
     Mat_<double> point2dMat(3,1);
     vector<Point2f> points;
+
+    double mat[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0,0,1}};
+    cameraMatrix = Mat(3,3,CV_64F,mat);
+    Mat_<double> translation = tvec;
+
+    cout << "TRANS : " << tvec.at<double>(0,1) << " " << tvec.at<double>(1,0) << endl;
+
+    double scale = 2;
+
     for(int i=0; i<fPoints_size; i++)
     {
         p = face_ptr->getPointFromPolygon(fPoints[i]);
         point3dMat(0,0) = p.x;
         point3dMat(1,0) = p.y;
         point3dMat(2,0) = p.z+1500.0;
-        point3dMat(3,0) = 1;
 
-        point2dMat = res * point3dMat;
+        point2dMat = cameraMatrix * ((rmatrix * point3dMat));
+        point2dMat = scale*point2dMat;
+        point2dMat = point2dMat + cameraMatrix*translation;
+
+        //translation = cameraMatrix*tvec;
+//        //homogenous coord
+//        translation = (1/translation.at<double>(2,0)) * translation;
 
         //homogenous coord
         point2dMat(0,0) /= point2dMat(2,0);
         point2dMat(1,0) /= point2dMat(2,0);
+
+        //point2dMat = point2dMat + translation;
+
+        cout << "2d: " << point2dMat(0,0) << " " << point2dMat(1,0) << endl;
+
         //objectPoints.push_back(Point3f(p.x,p.y,p.z));
 
         points.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));

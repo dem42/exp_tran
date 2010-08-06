@@ -15,11 +15,12 @@ class Face
   Color3 interpolate_color(Color3 a,Color3 b,Color3 c,Color3 d,float r,float s);
   Face();
   ~Face();
-  void interpolate(long double *w_id,long double *w_exp,bool brute=false);  
+  void interpolate(double *w_id,double *w_exp,bool brute=false);
   void setWireFrame(bool);
 
   int getPolyNum() const;
   Point3 getPointFromPolygon(int);
+  int getPointIndexFromPolygon(int);
 
   void setColor(int index);
   //draw should probably not happen here instead allow the user to iterate over the face i think  

@@ -1,9 +1,22 @@
 \begin{thebibliography}{1}
 
+\bibitem{Press1992}
+W.H. Press, S.A. Teukolsky, W.T. Vetterlin, and B.P. Flannery.
+\newblock {\em Numerical Recepies in C: The Art of Scientific Computing 2nd
+  Edition}.
+\newblock Cambridge University Press, 1992.
+
 \bibitem{vienna}
 M.~Reiter.
 \newblock Neural computation ws 2006/2007 lecture notes.
 \newblock {\em Vienna University of Technology}, 2006.
+
+\bibitem{Nelder2009}
+J.~Nelder S.~Singer.
+\newblock Nelder-\textsc{M}ead algorithm.
+\newblock 2009.
+\newblock
+  [http://www.scholar-\linebreak[1]pedia.org/article/Nelder-Mead\_algorithm].
 
 \bibitem{eigenfaces91}
 M.~Turk and A.~Pentland.

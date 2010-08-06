@@ -71,8 +71,8 @@ private:
 
   QString face_filename;
   std::map<QString,ExprType> expr_map;
-  long double *w_exp;
-  long double *w_id;
+  double *w_exp;
+  double *w_id;
   MyMainWindow *window;
   int current_expr;
   int current_ident;

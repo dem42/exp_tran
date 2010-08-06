@@ -28,8 +28,8 @@ FaceWidget::FaceWidget(MyMainWindow *win, QGLWidget *parent) : QGLWidget(parent)
 
   //initialize weight vectors
   int i=0;
-  w_id = new long double[56];
-  w_exp = new long double[7];
+  w_id = new double[56];
+  w_exp = new double[7];
 
   for(i=0;i<56;i++)
   {
@@ -45,6 +45,7 @@ FaceWidget::FaceWidget(MyMainWindow *win, QGLWidget *parent) : QGLWidget(parent)
   w_exp[4] = 0.0;
   w_exp[5] = 0.8;
   w_exp[6] = 0.0;
+
 
   face_ptr->interpolate(w_id,w_exp);
 
@@ -196,8 +197,8 @@ void FaceWidget::paintGL(void)
 
   //move the objects by:
   glTranslatef(trans_x,trans_y,trans_z);
-  //gluLookAt(0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-  glTranslatef(0,0,-1000);
+  gluLookAt(0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+  glTranslatef(0,0,500);
 
   //rotate around norm(r) and r which is the rotation vector
   //glRotatef(145.89, 0.64663, 1.10562, 2.20011);
