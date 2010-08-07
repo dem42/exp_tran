@@ -25,6 +25,7 @@ Matrix::Matrix(int m,int n) : m(m), n(n)
 //not possible to delegate constructors (chain) in c++
 Matrix::Matrix()
 {
+    mat = NULL;
 }
 
 Matrix::Matrix(std::vector<double> &in)
@@ -75,7 +76,8 @@ Matrix::Matrix(const Matrix &matrix)
 
 Matrix::~Matrix()
 {
-    delete[] mat;
+    if(mat != NULL)
+        delete[] mat;    
 }
 
 double Matrix::getElem(int i,int j) const
@@ -353,15 +355,16 @@ Matrix Matrix::kron(const Matrix &a,const Matrix &b)
 }
 
 //mult c (mxr) = a (mxn) * b (nxr)
-void Matrix::matrix_mult(const Matrix &a,const Matrix &b, Matrix &c)
+Matrix Matrix::matrix_mult(const Matrix &a,const Matrix &b)
 {
+        Matrix c(a.getM(),b.getN());
         int i,j,k;        
         for(i=0;i<a.getM();i++)
                 for(k=0;k<b.getM();k++)
                         for(j=0;j<b.getN();j++)
                                 c.mat[i][j] += a.mat[i][k]*b.mat[k][j];
-
-}
+        return c;
+ }
 
 void Matrix::transpose(Matrix &mt)
 {
@@ -443,6 +446,16 @@ double & Matrix::operator()(int row, int col) const
     return mat[row][col];
 }
 
+std::ostream& operator<<(std::ostream& stream, const Matrix &matrix)
+{
+    for(int i=0;i<matrix.m;i++)
+    {
+        for(int j=0;j<matrix.n;j++)
+            stream << matrix.mat[i][j] << " ";
+        stream << std::endl;
+    }
+    return stream;
+}
 
 void Matrix::test(void)
 {
@@ -472,7 +485,7 @@ void Matrix::test(void)
 
         std::cout << A.mat[1][0] << std::endl;
 
-        Matrix::matrix_mult(A,B,C);
+        C = Matrix::matrix_mult(A,B);
 
         for(i=0;i<3;i++)
                 {
@@ -504,4 +517,7 @@ void Matrix::test(void)
                                 std::cout << K.mat[i][j] << " ";
                         std::cout << std::endl;
                 }
+
+        Matrix sub = K.submatrix(2,4);
+        std::cout << "Submatix of K rows 2 to 4 is : \n" << sub;
 }

@@ -6,10 +6,6 @@
 #include "Face.h"
 #include "FaceModel.h"
 #include <QColor>
-#include <QGLWidget>
-
-//not too happy about having glut here too :(
-#include <GL/glut.h>
 
 using namespace std;
 
@@ -30,7 +26,6 @@ Face::Face()
     //this happens in the load method which also allocates the vertexes array
     load("/home/martin/project/JaceyBinghamtonVTKFiles/M0014_HA01WH.vtk","../face.ppm");
 
-    gl_display_style = GL_POLYGON;
 }
 
 Face::~Face()
@@ -107,40 +102,6 @@ void Face::interpolate(double *w_id,double *w_exp,bool brute)
     generate_vertex_normals();
 }
 
-
-
-void Face::draw()
-{
-    static const GLfloat P1[3] = { -10.0, -11.0, -8.0 };
-    static const GLfloat P2[3] = { -9.17, -11.0, -11.0 };
-    static const GLfloat P3[3] = { -11.73205081, -1.0, -1.0 };
-    static const GLfloat P4[3] = { -10.0, -8.0, -10.0 };
-
-    static const GLfloat * const coords[4][3] = {
-        { P1, P2, P3 }, { P1, P3, P4 }, { P1, P4, P2 }, { P2, P4, P3 }
-    };
-
-
-    for (int i = 0; i < 4; ++i) {
-        glLoadName(i);
-        glBegin(GL_TRIANGLES);
-        //qglColor(faceColors[i]);
-        for (int j = 0; j < 3; ++j) {
-            glVertex3f(coords[i][j][0], coords[i][j][1],
-                       coords[i][j][2]);
-        }
-        glEnd();
-    }
-}
-
-void Face::setWireFrame(bool on)
-{
-    if(on == true)
-        gl_display_style = GL_LINE_LOOP;
-    else
-        gl_display_style = GL_POLYGON;
-}
-
 //right now we are merely selecting the first point in the polygon
 //perhaps it would be better to average?
 //on one hand we perhaps want points we can generate .. from the model
@@ -155,11 +116,6 @@ Point3 Face::getPointFromPolygon(int index)
 int Face::getPointIndexFromPolygon(int index)
 {
     return triangles[index][0];
-}
-
-void Face::setColor(int index)
-{
-    this->index = index;
 }
 
 void Face::calculateBoundingSphere() const
@@ -210,57 +166,6 @@ void Face::calculateBoundingSphere() const
     std::cout << bx_u <<" " << bx_d <<" " << by_u <<" " << by_d <<" " << bz_u <<" " << bz_d << std::endl;
     std::cout << "bounding sphere" << std::endl;
     std::cout <<(bx_u + bx_d)/2.0 << " " << (by_u + by_d)/2.0 << " " << (bz_u+bz_d)/2.0 << std::endl;
-}
-
-void Face::display(void)
-{
-  cout << "in my display with " << poly_num << endl;
-  int v1,v2,v3;
-
-  for(int i=0; i<poly_num; i++)
-    {
-      v1 = triangles[i][0];
-      v2 = triangles[i][1];
-      v3 = triangles[i][2];
-
-      if(i == index)
-      {
-          // enable color tracking
-          glEnable(GL_COLOR_MATERIAL);
-          // set material properties which will be assigned by glColor
-          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-
-          glColor3f(1.0f, 0.0f, 0.0f); // blue reflective properties
-      }
-      else
-      {
-          glEnable(GL_COLOR_MATERIAL);
-          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-          glColor3f(1.0f, 1.0f, 1.0f);
-      }
-      //calls to glLoadName are ignored if we arent in GL_SELECT render mode
-      //its used to tell us what the user clicked on
-      glLoadName(i);
-      glBegin(gl_display_style);
-
-      // glTexCoord2f(vertex_texture[v1],vertex_texture[v1]);
-      //glColor3f(vertex_texture[v1].r,vertex_texture[v1].g,vertex_texture[v1].b);
-      glNormal3f(vertex_normals[v1].x,vertex_normals[v1].y,vertex_normals[v1].z);      
-      glVertex3f(vertexes[v1].x,vertexes[v1].y,vertexes[v1].z+1500.0);
-      
-      //glTexCoord2f(vertex_texture[v2],vertex_texture[v2]);
-      //glColor3f(vertex_texture[v2].r,vertex_texture[v2].g,vertex_texture[v2].b);
-      glNormal3f(vertex_normals[v2].x,vertex_normals[v2].y,vertex_normals[v2].z);
-      glVertex3f(vertexes[v2].x,vertexes[v2].y,vertexes[v2].z+1500.0);
-      
-      //glTexCoord2f(vertex_texture[v3],vertex_texture[v3]);
-      //glColor3f(vertex_texture[v3].r,vertex_texture[v3].g,vertex_texture[v3].b);
-      glNormal3f(vertex_normals[v3].x,vertex_normals[v3].y,vertex_normals[v3].z);
-      glVertex3f(vertexes[v3].x,vertexes[v3].y,vertexes[v3].z+1500.0);
-      glEnd();
-
-    }
-  //glFlush();
 }
 
   

@@ -54,15 +54,18 @@ FaceModel::~FaceModel()
 
 Matrix FaceModel::getCoreTensor() const
 {
+    cout << "core" << endl;
     return core;
 }
 
 Matrix FaceModel::getUIdentity() const
 {
+    cout << "u id" << endl;
     return U_id;
 }
 Matrix FaceModel::getUExpression() const
 {
+    cout << "u exp" << endl;
     return U_ex;
 }
 
@@ -121,8 +124,8 @@ void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bo
     if(brute == false)
     {
         //multiply with u2 and u3
-        Matrix::matrix_mult(m_wid,U_id,row_id);
-        Matrix::matrix_mult(m_wex,U_ex,row_ex);
+        row_id = Matrix::matrix_mult(m_wid,U_id);
+        row_ex = Matrix::matrix_mult(m_wex,U_ex);
     }
     else
     {
@@ -141,7 +144,7 @@ void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bo
     K.transpose(KT);
 
     //core * kron( (w2*u2), (w3*u3) )' = f
-    Matrix::matrix_mult(core,KT,f);
+    f = Matrix::matrix_mult(core,KT);
 
     for(i=0,j=0;i<3*n_v;i=i+3,j++)
     {
@@ -167,7 +170,7 @@ void FaceModel::computeIdentitySingularVectors(int m,int n)
     //more precise
     A.scalar_mult(0.01);
     A.transpose(AT);
-    Matrix::matrix_mult(A,AT,A2);
+    A2 = Matrix::matrix_mult(A,AT);
 
     double *d = new double[n];
 
@@ -188,7 +191,7 @@ void FaceModel::computeExpressionSingularVectors(int m,int n)
 
     A.scalar_mult(0.01);
     A.transpose(AT);
-    Matrix::matrix_mult(A,AT,A2);
+    A2 = Matrix::matrix_mult(A,AT);
 
     double *d = new double[n];
 
@@ -233,7 +236,7 @@ void FaceModel::compute_core_tensor(void)
     /*********calculate flat core tensor core = a1_flat*kron(u2,u3)*/
     /********************************/
     K = Matrix::kron(U_id,U_ex);
-    Matrix::matrix_mult(a_flat,K,core);
+    core = Matrix::matrix_mult(a_flat,K);
 
     /**** test
     at = new double*[1];

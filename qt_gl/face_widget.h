@@ -5,19 +5,15 @@
 #include <QMouseEvent>
 #include <QGLWidget>
 #include "Face.h"
-#include <map>
-#include <QString>
-#include "my_main_window.h"
 
-class MyMainWindow;
+
 
 class FaceWidget : public QGLWidget
 {
     Q_OBJECT
 
 public:
-  FaceWidget(MyMainWindow *win, QGLWidget *parent = 0);
-  enum ExprType { ANGRY=0, DISGUST=1, FEAR=2, HAPPY=3, NEUTRAL=4, SAD=5, SURPRISE=6 };
+  FaceWidget(QGLWidget *parent = 0);  
   void setTransParams(double r_x, double r_y, double r_z, double t_x, double t_y, double t_z);
 
    struct Pose {
@@ -29,11 +25,16 @@ public:
         double trans_z;
     };
 
+   void render();
+   void setFace(Face* face_ptr);
+   void setWireFrame(bool);
+   void setCameraParameters(double cameraZPosition, double cameraDistance);
+
+   void refreshGL();
+
 protected:
   void initializeGL(void);
   void paintGL(void);
-  void paintGL2(void);
-  void paintGL3(void);
 
   void resizeGL(int w, int h);
   void mousePressEvent(QMouseEvent *event);
@@ -41,18 +42,17 @@ protected:
   void mouseDoubleClickEvent(QMouseEvent *event);
 
 public slots:
-   void face_file_changed();
-   void face_file_changed(const QString str);
-   void render_action();
-   void expression_activated(const QString str);
-   void identity_activated(int);
-   void slider_moved(int);
    void wireFrameChecked(bool);
 
 private:
   int selectPoint(const QPoint &pos);
 
   Face *face_ptr;
+  int polygonNumber;
+  int face_index;
+  //whether we display using (line loop)wireframe or polygon (default)
+  int gl_display_style;
+
   QPoint lastPos;
 
   //extrinsic scene parameters
@@ -68,14 +68,11 @@ private:
   float center_x;
   float center_y;
   float center_z;
+  //camera
+  double cameraZPosition;
+  double cameraDistance;
 
   QString face_filename;
-  std::map<QString,ExprType> expr_map;
-  double *w_exp;
-  double *w_id;
-  MyMainWindow *window;
-  int current_expr;
-  int current_ident;
 };
 
 #endif // FACE_WIDGET_H

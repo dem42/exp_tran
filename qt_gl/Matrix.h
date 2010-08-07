@@ -54,7 +54,8 @@ public:
     //kronecker product
     static Matrix kron(const Matrix &a,const Matrix &b);
     //matrix multiplication c = a*b
-    static void matrix_mult(const Matrix &a,const Matrix &b, Matrix &c);
+    //seems to have been faster when we passed a reference back
+    static Matrix matrix_mult(const Matrix &a,const Matrix &b);
     void transpose(Matrix &mt);
     void scalar_mult(double scalar);
 
@@ -74,8 +75,16 @@ public:
     //my matrix format
     operator cv::Mat_<double>() const
     {
-        return cv::Mat(m,n,CV_64F,mat);
+        cv::Mat_<double> result(m,n);
+
+        for(int i=0;i<this->m;i++)
+            for(int j=0;j<this->n;j++)
+                result(i,j) = this->mat[i][j];
+
+        return result;
     }
+
+    friend std::ostream& operator<<(std::ostream& stream, const Matrix &m);
 
     //internal representation of the matrix
     //public to enhance performance of matrix loops

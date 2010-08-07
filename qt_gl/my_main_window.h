@@ -7,23 +7,23 @@
 #include "face_widget.h"
 #include "transferwidget.h"
 
+#include "facetabcontroller.h"
 
-class FaceWidget;
-
-class TransferWidget;
 
 class MyMainWindow : public QMainWindow
 {
     Q_OBJECT
 public:
     MyMainWindow(QMainWindow *window = 0);
-    ~MyMainWindow();
-    void setSlider(int);
+    ~MyMainWindow();    
 
 private:
     Ui::ApplForm ui;
+    //controllers
+    FaceTabController *f_controller;
     //custom widgets
-    FaceWidget *my_widget;
+    FaceWidget *face_widget1;
+    FaceWidget *face_widget2;
     TransferWidget *trans_widget;
     //menu dialogs
     QFileDialog *f_dialog;

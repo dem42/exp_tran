@@ -3,54 +3,22 @@
 #include <QGLFormat>
 #include <QFileDialog>
 
+#include "Vector3.h"
+
 #include "face_widget.h"
 
 #define PI 3.14159265
 
 using namespace std;
 
-FaceWidget::FaceWidget(MyMainWindow *win, QGLWidget *parent) : QGLWidget(parent)
+FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
 {
   cout << "building" << endl;
   setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
 
-  expr_map.insert(std::pair<QString,ExprType>("Angry",ANGRY));
-  expr_map.insert(std::pair<QString,ExprType>("Disgust",DISGUST));
-  expr_map.insert(std::pair<QString,ExprType>("Fear",FEAR));
-  expr_map.insert(std::pair<QString,ExprType>("Happy",HAPPY));
-  expr_map.insert(std::pair<QString,ExprType>("Neutral",NEUTRAL));
-  expr_map.insert(std::pair<QString,ExprType>("Sad",SAD));
-  expr_map.insert(std::pair<QString,ExprType>("Surprise",SURPRISE));
-
-  this->window = win;
-
-  face_ptr = new Face();
-
-  //initialize weight vectors
-  int i=0;
-  w_id = new double[56];
-  w_exp = new double[7];
-
-  for(i=0;i<56;i++)
-  {
-      if(i==33)w_id[i] = 0.2;
-      else if(i==17)w_id[i] = 0.5;
-      else if(i==50)w_id[i] = 0.3;
-      else w_id[i] = 0;
-  }
-  w_exp[0] = 0.0;
-  w_exp[1] = 0.0;
-  w_exp[2] = 0.0;
-  w_exp[3] = 0.2;
-  w_exp[4] = 0.0;
-  w_exp[5] = 0.8;
-  w_exp[6] = 0.0;
-
-
-  face_ptr->interpolate(w_id,w_exp);
-
-  current_expr = 0;
-  current_ident = 33;
+  polygonNumber = 0;
+  face_ptr = NULL;
+  gl_display_style = GL_POLYGON;
 
   //initialize camera parameters
   rot_x = 0;
@@ -68,6 +36,78 @@ FaceWidget::FaceWidget(MyMainWindow *win, QGLWidget *parent) : QGLWidget(parent)
   center_x = -2.8741;
   center_y = 19.915;
   center_z =  1518-1500;
+
+  cameraDistance = -500;
+  cameraZPosition = 1;
+}
+
+void FaceWidget::refreshGL()
+{
+    updateGL();
+}
+
+void FaceWidget::setFace(Face* face_ptr)
+{
+    this->face_ptr = face_ptr;
+    this->polygonNumber = face_ptr->getPolyNum();    
+}
+
+void FaceWidget::render()
+{
+  cout << "in my render Object with poly_num " << polygonNumber << endl;
+  int v1,v2,v3;
+
+  //nothing to render
+  if(face_ptr == NULL)
+      return;
+  
+  Point3 *vertexes = face_ptr->vertexes;
+  Vector3 *vertex_normals = face_ptr->vertex_normals;
+  float (*triangles)[3] = face_ptr->triangles;
+
+  for(int i=0; i<polygonNumber; i++)
+    {
+      v1 = triangles[i][0];
+      v2 = triangles[i][1];
+      v3 = triangles[i][2];
+
+      if(i == face_index)
+      {
+          // enable color tracking
+          glEnable(GL_COLOR_MATERIAL);
+          // set material properties which will be assigned by glColor
+          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+
+          glColor3f(1.0f, 0.0f, 0.0f); // red reflective properties
+      }
+      else
+      {
+          glEnable(GL_COLOR_MATERIAL);
+          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+          glColor3f(0.0f, 0.2f, 0.4f);
+      }
+      //calls to glLoadName are ignored if we arent in GL_SELECT render mode
+      //its used to tell us what the user clicked on
+      glLoadName(i);
+      glBegin(gl_display_style);
+
+      // glTexCoord2f(vertex_texture[v1],vertex_texture[v1]);
+      //glColor3f(vertex_texture[v1].r,vertex_texture[v1].g,vertex_texture[v1].b);
+      glNormal3f(vertex_normals[v1].x,vertex_normals[v1].y,vertex_normals[v1].z);
+      glVertex3f(vertexes[v1].x,vertexes[v1].y,vertexes[v1].z+1500.0);
+
+      //glTexCoord2f(vertex_texture[v2],vertex_texture[v2]);
+      //glColor3f(vertex_texture[v2].r,vertex_texture[v2].g,vertex_texture[v2].b);
+      glNormal3f(vertex_normals[v2].x,vertex_normals[v2].y,vertex_normals[v2].z);
+      glVertex3f(vertexes[v2].x,vertexes[v2].y,vertexes[v2].z+1500.0);
+
+      //glTexCoord2f(vertex_texture[v3],vertex_texture[v3]);
+      //glColor3f(vertex_texture[v3].r,vertex_texture[v3].g,vertex_texture[v3].b);
+      glNormal3f(vertex_normals[v3].x,vertex_normals[v3].y,vertex_normals[v3].z);
+      glVertex3f(vertexes[v3].x,vertexes[v3].y,vertexes[v3].z+1500.0);
+      glEnd();
+
+    }
 }
 
 void FaceWidget::setTransParams(double r_x, double r_y, double r_z, double t_x, double t_y, double t_z)
@@ -80,26 +120,6 @@ void FaceWidget::setTransParams(double r_x, double r_y, double r_z, double t_x, 
     trans_y = t_y;
     trans_z = t_z;
     cout << trans_x << " " << trans_y << " " << trans_z << endl;
-}
-
-void FaceWidget::face_file_changed(const QString str)
-{    
-    cout << str.toStdString() << endl;
-    face_filename = str;
-    face_ptr->load(face_filename.toStdString(),"../face.ppm");
-    updateGL();
-}
-
-void FaceWidget::face_file_changed()
-{
-    cout << "ugh" << endl;
-    face_filename = QFileDialog::getOpenFileName(this,
-                            tr("Select file to open"),
-                            "/home");
-
-    cout << "in face_file_changed with : " << face_filename.toStdString() << endl;
-    //face_filename = filename;
-    updateGL();
 }
 
 void FaceWidget::mousePressEvent(QMouseEvent *event)
@@ -124,22 +144,6 @@ void FaceWidget::mouseMoveEvent(QMouseEvent *event)
 }
 
 
-void FaceWidget::paintGL3()
-{
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    glMatrixMode(GL_MODELVIEW);
-    glLoadIdentity();
-    //glTranslatef(0.0, 0.0, -10.0);
-    gluLookAt(0.0, 0.0, -40.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-
-    glRotatef(rot_x, 1.0, 0.0, 0.0);
-    glRotatef(rot_y, 0.0, 1.0, 0.0);
-
-    face_ptr->draw();
-}
-
-
-
 void FaceWidget::initializeGL(void)
 {
   cout << "initializing" << endl;
@@ -148,7 +152,7 @@ void FaceWidget::initializeGL(void)
 
   //scary lighting
   //GLfloat LightPosition[] =  { 2.8741, -19.915, 1.0, 0.0 };
-  GLfloat LightPosition[] =  { 0.0, 0.0, -1.0, 0.0 };
+  GLfloat LightPosition[] =  { 0.0, 0.0, cameraZPosition, 0.0 };
   GLfloat LightSpecular[] = { 1.0, 1.0, 1.0 };
   GLfloat LightAmbient[] = { 0.0, 0.0, 0.0 };
   GLfloat LightDiffuse[] = { 1.0, 1.0, 1.0 };
@@ -184,6 +188,7 @@ void FaceWidget::paintGL(void)
   glMatrixMode(GL_MODELVIEW);  
   //reload so that transformations dont stack
   glLoadIdentity();
+  gluLookAt(0.0,0.0,cameraZPosition, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   //ok the 4th, 5th and 6th parameter are what im looking at and they should
   //be the center of the sphere bounding my scene
   //2.8741 -19.915 -1518.46
@@ -197,22 +202,27 @@ void FaceWidget::paintGL(void)
 
   //move the objects by:
   glTranslatef(trans_x,trans_y,trans_z);
-  gluLookAt(0.0, 0.0, -1.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-  glTranslatef(0,0,500);
+
+  glTranslatef(0,0,cameraDistance);
 
   //rotate around norm(r) and r which is the rotation vector
   //glRotatef(145.89, 0.64663, 1.10562, 2.20011);
 
   //glTranslatef(center_x, center_y, center_z);
   //does the open gl glBegin(GL_POLYGON) glEnd() stuff
-  face_ptr->display();
+  render();
+}
+
+void FaceWidget::setCameraParameters(double cameraZPosition, double cameraDistance)
+{
+    this->cameraZPosition = cameraZPosition;
+    this->cameraDistance = cameraDistance;
 }
 
 void FaceWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    int face_index = selectPoint(event->pos());
-    cout << "FACE INDEX " << face_index << endl;
-    face_ptr->setColor(face_index);
+    face_index = selectPoint(event->pos());
+    cout << "FACE INDEX " << face_index << endl;    
     updateGL();
 }
 
@@ -239,7 +249,7 @@ int FaceWidget::selectPoint(const QPoint &pos)
     gluPickMatrix(GLdouble(pos.x()), GLdouble(viewport[3] - pos.y()),
                   5.0, 5.0, viewport);
     gluPerspective(60, (GLfloat)width()/(GLfloat)height(), 1.0, 2000.0);
-    face_ptr->display();
+    paintGL();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
 
@@ -248,121 +258,24 @@ int FaceWidget::selectPoint(const QPoint &pos)
     return buffer[3];
 }
 
-void FaceWidget::render_action()
-{    
-    face_ptr->interpolate(w_id,w_exp);
-    updateGL();
-}
 
 void FaceWidget::wireFrameChecked(bool checked)
 {
-    face_ptr->setWireFrame(checked);
+    setWireFrame(checked);
 }
 
-void FaceWidget::identity_activated(int ident)
+void FaceWidget::setWireFrame(bool on)
 {
-    std::cout << "identity activated " << ident << std::endl;
-    /*if(ident == 42){
-        this->setHidden(true);
-        window->adjustSize();
-    }*/
-    w_id[current_ident] = 0;
-    w_id[ident-1] = 1;
-    current_ident = ident-1;
-}
-
-void FaceWidget::expression_activated(const QString str)
-{
-    current_expr = expr_map[str];
-    std::cout << "expression activated " << str.toStdString() << " cur expr is " << current_expr << std::endl;
-    window->setSlider(w_exp[current_expr]*100);
-
-}
-
-void FaceWidget::slider_moved(int val)
-{
-    //std::cout << "slider moved by " << (float)val/100 << std::endl;
-    w_exp[current_expr] = (float)val/100.0;
-    face_ptr->interpolate(w_id,w_exp);
-    updateGL();
-}
-
-void FaceWidget::paintGL2(void)
-{
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  //reload so that transformations dont stack
-  glLoadIdentity();
-  gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-
-  //rotations which will be updated anytime the values of rot_x, rot_y change
-  glRotatef(rot_x, 1.0, 0.0, 0.0);
-  glRotatef(rot_y, 0.0, 1.0, 0.0);
-
-  glBegin(GL_QUADS);
-
-  glVertex3f(-1.0f, -1.0f, 0.0f);
-
-  glVertex3f(1.0f, -1.0f, 0.0f);
-
-  glVertex3f(1.0f, 1.0f, 0.0f);
-
-  glVertex3f(-1.0f, 1.0f, 0.0f);
-
-  glEnd();
-
-
-  qglColor(Qt::blue);
-
-  glBegin(GL_QUADS);
-
-  glVertex3f(-1.0f, -1.0f, 1.0f);
-
-  glVertex3f(1.0f, -1.0f, 1.0f);
-
-  glVertex3f(1.0f, 1.0f, 1.0f);
-
-  glVertex3f(-1.0f, 1.0f, 1.0f);
-
-  glEnd();
-
-  qglColor(Qt::red);
-
-  glBegin(GL_QUADS);
-
-  glVertex3f(-1.0f, 1.0f, -1.0f);
-
-  glVertex3f(1.0f, 1.0f, -1.0f);
-
-  glVertex3f(1.0f, 1.0f, 1.0f);
-
-  glVertex3f(-1.0f, 1.0f, 1.0f);
-
-  glEnd();
-
-  qglColor(Qt::green);
-
-  glBegin(GL_QUADS);
-
-  glVertex3f(-1.0f, -1.0f, -1.0f);
-
-  glVertex3f(1.0f, -1.0f, -1.0f);
-
-  glVertex3f(1.0f, -1.0f, 1.0f);
-
-  glVertex3f(-1.0f, -1.0f, 1.0f);
-
-  glEnd();
-
+    if(on == true)
+        gl_display_style = GL_LINE_LOOP;
+    else
+        gl_display_style = GL_POLYGON;
 }
 
 void FaceWidget::resizeGL(int width, int height)
 {
   cout << "in resize" << endl;
 
-
-//  width = 360;
-//  height = 288;
   //coordinates of 2D plane (the one we're projecting to)
   glViewport(0, 0, (GLsizei)width, (GLsizei)height);
 

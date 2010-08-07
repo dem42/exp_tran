@@ -2,6 +2,7 @@
 #define VECTOR3_H
 
 #include <iostream>
+#include <cv.h>
 
 using namespace std;
 
@@ -10,6 +11,10 @@ struct Point3
 	float x;
 	float y;	
 	float z;
+        operator cv::Point3f() const
+        {
+            return cv::Point3f(x,y,z);
+        }
 };
 
 struct Color3

@@ -18,8 +18,7 @@
 #include <vector>
 #include <string>
 
-class FaceWidget;
-
+//really should be called transfer controller
 class TransferWidget : public QWidget
 {
     Q_OBJECT
@@ -78,6 +77,7 @@ private:
     //optical flow
     OpticalFlowEngine *flowEngine;
     
+    Face *face_ptr;
     FaceWidget *face_widget;
     //static here could be read from an xml config
     static const int fPoints[20];
@@ -92,6 +92,9 @@ private:
     vector<cv::Mat> frameRotation;
     //points used to calculate model parameters
     vector<vector<cv::Point2f> > generatedPoints;
+    //recalculated weights
+    vector<vector<double> >vector_weights_exp;
+    vector<vector<double> >vector_weights_id;
     QTimer *timerReplay;
 };
 

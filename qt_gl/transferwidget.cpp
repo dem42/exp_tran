@@ -44,6 +44,8 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
     picLabel = new FeaturePointQLabel();
     flowLabel = new VectorFieldQLabel();
     this->face_widget = face_widget;
+    this->face_widget->setCameraParameters(-500,1);
+    face_ptr  = new Face();
 
     //video
     media = new Phonon::MediaObject(this);
@@ -304,8 +306,8 @@ void TransferWidget::processVideo()
 
     vector<Point3f> objectPoints;
 
-    double m[2][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076}};
-    Mat camera(2,3,CV_64F,m);
+    double m[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0,0,1}};
+    Mat camera(3,3,CV_64F,m);
 
 //
 //    double m[3][3] = {{1, 0, 337.789},{0, 1, 299.076}};
@@ -328,8 +330,7 @@ void TransferWidget::processVideo()
             //with a param based on rand() from interval 0 to 1
             //with the +1 coz it will never go to 1 .. coz it will never be rand_max
             //U = a + (b-a+1)*rand()/(1+RAND_MAX);
-            random = low + (high - low + 1.0)*rand()/(1.0 + RAND_MAX);
-            cout << "is random: " << random << endl;
+            random = low + (high - low + 1.0)*rand()/(1.0 + RAND_MAX);            
             indices.push_back(random);
             p = face_ptr->getPointFromPolygon(fPoints[i]);
             point_indices.push_back(face_ptr->getPointIndexFromPolygon(fPoints[i]));
@@ -341,15 +342,11 @@ void TransferWidget::processVideo()
             Rodrigues(frameRotation[j],rmatrix);
             transpose = frameTranslation[j];
 
-            cout << rmatrix.size().height << " " << rmatrix.size().width << endl;
-            cout << transpose.size().height << " " << transpose.size().width << endl;
-
-
             point2dMat = camera*((rmatrix * point3dMat) + transpose);
 
-////            //homogenous coord
-//            point2dMat(0,0) /= point2dMat(2,0);
-//            point2dMat(1,0) /= point2dMat(2,0);
+            //homogenous coord
+            point2dMat(0,0) /= point2dMat(2,0);
+            point2dMat(1,0) /= point2dMat(2,0);
 
             //objectPoints.push_back(Point3f(p.x,p.y,p.z+1500.0));
 
@@ -391,7 +388,7 @@ void TransferWidget::processVideo()
     min = rosen(start);
     cout << min << endl;
 
-    ModelImageError error;
+    ModelImageError *error;
     vector<double> weights_id;
     vector<double> weights_ex;
     weights_id.assign(w_id,w_id+56);
@@ -399,25 +396,27 @@ void TransferWidget::processVideo()
 //sizeof(w_exp)/sizeof(double)
 
     //TODO smaller coz its too slow
-//    for(unsigned int i=0; i<1; i++)
-//    {
-//        Rodrigues(frameRotation[i],rmatrix);
-//        error = ModelImageError(camera,rmatrix,frameTranslation[i]);
-//        error.setWeights(weights_id);
-//        error.setPoints(featurePoints[i]);
-//        error.setPointIndices(point_indices_for_frame[i]);
-//
-//        min=mysimplex(error,weights_ex,weights_ex.size(),1);
-//
-//    }
+    for(unsigned int i=0; i<2; i++)
+    {
+        Rodrigues(frameRotation[i],rmatrix);
+        error = new ModelImageError(camera,rmatrix,frameTranslation[i]);
+        error->setWeights(weights_id);
+        cout << "here" << endl;
+        error->setPoints(featurePoints[i],point_indices_for_frame[i]);
+        cout << "min before : " << (*error)(weights_ex) << endl;
+        min=mysimplex(*error,weights_ex,weights_ex.size(),1);
+        vector_weights_exp.push_back(weights_ex);
+        cout << "min after : " << min << endl;
+        delete error;
+    }
 
     timerReplay = new QTimer(this);
     connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
     timerReplay->start(400);
 
     delete face_ptr;
-    delete[] w_id;
-    delete[] w_exp;
+    delete[] w_id;    
+    delete[] w_exp;    
 }
 
 void TransferWidget::calculateTransformation(vector<Point2f> imagePoints, Face *face_ptr, Mat &rvec, Mat &tvec, bool useExt)
@@ -448,43 +447,6 @@ void TransferWidget::calculateTransformation(vector<Point2f> imagePoints, Face *
     //transform vectors into Mats with 3 (2) channels
     cv::solvePnP(Mat(objectPoints),Mat(imagePoints),cameraMatrix,lensDist,rvec,tvec,useExt);
 
-   // Mat_<double> rmatrix;
-    //convert the rotation vector to a rotation matrix
-   // cv::Rodrigues(rvec,rmatrix);
-
-//    double r11 = rmatrix.at<double>(0,0), r12 = rmatrix.at<double>(0,1),r13 = rmatrix.at<double>(0,2);
-//    double r21 = rmatrix.at<double>(1,0), r22 = rmatrix.at<double>(1,1),r23 = rmatrix.at<double>(1,2);
-//    double r31 = rmatrix.at<double>(2,0), r32 = rmatrix.at<double>(2,1),r33 = rmatrix.at<double>(2,2);
-//    double tx = tvec.at<double>(0,0);
-//    double ty = tvec.at<double>(0,1);
-//    double tz = tvec.at<double>(0,2);
-//
-//    double r[3][4] = {{r11, r12, r13, tx},{r21,r22,r23,ty},{r31,r32,r33,tz}};
-//    Mat R(3,4,CV_64F,r);
-//    Mat result = cameraMatrix * R;
-//
-//    MatConstIterator_<double> it,it_end;
-//    cout << "camera matrix" << endl;
-//    it = cameraMatrix.begin<double>();
-//    it_end = cameraMatrix.end<double>();
-//    for(; it != it_end; ++it)
-//        cout << *it << " ";
-//    cout << endl;
-//    cout << "rot matrix" << endl;
-//    it = rvec.begin();
-//    it_end = rvec.end();
-//    for(; it != it_end; ++it)
-//        cout << *it << " ";
-//    cout << endl;
-//    cout << "trans mult" << endl;
-//    it = tvec.begin();
-//    it_end = tvec.end();
-//    for(; it != it_end; ++it)
-//        cout << *it << " ";
-//    cout << endl;
-//
-//    return result;
-
 }
 /**********************************************/
 /* PUBLIC SLOTS */
@@ -511,12 +473,18 @@ void TransferWidget::replayFrame()
 
 void TransferWidget::playBack()
 {
+    flowLabel->setVisible(false);
+    face_widget->setVisible(true);
+
     processVideo();
 }
 
 //later do a pyramid version
 void TransferWidget::startFaceTransfer()
 {
+    flowLabel->setVisible(false);
+    face_widget->setVisible(true);
+
     //first align our face guess over the marked feature points
     vector<Point2f> marked = picLabel->getMarked();
     //marked points should get recentered but we are gonna get rid of shifts anyway
@@ -529,7 +497,6 @@ void TransferWidget::startFaceTransfer()
     //face guess
     double *w_id = new double[56];
     double *w_exp = new double[7];
-    Face *face_ptr = new Face();
 
     for(int i=0;i<56;i++)
     {
@@ -547,15 +514,9 @@ void TransferWidget::startFaceTransfer()
     w_exp[6] = 0.0;
 
     face_ptr->interpolate(w_id,w_exp);
+    face_widget->setFace(face_ptr);
     //use feature points to position the geometry
 
-    //pick points from the face vertex data ... private atm .. then locate these points in
-    //the image based on distance
-//    for(int i=0; i < MAX_SAMPLES;i++)
-//    {
-//        vertex = vertexes[random()];
-//        val_of_vertex = picLabel->getPointAt(vertex);
-//    }
     //instead of using both point types overload operator Point3f in face.h including cv.h
     vector<Point3f> objectPoints;
     vector<Point2f> imagePoints;
@@ -738,7 +699,7 @@ void TransferWidget::startFaceTransfer()
 
     cout << "TRANS : " << tvec.at<double>(0,1) << " " << tvec.at<double>(1,0) << endl;
 
-    double scale = 2;
+    double scale = 1;
 
     for(int i=0; i<fPoints_size; i++)
     {
@@ -771,7 +732,7 @@ void TransferWidget::startFaceTransfer()
 
     face_widget->setTransParams(euler[0],euler[1],euler[2],tx,ty,tz);
 
-    delete face_ptr;
+
     delete[] w_id;
     delete[] w_exp;
 }
@@ -794,7 +755,7 @@ void TransferWidget::dropFrame()
     QPixmap p_map;
     p_map = QPixmap::fromImage(img_q);
     picLabel->setPixmap(p_map);
-    flowLabel->setPixmap(p_map);
+    flowLabel->setPixmap(p_map);    
 }
 
 void TransferWidget::captureFrame()
@@ -838,6 +799,9 @@ void TransferWidget::restartCapturing()
 {
     timer->stop();
 
+    flowLabel->setVisible(true);
+    face_widget->setVisible(false);
+
     capture->release();
     delete capture;
     frames.clear();
@@ -869,6 +833,9 @@ void TransferWidget::restartCapturing()
 
 void TransferWidget::playTransfer()
 {
+    flowLabel->setVisible(true);
+    face_widget->setVisible(false);
+
     captureFrame();
     timer->start(200);
 }
@@ -1020,6 +987,8 @@ TransferWidget::~TransferWidget()
 
     delete picLabel;
     delete flowLabel;
+
+    delete face_ptr;
 }
 
 
