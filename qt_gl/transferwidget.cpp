@@ -1,7 +1,7 @@
 #include "transferwidget.h"
 #include "featurepointqlabel.h"
 #include "opticalflowfarneback.h"
-#include <phonon>
+
 #include <iostream>
 #include <QImage>
 #include <QTimer>
@@ -15,6 +15,8 @@
 #include "modelimageerror.h"
 #include "rosenerror.h"
 #include "mysimplex.h"
+
+#include "neldermeadoptimizer.h"
 
 using namespace cv;
 using namespace std;
@@ -47,28 +49,15 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
     this->face_widget->setCameraParameters(-500,1);
     face_ptr  = new Face();
 
-    //video
-    media = new Phonon::MediaObject(this);
-
-    media->setCurrentSource(fileName);
-
-    vwidget = new Phonon::VideoWidget(this);
-    Phonon::createPath(media, vwidget);
-
-    //no audio for now
-    //audioOutput = new Phonon::AudioOutput(Phonon::VideoCategory, this);
-    //Phonon::createPath(media, audioOutput);
 
     //initialize the optical flow engine
     flowEngine = new OpticalFlowEngine();
+    //init the optimizer
+    paramOptimizer = new NelderMeadOptimizer();
 
     //setup the timer
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(captureFrame()));
-
-    media->play();
-
-    //images
 
 
     //m = imread("/home/martin/iowndis.png");
@@ -96,14 +85,7 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
     //successive frames
      capture = new VideoCapture(fileName.toStdString());
      frameCount = capture->get(CV_CAP_PROP_FRAME_COUNT); //SEEMS TO BE UNSUPPORTED AND RETURNS 0
-     cout << "frame count is : " << frameCount << endl;
-
-     connect(media,SIGNAL(aboutToFinish()),this,SLOT(playSource()));
-}
-
-Phonon::VideoWidget* TransferWidget::getVideoWidget() const
-{
-    return vwidget;
+     cout << "frame count is : " << frameCount << endl;     
 }
 
 ClickableQLabel* TransferWidget::getPicLabel() const
@@ -236,187 +218,24 @@ void TransferWidget::processVideo()
         nextPoints.clear();
     }
 
+    //183.536 0 337.789 0 186.4 299.076 0 0 1
+    //initialize intrinsic parameters of the camera
+    double m[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}};
+    Mat cameraMatrix(3,3,CV_64F,m);
+
+    //-0.0865513 0.197476 0.00430749 0.0072667 -0.114125
+    double l[1][5] = {{-0.0865513, 0.197476, 0.00430749, 0.0072667, -0.114125}};
+    Mat lensDist(1,5,CV_64F,l);
+
     /**********************/
     /*estimate model parameters + pose*/
-    /**********************/    
-    //make a face guess
-    double *w_id = new double[56];
-    double *w_exp = new double[7];
-    Face *face_ptr = new Face();
-
-    for(int i=0;i<56;i++)
-    {
-        if(i==33)w_id[i] = 0.1;
-        else if(i==7)w_id[i] = 0.8;
-        else if(i==20)w_id[i] = 0.1;
-        else w_id[i] = 0;
-    }
-    w_exp[0] = 0.0;
-    w_exp[1] = 0.0;
-    w_exp[2] = 0.0;
-    w_exp[3] = 0.2;
-    w_exp[4] = 0.0;
-    w_exp[5] = 0.8;
-    w_exp[6] = 0.0;
-
-    face_ptr->interpolate(w_id,w_exp);
-
-    Mat rvec, tvec, rvec_clone, tvec_clone;
-
-    vector<vector<Point2f> >::iterator it2 = featurePoints.begin(),
-                                       it2_end = featurePoints.end();
-
-    //do not use the guess in the first frame but do for every following frame
-    bool useExt = false;
-    for(; it2 != it2_end; ++it2)
-    {
-        //determine pose based on the preselected feature points (fPoints)
-        //the function also uses the current values in rvec and tvec as a guess
-        //for the extrinsic parameters (if it isnt the first frame
-        calculateTransformation( *it2, face_ptr, rvec, tvec, useExt);
-        rvec_clone = rvec.clone();
-        tvec_clone = tvec.clone();
-        frameRotation.push_back(rvec_clone);
-        frameTranslation.push_back(tvec_clone);
-
-        //useExt or true = useExt
-        useExt |= true;
-    }
-
-    //seed our pseudorandom number generator to give different numbers each time
-    srand( (unsigned int)time(0) );
-    int random;
-    double low = 0;
-    double high = face_ptr->getPolyNum();
-    vector<Point2f> imagePoints;
-
-    vector<int> indices;
-    vector<vector<int> >point_indices_for_frame;
-    vector<int> point_indices;
-    Point3f p;    
-    Mat_<double> point3dMat(3,1);
-    Mat_<double> point2dMat(3,1);
-
-
-    double l[1][5] = {{-0.0865513, 0.197476, 0.00430749, 0.0072667, -0.114125}};
-    Mat lens(1,5,CV_64F,l);
-
-    Mat_<double> rmatrix;
-    Mat_<double> transpose;
-
-    vector<Point3f> objectPoints;
-
-    double m[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0,0,1}};
-    Mat camera(3,3,CV_64F,m);
-
-//
-//    double m[3][3] = {{1, 0, 337.789},{0, 1, 299.076}};
-//    Mat_<double> camera = Mat(2,3,CV_64F,m);
-
-
-    //using the transformations generate a 1000 new points on the 2d image
-    for(unsigned int j=0; j<frameTranslation.size(); j++)
-    {
-        cout << "frame : " << j << endl;
-        imagePoints.clear();
-        objectPoints.clear();
-        point_indices.clear();
-
-
-        for(int i=0;i<fPoints_size;i++)
-        {
-            //now generate random numbers from range based on unifrom sampling dist formula
-            //we look at it as a parametrization of the interval a,b
-            //with a param based on rand() from interval 0 to 1
-            //with the +1 coz it will never go to 1 .. coz it will never be rand_max
-            //U = a + (b-a+1)*rand()/(1+RAND_MAX);
-            random = low + (high - low + 1.0)*rand()/(1.0 + RAND_MAX);            
-            indices.push_back(random);
-            p = face_ptr->getPointFromPolygon(fPoints[i]);
-            point_indices.push_back(face_ptr->getPointIndexFromPolygon(fPoints[i]));
-
-            point3dMat(0,0) = p.x;
-            point3dMat(1,0) = p.y;
-            point3dMat(2,0) = p.z+1500.0;            
-
-            Rodrigues(frameRotation[j],rmatrix);
-            transpose = frameTranslation[j];
-
-            point2dMat = camera*((rmatrix * point3dMat) + transpose);
-
-            //homogenous coord
-            point2dMat(0,0) /= point2dMat(2,0);
-            point2dMat(1,0) /= point2dMat(2,0);
-
-            //objectPoints.push_back(Point3f(p.x,p.y,p.z+1500.0));
-
-            imagePoints.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));
-        }
-        //projectPoints(Mat(objectPoints),frameRotation[j],frameTranslation[j],camera,lens,imagePoints);
-
-        point_indices_for_frame.push_back(point_indices);
-        generatedPoints.push_back(imagePoints);
-    }
-
-    /***********************/
-    /* now use the newly */
-    /* projected points to */
-    /* calculate how to change shape */
-    /***********************/
-
-    cout << "TESTING MYSIMPLEX (nelder mead impl) with ROSEN function" << endl;
-    RosenError rosen;
-
-    double start_array[] = {-1.2,1.0}; //,2.3,-1.3};
-    vector<double> start;
-    double min;
-    int i;
-    int size_t = sizeof(start_array) / sizeof(double);
-
-    start.assign(start_array, start_array + size_t);
-    min = rosen(start);
-    cout << "min before simplex : " << min << endl;
-
-    min=mysimplex(rosen,start,start.size(),1);
-    //min=mysimplex(rosen,start,start.size(),0.55);
-    cout <<  "min after simplex : " << min << endl;
-
-
-    for (i=0;i<2;i++) {
-        printf("%f\n",start[i]);
-    }
-    min = rosen(start);
-    cout << min << endl;
-
-    ModelImageError *error;
-    vector<double> weights_id;
-    vector<double> weights_ex;
-    weights_id.assign(w_id,w_id+56);
-    weights_ex.assign(w_exp,w_exp+7);
-//sizeof(w_exp)/sizeof(double)
-
-    //TODO smaller coz its too slow
-    for(unsigned int i=0; i<2; i++)
-    {
-        Rodrigues(frameRotation[i],rmatrix);
-        error = new ModelImageError(camera,rmatrix,frameTranslation[i]);
-        error->setWeights(weights_id);
-        cout << "here" << endl;
-        error->setPoints(featurePoints[i],point_indices_for_frame[i]);
-        cout << "min before : " << (*error)(weights_ex) << endl;
-        min=mysimplex(*error,weights_ex,weights_ex.size(),1);
-        vector_weights_exp.push_back(weights_ex);
-        cout << "min after : " << min << endl;
-        delete error;
-    }
+    /**********************/
+    paramOptimizer->estimateParametersAndPose(frameData,featurePoints,cameraMatrix,lensDist,frameRotation,frameTranslation,
+                                              vector_weights_id,vector_weights_exp,generatedPoints);
 
     timerReplay = new QTimer(this);
     connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
     timerReplay->start(400);
-
-    delete face_ptr;
-    delete[] w_id;    
-    delete[] w_exp;    
 }
 
 void TransferWidget::calculateTransformation(vector<Point2f> imagePoints, Face *face_ptr, Mat &rvec, Mat &tvec, bool useExt)
@@ -493,42 +312,6 @@ void TransferWidget::startFaceTransfer()
 
     //calcIntrinsicParams();
 
-
-    //face guess
-    double *w_id = new double[56];
-    double *w_exp = new double[7];
-
-    for(int i=0;i<56;i++)
-    {
-        if(i==33)w_id[i] = 0.2;
-        else if(i==17)w_id[i] = 0.5;
-        else if(i==50)w_id[i] = 0.3;
-        else w_id[i] = 0;
-    }
-    w_exp[0] = 0.0;
-    w_exp[1] = 0.0;
-    w_exp[2] = 0.0;
-    w_exp[3] = 0.2;
-    w_exp[4] = 0.0;
-    w_exp[5] = 0.8;
-    w_exp[6] = 0.0;
-
-    face_ptr->interpolate(w_id,w_exp);
-    face_widget->setFace(face_ptr);
-    //use feature points to position the geometry
-
-    //instead of using both point types overload operator Point3f in face.h including cv.h
-    vector<Point3f> objectPoints;
-    vector<Point2f> imagePoints;
-    Point3 p3;
-    for(int i=0;i<this->fPoints_size;i++)
-    {
-        p3 = face_ptr->getPointFromPolygon(fPoints[i]);
-        cout << p3.x << " " << p3.y << " " << p3.z << endl;
-        objectPoints.push_back(Point3f(p3.x,p3.y,p3.z+1500.0));
-    }
-    imagePoints = picLabel->getMarked();
-
     //183.536 0 337.789 0 186.4 299.076 0 0 1
     //initialize intrinsic parameters of the camera
     double m[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}};
@@ -541,106 +324,22 @@ void TransferWidget::startFaceTransfer()
     //setup the result vectors for the extrinsic parameters
     Mat_<double> rvec, tvec;
 
-    cout << "before solve pnp" << endl;
-    //transform vectors into Mats with 3 (2) channels
-    cv::solvePnP(Mat(objectPoints),Mat(imagePoints),cameraMatrix,lensDist,rvec,tvec);
+    paramOptimizer->calculateTransformation(marked,face_ptr,cameraMatrix,lensDist,rvec,tvec,false);
 
     Mat_<double> rmatrix;
     //convert the rotation vector to a rotation matrix
     cv::Rodrigues(rvec,rmatrix);
-    //after that compute the euler angles from the rotation matrix (from wiki)
-    //we extract based on the analytical formula of the
-//    double rot_y = ::asin(-rmatrix.at<double>(2,0));
-//    double cos_y = ::cos(rot_y);
-//    double rot_x = ::acos(rmatrix.at<double>(2,2) / cos_y);
-//    double rot_z = ::acos(rmatrix.at<double>(0,0) / cos_y);
 
-    double rot_y, rot_x, rot_z, C, trx, tr_y;
-    rot_y = asin( -rmatrix.at<double>(2,0));        /* Calculate Y-axis angle */
-    C           =  cos( rot_y );
-
-    if ( fabs( C ) > 0.005 )             /* Gimball lock? */
-      {
-      trx      =  rmatrix.at<double>(2,2) / C;           /* No, so get X-axis angle */
-      tr_y      = rmatrix.at<double>(2,1)  / C;
-
-      rot_x  = atan2( tr_y, trx );
-
-      trx      =  rmatrix.at<double>(0,0) / C;            /* Get Z-axis angle */
-      tr_y      = rmatrix.at<double>(1,0) / C;
-
-      rot_z  = atan2( tr_y, trx );
-  }
-
-    const double PI = 3.141593;
+    //const double PI = 3.141593;
 
 
-    double rx[3][3] = {{1,0,0},{0,::cos(rot_x),-::sin(rot_x)},{0,::sin(rot_x),::cos(rot_x)}};
-    double ry[3][3] = {{::cos(rot_y),0,-::sin(rot_y)},{0,1,0},{::sin(rot_y),0,::cos(rot_y)}};
-    double rz[3][3] = {{::cos(rot_z),-::sin(rot_z),0},{::sin(rot_z),::cos(rot_z),0},{0,0,1}};
+//    double rx[3][3] = {{1,0,0},{0,::cos(rot_x),-::sin(rot_x)},{0,::sin(rot_x),::cos(rot_x)}};
+//    double ry[3][3] = {{::cos(rot_y),0,-::sin(rot_y)},{0,1,0},{::sin(rot_y),0,::cos(rot_y)}};
+//    double rz[3][3] = {{::cos(rot_z),-::sin(rot_z),0},{::sin(rot_z),::cos(rot_z),0},{0,0,1}};
 
-    Mat rX(3,3,CV_64F,rx), rY(3,3,CV_64F,ry), rZ(3,3,CV_64F,rz);
-    Mat result = rZ*rX*rY;
+//    Mat rX(3,3,CV_64F,rx), rY(3,3,CV_64F,ry), rZ(3,3,CV_64F,rz);
+//    Mat result = rZ*rX*rY;
 
-    cout << "rvec" << endl;
-    cout << rot_x*(180.0/PI) << " " << rot_y*(180.0/PI) << " " << rot_z*(180.0/PI) << " " << endl;
-    cout << rmatrix.at<double>(2,0) << endl;
-
-    //since we parametrised Mat_<double> we dont need to call it agaon for begin
-    MatConstIterator_<double> it = rmatrix.begin(), it_end = rmatrix.end();
-    for(; it != it_end; ++it)
-        cout << *it << " ";
-    cout << endl;
-    it = result.begin<double>();
-    it_end = result.end<double>();
-    for(; it != it_end; ++it)
-        cout << *it << " ";
-    cout << endl;
-
-    double n = 0;
-    it = rvec.begin();
-    it_end = rvec.end();
-    for(; it != it_end; ++it)
-    {
-        cout << *it << " ";
-        n += (*it)*(*it);
-    }
-    cout << endl;
-    cout << "rvec norm" << endl;
-    cout << ::sqrt(n) << endl;
-
-    cout << "tvec" << endl;
-    it = tvec.begin();
-    it_end = tvec.end();
-    for(; it != it_end; ++it)
-        cout << *it << " ";
-    cout << endl;
-
-    vector<Point2f> output;
-    projectPoints(Mat(objectPoints),rvec,tvec,cameraMatrix,lensDist,output);
-
-    Mat frame = frames[frames.size()-1];
-
-    cout << "FOCAL LENGTH : " <<  frame.size().height << " "
-         <<  frame.size().width << endl;
-
-//
-//    cout << "FOCAL LENGTH : " <<  cameraMatrix.at<double>(0,0)*frame.size().height << " "
-//         <<  cameraMatrix.at<double>(1,1)*frame.size().width << endl;
-
-//    cout << "FOCAL LENGTH : " <<  cameraMatrix.at<double>(0,0) << " "
-//         <<  cameraMatrix.at<double>(1,1) << endl;
-
-    cout << "reprojection" << endl;
-    vector<Point2f>::iterator iter = output.begin(), iter_end = output.end();
-    for(;iter!=iter_end;++iter)
-        cout << iter->x << " " << iter->y << endl;
-    cout << "original" << endl;
-    iter = imagePoints.begin();
-    iter_end = imagePoints.end();
-    for(;iter!=iter_end;++iter)
-        cout << iter->x << " " << iter->y << endl;
-    //picLabel->setMarked(output);
 
     double r11 = rmatrix.at<double>(0,0), r12 = rmatrix.at<double>(0,1),r13 = rmatrix.at<double>(0,2);
     double r21 = rmatrix.at<double>(1,0), r22 = rmatrix.at<double>(1,1),r23 = rmatrix.at<double>(1,2);
@@ -652,38 +351,14 @@ void TransferWidget::startFaceTransfer()
     double r[3][4] = {{r11, r12, r13, tx},{r21,r22,r23,ty},{r31,r32,r33,tz}};
     Mat R(3,4,CV_64F,r);
     Mat res = cameraMatrix * R;
-    cout << "matrix mult" << endl;
-    it = res.begin<double>();
-    it_end = res.end<double>();
-    for(; it != it_end; ++it)
-        cout << *it << " ";
-    cout << endl;
+
 
     //decompose
     Vec3d euler;
     Mat cam,rot,trans,rotX,rotY,rotZ;
     decomposeProjectionMatrix(res,cam,rot,trans,rotX,rotY,rotZ,euler);
-    cout << "camera matrix" << endl;
-    it = cam.begin<double>();
-    it_end = cam.end<double>();
-    for(; it != it_end; ++it)
-        cout << *it << " ";
-    cout << endl;
-    cout << "rot matrix" << endl;
-    it = rot.begin<double>();
-    it_end = rot.end<double>();
-    for(; it != it_end; ++it)
-        cout << *it << " ";
-    cout << endl;
-    cout << "trans mult" << endl;
-    it = trans.begin<double>();
-    it_end = trans.end<double>();
-    for(; it != it_end; ++it)
-        cout << *it << " ";
-    cout << endl;
-    cout << "euler" << endl;
-    Vec3d v;
 
+    cout << "euler" << endl;    
     for(int i=0; i<3; ++i)
         cout << euler[i] << " ";
     cout << endl;
@@ -693,11 +368,9 @@ void TransferWidget::startFaceTransfer()
     Mat_<double> point2dMat(3,1);
     vector<Point2f> points;
 
-    double mat[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0,0,1}};
-    cameraMatrix = Mat(3,3,CV_64F,mat);
     Mat_<double> translation = tvec;
 
-    cout << "TRANS : " << tvec.at<double>(0,1) << " " << tvec.at<double>(1,0) << endl;
+    cout << "TRANS : " << tvec.at<double>(0,0) << " " << tvec.at<double>(1,0)  << " " << tvec.at<double>(2,0) << endl;
 
     double scale = 1;
 
@@ -731,10 +404,8 @@ void TransferWidget::startFaceTransfer()
     picLabel->setMarked(points);
 
     face_widget->setTransParams(euler[0],euler[1],euler[2],tx,ty,tz);
-
-
-    delete[] w_id;
-    delete[] w_exp;
+    face_widget->setFace(face_ptr);
+    face_widget->refreshGL();
 }
 
 void TransferWidget::dropFrame()
@@ -845,13 +516,6 @@ void TransferWidget::pauseTransfer()
     timer->stop();
 }
 
-void TransferWidget::playSource()
-{
-    QString fileName("/home/martin/project/TrackedSmiles/S003-024.avi");
-    const Phonon::MediaSource m("/home/martin/project/TrackedSmiles/test.ogv");
-    std::cout << "playing" << std::endl;
-    media->enqueue(m);
-}
 
 void TransferWidget::findGoodFeaturePoints()
 {
@@ -979,9 +643,6 @@ TransferWidget::~TransferWidget()
 {
     frames.clear();
     delete capture;
-    delete media;
-    delete vwidget;
-    delete audioOutput;
 
     delete flowEngine;
 

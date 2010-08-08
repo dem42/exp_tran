@@ -29,6 +29,7 @@ class Face
   float (*triangles)[3];
 
 private:
+  void loadPolygonDataFromModel();
   //Vector3 *surface_normals;
     
   //vertexes are sorted and the points in triangles therefore as well

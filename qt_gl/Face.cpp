@@ -16,16 +16,42 @@ Face::Face()
 
     //model = new SVD("svd_result_object_2",expr,id,ver);
     model = FaceModel::getInstance();
-//    model = new FaceModel("svd_result_object_2",
-//                                     "/home/martin/project/JaceyBinghamtonVTKFiles",
-//                                     "out_here.txt",
-//                                     56,7,5090);
-
 
     //we always need to load at least the topology data (which triangles are joined up)
     //this happens in the load method which also allocates the vertexes array
-    load("/home/martin/project/JaceyBinghamtonVTKFiles/M0014_HA01WH.vtk","../face.ppm");
+    loadPolygonDataFromModel();
+    cout << " point num " << point_num << endl;
+    cout << " poly num " << poly_num << endl;
 
+    //after we load polygonal data we can allocate memory for vertexes
+    vertexes = new (nothrow) Point3[point_num];
+    if(vertexes == NULL)
+    {
+        cerr << "error allocating memory for vertexes" << endl;
+        return;
+    }
+
+    //finally we use default weights to interpolate values for vertexes
+    double *w_id = new double[56];
+    double *w_exp = new double[7];
+
+    for(int i=0;i<56;i++)
+    {
+        if(i==33)w_id[i] = 0.2;
+        else if(i==10)w_id[i] = 0.2;
+        else if(i==20)w_id[i] = 0.2;
+        else if(i==1)w_id[i] = 0.2;
+        else if(i==50)w_id[i] = 0.2;
+        else w_id[i] = 0;
+    }
+    w_exp[0] = 0.0;
+    w_exp[1] = 0.0;
+    w_exp[2] = 0.0;
+    w_exp[3] = 0.0;
+    w_exp[4] = 1.0;
+    w_exp[5] = 0.0;
+    w_exp[6] = 0.0;
+    interpolate(w_id,w_exp);
 }
 
 Face::~Face()
@@ -280,6 +306,25 @@ void Face::test(void)
    delete[] surface_normals;   
  }
 
+void Face::loadPolygonDataFromModel()
+{
+    point_num = model->getPointNum();
+    poly_num = model->getPolyNum();
+
+    triangles = new (nothrow) float[poly_num][3];
+    if(triangles == NULL)
+    {
+        cerr << "error allocating memory for triangles" << endl;
+        return;
+    }
+
+    for(int i=0;i<poly_num;i++)
+    {
+        triangles[i][0] = model->triangles[i][0];
+        triangles[i][1] = model->triangles[i][1];
+        triangles[i][2] = model->triangles[i][2];
+    }
+}
 
 void Face::load(string filename, const char *tex_map_filename)
 {
@@ -433,4 +478,5 @@ void Face::load(string filename, const char *tex_map_filename)
 
   /***** generate vertex normals ******/
   generate_vertex_normals();  
+  file_op.close();
 }

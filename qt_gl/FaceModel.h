@@ -23,6 +23,12 @@ class FaceModel
     Matrix getCoreTensor() const;
     Matrix getUIdentity() const;
     Matrix getUExpression() const;
+
+    //polygon information
+    float (*triangles)[3];
+    int getPolyNum() const;
+    int getPointNum() const;
+
  protected:
     FaceModel(std::string filename,std::string dir,std::string db_list,int f,int e,int v);
     ~FaceModel();
@@ -33,6 +39,7 @@ private:
     void computeIdentitySingularVectors(int m,int n);
     void computeExpressionSingularVectors(int m,int n);
     void initializeDbStrings();
+    void loadFacePolygon(string filename);
 
     static FaceModel *instance;
 
@@ -47,6 +54,9 @@ private:
     Matrix U_id;
     Matrix U_ex;
     Matrix core;
+
+    int poly_num;
+    int point_num;
 };
 
 #endif // FACEMODEL_H

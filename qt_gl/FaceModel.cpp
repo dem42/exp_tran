@@ -15,7 +15,7 @@ FaceModel * FaceModel::getInstance()
     //lazy initialization
     if(instance == NULL)
     {
-        instance = new FaceModel("svd_result_object_2",
+        instance = new FaceModel("svd_result_object_3",
                                  "/home/martin/project/JaceyBinghamtonVTKFiles",
                                  "out_here.txt",
                                   56,7,5090);
@@ -38,8 +38,16 @@ FaceModel::FaceModel(string filename,string dir,string db_list,int f,int e,int v
         initializeDbStrings();
 
         compute_core_tensor();
+
+        loadFacePolygon("/home/martin/project/JaceyBinghamtonVTKFiles/M0014_HA01WH.vtk");
+
+
+        /*persist core, u2, u3, point_num, poly_num, triangles*/
+        persist();
     } else
         cout << "the u2,u3,core have been loaded from: " << filename << endl;
+
+    cout << "model : point_num and poly_num : " << point_num << " " << poly_num << endl;
 
     core.test();
 }
@@ -50,6 +58,7 @@ FaceModel::~FaceModel()
 {
     std::cout << "destructor FaceModel" << std::endl;
     delete[] strs;
+    delete[] triangles;
 }
 
 Matrix FaceModel::getCoreTensor() const
@@ -257,11 +266,7 @@ void FaceModel::compute_core_tensor(void)
         at[i] = new double[1];
 
     matrix_mult(core,v,at,m,n,1);
-    ***/
-    /********************************/
-    /*********persist core, u2, u3*/
-    /********************************/
-    persist();
+    ***/    
 }
 
 
@@ -279,8 +284,14 @@ void FaceModel::persist()
     for(int i=0;i<3*n_v;i++)
         for(int j=0;j<n_f*n_e;j++)
             fstr << core[i][j] << " ";
+    fstr << point_num << " " << poly_num << endl;
+    for(int i=0; i<poly_num; i++)
+    {
+        fstr << triangles[i][0] << " " << triangles[i][1] << " " << triangles[i][2] << " ";
+    }    
     fstr.close();
 }
+
 bool FaceModel::load()
 {
     //open the file for reading, so if it doesnt exist we get a not is_open() == false
@@ -309,6 +320,20 @@ bool FaceModel::load()
         for(int i=0;i<3*n_v;i++)
             for(int j=0;j<n_f*n_e;j++)
                 fstr >> core[i][j];
+
+        fstr >> point_num >> poly_num;
+
+        triangles = new (nothrow) float[poly_num][3];
+        if(triangles == NULL)
+        {
+            cerr << "error allocating memory for triangles" << endl;
+            return false;
+        }
+
+        for(int i=0; i<poly_num; i++)
+        {
+            fstr >> triangles[i][0] >> triangles[i][1] >> triangles[i][2];
+        }
     }
     catch(bad_alloc &bae)
     {
@@ -399,3 +424,78 @@ void FaceModel::read_flat_vertex(double **a, int m, int n,
     }
 }
 
+int FaceModel::getPolyNum() const
+{
+    return poly_num;
+}
+int FaceModel::getPointNum() const
+{
+    return point_num;
+}
+
+void FaceModel::loadFacePolygon(string filename)
+{
+  string str;
+  int dont_need_int;
+  fstream file_op(filename.c_str(),ios::in);
+
+  /*vtk files begin with several unimportant lines*/
+  char line[256];
+  file_op.getline(line,256);
+  cerr << line << endl;
+  file_op.getline(line,256);
+  cerr << line << endl;
+  file_op.getline(line,256);
+  cerr << line << endl;
+  file_op.getline(line,256);
+  cerr << line << endl;
+
+  /**************************************************/
+  /** load POINTS ***/
+  /**************************************************/
+  file_op >> str >> point_num;
+  //error if wrong label
+  if(str.compare("POINTS") != 0)
+  {
+      cerr << "did not match the label POINTS got " << str << endl;
+      return;
+  }
+
+  Point3 p;
+
+  //one more line telling us its float
+  file_op >> str;
+
+  for(int i=0; i<point_num; i++)
+    file_op >> p.x >> p.y >> p.z;
+
+  /**************************************************/
+  /** load POLYGONS ***/
+  /**************************************************/
+  file_op >> str >> poly_num >> dont_need_int;
+  //error if wrong label
+  if(str.compare("POLYGONS") != 0)
+    {
+      cerr << "did not match the label POLYGONS" << endl;
+      return;
+    }
+
+  triangles = new (nothrow) float[poly_num][3];
+  if(triangles == NULL)
+    {
+      cerr << "error allocating memory for triangles" << endl;
+      return;
+    }
+
+  for(int i=0; i<poly_num; i++)
+    {
+      file_op >> dont_need_int;
+      if(dont_need_int != 3)
+        {
+          cerr << "error .. not a triangle on line " << i << endl;
+          return;
+        }
+      file_op >> triangles[i][0] >> triangles[i][1] >> triangles[i][2];
+    }
+  file_op.close();
+}

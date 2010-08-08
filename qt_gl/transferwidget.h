@@ -1,7 +1,6 @@
 #ifndef TRANSFERWIDGET_H
 #define TRANSFERWIDGET_H
 
-#include <phonon>
 #include <highgui.h>
 #include <QWidget>
 #include <QString>
@@ -13,6 +12,7 @@
 
 #include "Face.h"
 #include "face_widget.h"
+#include "optimizer.h"
 
 #include <cv.h>
 #include <vector>
@@ -24,8 +24,7 @@ class TransferWidget : public QWidget
     Q_OBJECT
 public:
     TransferWidget(QString fileName, FaceWidget *face_widget);
-    ~TransferWidget();
-    Phonon::VideoWidget* getVideoWidget() const;
+    ~TransferWidget();    
     ClickableQLabel* getPicLabel() const;
     ClickableQLabel* getFlowLabel() const;
     void grabThumbnailForVideo(std::string videoName,cv::Mat& thumbnail);
@@ -33,8 +32,7 @@ public:
 
     void setInteractiveLabel(QLabel *);   
 
-public slots:
-    void playSource();
+public slots:   
     void playTransfer();
     void pauseTransfer();
     void restartCapturing();
@@ -61,21 +59,20 @@ private:
 
     QTimer *timer;
 
-    Phonon::MediaObject *media;
-    Phonon::VideoWidget *vwidget;
-    Phonon::AudioOutput *audioOutput;
-
     cv::VideoCapture *capture;
     double frameCount;
 
     ClickableQLabel *picLabel;
     VectorFieldQLabel *flowLabel;
 
+    //frameHistory .. this includes dropped frames and first frame
     std::vector<cv::Mat> frames;
 
     //object responsible for computing
     //optical flow
     OpticalFlowEngine *flowEngine;
+    //model parameters optimization
+    Optimizer *paramOptimizer;
     
     Face *face_ptr;
     FaceWidget *face_widget;
