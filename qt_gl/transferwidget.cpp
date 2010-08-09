@@ -17,6 +17,7 @@
 #include "mysimplex.h"
 
 #include "neldermeadoptimizer.h"
+#include "closedformoptimizer.h"
 
 using namespace cv;
 using namespace std;
@@ -53,7 +54,7 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
     //initialize the optical flow engine
     flowEngine = new OpticalFlowEngine();
     //init the optimizer
-    paramOptimizer = new NelderMeadOptimizer();
+    paramOptimizer = new ClosedFormOptimizer();
 
     //setup the timer
     timer = new QTimer(this);

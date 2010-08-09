@@ -31,23 +31,41 @@ public:
             int row;
      };
     /******************/
-    /*functions*/
+    /*constructors*/
     /*****************/
     Matrix();
     Matrix(int m,int n);
     Matrix(std::vector<double> &in);
     //since the class has a dynamically allocated variable we need
     //a copy constructor or else it will be a shallow copy
-    Matrix(Matrix &matrix);
+    Matrix(Matrix &matrix);    
     Matrix(const Matrix &m);
+    Matrix(cv::Mat &);
+    Matrix(const cv::Mat &);
 
     ~Matrix();
 
+
+    /******************/
+    /*functions*/
+    /*****************/
     double getElem(int i,int j) const;
     void setElem(int i,int j,double elem);
     inline int getM() const;
     inline int getN() const;
 
+
+    void transpose(Matrix &mt);
+    void scalar_mult(double scalar);
+
+    Matrix submatrix(int rowstart, int rowend) const;
+
+    void test(void);
+
+
+    /********************************************/
+    /*      STATIC FUNCTIONS                    */
+    /********************************************/
     //function to compute the singular value decomposition
     static int svd(int m,int n,int withu,int withv,double eps,double tol,
         double **a,double *q,double **u,double **v);
@@ -56,14 +74,17 @@ public:
     //matrix multiplication c = a*b
     //seems to have been faster when we passed a reference back
     static Matrix matrix_mult(const Matrix &a,const Matrix &b);
-    void transpose(Matrix &mt);
-    void scalar_mult(double scalar);
+    static Matrix eye(int i);
+    //solve linear system with SVD .. works with singular matrices too
+    //@return .. the solution x = inv(svd(A)) * b
+    static Matrix solveLinSysSvd(const Matrix &A, const Matrix &b);
 
-    Matrix submatrix(int rowstart, int rowend) const;
 
-    void test(void);
-
+    /********************************************/
+    /*      OPERATORS                           */
+    /********************************************/
     double & operator()(int row, int col);
+
     Matrix::Row operator[](int row);
 
     Matrix::ConstRow operator[](int row) const;

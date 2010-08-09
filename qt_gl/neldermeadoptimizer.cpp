@@ -21,23 +21,9 @@ void NelderMeadOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
     double *w_id = new double[56];
     double *w_exp = new double[7];
 
-    int random;
-    double low = 0;
-    double high = face_ptr->getPolyNum();
-    vector<Point2f> imagePoints;
-
-    vector<int> indices;
     vector<vector<int> >point_indices_for_frame;
-    vector<int> point_indices;
-    Point3f p;
-    Mat_<double> point3dMat(3,1);
-    Mat_<double> point2dMat(3,1);
-
 
     Mat_<double> rmatrix;
-    Mat_<double> transpose;
-
-    vector<Point3f> objectPoints;
 
     double min;
     ModelImageError *error;
@@ -64,54 +50,11 @@ void NelderMeadOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
 
     //estimate the pose parameters and place estimations into vectors rotations and translations
     //the rotations vector holds the rodrigues rotation vectors which can be converted to a rotation matrix
-    this->estimatePose(featurePoints,face_ptr,cameraMatrix,lensDist,rotations,translations);
-
-    //seed our pseudorandom number generator to give different numbers each time
-    srand( (unsigned int)time(0) );
-
-    //using the transformations generate a 1000 new points on the 2d image
-    for(unsigned int j=0; j<FRAME_NUMBER; j++)
-    {
-        cout << "frame : " << j << endl;
-        imagePoints.clear();
-        objectPoints.clear();
-        point_indices.clear();
+    estimatePose(featurePoints,face_ptr,cameraMatrix,lensDist,rotations,translations);
 
 
-        for(int i=0;i<this->fPoints_size;i++)
-        {
-            //now generate random numbers from range based on unifrom sampling dist formula
-            //we look at it as a parametrization of the interval a,b
-            //with a param based on rand() from interval 0 to 1
-            //with the +1 coz it will never go to 1 .. coz it will never be rand_max
-            //U = a + (b-a+1)*rand()/(1+RAND_MAX);
-            random = low + (high - low + 1.0)*rand()/(1.0 + RAND_MAX);
-            indices.push_back(random);
-            p = face_ptr->getPointFromPolygon(fPoints[i]);
-            point_indices.push_back(face_ptr->getPointIndexFromPolygon(fPoints[i]));
-
-            point3dMat(0,0) = p.x;
-            point3dMat(1,0) = p.y;
-            point3dMat(2,0) = p.z+1500.0;
-
-            Rodrigues(rotations[j],rmatrix);
-            transpose = translations[j];
-
-            point2dMat = cameraMatrix*((rmatrix * point3dMat) + transpose);
-
-            //homogenous coord
-            point2dMat(0,0) /= point2dMat(2,0);
-            point2dMat(1,0) /= point2dMat(2,0);
-
-            //objectPoints.push_back(Point3f(p.x,p.y,p.z+1500.0));
-
-            imagePoints.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));
-        }
-        //projectPoints(Mat(objectPoints),frameRotation[j],frameTranslation[j],camera,lens,imagePoints);
-
-        point_indices_for_frame.push_back(point_indices);
-        generatedPoints.push_back(imagePoints);
-    }
+    //generate new points for the frames to help tracking
+    generatePoints(rotations,translations,cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,generatedPoints,point_indices_for_frame);
 
     /***********************/
     /* now use the newly */

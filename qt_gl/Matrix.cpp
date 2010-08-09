@@ -74,6 +74,35 @@ Matrix::Matrix(const Matrix &matrix)
     }
 }
 
+Matrix::Matrix(cv::Mat &matrix)
+{
+    m = matrix.size().height;
+    n = matrix.size().width;
+    mat = new double*[m];
+    for(int i=0;i<m; ++i)
+    {
+        mat[i] = new double[n];
+        for(int j=0;j<n; ++j)
+        {
+            mat[i][j] = matrix.at<double>(i,j);
+        }
+    }
+}
+
+Matrix::Matrix(const cv::Mat &matrix)
+{
+    m = matrix.size().height;
+    n = matrix.size().width;
+    mat = new double*[m];
+    for(int i=0;i<m; ++i)
+    {
+        mat[i] = new double[n];
+        for(int j=0;j<n; ++j)
+        {
+            mat[i][j] = matrix.at<double>(i,j);
+        }
+    }
+}
 Matrix::~Matrix()
 {
     if(mat != NULL)
@@ -366,6 +395,52 @@ Matrix Matrix::matrix_mult(const Matrix &a,const Matrix &b)
         return c;
  }
 
+Matrix Matrix::eye(int n)
+{
+    Matrix r(n,n);
+    for(int i=0;i<n;i++)
+        for(int j=0;j<n;j++)
+        {
+            if(i==j) r.mat[i][j] = 1;
+            else r.mat[i][j] = 0;
+        }
+    return r;
+}
+//A*x = b; A = U*D*V', inv(A) = V*inv(D)*U', x = V*inv(D)*U'*b
+Matrix Matrix::solveLinSysSvd(const Matrix &A, const Matrix &b)
+{
+    int m = A.getM();
+    int n = A.getN();
+    int p = b.getM();
+    int q = b.getN();
+    Matrix U(m,m), UT(m,m), V(n,n), invD(m,n), result(m,q);
+
+    assert(m == p);
+
+    for(int i=0;i<m;i++)
+        for(int j=0;j<n;j++)
+            invD[i][j] = 0;
+
+    double *d = new double[m];
+
+    Matrix::svd(m,n,1,1,0.000001,0.000001,A.mat,d,U.mat,V.mat);
+
+    //if there is a zero in the diagonal keep it in inv(D)
+    //proof why this is okay in numerical recepies
+    for(int i=0;i<m;i++)
+    {
+        invD[i][i] = (d[i] != 0)? 1.0/d[i] : 0;
+    }
+
+    U.transpose(UT);
+
+    result = matrix_mult(matrix_mult(V,invD),matrix_mult(UT,b));
+
+    delete[] d;
+
+    return result;
+}
+
 void Matrix::transpose(Matrix &mt)
 {
         int i,j;
@@ -399,10 +474,10 @@ Matrix Matrix::submatrix(int rowstart, int rowend) const
 /*********************************/
 
 Matrix& Matrix::operator=(const Matrix& matrix)
-{
-    std::cout << "assignment" << std::endl;
+{    
     m = matrix.getM();
     n = matrix.getN();
+    //here we should also delete previous mat if not null
 
     mat = new double*[matrix.getM()];
     for(int i=0;i<matrix.getM(); ++i)
@@ -468,6 +543,7 @@ void Matrix::test(void)
 //        AT = new Matrix(2,3);
 //        K = new Matrix(2*3,3*2);
         Matrix A(3,2),B(2,3),C(3,3),AT(2,3),K(2*3,3*2);
+        Matrix M(3,3),x(3,1),b(3,1);
 
         A[0][0] = 0;
         A[0][1] = 1;
@@ -520,4 +596,25 @@ void Matrix::test(void)
 
         Matrix sub = K.submatrix(2,4);
         std::cout << "Submatix of K rows 2 to 4 is : \n" << sub;
-}
+
+        std::cout << "now test solving a linear system using SVD: " << std::endl;
+        std::cout << "A*x = b; A = U*D*V', inv(A) = V*inv(D)*U', x = V*inv(D)*U'*b" << std::endl;
+        //if element in diagonal of D is 0 set element in inv(D) to 0 proof in numerical recipies
+        M[0][0] = 4;
+        M[0][1] = 1.5;
+        M[0][2] = 2;
+        M[1][0] = 3;
+        M[1][1] = 3;
+        M[1][2] = 1;
+        M[2][0] = 2;
+        M[2][1] = 1;
+        M[2][2] = 5;
+
+        b[0][0] = 10.6;
+        b[1][0] = 11.3;
+        b[2][0] = 9;
+        //x should be 1.5, 2, 0.8
+        Matrix result = solveLinSysSvd(M,b);
+        std::cout << " The result of the linear system is : " << std::endl;
+        std::cout << result;
+    }
