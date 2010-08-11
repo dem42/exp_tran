@@ -1,6 +1,8 @@
-\documentclass[11pt,a4paper]{book}
+\documentclass[11pt,a4paper]{report}
 \usepackage{listings,textcomp,graphicx,float,verbatim,extsizes}
 \usepackage{amsmath,amssymb,mathrsfs}
+\usepackage{here}
+\usepackage{subfig}
 \usepackage{sectsty}
 \usepackage[left=3.2cm, right=3.2cm, top=3cm, bottom=4cm]{geometry}
 
@@ -30,7 +32,7 @@
 \lfoot{}
 \cfoot{\thepage}
 \rfoot{}
-\end{comment}
+
 
 \makeatletter
 \renewcommand{\@makechapterhead}[1]{%
@@ -42,15 +44,43 @@
 \fi
 #1\par\nobreak\vspace{40 pt}}}
 \makeatother
-
-\title{Individual Project\\Expression Transfer}
-\author{Martin Papanek (mp5309)}
-\date{}
-
-
+\end{comment}
 \begin{document}
 
-\maketitle
+\begin{titlepage}
+
+\begin{center}
+
+
+\textsc{\LARGE Imperial College London}\\[3.5cm]
+
+
+{ \huge \bfseries Expression Transfer}\\[5.5cm]
+
+
+
+% Author and supervisor
+\begin{minipage}{0.4\textwidth}
+\begin{flushleft} \large
+\emph{Author:}\\
+Martin \textsc{Papanek}
+\end{flushleft}
+\end{minipage}
+\begin{minipage}{0.4\textwidth}
+\begin{flushright} \large
+\emph{Supervisor:} \\
+Professor ~Duncan \textsc{Gillies}
+\end{flushright}
+\end{minipage}
+
+\vfill
+
+% Bottom of the page
+{\large \today}
+
+\end{center}
+
+\end{titlepage}
 
 \begin{center}
 \LARGE \textbf{Abstract}
@@ -59,32 +89,29 @@
 \newpage
 
 \begin{center}
-\LARGE \textbf{Acknowledgements}
+\LARGE \textbf{Acknowledgments}
 \end{center}
 
 
-\newpage
 
 \tableofcontents
-\listoftables
 
 \chapter{Introduction}
 \section{Motivation}
 Allowing computers to understand the world around them is one of the most
 intriguing goals of computer science. In order to aid humans in day-to-day
-tasks,the ideal computer should perceive his surroundings, correctly identify the objects and beings around him and act based
-on this information. Achieving this level of sophisticated, environment aware
-behaviour is the focus of popular computer science fields such as machine
+tasks, the ideal computer should be able to perceive his surroundings, correctly identify the objects and beings around him and act based
+on this information. Achieving this level of sophisticated, environment-aware
+behavior is the focus of popular computer science fields such as machine
 learning, computer vision and logic.
 
 The problem of understanding the surrounding world can be broken down into a
 number of sub-problems. First the machine must obtain and process the information on
-its sensors. Then it has to utilize the data gleaned from its sensors to find
-objects in the image. Finally, the machine has to obtain contextual information
-from the configuration of these objects. Possessing this contextual information can be seen
-as equivalent to understanding the scene. The computer uses the contextual
-information to understand what state the environment is in and can then act based on
-simple if-then rules.
+its sensors. Then it has to process this data in order to find objects in the
+sensory input. Finally, the machine has to assign meaning to the scene it perceived
+based on the the configuration and the properties of the objects it found. This
+allows the machine to understand what state the environment is in and it may
+then utilize this information using simple if-then rules.
 
 For humans, all of the aforementioned sub-problems seem simple. However, programming
 machines to do the same is quite difficult. Computers often do
@@ -93,41 +120,46 @@ from sensors. Yet, they are sorely lacking when it comes to locating objects
 in this sensory input and correctly assessing the properties and configuration
 of these objects. While it is possible to locate circles and lines, joining
 these to locate a face or a tree can only be done if the machine knows what a
-face or a tree should look like. To instruct machines about the properties of
-the various objects, which could potentially be present in the surroundings, we
-use \textit{models}. A model describes the expected structure of the object.
+face or a tree should look like. Thus, the machine needs to have prior
+information about the objects it can expect. This prior information can be
+encoded in a \textit{model}. The model describes the structure of the object.
 This, in turn, allows the machine to explain aspects of its sensory input as the
-occurence of that object. Finding objects by means of locating an instance of a
-model in the input is called \textit{model-based tracking}.
+occurrence of that object. Finding objects by means of locating an instance of a
+model in the input is called \textit{model-based recognition}.
 
 Certain objects may also change their shape or
 appearance. For example a face may transition from a closed eyed state to an
 open eyed state. An even better example is the body of a human, which is also
 highly dynamic. These deformable objects are often of special interest to us in
 our everyday life. A machine should therefore be able to recognize an arbitrarily deformed
-object and also correctly identify the shape or appearence of this dynamic
-object. The challenge thus lies in constructing an appropriate \textit{deformable
+object and also correctly identify the the degree of deformation, since the amount of deformation may be crucial for the understanding of
+the scene. The challenge thus lies in constructing an appropriate \textit{deformable
 model}. 
 
-Furthermore, the computer has to be able to find an instance of this
-model in its surroundings if and only if this object is present. This task is
-known as \textit{model extraction}. When extracting deformable models, it is
-necessary to also estimate what state the model is in. This means we have to not
-only locate the object but also estimate the values of parameters which govern how this
-object changes.
+Given a deformable model, the machine then has to process the sensor input and
+locate instances of the model by adjusting the model's parameters. This task is
+known as \textit{model-based object recognition}. The parameters of the model then allow the
+machine to interpret the scene. In addition to locating an instance of the model
+in one sensory input the machine should also be ablo to track its movement given a sequence of snapshots of
+the environment. In \textit{model-based tracking} an instance of the model is
+identified and tracked from snapshot to snapshot, in spite of deformations of shape
+and changes in position.
 
-Hence, in this paper we are interested in describing convenient dynamical shape
-and appearence models and effective algorithms for locating these models. For our
-sensory snapshots, we will focus exclusively on images. Since we will be dealing
+In this paper we  describe convenient deformable shape
+and appearance models and effective algorithms for locating these models. For our
+sensory snapshots, we will focus exclusively on images. As we will be dealing
 with images we will investigate motion tracking and feature detection
 algorithms. These are necessary to obtain cues from our input image which allow
-us to locate the model in the image.
+us to first locate the model in the image and then track its movements through
+sucessive images.
 
- The area where deformable models
-are applicable is quite large. This paper will focus on one very interesting application of dynamical
+\section{Contributions}
+
+The area where deformable models are applicable is quite large. This paper will focus on one very interesting application of dynamical
 models and model extraction which is
-\textit{expression transfer}.  The purpose of expression transfer is to capture the expressions and visemes
-(speech related mouth articulations) from a video recording of one individual and
+\textit{expression transfer}. The purpose of expression transfer is to capture
+the expressions and visemes -
+speech related mouth articulations - from a video recording of one individual and
 generate a video of another individual mimicking these
 expressions and visemes. The alternative to transferring these expressions would
 be to construct a physical model of the face and simulate the observed
@@ -137,43 +169,205 @@ is quite difficult to generate realistic expressions by setting the appropriate
 parameters of a physical model simply because of the complexity of the physics
 behind the movement that is responsible for expressions.
 
-\section{Contributions}
-
-\section{Report Overview}
 
 \newpage
 
 \chapter{Background}
-Using models to characterise a deformable object and locate it in an image remains
-a very fundamental challenge of computer vision and graphics. In this chapter we
-will examine various model extraction techniques. Likewise, we will discuss
-computer vision algorithms that will allow us to locate the parts that make up
-our objects and observe how the objects change between several images.
-\section{Model-based object recognition}
-The goal of model-based object recognition is to fit an instance of a model to
+Considerable amount of research has been done on using models to characterize a
+deformable object as well as on model-based object recognition and
+tracking. In this chapter we will present an overview of various modelling techniques. Likewise, we will discuss
+computer vision algorithms which will allow us to locate the features of
+interest in the image. These features then make it possible to fit an instance
+of the model to the image.
+
+\section{Deformable Models}
+Models give the computer prior information about the structure of a class of objects. Most
+real world objects have a dynamic structure. To allow the computer to locate
+such dynamic objects it is necessary to account for this variability by giving the
+computer prior information about the possible variations. A deformable model
+describes the expected structure of a class of objects while at the same time allowing
+for variations from the expected structure. Thus, if a somewhat deformed
+instance of this class of objects is present in the image, the deformable model
+will be able to explain this is a deformation from the expected shape.
+
+The quality of a deformable model can be assessed based on two important
+characteristics. First, the model should be \textit{general} enough so that it
+is capable of representing any realistic deformation of the object.
+On the other hand, the computer should only to be able to find an instance of this
+model in its surroundings if and only if this object is present. The deformable model
+therefore has to be \textit{specific} so that it does not locate non-existent
+instances of a model in the input.Clearly, a model that is too general will inadvertently fit objects from a
+different class and vice versa a model that is too specific will not be able to
+explain all the variations of the object structure and thus fail to locate
+instances of the correct class. The optimal deformable model should balance these two
+attributes.
+
+The variance in shape or appearance of a model may be due to combination of the following
+factors:
+\begin{itemize}
+\item Variations of shape due to deformations of the object.
+\item Arbitrary scaling of the object, possibly due to distance from the observer.
+\item Arbitrary rotations of the object which may cause occlusions. 
+\item Some measure of Gaussian input noise.
+\item Differences in color or intensity caused by a change in lighting.
+\end{itemize}
+Some of these sources of variation may be explained away using standard machine
+vision techinques. Noisy input can be explained by means of Gaussian
+filtering. Other sources of variation such as those due to deformations of the
+object need to be represented by appropriate parameters of the model. The
+deformable model simulates the deformations based on the parameter values. The
+model thus needs to learn the mapping from parameters to deformations. The two
+most prevalent approaches to discovering this mapping are using either \textit{physical
+models} or \textit{statistical models}.
+
+Physical models construct deformable models which mimic the elastic deformations
+of the class of object they model. The parameters of a physical model control the amount
+of actual physical deformation.
+
+Satistical deformable models are trained on a set of examples of a class of
+objects. Through statistical analysis a basis for the deformations observed in
+this set of examples is constructed. This basis then allows the model to predict
+probable instances of the objects of this class.
+
+Finally, given that a deformable model is uniquely defined by its parameters,
+ the goal of model-based object recognition is then to fit an instance of a model to
 an the appropriate object in the image. The problem of fitting the model to the
 image is in essence an optimization problem. In order to fit the model we need to
 correctly adjust parameters that control the model. In addition to determining
 the intrinsic parameters of the model it is necessary to also find how the
-object is rotated, moved and scaled. The parameters which determine the
-orientation are called \textit{pose parameters}. 
+object is rotated, moved and scaled to explain the variation in structure which
+is not caused by the deformations. The recognition algorithm also needs to be
+robust in order to deal with variations caused by noise.
 
-\subsection{Shape Model}
-A \textit{shape model} describes the boundaries of an object. figure 111 For example a
-shape model of a face which denotes the location and measures of the defining
+\subsection{Physically Based Models}
+Natural objects all obey physical laws. Human and animal bodies change shape
+when their muscles contract and loosen, which in turn alters the shape of the
+elastic soft tissues which surround the muscles. Movement is further constrained
+by the skeletons and gravity. Due to the dynamic nature of such objects it is quite impractical to
+model the structure of these objects as consisting of only rigid components. To cope with
+these highly dynamic bodies researchers have turned to physics to describe the
+rules governing these dynamics in form of a set of equations \cite{FEM1pen}, \cite{FEM1ter}.  
+
+As the name suggests, physical models emulate the physical laws that govern
+deformations. Physical models are predominantly formulated using the finite
+element analysis. An indepth discussion of finite element
+analysis can be found in \cite{FEMbook}.
+
+\subsubsection{Finite Element Method (FEM)}
+The FEM method is a numerical engineering technique for the simulation of dynamic
+behaviour of solids and structures. With the finite element method the assumption is made that
+the object alters shape as if it were made of a elastic material. In physics,
+\textit{strain} is the measure of deformation or displacement from a rigid body state. The stiffness
+of the material determines responses to strain and stress and thus describes the
+degrees of freedom of the material.
+
+The underlying idea behind FEM is that the object is approximated as an
+assemblage of elements of finite size. These elements are interconnected with
+each other by nodal points throughout the object. The structure of an object is
+thus discretized into a mesh of $N$ finite elements. The elements are placed
+next to each other so that no gaps remain in between. When the object undergoes a
+deformation, this in turn propagates through the mesh of finite elements which
+themselves deform accordingly. The displacements within these elements are assumed to be a function
+of the displacements measured at the nodal points. This assumption is
+fundamental for the FEM and can be formalized as
+\begin{equation}\label{eq:FEMdisplacements}
+u^{(m)}(x,y,z) = \mathbf{H}^{(m)}(x,y,z)*\mathbf{U}
+\end{equation}
+where $u^{(m)}$ is the displacement at $x$,$y$, and $z$ coordinate within the element $m$, $\mathbf{H}^{(m)}$
+the displacement interpolation matrix and $\mathbf{U}$ the global
+displacement measured at every nodel point. With equation
+\ref{eq:FEMdisplacements} the displacements at any point in the object can be calculated.
+The values of the displacement interpolation matrix $\mathbf{H}^{(m)}$ depend on
+the choice of the finite elements that make up the mesh.
+
+From the displacement $u^{(m)}(x,y,z)$, the strain can be calculated as the
+derivative of the displacement with respect to $x$,$y$, and $z$. Thus, the
+strain $\epsilon^{(m)}(x,y,z)$ at the element $m$ is given by  
+\begin{equation}\label{eq:FEMstrain}
+\epsilon^{(m)}(x,y,z) = \mathbf{B}^{(m)}(x,y,z)*\mathbf{U}
+\end{equation}
+where $\mathbf{B}^{(m)}(x,y,z)$ is the strain-displacement matrix. This matrix can
+be calculated by differentiating the the displacement interpolation matirx
+$\mathbf{H}^{(m)}$. With equations \ref{eq:FEMdisplacements} and \ref{eq:FEMstrain} the behaviour of
+the object structure given a global nodal point displacement $\mathbf{U}$ is
+defined. 
+
+The goal of displacement-based finite element analysis is to calculate
+unknown nodal point displacements from a known force or load acting on the
+object. When a load is applied to the structure of the object it will cause a
+deformation of the mesh. The nodal points in the mesh will bounce and move
+until they reach a state of equilibrium. It is important to stress that in this equilibrium the shape of the
+object is still deformed due the applied force. However, the nodal points may have
+assumed new stable positions hence we refer to it as an equilibrium. The
+equation governing the equilibrium is derived using equations
+\ref{eq:FEMdisplacements}, \ref{eq:FEMstrain} and the Principle of Virtual
+Work \cite{FEMbook}. It relates the stiffness matrix $\mathbf{K}$ and the unknown nodal
+displacements $\mathbf{U}$ to the loads $\mathbf{R}$ as follows
+\begin{equation}\label{eq:FEMequilibrium}
+\mathbf{K}\mathbf{U} = \mathbf{R}
+\end{equation}
+The stiffness matrix $\mathbf{K}$ is calculated as the sum of the stiffness
+matrices $\mathbf{K}^{(m)}$ of the indivdual finite elements. The
+$\mathbf{K}^{(m)}$ are
+computed from the strain-displacement matrices $\mathbf{B}^{(m)}$ and the
+elasticity matrix $\mathbf{E}^{(m)}$ as
+\begin{equation}\label{eq:FEMstiffness}
+\mathbf{K} = \sum_m \mathbf{K}^{(m)} = \sum_m \int_{V^{(m)}} \mathbf{B}^{(m)T}
+  \mathbf{E}^{(m)} \mathbf{B}^{(m)} dV^{(m)}
+\end{equation}
+where the integral goes over the volume $V^{(m)}$ of the element $m$. This
+approach to computing the stiffness matrix is known as the \textit{direct
+  stiffness method} \cite{FEMbook}. The elasticity matrix relates stress and
+strain in the material. Its form depends on the dimensionality of the
+element. In a one dimensional element the elasticity matrix is a scalar known as
+\textit{Young's Modulus}.   
+
+Equation \ref{eq:FEMequilibrium} describes a static equilibrium at a specific
+point in time. If the loads are applied rapidly then element inertial forces and
+energy damping forces must be considered as well. Equation \ref{eq:FEMdynamic} gives
+the dynamic form of the FEM equilibrium equation where $\dot{\mathbf{U}}$, $\ddot{\mathbf{U}}$ are the
+first and second time derivative of $\mathbf{U}$ respectively.
+\begin{equation}\label{eq:FEMdynamic}
+\mathbf{M}\ddot{\mathbf{U}} + \mathbf{C}\dot{\mathbf{U}} + \mathbf{K}\mathbf{U}
+= \mathbf{R}
+\end{equation}
+Here $\mathbf{M}$ is the mass matrix and $\mathbf{C}$ the damping matrix. This
+equation is sometimes refered to as the governing equation.
+
+\subsubsection{Modal Analysis}
+Solving the dynamic equilibrium equation \ref{eq:FEMdynamic} by direct integration
+is very costly \cite{FEMbook}. However, it is possible to diagonilze the system
+of equations by changing the finite element displacement basis to a generalized displacement
+basis $\Phi$ as 
+\begin{equation}
+\mathbf{U} = \Phi \mathbf{\tilde{U}}
+\end{equation}
+Equation \ref{eq:FEMdynamic} can further be premultiplied from the left by $\Phi^T$
+to give
+\begin{equation}\label{eq:FEMmodal}
+\Phi^T\mathbf{M}\Phi\ddot{\mathbf{\tilde{U}}} + \Phi^T\mathbf{C}\Phi\dot{\mathbf{\tilde{U}}} + \Phi^T\mathbf{K}\Phi^T\mathbf{\tilde{U}}
+= \Phi^T\mathbf{R}
+\end{equation}
+The above equation can be diagonalized if $\Phi$ is chosen as consisting of the $n$ eigenvectors of the eigensolutions $(\omega_1^2,\phi_1)\,,\, \dots \,,(\omega_n^2,\phi_n)$ which solve the eigenproblem
+\begin{equation}
+\mathbf{K}\Phi = \Omega^2\mathbf{M}\Phi
+\end{equation}
+So that 
+\begin{align}
+\Phi^T\mathbf{K}\Phi &= \Omega^2\\
+\Phi^T\mathbf{M}\Phi &= \mathbf{I}
+\end{align}
+The diagonalized equation \ref{eq:FEMmodal} can be solved for the displacements $\mathbf{\tilde{U}}$
+either in closed form or integrated numerically in fewer steps.
+\subsubsection{Recovering shape with FEM} 
+
+\subsection{Satistical Models}
+A \textit{shape model} describes the boundaries of an object. figur. For instance, a
+shape model of a face will denote the location and measures of the defining
 contours of a face. To locate an object in an image the shape model must be able to
 account for the following
-\begin{itemize}
-\item variations of shape due to deformations of the object
-\item arbitrary scaling of the object
-\item arbitrary rotations of the object
-\item some measure of gaussian input noise tolerance
-\end{itemize}
 
-
-   
-
-\subsection{PCA and Eigenfaces}
+\subsubsection{PCA and Eigenfaces}
 In 1991, Turk and Pentland \cite{eigenfaces91} pioneered a face recognition approach
 based on the mathematical
 technique called principal component analysis (PCA). Their face recognition
@@ -196,7 +390,7 @@ exactly represented as a linear combination all the eigenfaces.
 
 The weight of each eigenface in the linear combination is computed from the
 projection of the face image onto this eigenface. To recognize a face we
- first calculate these weights. Then we calculate the euclidean distance of the vector
+ first calculate these weights. Then we calculate the Euclidean distance of the vector
 of weights to the weights of faces from our training data set. The face from
 the data set with weights which are closest to the new image's weights is chosen
 as a match.
@@ -226,105 +420,459 @@ The eigenfaces approach is based heavily information and coding theory
 using low dimensional vector. As such PCA and eigenfaces are often used to
 reduce dimensionality in more sophisticated modelling approaches.
 
+
+\subsection{Statistical Models of Appearance}
+In their paper Statistical Models of Appearance \cite{activeApp04} Cootes and Taylor
+describe modelling approaches that consider texture variance, shape variance and the
+correlations between these two variances. The models they introduce are well suited for highly
+variables structures such as faces or internal organs. Using the shape and
+texture models, Cootes and Taylor show that it is possible to construct Active
+Shape and Active Appearance models that successfully locate
+shapes and even faces in images.
+
+Cootes and Taylor separate the shape and the information of a target image into
+two distinct vectors - the shape parameter vector $b_s$ and the texture
+represented by the grey-level vector $b_g$ (here the image is cray-scaled). Thus
+texture can be manipulated and investigated independent of the shape. They
+then perform PCA on both vectors, which allows them to express grey-levels and
+shape as functions of a parameter vector $c$ as follows
+\begin{gather} \label{gth:shape_mod} 
+x = \bar{x} + Q_s c\\ \label{gth:texture_mod}
+g = \bar{g} + Q_g c
+\end{gather}
+Where the shape vector $x$ and the grey-level (texture) vector $g$ are functions of the
+mean shape $\bar{x}$, the mean texture $\bar{g}$ and the matrices $Q_s$ and
+$Q_g$ which describe the modes of variation learned from the training data set
+\cite{activeApp04}. To reconstruct a new face using the model we first determine the $b_s$ and
+$b_g$ parameters from the new face image. These parameters are then
+used to calculate the $c$. Finally, the reconstruction is obtained using the
+formulas \ref{gth:shape_mod} and \ref{gth:texture_mod}.
+
+\subsubsection{Active Shape Model}
+The active shape model (ASM) proposed by Codee's and Taylor \cite{activeApp04} is based
+on the statistical models of shape and texture. The ASM enables us to locate a
+shape in an image using an iterative
+procedure as shown in figure \ref{gr:asm}. To search for objects in an image
+using the ASM, we first place the shape model, which we obtained from the training data, into
+the centre of the image. In the next iterations a texture profile of $k$
+neighbouring points around each point of the shape model is taken and compared
+with the texture profile of this point obtained when training the model. Then
+the point of the shape model is moved to make the difference between the two
+profiles smaller. This process is repeated until convergence is reached.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{images/scary_face2.png}
+\caption{ Active Shape Model iterations shown on on finding the shape of a
+  previously unseen face. Taken from \cite{cootesOverview01} }
+\label{gr:asm}
+\end{figure}
+
+The ASM moves the point only based on the texture profile of a
+local neighbourhood of this point. The obvious problem with this approach is
+that as it is a local search technique and thus it depends too much on the choice of the
+starting point. If the target image is not centered on the face and the
+algorithm begins in the centre of the image, then it can possibly converge on incorrect
+shapes such as the nose as can be seen in figure \ref{gr:bad_asm}. This is due to
+the fact that as a local search method, the ASM cannot escape a local minimum.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{images/bad_asm.png}
+\caption{ Incorrect convergence of the ASM when the search is initialised
+  incorrectly. This can happen when the face is not centered in the image or
+  when the search does not begin in the centre of the image. Taken from \cite{cootesOverview01} }
+\label{gr:bad_asm}
+\end{figure}
+
+An interesting improvement of the technique is proposed by Cootes et al
+\cite{activeApp04}. To improve the efficiency and the robustness of ASM, Cootes
+suggests to perform several searches at different resolutions. First a coarse
+search is performed on the image with a low resolution until the search converges. The resulting configuration
+of the shape model points from this coarse search
+then serves as the starting point for a search in the same image with a better
+resolution. The advantage of adopting this coarse to fine search approach is
+that it makes the search less susceptible to converging on incorrect shapes. When
+searching at a lower resolutions it will be easier to find the outlines of the
+face. Once the search is restarted with a higher resolution shapes like the
+mouth and the nose can be identified.
+
+\subsubsection{Active Appearance Model}
+Modelling faces using the Active Appearance Model (AAM) is a technique explored
+by Cootes and Taylor \cite{activeApp04}. AMM takes advantage of the
+Active Shape Model which allows us to locate interesting shapes in a new
+image. The set of points defining this shape are called landmark or feature
+points. The AMM enhances the AMS search by also considering the texture
+information.
+
+The AMM search attempts to minimise the difference between the texture (the
+grey-levels) of the image we are searching and the grey-levels of the
+image generated with the current model parameters. The difference vector that is
+minimised is defined as:
+\begin{equation}
+\delta I = I_i - I_m
+\end{equation}
+where $I_m$ is the vector of the grey-levels generated with the current model
+parameters and $I_i$ is a vector containing the grey-levels of the image we are
+searching in.
+
+To simplify this optimisation problem, Cootes and Taylor learn the relationship
+between the difference vector $\delta I$ and the error in the model
+parameters. Learning this relationship makes it possible to correctly improve the
+model for a given measured error in an iterative procedure.
+
+The AAM iterations are depicted in figure \ref{gr:amm}. The process attempts
+change model parameters to fit it to an unseen face. This fitting is done by
+minimising the differences between pixels at the landmark points.
+
+\begin{figure}[H]
+
+\includegraphics[scale=0.8]{images/amm_example.png}
+\caption{ Active Appearance Model iterations shown when searching for previously
+ unseen faces. Taken from \cite{activeApp04} }
+\label{gr:amm}
+\end{figure}
+
+The drawback of the AMM search is that it is required of the user to specify
+landmark points on the target image. This means the technique is not well suited
+for applications where the model would have to be matched to a large number of
+faces. To combat this problem, a number of automatic 2D and 3D landmark location
+solutions can be used \cite{activeApp04}.
+
+Another problem of both the ASM and the AMM lies in the fact that it does not
+distinguish or model the different variation sources. The variation caused by
+identity and the variation caused by expression are not perceived as two
+fundamentally different sources. Thus, it is impossible to only alter one
+variational source while leaving the other source constant. This makes the
+models unsuitable for expression transfer.
+
+\subsection{Tensor-Based Model}
+The possibility of using a multilinear approach to construct face models for face transfer was explored
+by Vlasic, Brand, Pfister and Popovic \cite{faceTransfer05}. The group
+successfully managed to implemented a face transfer application based on
+multilinear face model which allowed for expressions and even for speech related
+movements to be transferred between video-recordings of two different subjects. The multilinear
+model was estimated from geometric variations in 3D face scans that Vlasic and
+his group collected. Vlasic et al utilised two tensor models with
+different dimensionality. Their first model was a lower dimensional bilinear model that organised the data into three
+groups of vertexes, identity and expression. Their higher dimensional model
+organised faces into groups of expressions, vertexes, identities and visemes. The parameters for the multilinear face model which were used to generate new expressions were
+extracted from the video input using an optical flow algorithm.
+
+To construct a bilinear face model it is necessary to separate the faces from the
+database into groups of expressions and identities in order to organise them
+into the tensor. The tensor based approach allows us to organise
+the data in a way that makes for easier manipulation with a transformation
+matrix. The groups are aligned in the tensor along the modes as shown in figure
+\ref{gr:tensor}. In this example the vertexes change along the mode-1 space, the identity changes
+along the mode-2 space and the expressions change along the mode-3 space. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.8]{images/modes_faces.png}
+\caption{Multilinear face model showing how different attributes change along
+  the modes. Taken from \cite{faceTransfer05} }
+\label{gr:tensor}
+\end{figure}
+
+A mode spaces of
+a tensor can be altered independently of the other
+mode spaces by a linear transformations called \textit{mode-n product}. The
+mode-n product is defined between a matrix $\mathbf{M}$ and a tensor
+$\mathscr{T}$ and is written as $\mathscr{T} \times_n \mathbf{M}$. The mode-n
+product transforms the vectors in the n-th mode of the tensor by the matrix
+$\mathbf{M}$. Thus, it is possible to separately transform the expressions in
+mode-3 and the identity in mode-2. This separability of the model is convenient for the face transfer application.
+
+
+The \textit{mode-n singular value decomposition
+  (SVD)} is a linear transformation of a tensor that produces a \textit{core
+  tensor}. The core tensor is analogous to a diagonal matrix of eigenvalues used
+in PCA. Eigenvalues can be seen as measures of the variance along the
+corresponding eigenvector directions. In the core tensor the variance decreases from first element of the
+core tensor to the last, which makes it possible to reduce the dimensionality of
+the data set by truncating the core tensor. Therefore, it is possible to
+approximate the original tensor using a reduced core tensor. The approximation
+of a tensor
+$\mathscr{T}$ using a reduced core tensor $\mathscr{C}_{reduced}$ is derived from the
+mode-n SVD and thus defined as:
+\begin{equation} \label{eq:core_tensor}
+\mathscr{T} \approx \mathscr{C}_{reduced} \times_1 \hat{\mathbf{U}}_1 \times_2
+\hat{\mathbf{U}}_2 \times_3 \hat{\mathbf{U}}_3 \dotsb \times_N \hat{\mathbf{U}}_N
+\end{equation}
+The matrices $\hat{\mathbf{U}}_i$ are truncated versions of the eigenvector
+matrices for the corresponding mode space.
+
+Vlasic et al constructed a multilinear
+face model using mode-n SVD and decomposing the organised tensor into the
+matrices of eigenvectors of all modes except for the mode-1
+space which holds the vertexes. Using equation \ref{eq:core_tensor} the
+multilinear face model then becomes:
+\begin{equation} \label{eq:multilin_face}
+\mathscr{T} \approx \mathscr{M} \times_2
+\hat{\mathbf{U}}_2 \times_3 \hat{\mathbf{U}}_3 \dotsb \times_N \hat{\mathbf{U}}_N
+\end{equation}
+The tensor $\mathscr{M}$ is called the \textit{multilinear model}. Multiplying
+the multilinear model $\mathscr{M}$ with a linear combination of rows from the truncated eigenvectors
+then gives us exactly one original face \cite{faceTransfer05}. 
+
+The described tensor-based model is
+similar to what we saw in the eigenfaces PCA approach in figure
+\ref{gr:eigenfaces}. However, the tensor-based approach has the advantage that
+we can manipulate the different sources of variance (i.e. the identity, the
+expressions) separately. This advantage outweighs the additional computational
+complexity carried by the high order SVD and makes this model suitable for the
+task of expression transfer.
+
+The drawback of the method described by Vlasic et al is that it requires the
+tensor to be fully populated. This means that we require all
+expressions to be performed by all subjects to have a full tensor. This raises
+issues when some data is corrupted or lost during data gathering. There are two
+ways of coping with this problem. The first approach is to use a
+statistical method to model the data. Or the missing data can be estimated from the current data.
+\subsection{Tensor-based Statistical Discriminant Method}
+The tensor-based statistical discriminant methods (SDM) was successfully used by Minoi and Gillies
+\cite{sdm,jacey} to synthesise expressions and to neutralise faces displaying an
+expression. The SDM is based on Fischer's linear discriminant analysis (LDA) \cite{lda}. The LDA
+differs from the standard PCA eigenfaces approach in that it seeks to separate
+data into distinct classes. The way this is done is by projecting the data into
+a lower dimensional subspace that maximises the between class separability and
+minimises the within class variance.
+
+In LDA we first separate the training data set into a number of groups. Then we
+look for the between class scatter matrix $S_b$ and the within class scatter
+matrix $S_w$. The matrix $\Phi_{lda}$ that defines the projection onto the desired low dimensional
+space is defined as:
+\begin{equation} \label{eq:lda}
+\Phi_{lda} = \textrm{arg} \max_{\Phi}\frac{\lvert \Phi^T S_b \Phi \rvert}{\lvert \Phi^T S_w \Phi \rvert}
+\end{equation}
+In equation \ref{eq:lda} the ratio of the determinant of the between class
+separability and the determinant of the within class variability is
+maximised. The maximum of this equation is the optimal projection.
+
+However, the LDA approach has difficulties when the training data set is small
+in comparison to the dimensions of the image. This is called the \textit{small
+  size problem} and it causes the scatter matrices to be singular due to not
+having a full rank.To overcome the small size problem the statistical discriminant method can be used.
+
+The SDM approach consists of two stages. In the first stage the PCA
+and LDA are used to reduce the dimensionality and find the discriminant
+directions of the classes. The PCA helps to overcome the small size problem
+common to stand-alone LDA. In the second stage the most discriminant vectors of
+our classes are projected back into the original high dimensional space. This
+back projection will give us a vector for every class in the high dimensional
+space. These vectors allow us to synthesise an expression for a new face image by moving the the surface
+points of this new image in the direction of one of the vectors. 
+
+The SDM technique can be extended to tensor models by expanding the mode
+responsible for expressions into a number of modes representing
+individual expression classes, thereby effectively increasing the dimension of
+the tensor. The expanded tensor model still retains the quality of independence
+along the modes of variance. However, due to the expansion the SDM can be
+applied to the tensor if we flatten the sub-tensors into matrices.
+
+
 \section{Model-based tracking}
+
+\subsection{Kanade-Lucas-Tomasi Feature Tracker}
+The problem of registering a displaced image can be formalised by assuming we
+are given two functions $F(x)$ and $G(x)$. These function take a vector $x$ as input
+and output the pixel intensity at $x$. Thus, we can think of think of these
+functions as representing images. 
+The goal in image registration is to find a disparity vector $h$ which minimises
+a measure of difference between $F(x + h)$ and $G(x)$ for a given region of
+interest $R$ \cite{kanade}. This region of interest $R$ is the feature which we
+are tracking. The image registration problem is shown below:
+
+\begin{figure}[H] 
+\centering
+\setlength\fboxsep{0.5pt}
+\setlength\fboxrule{0.5pt}
+\subfloat[F(x)]{
+  \fbox{\includegraphics[scale=0.35]{images/fx.png}}
+}
+\subfloat[G(x)]{
+  \fbox{\includegraphics[scale=0.35]{images/gx.png}}
+}
+\caption{ The image registration problem. The task is to find the disparity
+  vector $h$.}
+\end{figure}
+
+The measure of difference most often used is the $L_2$ norm, which is defined
+as follows for the registration problem:
+\begin{equation}
+L_2 \mathrm{norm} = (\sum_{x \in R} [F(x + h) - G(x)]^2)^{\frac{1}{2}}
+\end{equation}
+
+The naive way to locate the $h$ that minimises the $L_2$ norm would be to
+iterate through all the possible values of $h$ and measure the $L_2$ norm. A
+better approach was proposed by Kanade and Lucas \cite{kanade}. Their algorithm
+specifies the order in which possible values of $h$ will be explored. The procedure
+iteratively improves the guess for $h$ by considering the spatial intensity
+gradients at each point $x$ in the image. This means that the Kanade-Lucas-Tomas
+feature tracker locally searches for the best disparity vector $h$ by using the
+information about the gradient at all points in the image. The estimation of the
+$h$ and the convergence of the algorithm is further improved by weighing the gradients using a second derivation
+approximation of the image \cite{kanade}. The weights are thus defined as:
+\begin{equation}\label{eq:weights}
+w(x) = \frac{1}{\lvert G'(x) - F'(x) \rvert}
+\end{equation}
+Where the w(x) was derived from an approximation to the second derivative with
+$h$ factored out since it is a constant in all the weights.
+
+ The iterative scheme for the Kanade-Lucas-Tomasi algorithm is:
+\begin{align}
+&h_0 = 0\\
+&h_{k+1} = h_k + \frac{\sum_x w(x) F'(x + h)[G(x) - F(x +h_k)]}{\sum_x
+  w(x)F'(x+h_k)^2}
+\end{align}
+where w(x) is calculated using equation \ref{eq:weights}.
+
+To further improve the technique Kanade et al suggest to perform the algorithm
+on several resolutions, using the result from the coarser resolution as starting
+$h_0$ of the algorithm with a finer resolution. 
+
+The algorithm can also successfully compute the $h$ even if the region of interest has been rotated or
+scaled. If the image has been rotated or scaled we express the matching problem
+as $G(x) = F(xA +h)$ where $A$ is a linear transformation matrix. This
+transformation allows us
+to apply the algorithm.
+
+The Kanade-Lucas-Tomasi feature tracker has been successfully applied to
+tracking facial feature points \cite{faceTransfer05}. Vlasic et al localised
+feature points in the initial frame manually and then used the
+Kanade-Lucas-Tomasi feature tracker to obtain the displacements between pairs of
+frames. From these displacements they were able to derive parameters for their
+tensor-based multilinear model. This allowed them to transfer expressions to
+another video performance.
+
+As a local iterative search method, the Kanade-Lucas-Tomasi feature tracker's
+performance depends heavily on the initial guess of the $h$. If the initial
+guess is too far from the region of interest then the algorithm does not perform
+well, since the scheme was derived using local approximations of
+functions. These local approximations will not hold for points far from the
+region of interest.
+
+
+\section{Optimization}
 
 \subsection{Nelder Mead Downhill Simplex}
 
 The downhill simplex is a local optimization method that does not
-require gradients and makes use of only fitness function evaluations
-in finding a local optimum. It was created by Nelder and Mead in 1965
-and has since proven itself to display efficiency comparable to that
-of gradient based optimization methods. The method was engineered
+require gradients to identify local extrema. With the downhill simplex method a
+local optimum is found by means of a sequence of fitness function evaluations.
+
+The downhill simplex method was coined by Nelder and Mead in 1965
+and has since proven itself to be comparable in efficiency to the more popular 
+gradient based optimization methods. The method was designed
 for the optimization of multidimensional, unconstrained functions
-that have either no gradients or when the derivatives exist only for
-portions of the search space like in the case of discontinuous function
-\cite{Nelder2009}. The downhill simplex is also fairly simple to
-implement, however the drawback is that many function evaluations
-are required. Therefore, when the computational difficulty of the
+that have either no gradients or when the gradient exist only for
+portions of the search space sucha as in the case of discontinuous functions
+\cite{Nelder2009}. However, the drawback of the method is that many fitness function evaluations
+are required. Therefore, when the computational complexity of the
 fitness function is very high, other optimization methods need to
 be considered instead of the Nelder Mead downhill simplex \cite{Press1992}.
 
-The downhill simplex method is based on the idea of isolating the
+The algorithm is based on the idea of isolating the
 minimum by geometrically transforming a \textit{simplex}. The simplex
 is a convex hull of $N+1$ vertices, where $N$ is the underlying
-problem's dimension. In a two dimensional space this simplex would
-be a triangle, in three dimensions a tetrahedron. This simplex encloses
-a portion of the search space and the goal is to move and deform the
-simplex to have it enclose the minimum only. This is achieved with
-the help of geometric transformations of the simplex. These transformations,
-will be discussed more in depth later. 
+problem's dimension. In a two dimensional space this simplex would therefore
+be a triangle, in three dimensions a tetrahedron. The algorithm is initialized
+so that the simplex encloses
+a portion of the search space and the goal is to move the simplex along the
+search space surface and deform so that all of its vertices converge on the local optimum. This is achieved with
+the help of geometric transformations of the simplex.
 
 The process of transforming a multidimensional simplex, in order to
 isolate the minimum, is somewhat analogous to bracketing a minimum
-in a one dimensional search space. The simplex makes it's way downhill
-through the search space, in search of a minimum and when it finds
-such a local minimum, it shrinks itself to contain only the minimum
-which is then the result of our local optimization. The behavior of
-the simplex during the algorithm parallels the movements of the amoeba
-organism. Due to this and also to distinguish it from the Dantzig's
-simplex method for linear programming, the downhill simplex is in
-some publications referred to as the \textit{amoeba} method \cite{Press1992}. 
+in a one dimensional search space. The one dimensional search space will have
+peaks and valleys in places of local optima. The simplex, which is a line in one
+dimensional space, makes it's way downhill
+through this search space, in search of a minimum by means of shrinking and
+stretching. When the simplex finds a local minimum, it shrinks itself to contain
+only the minimum and the algorithm terminates.
+
+The behavior of the simplex during the algorithm parallels the expanding and
+collapsing movements of the amoeba
+organism. The Nelder Mead downhill simplex is in
+some publications referred to as the \textit{amoeba} method due to this similarity but also to distinguish it from Dantzig's
+simplex method for linear programming \cite{Press1992}. 
 
 
-\subsubsection*{The Downhill Simplex Algorithm}
+\subsubsection{The Downhill Simplex Algorithm}
 
-Given a nonlinear fitness function $f\,:\,\mathbb{R}^{N}\rightarrow\mathbb{R}$
-and an initial point $P_{0}$, a simplex is constructed from the initial
-point and $N$ derived points $P_{i}$. There are generally two kinds
-of shapes of simplex that can be picked from and it is this shape
-that defines the way in which the points $P_{i}$ are obtained \cite{Nelder2009}.
-The simplex can either have a regular shape where all sides are equally
-long, or the simplex can be right angled in which case the vertices
-$P_{i}$ are calculated according to formula 5.1.\\
-\begin{equation}
-P_{i}=P_{0}+\lambda e_{i}\end{equation}
+To initialize the downhill simplex algorithm we need a nonlinear fitness function $f\,:\,\mathbb{R}^{N}\rightarrow\mathbb{R}$
+and an initial point $P_{0}$. The simplex will be a $N+1$ dimensional convex
+hull. The first vertex of the convex hull is the initial point. The remaining
+$N$ vertices $P_{i}$ are derived from the initial point. The shape of the simplex defines the way in which the
+points $P_{i}$ are calculated\cite{Nelder2009}.
+
+The simplex shape can be one of the following:
+\begin{itemize}
+\item The simplex can have a regular shape where all sides are equally
+long. It is up to the user to pick this length.
+\item The simplex can be right angled in which case the vertices
+$P_{i}$ are calculated according to formula \ref{eq:right_angle_simplex}.
+
+
+\begin{equation}\label{eq:right_angle_simplex}
+P_{i}=P_{0}+\lambda e_{i}
+\end{equation}
 \\
 where $e_{i}$ are unit vectors for the $N$ dimensions and $\lambda$
 is a constant. This constant influences the size of the simplex and
 represents a guess of the problem's characteristic scale length \cite{Press1992}.
+\end{itemize}
 
-After the simplex has been initialized, three crucial steps are repeated
+After the initialization phase, three crucial steps are repeated
 until the simplex has encountered the local minimum. These steps are
-based around moving the vertex of the simplex from where the fitness
-function has the largest value to a point where the value will be
-smaller. To achieve this, the first step is to order the vertexes
+based around moving the vertex of the simplex with the largest fitness
+function largest value to a new point where the value will be
+smaller. 
+
+\begin{enumerate}
+\item[\textbf{1.}] The first step is to sort the vertexes
 $x_{i}$ of the simplex from worst to best, where $h$ is the index
 of the worst vertex, $s$ the second worst index and $l$ the best
-index. Then the \textit{centroid} of the best side is calculated according
-to formula 5.2.\\
-\begin{equation}
+index.
+\item[\textbf{2.}] Then the \textit{centroid} of the best side is calculated according
+to formula \ref{eq:centroid}.\\
+\begin{equation}\label{eq:centroid}
 c=\frac{1}{N}\sum_{j\neq h}x_{j}\end{equation}
 \\
-This centroid is then used in the final step, wherein the simplex
-is geometrically transformed in order to move the current worst to
-a better position. At first, a replacement point for $x_{h}$ is sought
+\item[\textbf{3.}] In the final step, the centroid is used to geometrically
+  transform the simplex in order to move the current worst vertex to
+a better position. To achieve this, the algorithm seeks a replacement point for $x_{h}$
 on the line that connects the worst index $x_{h}$ and the centroid
-$c$. Three different points are considered as a replacement point
-and they are obtained using reflection (formula 5.3), expansion (formula
-5.4) and either inside or outside contraction (formula 5.5). \\
-\begin{equation}
-x_{r}=c+\alpha(c-x_{h})\end{equation}
+$c$. Three different points are then compared and the one with the best fitness
+value is chosen as the replacement point. These three candidates are obtained
+using reflection (formula \ref{eq:reflection}), expansion (formula
+\ref{eq:expansion}) and either inside or outside contraction (formula \ref{eq:contraction}). \\
+\begin{equation}\label{eq:reflection}
+x_{r}=c+\alpha(c-x_{h})
+\end{equation}
 
+\begin{equation}\label{eq:expansion}
+x_{e}=c+\gamma(x_{r}-c)
+\end{equation}
 
-\begin{equation}
-x_{e}=c+\gamma(x_{r}-c)\end{equation}
-
-
-\begin{equation}
+\begin{equation}\label{eq:contraction}
 x_{c}=\begin{cases}
 c+\beta(x_{r}-c) & if\, x_{h}\leq x_{r}\\
-c+\beta(x_{h}-c) & else\end{cases}\end{equation}
-
+c+\beta(x_{h}-c) & else\end{cases}
+\end{equation}
 
 In case neither of these three new replacement point candidates has
 a better fitness value than the worst vertex $x_{h}$, then the entire
-simplex is shrunk towards the best vertex $x_{l}$. Meaning, $N$
+simplex is shrunk towards the best vertex $x_{l}$. In this case $N$
 new vertices will be computed as follows:\\
 \begin{equation}
 x_{j}=x_{l}+\delta(x_{j}-x_{l})\,\,\,\, j=0,\ldots,N\,\wedge\, j\neq l\end{equation}
 \\
 The geometric implications of the transformations reflection, expansion,
-contraction and shrinking are depicted in figure 7. 
+contraction and shrinking are depicted in figure \ref{fg:amoeba}. 
+
+\end{enumerate}
+
 
 %
 \begin{figure}[H]
@@ -334,8 +882,7 @@ contraction and shrinking are depicted in figure 7.
 
 \caption{Geometric interpretations of the simplex transformations. Taken from
 \cite{Nelder2009}}
-
-
+\label{fg:amoeba}
 
 \end{figure}
 
@@ -362,3 +909,5 @@ restarts of the downhill algorithm are also sometimes utilized \cite{Press1992}.
 \bibliography{references}
 
 \end{document}
+
+% LocalWords:  Nelder

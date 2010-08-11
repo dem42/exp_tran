@@ -40,6 +40,9 @@ class Vector3
 	Vector3 sub(Vector3 v1);
 	Vector3 mult(float scalar);
 	float length();
+        //normalize the vector input as a double*
+        //overwirtes the argument and also returns a pointer to it
+        static double* normalize(double*,int);
 
 	//void versions
 	void addTo(Vector3 v1);
@@ -47,7 +50,7 @@ class Vector3
 		
 	//cross product between this x v1
 	Vector3 cross_product(Vector3 v1);
-	Vector3 normalize();
+	Vector3 normalize();        
 };
 
 ostream& operator<<(ostream& stream, Vector3 v);

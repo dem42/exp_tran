@@ -94,23 +94,22 @@ Color3 Face::interpolate_color(Color3 a,Color3 b,Color3 c,Color3 d,float r,float
 //the singular value matricies U2 and U3
 void Face::interpolate(double *w_id,double *w_exp,bool brute)
 {
-    double sum = 0;
-    for(int i=0;i<7;i++)
-    {
-        cout << "w_exp["<<i<<"] = " << w_exp[i] << endl;
-        sum += w_exp[i];
-    }
-    //normalize:
-    //if no exp set make it neutral
-    if(sum == 0)
-       w_exp[4] = 1;
-    else
-        for(int i=0;i<7;i++)
-            w_exp[i] = w_exp[i]/sum;
-
-
-    sum = 0;
-
+//    double sum = 0;
+//    for(int i=0;i<7;i++)
+//    {
+//        cout << "w_exp["<<i<<"] = " << w_exp[i] << endl;
+//        sum += w_exp[i];
+//    }
+//    //normalize:
+//    //if no exp set make it neutral
+//    if(sum == 0)
+//       w_exp[4] = 1;
+//    else
+//        for(int i=0;i<7;i++)
+//            w_exp[i] = w_exp[i]/sum;
+//
+//    sum = 0;
+//
 //    for(int i=0;i<56;i++)
 //    {
 //        sum += w_id[i];
@@ -144,7 +143,7 @@ int Face::getPointIndexFromPolygon(int index)
     return triangles[index][0];
 }
 
-void Face::calculateBoundingSphere() const
+void Face::calculateBoundingSphere(float *cx,float *cy,float *cz) const
 {
     int v1,v2,v3;
     float v;
@@ -191,6 +190,9 @@ void Face::calculateBoundingSphere() const
 
     std::cout << bx_u <<" " << bx_d <<" " << by_u <<" " << by_d <<" " << bz_u <<" " << bz_d << std::endl;
     std::cout << "bounding sphere" << std::endl;
+    *cx = (bx_u + bx_d)/2.0;
+    *cy = (by_u + by_d)/2.0;
+    *cz = (bz_u + bz_d)/2.0;
     std::cout <<(bx_u + bx_d)/2.0 << " " << (by_u + by_d)/2.0 << " " << (bz_u+bz_d)/2.0 << std::endl;
 }
 

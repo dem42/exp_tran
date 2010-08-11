@@ -65,7 +65,13 @@ Matrix FaceModel::getCoreTensor() const
 {
     cout << "core" << endl;
     return core;
-}
+}//    w_exp[0] = 0.0;
+//    w_exp[1] = 0.0;
+//    w_exp[2] = 0.0;
+//    w_exp[3] = 0.2;
+//    w_exp[4] = 0.0;
+//    w_exp[5] = 0.8;
+//    w_exp[6] = 0.0;
 
 Matrix FaceModel::getUIdentity() const
 {
@@ -168,6 +174,24 @@ void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bo
 }
 
 
+void meanCenterMatrix(Matrix &matrix)
+{
+    double sum_x = 0;
+    double sum_y = 0;
+    double sum_z = 0;
+
+//    for(int i=0;i<matrix.getM();i+=3)
+//    {
+//        sum[i]
+//            }
+    for(int i=0;i<matrix.getM();i++)
+    {
+        for(int i=0;i<matrix.getN();i++)
+        {
+
+        }
+    }
+}
 void FaceModel::computeIdentitySingularVectors(int m,int n)
 {
     Matrix A(m,n);

@@ -10,7 +10,7 @@ void Optimizer::generatePoints(const vector<Mat>&rotations, const vector<Mat>&tr
                                const Mat& cameraMatrix, const Mat& lensDist,
                                int frame_number, Face *face_ptr,
                                vector<vector<Point2f> >&generatedPoints,
-                               vector<vector<int> >&point_indices_for_frame)
+                               vector<vector<int> >&point_indices_for_frame,bool test)
 {
     int random;
     double low = 0;
@@ -51,7 +51,10 @@ void Optimizer::generatePoints(const vector<Mat>&rotations, const vector<Mat>&tr
 
             point3dMat(0,0) = p.x;
             point3dMat(1,0) = p.y;
-            point3dMat(2,0) = p.z+1500.0;
+            if(test == false)
+                point3dMat(2,0) = p.z+1500.0;
+            else
+                point3dMat(2,0) = p.z;
 
             Rodrigues(rotations[j],rmatrix);
             transpose = translations[j];
@@ -59,10 +62,15 @@ void Optimizer::generatePoints(const vector<Mat>&rotations, const vector<Mat>&tr
             point2dMat = cameraMatrix*((rmatrix * point3dMat) + transpose);
 
             //homogenous coord
-            point2dMat(0,0) /= point2dMat(2,0);
-            point2dMat(1,0) /= point2dMat(2,0);
+            if(test == false)
+            {
+                point2dMat(0,0) /= point2dMat(2,0);
+                point2dMat(1,0) /= point2dMat(2,0);
+            }
 
             //objectPoints.push_back(Point3f(p.x,p.y,p.z+1500.0));
+
+            //cout << "generated new point : " << point2dMat(0,0) << " " << point2dMat(1,0) << endl;
 
             imagePoints.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));
         }
@@ -114,9 +122,9 @@ void Optimizer::calculateTransformation(const vector<Point2f> &imagePoints, Face
     {
         p3 = face_ptr->getPointFromPolygon(fPoints[i]);
 
-        cout << "point at polygon " << face_ptr->getPointIndexFromPolygon(fPoints[i]) << endl;
+        //cout << "point at polygon " << face_ptr->getPointIndexFromPolygon(fPoints[i]) << endl;
         p3.z += 1500.0;
-        cout << "point " << p3.x << " " << p3.y << " " << p3.z << endl;
+        //cout << "point " << p3.x << " " << p3.y << " " << p3.z << endl;
         objectPoints.push_back(p3);
     }
 

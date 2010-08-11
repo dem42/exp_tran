@@ -1,4 +1,51 @@
-\begin{thebibliography}{1}
+\begin{thebibliography}{10}
+
+\bibitem{cootesOverview01}
+T.F. Cootes and C.J. Taylor.
+\newblock Statistical models of appearance for medical image analysis and
+  computer vision.
+\newblock {\em Proc. SPIE Medical Imaging}, 2001.
+
+\bibitem{activeApp04}
+T.F. Cootes and C.J. Taylor.
+\newblock Statistical models of appearance for computer vision.
+\newblock mar 2004.
+
+\bibitem{lda}
+D.F. Gillies.
+\newblock Intelligent data and probabalistic inference lecture notes.
+\newblock {\em Imperial College London}, 2009.
+
+\bibitem{kanade}
+Bruce~D. Lucas and Takeo Kanade.
+\newblock An iterative image registration technique with an application to
+  stereo vision.
+\newblock {\em International Joint Conference on Artificial Intelligence},
+  pages 674--679, 1981.
+
+\bibitem{FEM1ter}
+Dimitri Metaxas and Demetri Terzopoulos.
+\newblock Shape and nonrigid motion estimation through physics-based synthesis.
+\newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  15(6):580--591, 1993.
+
+\bibitem{jacey}
+Jacey-Lynn Minoi.
+\newblock {\em Geometric Expression Invariant 3D Face Recognition using
+  Statistical Discriminant Models}.
+\newblock {Phd} dissertation, Imperial College London.
+
+\bibitem{sdm}
+J.L. Minoi and D.F. Gillies.
+\newblock 3d face and facial expression recognition using tensor-based
+  discriminant analysis methods.
+
+\bibitem{FEM1pen}
+Alex Pentland and Stan Sclaroff.
+\newblock Closed-form solutions for physically based shape modelling and
+  recognition.
+\newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  13(7):715--726, 1991.
 
 \bibitem{Press1992}
 W.H. Press, S.A. Teukolsky, W.T. Vetterlin, and B.P. Flannery.
@@ -22,5 +69,10 @@ J.~Nelder S.~Singer.
 M.~Turk and A.~Pentland.
 \newblock Eigenfaces for recognition.
 \newblock {\em Journal of Cognitive Neuroscience}, 3(1):71--86, 1991.
+
+\bibitem{faceTransfer05}
+D.~Vlasic, M.~Brand, H.~Pfister, and J.~Popovic.
+\newblock Face transfer with multilinear models.
+\newblock {\em ACM Transactions on Graphics}, 24(3), 2005.
 
 \end{thebibliography}

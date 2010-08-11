@@ -26,7 +26,7 @@ protected:
                         const Mat& cameraMatrix, const Mat& lensDist,
                         int frame_number, Face *face_ptr,
                         vector<vector<Point2f> >&generatedPoints,
-                        vector<vector<int> >&point_indices_for_frame);
+                        vector<vector<int> >&point_indices_for_frame, bool test=false);
     //static here could be read from an xml config
     static const int fPoints[20];
     static const int fPoints_size;

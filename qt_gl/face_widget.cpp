@@ -35,9 +35,9 @@ FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
   //0.479993 0.0882419 -0.872801 0.00623718
   center_x = -2.8741;
   center_y = 19.915;
-  center_z =  1518-1500;
+  center_z =  1518;
 
-  cameraDistance = -500;
+  cameraDistance = 200;
   cameraZPosition = 1;
 }
 
@@ -94,17 +94,17 @@ void FaceWidget::render()
       // glTexCoord2f(vertex_texture[v1],vertex_texture[v1]);
       //glColor3f(vertex_texture[v1].r,vertex_texture[v1].g,vertex_texture[v1].b);
       glNormal3f(vertex_normals[v1].x,vertex_normals[v1].y,vertex_normals[v1].z);
-      glVertex3f(vertexes[v1].x,vertexes[v1].y,vertexes[v1].z+1500.0);
+      glVertex3f(vertexes[v1].x,vertexes[v1].y,vertexes[v1].z);
 
       //glTexCoord2f(vertex_texture[v2],vertex_texture[v2]);
       //glColor3f(vertex_texture[v2].r,vertex_texture[v2].g,vertex_texture[v2].b);
       glNormal3f(vertex_normals[v2].x,vertex_normals[v2].y,vertex_normals[v2].z);
-      glVertex3f(vertexes[v2].x,vertexes[v2].y,vertexes[v2].z+1500.0);
+      glVertex3f(vertexes[v2].x,vertexes[v2].y,vertexes[v2].z);
 
       //glTexCoord2f(vertex_texture[v3],vertex_texture[v3]);
       //glColor3f(vertex_texture[v3].r,vertex_texture[v3].g,vertex_texture[v3].b);
       glNormal3f(vertex_normals[v3].x,vertex_normals[v3].y,vertex_normals[v3].z);
-      glVertex3f(vertexes[v3].x,vertexes[v3].y,vertexes[v3].z+1500.0);
+      glVertex3f(vertexes[v3].x,vertexes[v3].y,vertexes[v3].z);
       glEnd();
 
     }
@@ -192,6 +192,12 @@ void FaceWidget::paintGL(void)
   //ok the 4th, 5th and 6th parameter are what im looking at and they should
   //be the center of the sphere bounding my scene
   //2.8741 -19.915 -1518.46
+  face_ptr->calculateBoundingSphere(&center_x,&center_y,&center_z);
+  //negative because we arent moving the camera , we are moving the scene to the center
+  glTranslatef(0,0,-cameraDistance);
+
+  //move the objects by:
+  glTranslatef(trans_x,trans_y,trans_z);
 
   //rotations which will be updated anytime the values of rot_x, rot_y change
   //to get the rotations around the object (which isnt at 0,0,0) we need to
@@ -199,15 +205,18 @@ void FaceWidget::paintGL(void)
   glRotatef(rot_z, 0.0, 0.0, 1.0);
   glRotatef(rot_y, 0.0, 1.0, 0.0);
   glRotatef(rot_x, 1.0, 0.0, 0.0);
-
-  //move the objects by:
-  glTranslatef(trans_x,trans_y,trans_z);
-
-  glTranslatef(0,0,cameraDistance);
+//
+//  glRotatef(rot_x, 1.0, 0.0, 0.0);
+//  glRotatef(rot_y, 0.0, 1.0, 0.0);
+//  glRotatef(rot_z, 0.0, 0.0, 1.0);
 
   //rotate around norm(r) and r which is the rotation vector
   //glRotatef(145.89, 0.64663, 1.10562, 2.20011);
 
+  //if its too small use:
+  //glScalef(100,100,1);
+
+  glTranslatef(-center_x,-center_y,-center_z);
   //glTranslatef(center_x, center_y, center_z);
   //does the open gl glBegin(GL_POLYGON) glEnd() stuff
   render();

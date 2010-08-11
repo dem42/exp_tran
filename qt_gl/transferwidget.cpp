@@ -47,7 +47,7 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
     picLabel = new FeaturePointQLabel();
     flowLabel = new VectorFieldQLabel();
     this->face_widget = face_widget;
-    this->face_widget->setCameraParameters(-500,1);
+    this->face_widget->setCameraParameters(600,1);
     face_ptr  = new Face();
 
 
@@ -107,7 +107,9 @@ void TransferWidget::calcIntrinsicParams()
     cout << img.size().height << " " << img.size().width << endl;
 
 
-    vector<Point2f> corners;
+     vector<Point2f> corners;
+    // use calibration matrix value to find opengl parameters calibrationMatrixValues();
+
     //the size here is very important .. it cannot be a subset
     //of the inner corners in the image but the max number in there
     Size s(3,4);
@@ -124,21 +126,21 @@ void TransferWidget::calcIntrinsicParams()
     //order of corners is from top to bottom, left to right
     vector<Point3f> worldCoord;
     //top row
-    worldCoord.push_back(Point3f(-3.0,3.0,-0.0));
-    worldCoord.push_back(Point3f(0.0,3.0,-0.0));
-    worldCoord.push_back(Point3f(3.0,3.0,-0.0));
+    worldCoord.push_back(Point3f(-3.0,3.0,0.0));
+    worldCoord.push_back(Point3f(0.0,3.0,0.0));
+    worldCoord.push_back(Point3f(3.0,3.0,0.0));
     //middle row
-    worldCoord.push_back(Point3f(-3.0,0.0,-0.0));
-    worldCoord.push_back(Point3f(0.0,0.0,-0.0));
-    worldCoord.push_back(Point3f(3.0,0.0,-0.0));
+    worldCoord.push_back(Point3f(-3.0,0.0,0.0));
+    worldCoord.push_back(Point3f(0.0,0.0,0.0));
+    worldCoord.push_back(Point3f(3.0,0.0,0.0));
     //middle bottom
-    worldCoord.push_back(Point3f(-3.0,-3.0,-0.0));
-    worldCoord.push_back(Point3f(0.0,-3.0,-0.0));
-    worldCoord.push_back(Point3f(3.0,-3.0,-0.0));
+    worldCoord.push_back(Point3f(-3.0,-3.0,0.0));
+    worldCoord.push_back(Point3f(0.0,-3.0,0.0));
+    worldCoord.push_back(Point3f(3.0,-3.0,0.0));
     //bottom row
-    worldCoord.push_back(Point3f(-3.0,-6.0,-0.0));
-    worldCoord.push_back(Point3f(0.0,-6.0,-0.0));
-    worldCoord.push_back(Point3f(3.0,-6.0,-0.0));
+    worldCoord.push_back(Point3f(-3.0,-6.0,0.0));
+    worldCoord.push_back(Point3f(0.0,-6.0,0.0));
+    worldCoord.push_back(Point3f(3.0,-6.0,0.0));
 
     vector<vector<Point3f> > objectPoints;
     objectPoints.push_back(worldCoord);
@@ -236,7 +238,9 @@ void TransferWidget::processVideo()
 
     timerReplay = new QTimer(this);
     connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
-    timerReplay->start(400);
+    timerReplay->start(900);
+
+    face_widget->setFace(face_ptr);
 }
 
 void TransferWidget::calculateTransformation(vector<Point2f> imagePoints, Face *face_ptr, Mat &rvec, Mat &tvec, bool useExt)
@@ -331,16 +335,36 @@ void TransferWidget::startFaceTransfer()
     //convert the rotation vector to a rotation matrix
     cv::Rodrigues(rvec,rmatrix);
 
-    //const double PI = 3.141593;
+    const double PI = 3.141593;
 
 
-//    double rx[3][3] = {{1,0,0},{0,::cos(rot_x),-::sin(rot_x)},{0,::sin(rot_x),::cos(rot_x)}};
-//    double ry[3][3] = {{::cos(rot_y),0,-::sin(rot_y)},{0,1,0},{::sin(rot_y),0,::cos(rot_y)}};
-//    double rz[3][3] = {{::cos(rot_z),-::sin(rot_z),0},{::sin(rot_z),::cos(rot_z),0},{0,0,1}};
+    double rot_y, rot_x, rot_z,cy, cx,sx,cz,sz;
+    rot_y = asin( rmatrix.at<double>(2,0));        /* Calculate Y-axis angle */
+    cy           =  cos( rot_y );
 
-//    Mat rX(3,3,CV_64F,rx), rY(3,3,CV_64F,ry), rZ(3,3,CV_64F,rz);
-//    Mat result = rZ*rX*rY;
+    if ( fabs( cy ) > 0.005 )             /* Gimball lock? */
+      {
+      cx      =  rmatrix.at<double>(2,2) / cy;           /* No, so get X-axis angle */
+      sx      = rmatrix.at<double>(2,1)  / cy;
 
+      rot_x  = atan2( sx, cx );
+
+      cz      =  rmatrix.at<double>(0,0) / cy;            /* Get Z-axis angle */
+      sz      = rmatrix.at<double>(1,0) / cy;
+
+      rot_z  = atan2( sz, cz );
+  }
+
+
+    double rx[3][3] = {{1,0,0},{0,::cos(rot_x),-::sin(rot_x)},{0,::sin(rot_x),::cos(rot_x)}};
+    double ry[3][3] = {{::cos(rot_y),0,-::sin(rot_y)},{0,1,0},{::sin(rot_y),0,::cos(rot_y)}};
+    double rz[3][3] = {{::cos(rot_z),-::sin(rot_z),0},{::sin(rot_z),::cos(rot_z),0},{0,0,1}};
+
+    Mat rX(3,3,CV_64F,rx), rY(3,3,CV_64F,ry), rZ(3,3,CV_64F,rz);
+    Mat result = rZ*rY*rX;
+
+    cout << "its so dumb i want to scream rZT*rYT*rXT" << Matrix(result);
+    cout << "so soooo dumb rmatrix: " << Matrix(rmatrix);
 
     double r11 = rmatrix.at<double>(0,0), r12 = rmatrix.at<double>(0,1),r13 = rmatrix.at<double>(0,2);
     double r21 = rmatrix.at<double>(1,0), r22 = rmatrix.at<double>(1,1),r23 = rmatrix.at<double>(1,2);
@@ -404,7 +428,7 @@ void TransferWidget::startFaceTransfer()
     }
     picLabel->setMarked(points);
 
-    face_widget->setTransParams(euler[0],euler[1],euler[2],tx,ty,tz);
+    face_widget->setTransParams(-euler[0],-euler[1],-euler[2],tx,ty,tz);
     face_widget->setFace(face_ptr);
     face_widget->refreshGL();
 }

@@ -79,6 +79,17 @@ float Vector3::length()
   return sqrt(x*x + y*y + z*z);
 }
 
+double* Vector3::normalize(double*d, int len)
+{
+    double sum = 0;
+    for(int i=0;i<len;i++)
+        sum += d[i]*d[i];
+    sum = sqrt(sum);
+    for(int i=0;i<len;i++)
+        d[i] = d[i]/sum;
+    return d;
+}
+
 Vector3 Vector3::normalize()
 {
   Vector3 result;
@@ -92,5 +103,6 @@ Vector3 Vector3::normalize()
 ostream& operator<<(ostream& stream, Vector3 v)
 {
   stream << "vector = ("<< v.x << ", " << v.y << ", " << v.z << ")";
+  return stream;
 }
 

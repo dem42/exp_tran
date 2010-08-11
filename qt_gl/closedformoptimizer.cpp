@@ -142,7 +142,7 @@ void ClosedFormOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
         ZU = Z_ex*(u_ex.t());
 
         PR = weakCamera*rmatrix;
-        Pt = (1/translations[1].at<double>(2,0)) * (weakCamera*translations[i]);
+        Pt = (1/translations[i].at<double>(2,0)) * (weakCamera*translations[i]);
 
         A_ex = Mat_<double>::zeros(Size(exr_size,exr_size));
         B_ex = Mat_<double>::zeros(Size(1,exr_size));
@@ -157,6 +157,18 @@ void ClosedFormOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
             A_ex = A_ex + WT*W;            
             B_ex = B_ex + WT*(featurePointsMat[i][j] - Pt);
         }
+
+        x = Matrix::solveLinSysSvd(A_ex,B_ex);
+        cout << "this should work ... O_O : " << endl << x;
+
+        Mat_<double> xM = x;
+
+        for(unsigned int j=0;j<point_indices[i].size();j++)
+        {
+            W = PR*(Mi[i][j])*ZU*xM + Pt;
+            cout << W(0,0) << " " << W(1,0) << " vs " << featurePointsMat[i][j](0,0) << " " << featurePointsMat[i][j](1,0) << endl;
+
+        }
     }
 //    //then identity using the expression guess
 //    for(unsigned int i=0; i<1; i++)
@@ -166,6 +178,17 @@ void ClosedFormOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
 //
 //
 //    }
+
+    for(int i=0;i<exr_size;i++){
+        w_exp[i] = x[i][0];
+        cout << w_exp[i] << " ";
+    }
+    cout << endl;
+
+    face_ptr->interpolate(w_id,w_exp);
+
+    //here you should clear generated points
+    generatePoints(rotations,translations,weakCamera,lensDist,FRAME_NUMBER,face_ptr,generatedPoints,point_indices,true);
 
     delete face_ptr;
     delete[] w_id;

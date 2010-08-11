@@ -1,5 +1,4 @@
 #include "my_main_window.h"
-#include <phonon>
 
 #include <qimage.h>
 #include <cv.h>
