@@ -30,8 +30,7 @@ void Optimizer::generatePoints(const vector<Mat>&rotations, const vector<Mat>&tr
 
     //using the transformations generate a 1000 new points on the 2d image
     for(unsigned int j=0; j<frame_number; j++)
-    {
-        cout << "frame : " << j << endl;
+    {        
         imagePoints.clear();
         objectPoints.clear();
         point_indices.clear();
@@ -51,25 +50,31 @@ void Optimizer::generatePoints(const vector<Mat>&rotations, const vector<Mat>&tr
 
             point3dMat(0,0) = p.x;
             point3dMat(1,0) = p.y;
-            if(test == false)
-                point3dMat(2,0) = p.z+1500.0;
-            else
-                point3dMat(2,0) = p.z;
+            point3dMat(2,0) = p.z;
 
             Rodrigues(rotations[j],rmatrix);
             transpose = translations[j];
 
-            point2dMat = cameraMatrix*((rmatrix * point3dMat) + transpose);
-
-            //homogenous coord
             if(test == false)
             {
+
+                point2dMat = cameraMatrix*((rmatrix * point3dMat) + transpose);
+
+            //homogenous coord
+
                 point2dMat(0,0) /= point2dMat(2,0);
                 point2dMat(1,0) /= point2dMat(2,0);
+            }
+            else
+            {
+                Mat_<double> Pt = (1./transpose(0,2))*(cameraMatrix*transpose);
+                point2dMat = cameraMatrix*(rmatrix * point3dMat) + Pt;
             }
 
             //objectPoints.push_back(Point3f(p.x,p.y,p.z+1500.0));
 
+            if(j==0)
+                cout << "feature point : " << point3dMat(0,0) << " " << point3dMat(1,0) << " " << point3dMat(2,0) << endl;
             //cout << "generated new point : " << point2dMat(0,0) << " " << point2dMat(1,0) << endl;
 
             imagePoints.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));
@@ -123,11 +128,14 @@ void Optimizer::calculateTransformation(const vector<Point2f> &imagePoints, Face
         p3 = face_ptr->getPointFromPolygon(fPoints[i]);
 
         //cout << "point at polygon " << face_ptr->getPointIndexFromPolygon(fPoints[i]) << endl;
-        p3.z += 1500.0;
+
         //cout << "point " << p3.x << " " << p3.y << " " << p3.z << endl;
         objectPoints.push_back(p3);
     }
-
+    MatConstIterator_<double> it = cameraMatrix.begin<double>(), it_end = cameraMatrix.end<double>();
+    for(; it != it_end; ++it)
+        cout << *it << " ";
+    cout << endl;
     cout << "before solve pnp" << endl;
     //transform vectors into Mats with 3 (2) channels
     cv::solvePnP(Mat(objectPoints),Mat(imagePoints),cameraMatrix,lensDist,rvec,tvec,useExt);

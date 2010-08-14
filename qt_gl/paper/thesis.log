@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  11 AUG 2010 04:08
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  11 AUG 2010 22:27
 entering extended mode
  %&-line parsing enabled.
 **thesis.tex
@@ -276,27 +276,74 @@ Package caption Info: listings package v1.2 (or newer) detected on input line 3
 \sf@top=\skip49
 \sf@bottom=\skip50
 )
+(/usr/share/texmf-texlive/tex/latex/tools/multicol.sty
+Package: multicol 2006/05/18 v1.6g multicolumn formatting (FMi)
+\c@tracingmulticols=\count118
+\mult@box=\box32
+\multicol@leftmargin=\dimen125
+\c@unbalance=\count119
+\c@collectmore=\count120
+\doublecol@number=\count121
+\multicoltolerance=\count122
+\multicolpretolerance=\count123
+\full@width=\dimen126
+\page@free=\dimen127
+\premulticols=\dimen128
+\postmulticols=\dimen129
+\multicolsep=\skip51
+\multicolbaselineskip=\skip52
+\partial@page=\box33
+\last@line=\box34
+\mult@rightbox=\box35
+\mult@grightbox=\box36
+\mult@gfirstbox=\box37
+\mult@firstbox=\box38
+\@tempa=\box39
+\@tempa=\box40
+\@tempa=\box41
+\@tempa=\box42
+\@tempa=\box43
+\@tempa=\box44
+\@tempa=\box45
+\@tempa=\box46
+\@tempa=\box47
+\@tempa=\box48
+\@tempa=\box49
+\@tempa=\box50
+\@tempa=\box51
+\@tempa=\box52
+\@tempa=\box53
+\@tempa=\box54
+\@tempa=\box55
+\c@columnbadness=\count124
+\c@finalcolumnbadness=\count125
+\last@try=\dimen130
+\multicolovershoot=\dimen131
+\multicolundershoot=\dimen132
+\mult@nat@firstbox=\box56
+\colbreak@box=\box57
+)
 (/usr/share/texmf-texlive/tex/sectsty/sectsty.sty
 Package: sectsty 2002/02/25 v2.0.2 Commands to change all sectional heading sty
 les
 )
 (/usr/share/texmf-texlive/tex/latex/geometry/geometry.sty
 Package: geometry 2002/07/08 v3.2 Page Geometry
-\Gm@cnth=\count118
-\Gm@cntv=\count119
-\c@Gm@tempcnt=\count120
-\Gm@bindingoffset=\dimen125
-\Gm@wd@mp=\dimen126
-\Gm@odd@mp=\dimen127
-\Gm@even@mp=\dimen128
+\Gm@cnth=\count126
+\Gm@cntv=\count127
+\c@Gm@tempcnt=\count128
+\Gm@bindingoffset=\dimen133
+\Gm@wd@mp=\dimen134
+\Gm@odd@mp=\dimen135
+\Gm@even@mp=\dimen136
 \Gm@dimlist=\toks25
 
 (/usr/share/texmf-texlive/tex/xelatex/xetexconfig/geometry.cfg))
 (/usr/share/texmf-texlive/tex/latex/hyperref/hyperref.sty
 Package: hyperref 2007/02/07 v6.75r Hypertext links for LaTeX
-\@linkdim=\dimen129
-\Hy@linkcounter=\count121
-\Hy@pagecounter=\count122
+\@linkdim=\dimen137
+\Hy@linkcounter=\count129
+\Hy@pagecounter=\count130
 
 (/usr/share/texmf-texlive/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2007/02/07 v6.75r Hyperref: PDFDocEncoding definition (HO)
@@ -321,9 +368,9 @@ Package hyperref Info: Bookmarks ON on input line 2444.
 Package: url 2005/06/27  ver 3.2  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 2599.
-\Fld@menulength=\count123
-\Field@Width=\dimen130
-\Fld@charsize=\dimen131
+\Fld@menulength=\count131
+\Field@Width=\dimen138
+\Fld@charsize=\dimen139
 \Choice@toks=\toks26
 \Field@toks=\toks27
 Package hyperref Info: Hyper figures OFF on input line 3102.
@@ -331,63 +378,63 @@ Package hyperref Info: Link nesting OFF on input line 3107.
 Package hyperref Info: Hyper index ON on input line 3110.
 Package hyperref Info: backreferencing OFF on input line 3117.
 Package hyperref Info: Link coloring OFF on input line 3122.
-\Hy@abspage=\count124
-\c@Item=\count125
-\c@Hfootnote=\count126
+\Hy@abspage=\count132
+\c@Item=\count133
+\c@Hfootnote=\count134
 )
 *hyperref using default driver hpdftex*
 (/usr/share/texmf-texlive/tex/latex/hyperref/hpdftex.def
 File: hpdftex.def 2007/02/07 v6.75r Hyperref driver for pdfTeX
-\Fld@listcount=\count127
+\Fld@listcount=\count135
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 17.
+Package hyperref Info: Option `colorlinks' set `true' on input line 18.
 
 (/usr/share/texmf-texlive/tex/latex/fancyhdr/fancyhdr.sty
-\fancy@headwidth=\skip51
-\f@ncyO@elh=\skip52
-\f@ncyO@erh=\skip53
-\f@ncyO@olh=\skip54
-\f@ncyO@orh=\skip55
-\f@ncyO@elf=\skip56
-\f@ncyO@erf=\skip57
-\f@ncyO@olf=\skip58
-\f@ncyO@orf=\skip59
+\fancy@headwidth=\skip53
+\f@ncyO@elh=\skip54
+\f@ncyO@erh=\skip55
+\f@ncyO@olh=\skip56
+\f@ncyO@orh=\skip57
+\f@ncyO@elf=\skip58
+\f@ncyO@erf=\skip59
+\f@ncyO@olf=\skip60
+\f@ncyO@orf=\skip61
 )
-
-Package Fancyhdr Warning: \fancyhead's `E' option without twoside option is use
-less on input line 24.
-
 
 Package Fancyhdr Warning: \fancyhead's `E' option without twoside option is use
 less on input line 25.
 
+
+Package Fancyhdr Warning: \fancyhead's `E' option without twoside option is use
+less on input line 26.
+
 (./thesis.aux)
 \openout1 = `thesis.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 48.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 48.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 49.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 49.
  (/usr/share/texmf-texlive/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 48.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 48.
-LaTeX Font Info:    ... okay on input line 48.
+LaTeX Font Info:    ... okay on input line 49.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 49.
+LaTeX Font Info:    ... okay on input line 49.
 Package caption Info: hyperref package v6.74m (or newer) detected on input line
- 48.
-Package caption Info: subref 1.2 or 1.3 detected on input line 48.
-LaTeX Info: Redefining \subref on input line 48.
+ 49.
+Package caption Info: subref 1.2 or 1.3 detected on input line 49.
+LaTeX Info: Redefining \subref on input line 49.
 -------------------- Geometry parameters
 paper: a4paper
 landscape: --
@@ -436,7 +483,7 @@ File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
 Package color Info: Driver file: pdftex.def on input line 130.
 )
-Package hyperref Info: Link coloring ON on input line 48.
+Package hyperref Info: Link coloring ON on input line 49.
 
 (/usr/share/texmf-texlive/tex/latex/hyperref/nameref.sty
 Package: nameref 2006/12/27 v2.28 Cross-referencing by name of section
@@ -444,25 +491,25 @@ Package: nameref 2006/12/27 v2.28 Cross-referencing by name of section
 (/usr/share/texmf-texlive/tex/latex/oberdiek/refcount.sty
 Package: refcount 2006/02/20 v3.0 Data extraction from references (HO)
 )
-\c@section@level=\count128
+\c@section@level=\count136
 )
-LaTeX Info: Redefining \ref on input line 48.
-LaTeX Info: Redefining \pageref on input line 48.
+LaTeX Info: Redefining \ref on input line 49.
+LaTeX Info: Redefining \pageref on input line 49.
  (./thesis.out)
 (./thesis.out)
 \@outlinefile=\write3
 \openout3 = `thesis.out'.
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 68.
+LaTeX Font Info:    Try loading font information for U+msa on input line 69.
  (/usr/share/texmf-texlive/tex/latex/amsfonts/umsa.fd
 File: umsa.fd 2002/01/19 v2.2g AMS font definitions
 )
-LaTeX Font Info:    Try loading font information for U+msb on input line 68.
+LaTeX Font Info:    Try loading font information for U+msb on input line 69.
 
 (/usr/share/texmf-texlive/tex/latex/amsfonts/umsb.fd
 File: umsb.fd 2002/01/19 v2.2g AMS font definitions
 )
-LaTeX Font Info:    Try loading font information for U+rsfs on input line 68.
+LaTeX Font Info:    Try loading font information for U+rsfs on input line 69.
 
 (/usr/share/texmf-texlive/tex/latex/jknapltx/ursfs.fd
 File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
@@ -473,7 +520,7 @@ ination with the same identifier (name{page.1}) has been already used, duplicat
 e ignored
 <to be read again> 
                    \relax 
-l.89 \newpage
+l.90 \newpage
               [1] [2] (./thesis.toc)
 \tf@toc=\write4
 \openout4 = `thesis.toc'.
@@ -488,109 +535,97 @@ Chapter 1.
 Chapter 2.
 [6
 
-]
-
-LaTeX Warning: Citation `FEMbook' on page 7 undefined on input line 254.
-
-[7]
-
-LaTeX Warning: Citation `FEMbook' on page 8 undefined on input line 304.
-
-
-LaTeX Warning: Citation `FEMbook' on page 8 undefined on input line 320.
-
-[8]
-
-LaTeX Warning: Citation `FEMbook' on page 9 undefined on input line 339.
-
-<images/eigenfaces_comb_from_nn_vienna.png, id=151, 770.88pt x 362.85562pt>
+] [7] [8] [9] [10]
+<images/eigenfaces_comb_from_nn_vienna.png, id=190, 770.88pt x 362.85562pt>
 File: images/eigenfaces_comb_from_nn_vienna.png Graphic file (type png)
 
-<use images/eigenfaces_comb_from_nn_vienna.png> [9] [10 <./images/eigenfaces_co
-mb_from_nn_vienna.png (PNG copy)>]
-<images/scary_face2.png, id=182, 815.29594pt x 257.46187pt>
+<use images/eigenfaces_comb_from_nn_vienna.png> [11 <./images/eigenfaces_comb_f
+rom_nn_vienna.png (PNG copy)>]
+<images/scary_face2.png, id=207, 815.29594pt x 257.46187pt>
 File: images/scary_face2.png Graphic file (type png)
 
-<use images/scary_face2.png> [11 <./images/scary_face2.png (PNG copy)>]
-<images/bad_asm.png, id=196, 576.65437pt x 213.04594pt>
+<use images/scary_face2.png> [12 <./images/scary_face2.png (PNG copy)>]
+<images/bad_asm.png, id=222, 576.65437pt x 213.04594pt>
 File: images/bad_asm.png Graphic file (type png)
 
-<use images/bad_asm.png> [12 <./images/bad_asm.png (PNG copy)>]
-<images/amm_example.png, id=210, 602.25pt x 392.96812pt>
+<use images/bad_asm.png> [13 <./images/bad_asm.png (PNG copy)>]
+<images/amm_example.png, id=235, 602.25pt x 392.96812pt>
 File: images/amm_example.png Graphic file (type png)
 
 <use images/amm_example.png>
-Overfull \hbox (66.39021pt too wide) in paragraph at lines 530--532
+Overfull \hbox (66.39021pt too wide) in paragraph at lines 597--599
 [][] 
  []
 
-[13 <./images/amm_example.png (PNG copy)>]
-<images/modes_faces.png, id=221, 317.68687pt x 173.89969pt>
+[14 <./images/amm_example.png (PNG copy)>]
+<images/modes_faces.png, id=246, 317.68687pt x 173.89969pt>
 File: images/modes_faces.png Graphic file (type png)
 
-<use images/modes_faces.png> [14 <./images/modes_faces.png (PNG copy)>]
-[15] <images/fx.png, id=249, 602.25pt x 432.61626pt>
+<use images/modes_faces.png> [15 <./images/modes_faces.png (PNG copy)>]
+[16] [17]
+Underfull \hbox (badness 10000) in paragraph at lines 821--825
+
+ []
+
+[18] <images/fx.png, id=296, 602.25pt x 432.61626pt>
 File: images/fx.png Graphic file (type png)
  <use images/fx.png>
-<images/gx.png, id=250, 401.5pt x 359.3425pt>
+<images/gx.png, id=297, 401.5pt x 359.3425pt>
 File: images/gx.png Graphic file (type png)
- <use images/gx.png> [16 <./images/fx.png> <./images/gx.png>] [17] [18]
-Underfull \hbox (badness 10000) in paragraph at lines 837--839
+ <use images/gx.png> [19 <./images/fx.png> <./images/gx.png>] [20]
+Underfull \hbox (badness 10000) in paragraph at lines 1009--1011
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 840--842
+Underfull \hbox (badness 10000) in paragraph at lines 1012--1014
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 842--850
+Underfull \hbox (badness 10000) in paragraph at lines 1014--1022
 
  []
 
-
-Underfull \hbox (badness 10000) in paragraph at lines 864--868
+[21]
+Underfull \hbox (badness 10000) in paragraph at lines 1036--1040
 
  []
 
-<images/amoeba.png, id=295, 602.25pt x 602.25pt>
+<images/amoeba.png, id=342, 602.25pt x 602.25pt>
 File: images/amoeba.png Graphic file (type png)
  <use images/amoeba.png>
-[19] (./thesis.bbl [20 <./images/amoeba.png>]) [21
+[22] (./thesis.bbl [23 <./images/amoeba.png>] [24
 
-] (./thesis.aux)
-
-LaTeX Warning: There were undefined references.
-
- ) 
+]) [25] (./thesis.aux) ) 
 Here is how much of TeX's memory you used:
- 6439 strings out of 95086
- 93123 string characters out of 1183256
- 150757 words of memory out of 1500000
- 9401 multiletter control sequences out of 10000+50000
+ 6550 strings out of 95086
+ 94675 string characters out of 1183256
+ 155731 words of memory out of 1500000
+ 9489 multiletter control sequences out of 10000+50000
  15337 words of font info for 56 fonts, out of 1200000 for 2000
  28 hyphenation exceptions out of 8191
- 43i,12n,43p,362b,380s stack positions out of 5000i,500n,6000p,200000b,5000s
- </home/martin/.texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.600pk></usr/sh
-are/texmf-texlive/fonts/type1/bluesky/cm/cmbx10.pfb></usr/share/texmf-texlive/f
-onts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/
-cm/cmcsc10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmex10.pfb></us
-r/share/texmf-texlive/fonts/type1/bluesky/cm/cmmi10.pfb></usr/share/texmf-texli
-ve/fonts/type1/bluesky/cm/cmmi6.pfb></usr/share/texmf-texlive/fonts/type1/blues
-ky/cm/cmmi8.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr10.pfb></us
-r/share/texmf-texlive/fonts/type1/bluesky/cm/cmr12.pfb></usr/share/texmf-texliv
-e/fonts/type1/bluesky/cm/cmr6.pfb></usr/share/texmf-texlive/fonts/type1/bluesky
-/cm/cmr8.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr9.pfb></usr/sh
-are/texmf-texlive/fonts/type1/bluesky/cm/cmsl10.pfb></usr/share/texmf-texlive/f
-onts/type1/bluesky/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/
-cm/cmsy8.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmti10.pfb></usr/
-share/texmf-texlive/fonts/type1/bluesky/cm/cmti12.pfb></usr/share/texmf-texlive
-/fonts/type1/bluesky/ams/msbm10.pfb></usr/share/texmf-texlive/fonts/type1/hoekw
-ater/rsfs/rsfs10.pfb>
-Output written on thesis.pdf (22 pages, 1415123 bytes).
+ 43i,12n,43p,362b,426s stack positions out of 5000i,500n,6000p,200000b,5000s
+ </home/martin/.texmf-var/fonts/pk/ljfour/jknappen/ec/t
+crm1095.600pk></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmbx10.pfb></usr
+/share/texmf-texlive/fonts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf-texliv
+e/fonts/type1/bluesky/cm/cmbx8.pfb></usr/share/texmf-texlive/fonts/type1/bluesk
+y/cm/cmcsc10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmex10.pfb></
+usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmmi10.pfb></usr/share/texmf-tex
+live/fonts/type1/bluesky/cm/cmmi6.pfb></usr/share/texmf-texlive/fonts/type1/blu
+esky/cm/cmmi8.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr10.pfb></
+usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr12.pfb></usr/share/texmf-texl
+ive/fonts/type1/bluesky/cm/cmr6.pfb></usr/share/texmf-texlive/fonts/type1/blues
+ky/cm/cmr8.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr9.pfb></usr/
+share/texmf-texlive/fonts/type1/bluesky/cm/cmsl10.pfb></usr/share/texmf-texlive
+/fonts/type1/bluesky/cm/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/bluesk
+y/cm/cmsy8.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmti10.pfb></us
+r/share/texmf-texlive/fonts/type1/bluesky/cm/cmti12.pfb></usr/share/texmf-texli
+ve/fonts/type1/bluesky/ams/msbm10.pfb></usr/share/texmf-texlive/fonts/type1/hoe
+kwater/rsfs/rsfs10.pfb>
+Output written on thesis.pdf (26 pages, 1438995 bytes).
 PDF statistics:
- 407 PDF objects out of 1000 (max. 8388607)
- 93 named destinations out of 1000 (max. 131072)
- 169 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 464 PDF objects out of 1000 (max. 8388607)
+ 113 named destinations out of 1000 (max. 131072)
+ 177 words of extra memory for PDF output out of 10000 (max. 10000000)
 

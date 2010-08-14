@@ -40,6 +40,7 @@ private:
     void computeExpressionSingularVectors(int m,int n);
     void initializeDbStrings();
     void loadFacePolygon(string filename);
+    void computeMean(int first_dim, int second_dim, int n, double &mean_x, double &mean_y, double &mean_z);
 
     static FaceModel *instance;
 
@@ -57,6 +58,10 @@ private:
 
     int poly_num;
     int point_num;
+
+    double mean_x;
+    double mean_y;
+    double mean_z;
 };
 
 #endif // FACEMODEL_H

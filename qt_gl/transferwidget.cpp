@@ -47,9 +47,11 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
     picLabel = new FeaturePointQLabel();
     flowLabel = new VectorFieldQLabel();
     this->face_widget = face_widget;
-    this->face_widget->setCameraParameters(600,1);
+    this->face_widget->setCameraParameters(-200,-1,-200);
     face_ptr  = new Face();
 
+    cameraDialog = new QDialog();
+    cameraUi.setupUi(cameraDialog);
 
     //initialize the optical flow engine
     flowEngine = new OpticalFlowEngine();
@@ -87,6 +89,47 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
      capture = new VideoCapture(fileName.toStdString());
      frameCount = capture->get(CV_CAP_PROP_FRAME_COUNT); //SEEMS TO BE UNSUPPORTED AND RETURNS 0
      cout << "frame count is : " << frameCount << endl;     
+
+
+     //initalize the camera based on precalculated intrinsic parameters
+     //283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}
+    //389.515 0 303.703 0 394.657 159.174 0 0 1
+    //initialize intrinsic parameters of the camera
+    //double mat[3][3] = {{389.515, 0, 303.703},{0, 394.657, 159.174},{0, 0, 1}};
+//     double mat[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}};
+//    cameraMatrix = Mat(3,3,CV_64F,mat);
+    cameraMatrix = Mat_<double>(3,3);
+    cameraMatrix(0,0) = 389.515;
+    cameraMatrix(0,1) = 0;
+    cameraMatrix(0,2) = 337.789;//303.703;
+    cameraMatrix(1,0) = 0;
+    cameraMatrix(1,1) = 394.657;
+    cameraMatrix(1,2) = 299.076;//159.174;
+    cameraMatrix(2,0) = 0;
+    cameraMatrix(2,1) = 0;
+    cameraMatrix(2,2) = 1;
+
+
+    //double l[1][5] = {{-0.0865513, 0.197476, 0.00430749, 0.0072667, -0.114125}};
+    //-0.20357 0.423957 -0.00415811 -0.00633922 -0.295448
+    //double l[1][5] = {{-0.20357, 0.423957, -0.00415811, -0.00633922, -0.295448}};
+    lensDist = Mat_<double>(1,5);
+    lensDist(0,0) = -0.20357;
+    lensDist(0,1) = 0.423957;
+    lensDist(0,2) = -0.00415811;
+    lensDist(0,3) = -0.00633922;
+    lensDist(0,4) = -0.295448;
+//    lensDist(0,0) = 0;
+//    lensDist(0,1) = 0;
+//    lensDist(0,0) = 0;
+//    lensDist(0,1) = 0;
+//    lensDist(0,1) = 0;
+
+
+    MatConstIterator_<double> it = cameraMatrix.begin(), it_end = cameraMatrix.end();
+    for(; it != it_end; ++it)
+        cout << *it << " ";
+    cout << endl;
 }
 
 ClickableQLabel* TransferWidget::getPicLabel() const
@@ -100,56 +143,72 @@ ClickableQLabel* TransferWidget::getFlowLabel() const
 }
 
 void TransferWidget::calcIntrinsicParams()
-{    
-    Mat img = imread("../../chessboard.jpg");
+{
+    vector<Mat> imgs;
+
+    imgs.push_back(imread("../../camera1.jpg"));
+    imgs.push_back(imread("../../camera2.jpg"));
 
     cout << " CALIBRATE SIZE" << endl;
-    cout << img.size().height << " " << img.size().width << endl;
+    cout << imgs[0].size().height << " " << imgs[0].size().width << endl;
 
-
-     vector<Point2f> corners;
-    // use calibration matrix value to find opengl parameters calibrationMatrixValues();
 
     //the size here is very important .. it cannot be a subset
     //of the inner corners in the image but the max number in there
-    Size s(3,4);
-
-    bool out = findChessboardCorners(img,s,corners);
-    cout << out << endl;
-    drawChessboardCorners(img,s,Mat(corners),out);
-
-    QImage img_q = mat2QImage(img);
-    QPixmap p_map;
-    p_map = QPixmap::fromImage(img_q);
-    picLabel->setPixmap(p_map);
+    Size s(7,7);
 
     //order of corners is from top to bottom, left to right
     vector<Point3f> worldCoord;
-    //top row
-    worldCoord.push_back(Point3f(-3.0,3.0,0.0));
-    worldCoord.push_back(Point3f(0.0,3.0,0.0));
-    worldCoord.push_back(Point3f(3.0,3.0,0.0));
-    //middle row
-    worldCoord.push_back(Point3f(-3.0,0.0,0.0));
-    worldCoord.push_back(Point3f(0.0,0.0,0.0));
-    worldCoord.push_back(Point3f(3.0,0.0,0.0));
-    //middle bottom
-    worldCoord.push_back(Point3f(-3.0,-3.0,0.0));
-    worldCoord.push_back(Point3f(0.0,-3.0,0.0));
-    worldCoord.push_back(Point3f(3.0,-3.0,0.0));
-    //bottom row
-    worldCoord.push_back(Point3f(-3.0,-6.0,0.0));
-    worldCoord.push_back(Point3f(0.0,-6.0,0.0));
-    worldCoord.push_back(Point3f(3.0,-6.0,0.0));
+    Point3f p;
+    p.x = 0;
+    p.y = 0;
+    p.z = 0;
+    p.y = (s.height) * -3;
+    for(int i=0;i<s.height;i++)
+    {
+        p.y += 3;
+        p.x = (s.width) * -3;
+                for(int j=0;j<s.width;j++)
+        {
+            p.x += 3;
+            cout << p.x << " " << p.y << endl;
+            worldCoord.push_back(p);
+        }
+    }
 
-    vector<vector<Point3f> > objectPoints;
-    objectPoints.push_back(worldCoord);
-    vector<vector<Point2f> > imagePoints;
-    imagePoints.push_back(corners);
+
+    vector<vector<Point3f> >objectPoints;
+    vector<vector<Point2f> >imagePoints;
+
+    Mat img;
+    vector<Mat>::iterator iter = imgs.begin(), iter_end = imgs.end();
+    for(; iter != iter_end; ++iter)
+    {
+        img = *iter;
+        vector<Point2f> corners;
+        // use calibration matrix value to find opengl parameters calibrationMatrixValues();
+
+        bool out = findChessboardCorners(img,s,corners);
+        cout << out << endl;
+
+
+        drawChessboardCorners(img,s,Mat(corners),out);
+
+        QImage img_q = mat2QImage(img);
+        QPixmap p_map;
+        p_map = QPixmap::fromImage(img_q);
+        picLabel->setPixmap(p_map);
+
+
+
+        objectPoints.push_back(worldCoord);
+        imagePoints.push_back(corners);
+
+    }
 
     Mat cameraMatrix, distCoeffs;
     vector<Mat> rvecs, tvecs;
-    calibrateCamera(objectPoints,imagePoints,img.size(),cameraMatrix,distCoeffs,rvecs,tvecs);
+    calibrateCamera(objectPoints,imagePoints,imgs[0].size(),cameraMatrix,distCoeffs,rvecs,tvecs);
 
     cout << "CALIBRATED : " << endl;
     MatConstIterator_<double> it = cameraMatrix.begin<double>(), it_end = cameraMatrix.end<double>();
@@ -196,46 +255,40 @@ void TransferWidget::processVideo()
         copyFrame = rgb_frame.clone();
         frameData.push_back(copyFrame);
     }
-    /**********************/
-    /*calculate points in all
-    frames using optical flow*/
-    /**********************/
-    vector<Point2f> currentPoints = picLabel->getMarked();
-    vector<Point2f> nextPoints;
 
-    featurePoints.push_back(currentPoints);
-
-    vector<Mat>::iterator it = frameData.begin(),
-                          it_last = frameData.begin(),
-                          it_end = frameData.end();
-
-    for(;it != it_end; ++it)
+    for(int i=0;i<frameData[i];++i)
     {
-        flowEngine->computeFlow(*it_last,*it,currentPoints,nextPoints);
-        it_last = it;
+        /**********************/
+        /*calculate points in all
+    frames using optical flow*/
+        /**********************/
+        vector<Point2f> currentPoints = picLabel->getMarked();
+        vector<Point2f> nextPoints;
 
-        featurePoints.push_back(nextPoints);
-        currentPoints.clear();
-        //assigns a copy of next points as the new content for currentPoints
-        currentPoints = nextPoints;
-        nextPoints.clear();
+        featurePoints.push_back(currentPoints);
+
+        vector<Mat>::iterator it = frameData.begin(),
+        it_last = frameData.begin(),
+        it_end = frameData.end();
+
+        for(;it != it_end; ++it)
+        {
+            flowEngine->computeFlow(*it_last,*it,currentPoints,nextPoints);
+            it_last = it;
+
+            featurePoints.push_back(nextPoints);
+            currentPoints.clear();
+            //assigns a copy of next points as the new content for currentPoints
+            currentPoints = nextPoints;
+            nextPoints.clear();
+        }
+
+        /**********************/
+        /*estimate model parameters + pose*/
+        /**********************/
+        paramOptimizer->estimateParametersAndPose(frameData[i],featurePoints[i],cameraMatrix,lensDist,frameRotation[i],frameTranslation[i],
+                                                  vector_weights_id[i],vector_weights_exp[i],generatedPoints[i]);
     }
-
-    //183.536 0 337.789 0 186.4 299.076 0 0 1
-    //initialize intrinsic parameters of the camera
-    double m[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}};
-    Mat cameraMatrix(3,3,CV_64F,m);
-
-    //-0.0865513 0.197476 0.00430749 0.0072667 -0.114125
-    double l[1][5] = {{-0.0865513, 0.197476, 0.00430749, 0.0072667, -0.114125}};
-    Mat lensDist(1,5,CV_64F,l);
-
-    /**********************/
-    /*estimate model parameters + pose*/
-    /**********************/
-    paramOptimizer->estimateParametersAndPose(frameData,featurePoints,cameraMatrix,lensDist,frameRotation,frameTranslation,
-                                              vector_weights_id,vector_weights_exp,generatedPoints);
-
     timerReplay = new QTimer(this);
     connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
     timerReplay->start(900);
@@ -243,35 +296,6 @@ void TransferWidget::processVideo()
     face_widget->setFace(face_ptr);
 }
 
-void TransferWidget::calculateTransformation(vector<Point2f> imagePoints, Face *face_ptr, Mat &rvec, Mat &tvec, bool useExt)
-{
-    vector<Point3f> objectPoints;
-
-    Point3f p3;
-    for(int i=0;i<this->fPoints_size;i++)
-    {
-        p3 = face_ptr->getPointFromPolygon(fPoints[i]);
-        p3.z += 1500.0;
-        objectPoints.push_back(p3);
-    }    
-
-    //183.536 0 337.789 0 186.4 299.076 0 0 1
-    //initialize intrinsic parameters of the camera
-    double m[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}};
-    Mat cameraMatrix(3,3,CV_64F,m);
-
-    //-0.0865513 0.197476 0.00430749 0.0072667 -0.114125
-    double l[1][5] = {{-0.0865513, 0.197476, 0.00430749, 0.0072667, -0.114125}};
-    Mat lensDist(1,5,CV_64F,l);
-
-    //setup the result vectors for the extrinsic parameters
-
-
-    cout << "before solve pnp" << endl;
-    //transform vectors into Mats with 3 (2) channels
-    cv::solvePnP(Mat(objectPoints),Mat(imagePoints),cameraMatrix,lensDist,rvec,tvec,useExt);
-
-}
 /**********************************************/
 /* PUBLIC SLOTS */
 /**********************************************/
@@ -303,6 +327,11 @@ void TransferWidget::playBack()
     processVideo();
 }
 
+void TransferWidget::calibrate()
+{
+    cameraDialog->show();
+}
+
 //later do a pyramid version
 void TransferWidget::startFaceTransfer()
 {
@@ -317,14 +346,11 @@ void TransferWidget::startFaceTransfer()
 
     //calcIntrinsicParams();
 
-    //183.536 0 337.789 0 186.4 299.076 0 0 1
-    //initialize intrinsic parameters of the camera
-    double m[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}};
-    Mat cameraMatrix(3,3,CV_64F,m);
 
-    //-0.0865513 0.197476 0.00430749 0.0072667 -0.114125
-    double l[1][5] = {{-0.0865513, 0.197476, 0.00430749, 0.0072667, -0.114125}};
-    Mat lensDist(1,5,CV_64F,l);
+    MatConstIterator_<double> it = cameraMatrix.begin(), it_end = cameraMatrix.end();
+    for(; it != it_end; ++it)
+        cout << *it << " ";
+    cout << endl;
 
     //setup the result vectors for the extrinsic parameters
     Mat_<double> rvec, tvec;
@@ -397,6 +423,14 @@ void TransferWidget::startFaceTransfer()
 
     cout << "TRANS : " << tvec.at<double>(0,0) << " " << tvec.at<double>(1,0)  << " " << tvec.at<double>(2,0) << endl;
 
+    double fovy, fovx, fl, aratio;
+    Point2d pp;
+    cv::calibrationMatrixValues(cameraMatrix,frames[0].size(),200,200,fovx,fovy,fl,pp,aratio);
+
+    cout << "fovx " << fovx << " fovy " << fovy << " focal length " << fl
+         << " pp.x " << pp.x << " pp.y " << pp.y << " aratio " << aratio << endl;
+
+
     double scale = 1;
 
     for(int i=0; i<fPoints_size; i++)
@@ -404,7 +438,7 @@ void TransferWidget::startFaceTransfer()
         p = face_ptr->getPointFromPolygon(fPoints[i]);
         point3dMat(0,0) = p.x;
         point3dMat(1,0) = p.y;
-        point3dMat(2,0) = p.z+1500.0;
+        point3dMat(2,0) = p.z;
 
         point2dMat = cameraMatrix * ((rmatrix * point3dMat));
         point2dMat = scale*point2dMat;
@@ -428,7 +462,14 @@ void TransferWidget::startFaceTransfer()
     }
     picLabel->setMarked(points);
 
-    face_widget->setTransParams(-euler[0],-euler[1],-euler[2],tx,ty,tz);
+    //the sign here doesnt seem to make a difference as far as orientation of
+    //the object is concerned .. however it does flip the extreme head
+    //z is the one we dont need to inverse since opengl displays with upvector as 0,0,-1
+    //x also changes if we the up vector is upside down
+    //only y needs to be negative so that it agrees with the transposes
+    //that the pose estimation returns .. (solvePnP return R = rzTryTrxT but a different upvector
+    face_widget->setTransParams(euler[0],-euler[1],euler[2],tx,ty,tz);
+    //face_widget->setTransParams(euler[0],euler[1],euler[2],tx,ty,tz);
     face_widget->setFace(face_ptr);
     face_widget->refreshGL();
 }

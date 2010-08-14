@@ -23,7 +23,7 @@
 \citation{FEM1pen}
 \citation{FEM1ter}
 \citation{FEMbook}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.1}Physically Based Models}{7}{subsection.2.1.1}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.1}Physics Based Models}{7}{subsection.2.1.1}}
 \@writefile{toc}{\contentsline {subsubsection}{Finite Element Method (FEM)}{7}{section*.2}}
 \citation{FEMbook}
 \citation{FEMbook}
@@ -32,96 +32,108 @@
 \newlabel{eq:FEMequilibrium}{{2.3}{8}{Finite Element Method (FEM)\relax }{equation.2.3}{}}
 \newlabel{eq:FEMstiffness}{{2.4}{8}{Finite Element Method (FEM)\relax }{equation.2.4}{}}
 \citation{FEMbook}
-\citation{eigenfaces91}
-\citation{vienna}
-\citation{vienna}
 \newlabel{eq:FEMdynamic}{{2.5}{9}{Finite Element Method (FEM)\relax }{equation.2.5}{}}
 \@writefile{toc}{\contentsline {subsubsection}{Modal Analysis}{9}{section*.3}}
 \newlabel{eq:FEMmodal}{{2.7}{9}{Modal Analysis\relax }{equation.2.7}{}}
-\@writefile{toc}{\contentsline {subsubsection}{Recovering shape with FEM}{9}{section*.4}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.2}Satistical Models}{9}{subsection.2.1.2}}
-\@writefile{toc}{\contentsline {subsubsection}{PCA and Eigenfaces}{9}{section*.5}}
+\newlabel{eq:FEMbasis}{{2.8}{9}{Modal Analysis\relax }{equation.2.8}{}}
+\newlabel{eq:FEMdiag}{{2.11}{9}{Modal Analysis\relax }{equation.2.11}{}}
+\citation{eigenfaces91}
+\@writefile{toc}{\contentsline {subsubsection}{Recovering shape with FEM}{10}{section*.4}}
+\newlabel{eq:FEMgenerate}{{2.12}{10}{Recovering shape with FEM\relax }{equation.2.12}{}}
+\newlabel{eq:FEMload}{{2.13}{10}{Recovering shape with FEM\relax }{equation.2.13}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Combining Statistical and FEM modes}{10}{section*.5}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.2}Satistical Models}{10}{subsection.2.1.2}}
+\@writefile{toc}{\contentsline {subsubsection}{PCA and Eigenfaces}{10}{section*.6}}
+\citation{vienna}
+\citation{vienna}
 \citation{eigenfaces91}
 \citation{eigenfaces91}
 \citation{activeApp04}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.1}{\ignorespaces  Using the eigenfaces we can represent an image as a linear combination of the eigenfaces. Taken from \cite  {vienna} }}{10}{figure.2.1}}
-\newlabel{gr:eigenfaces}{{2.1}{10}{ Using the eigenfaces we can represent an image as a linear combination of the eigenfaces. Taken from \cite {vienna} \relax }{figure.2.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.1}{\ignorespaces  Using the eigenfaces we can represent an image as a linear combination of the eigenfaces. Taken from \cite  {vienna} }}{11}{figure.2.1}}
+\newlabel{gr:eigenfaces}{{2.1}{11}{ Using the eigenfaces we can represent an image as a linear combination of the eigenfaces. Taken from \cite {vienna} \relax }{figure.2.1}{}}
 \citation{activeApp04}
 \citation{activeApp04}
 \citation{cootesOverview01}
 \citation{cootesOverview01}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.3}Statistical Models of Appearance}{11}{subsection.2.1.3}}
-\newlabel{gth:shape_mod}{{2.11}{11}{Statistical Models of Appearance\relax }{equation.2.11}{}}
-\newlabel{gth:texture_mod}{{2.12}{11}{Statistical Models of Appearance\relax }{equation.2.12}{}}
-\@writefile{toc}{\contentsline {subsubsection}{Active Shape Model}{11}{section*.6}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.2}{\ignorespaces  Active Shape Model iterations shown on on finding the shape of a previously unseen face. Taken from \cite  {cootesOverview01} }}{11}{figure.2.2}}
-\newlabel{gr:asm}{{2.2}{11}{ Active Shape Model iterations shown on on finding the shape of a previously unseen face. Taken from \cite {cootesOverview01} \relax }{figure.2.2}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.3}Statistical Models of Appearance}{12}{subsection.2.1.3}}
+\newlabel{gth:shape_mod}{{2.15}{12}{Statistical Models of Appearance\relax }{equation.2.15}{}}
+\newlabel{gth:texture_mod}{{2.16}{12}{Statistical Models of Appearance\relax }{equation.2.16}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Active Shape Model}{12}{section*.7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.2}{\ignorespaces  Active Shape Model iterations shown on on finding the shape of a previously unseen face. Taken from \cite  {cootesOverview01} }}{12}{figure.2.2}}
+\newlabel{gr:asm}{{2.2}{12}{ Active Shape Model iterations shown on on finding the shape of a previously unseen face. Taken from \cite {cootesOverview01} \relax }{figure.2.2}{}}
 \citation{cootesOverview01}
 \citation{cootesOverview01}
 \citation{activeApp04}
 \citation{activeApp04}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces  Incorrect convergence of the ASM when the search is initialised incorrectly. This can happen when the face is not centered in the image or when the search does not begin in the centre of the image. Taken from \cite  {cootesOverview01} }}{12}{figure.2.3}}
-\newlabel{gr:bad_asm}{{2.3}{12}{ Incorrect convergence of the ASM when the search is initialised incorrectly. This can happen when the face is not centered in the image or when the search does not begin in the centre of the image. Taken from \cite {cootesOverview01} \relax }{figure.2.3}{}}
-\@writefile{toc}{\contentsline {subsubsection}{Active Appearance Model}{12}{section*.7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces  Incorrect convergence of the ASM when the search is initialised incorrectly. This can happen when the face is not centered in the image or when the search does not begin in the centre of the image. Taken from \cite  {cootesOverview01} }}{13}{figure.2.3}}
+\newlabel{gr:bad_asm}{{2.3}{13}{ Incorrect convergence of the ASM when the search is initialised incorrectly. This can happen when the face is not centered in the image or when the search does not begin in the centre of the image. Taken from \cite {cootesOverview01} \relax }{figure.2.3}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Active Appearance Model}{13}{section*.8}}
 \citation{activeApp04}
 \citation{activeApp04}
 \citation{activeApp04}
 \citation{faceTransfer05}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.4}{\ignorespaces  Active Appearance Model iterations shown when searching for previously unseen faces. Taken from \cite  {activeApp04} }}{13}{figure.2.4}}
-\newlabel{gr:amm}{{2.4}{13}{ Active Appearance Model iterations shown when searching for previously unseen faces. Taken from \cite {activeApp04} \relax }{figure.2.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.4}{\ignorespaces  Active Appearance Model iterations shown when searching for previously unseen faces. Taken from \cite  {activeApp04} }}{14}{figure.2.4}}
+\newlabel{gr:amm}{{2.4}{14}{ Active Appearance Model iterations shown when searching for previously unseen faces. Taken from \cite {activeApp04} \relax }{figure.2.4}{}}
 \citation{faceTransfer05}
 \citation{faceTransfer05}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.4}Tensor-Based Model}{14}{subsection.2.1.4}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.5}{\ignorespaces Multilinear face model showing how different attributes change along the modes. Taken from \cite  {faceTransfer05} }}{14}{figure.2.5}}
-\newlabel{gr:tensor}{{2.5}{14}{Multilinear face model showing how different attributes change along the modes. Taken from \cite {faceTransfer05} \relax }{figure.2.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.4}Tensor-Based Model}{15}{subsection.2.1.4}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.5}{\ignorespaces Multilinear face model showing how different attributes change along the modes. Taken from \cite  {faceTransfer05} }}{15}{figure.2.5}}
+\newlabel{gr:tensor}{{2.5}{15}{Multilinear face model showing how different attributes change along the modes. Taken from \cite {faceTransfer05} \relax }{figure.2.5}{}}
 \citation{faceTransfer05}
 \citation{sdm}
 \citation{jacey}
 \citation{lda}
-\newlabel{eq:core_tensor}{{2.14}{15}{Tensor-Based Model\relax }{equation.2.14}{}}
-\newlabel{eq:multilin_face}{{2.15}{15}{Tensor-Based Model\relax }{equation.2.15}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.5}Tensor-based Statistical Discriminant Method}{15}{subsection.2.1.5}}
-\newlabel{eq:lda}{{2.16}{15}{Tensor-based Statistical Discriminant Method\relax }{equation.2.16}{}}
+\newlabel{eq:core_tensor}{{2.18}{16}{Tensor-Based Model\relax }{equation.2.18}{}}
+\newlabel{eq:multilin_face}{{2.19}{16}{Tensor-Based Model\relax }{equation.2.19}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.5}Tensor-based Statistical Discriminant Method}{16}{subsection.2.1.5}}
+\newlabel{eq:lda}{{2.20}{16}{Tensor-based Statistical Discriminant Method\relax }{equation.2.20}{}}
+\citation{blanz1}
+\citation{blanz2}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.1.6}Morphable Model}{17}{subsection.2.1.6}}
 \citation{kanade}
-\@writefile{toc}{\contentsline {section}{\numberline {2.2}Model-based tracking}{16}{section.2.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2.1}Kanade-Lucas-Tomasi Feature Tracker}{16}{subsection.2.2.1}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.6}{\ignorespaces  The image registration problem. The task is to find the disparity vector $h$.}}{16}{figure.2.6}}
+\@writefile{toc}{\contentsline {subsubsection}{3D Reconstruction algorithm}{18}{section*.9}}
 \citation{kanade}
 \citation{kanade}
+\@writefile{toc}{\contentsline {section}{\numberline {2.2}Model-based tracking}{19}{section.2.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2.1}Kanade-Lucas-Tomasi Feature Tracker}{19}{subsection.2.2.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.6}{\ignorespaces  The image registration problem. The task is to find the disparity vector $h$.}}{19}{figure.2.6}}
+\newlabel{eq:weights}{{2.28}{19}{Kanade-Lucas-Tomasi Feature Tracker\relax }{equation.2.28}{}}
 \citation{faceTransfer05}
-\newlabel{eq:weights}{{2.18}{17}{Kanade-Lucas-Tomasi Feature Tracker\relax }{equation.2.18}{}}
 \citation{Nelder2009}
 \citation{Press1992}
+\@writefile{toc}{\contentsline {section}{\numberline {2.3}Optimization}{20}{section.2.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.1}Nelder Mead Downhill Simplex}{20}{subsection.2.3.1}}
 \citation{Press1992}
 \citation{Nelder2009}
-\@writefile{toc}{\contentsline {section}{\numberline {2.3}Optimization}{18}{section.2.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.1}Nelder Mead Downhill Simplex}{18}{subsection.2.3.1}}
-\@writefile{toc}{\contentsline {subsubsection}{The Downhill Simplex Algorithm}{18}{section*.8}}
 \citation{Press1992}
+\@writefile{toc}{\contentsline {subsubsection}{The Downhill Simplex Algorithm}{21}{section*.10}}
+\newlabel{eq:right_angle_simplex}{{2.31}{21}{The Downhill Simplex Algorithm\relax }{equation.2.31}{}}
+\newlabel{eq:centroid}{{2.32}{21}{The Downhill Simplex Algorithm\relax }{Item.1}{}}
 \citation{Nelder2009}
 \citation{Nelder2009}
-\newlabel{eq:right_angle_simplex}{{2.21}{19}{The Downhill Simplex Algorithm\relax }{equation.2.21}{}}
-\newlabel{eq:centroid}{{2.22}{19}{The Downhill Simplex Algorithm\relax }{Item.1}{}}
-\newlabel{eq:reflection}{{2.23}{19}{The Downhill Simplex Algorithm\relax }{Item.2}{}}
-\newlabel{eq:expansion}{{2.24}{19}{The Downhill Simplex Algorithm\relax }{Item.3}{}}
-\newlabel{eq:contraction}{{2.25}{19}{The Downhill Simplex Algorithm\relax }{Item.4}{}}
+\newlabel{eq:reflection}{{2.33}{22}{The Downhill Simplex Algorithm\relax }{Item.2}{}}
+\newlabel{eq:expansion}{{2.34}{22}{The Downhill Simplex Algorithm\relax }{Item.3}{}}
+\newlabel{eq:contraction}{{2.35}{22}{The Downhill Simplex Algorithm\relax }{Item.4}{}}
 \citation{Press1992}
 \citation{Nelder2009}
 \citation{Press1992}
 \bibstyle{plain}
 \bibdata{references}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.7}{\ignorespaces Geometric interpretations of the simplex transformations. Taken from \cite  {Nelder2009}}}{20}{figure.2.7}}
-\newlabel{fg:amoeba}{{2.7}{20}{Geometric interpretations of the simplex transformations. Taken from \cite {Nelder2009}\relax }{figure.2.7}{}}
-\bibcite{cootesOverview01}{1}
-\bibcite{activeApp04}{2}
-\bibcite{lda}{3}
-\bibcite{kanade}{4}
-\bibcite{FEM1ter}{5}
-\bibcite{jacey}{6}
-\bibcite{sdm}{7}
-\bibcite{FEM1pen}{8}
-\bibcite{Press1992}{9}
-\bibcite{vienna}{10}
-\bibcite{Nelder2009}{11}
-\bibcite{eigenfaces91}{12}
-\bibcite{faceTransfer05}{13}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.7}{\ignorespaces Geometric interpretations of the simplex transformations. Taken from \cite  {Nelder2009}}}{23}{figure.2.7}}
+\newlabel{fg:amoeba}{{2.7}{23}{Geometric interpretations of the simplex transformations. Taken from \cite {Nelder2009}\relax }{figure.2.7}{}}
+\bibcite{FEMbook}{1}
+\bibcite{blanz1}{2}
+\bibcite{blanz2}{3}
+\bibcite{cootesOverview01}{4}
+\bibcite{activeApp04}{5}
+\bibcite{lda}{6}
+\bibcite{kanade}{7}
+\bibcite{FEM1ter}{8}
+\bibcite{jacey}{9}
+\bibcite{sdm}{10}
+\bibcite{FEM1pen}{11}
+\bibcite{Press1992}{12}
+\bibcite{vienna}{13}
+\bibcite{Nelder2009}{14}
+\bibcite{eigenfaces91}{15}
+\bibcite{faceTransfer05}{16}

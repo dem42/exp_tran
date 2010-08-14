@@ -143,7 +143,7 @@ int Face::getPointIndexFromPolygon(int index)
     return triangles[index][0];
 }
 
-void Face::calculateBoundingSphere(float *cx,float *cy,float *cz) const
+void Face::calculateBoundingSphere(float &cx,float &cy,float &cz, float &diameter) const
 {
     int v1,v2,v3;
     float v;
@@ -190,10 +190,12 @@ void Face::calculateBoundingSphere(float *cx,float *cy,float *cz) const
 
     std::cout << bx_u <<" " << bx_d <<" " << by_u <<" " << by_d <<" " << bz_u <<" " << bz_d << std::endl;
     std::cout << "bounding sphere" << std::endl;
-    *cx = (bx_u + bx_d)/2.0;
-    *cy = (by_u + by_d)/2.0;
-    *cz = (bz_u + bz_d)/2.0;
+    cx = (bx_u + bx_d)/2.0;
+    cy = (by_u + by_d)/2.0;
+    cz = (bz_u + bz_d)/2.0;
     std::cout <<(bx_u + bx_d)/2.0 << " " << (by_u + by_d)/2.0 << " " << (bz_u+bz_d)/2.0 << std::endl;
+    diameter = std::max(fabs(bx_d - bx_u), fabs(by_d - by_u));
+    diameter = std::max(diameter, fabs(bz_d - bz_u));
 }
 
   

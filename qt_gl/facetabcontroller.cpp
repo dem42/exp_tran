@@ -1,4 +1,5 @@
 #include "facetabcontroller.h"
+#include "Vector3.h"
 
 FaceTabController::FaceTabController(QSlider *exp_slider, FaceWidget *face_widget)
 {
@@ -18,13 +19,34 @@ FaceTabController::FaceTabController(QSlider *exp_slider, FaceWidget *face_widge
         else if(i==20)w_id[i] = 0.1;
         else w_id[i] = 0;
     }
-    w_exp[0] = 0.0;
-    w_exp[1] = 0.0;
-    w_exp[2] = 0.0;
-    w_exp[3] = 0.2;
-    w_exp[4] = 0.0;
-    w_exp[5] = 0.8;
-    w_exp[6] = 0.0;
+//    w_exp[0] = 0.0;
+//    w_exp[1] = 0.0;
+//    w_exp[2] = 0.0;
+//    w_exp[3] = -0.4;
+//    w_exp[4] = 0.0;
+//    w_exp[5] = 0.8;
+//    w_exp[6] = 0.0;
+
+//    w_exp[0] = 0.021423;
+//    w_exp[1] = 0.00498108;
+//    w_exp[2] = 0.00829062;
+//    w_exp[3] = -0.00608236;
+//    w_exp[4] = 0.00763084;
+//    w_exp[5] = -0.0193017;
+//    w_exp[6] = -0.021784;
+
+    w_exp[0] = 0.00883634;
+    w_exp[1] = -0.0029592;
+    w_exp[2] = -0.00662942;
+    w_exp[3] = 0.000328165;
+    w_exp[4] = -0.00611554;
+    w_exp[5] = 0.00532823;
+    w_exp[6] = 0.00375425;
+
+    Vector3::normalize(w_exp,7);
+
+    for(int i=0;i<7;i++)
+        cout << w_exp[i] << endl;
 
     face_ptr->interpolate(w_id,w_exp);
 

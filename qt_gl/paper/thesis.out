@@ -3,11 +3,12 @@
 \BOOKMARK [1][-]{section.1.2}{Contributions}{chapter.1}
 \BOOKMARK [0][-]{chapter.2}{Background}{}
 \BOOKMARK [1][-]{section.2.1}{Deformable Models}{chapter.2}
-\BOOKMARK [2][-]{subsection.2.1.1}{Physically Based Models}{section.2.1}
+\BOOKMARK [2][-]{subsection.2.1.1}{Physics Based Models}{section.2.1}
 \BOOKMARK [2][-]{subsection.2.1.2}{Satistical Models}{section.2.1}
 \BOOKMARK [2][-]{subsection.2.1.3}{Statistical Models of Appearance}{section.2.1}
 \BOOKMARK [2][-]{subsection.2.1.4}{Tensor-Based Model}{section.2.1}
 \BOOKMARK [2][-]{subsection.2.1.5}{Tensor-based Statistical Discriminant Method}{section.2.1}
+\BOOKMARK [2][-]{subsection.2.1.6}{Morphable Model}{section.2.1}
 \BOOKMARK [1][-]{section.2.2}{Model-based tracking}{chapter.2}
 \BOOKMARK [2][-]{subsection.2.2.1}{Kanade-Lucas-Tomasi Feature Tracker}{section.2.2}
 \BOOKMARK [1][-]{section.2.3}{Optimization}{chapter.2}

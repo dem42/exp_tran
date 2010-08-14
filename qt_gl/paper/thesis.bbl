@@ -1,5 +1,20 @@
 \begin{thebibliography}{10}
 
+\bibitem{FEMbook}
+Klaus-Juergen Bathe.
+\newblock {\em Finite Element Procedures}.
+\newblock Prentice Hall, 1996.
+
+\bibitem{blanz1}
+V.~Blanz, C.~Basso, T.~Poggio, and T.~Vetter.
+\newblock Reanimating faces in images and video.
+\newblock {\em EUROGRAPHICS 2003}, 22(3), 2003.
+
+\bibitem{blanz2}
+V.~Blanz, K.~Scherbaum, T.~Vetter, and H.P Seidel.
+\newblock Exchanging faces in images.
+\newblock {\em EUROGRAPHICS 2004}, 23(3), 2004.
+
 \bibitem{cootesOverview01}
 T.F. Cootes and C.J. Taylor.
 \newblock Statistical models of appearance for medical image analysis and

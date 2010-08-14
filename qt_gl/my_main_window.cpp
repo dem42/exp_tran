@@ -15,7 +15,7 @@ MyMainWindow::MyMainWindow(QMainWindow *window)
     v_dialog = new QFileDialog();    
 
     //intialize transfer widget    
-    trans_widget = new TransferWidget("/home/martin/project/test/optical_flow_input.avi",face_widget2);
+    trans_widget = new TransferWidget("/home/martin/project/TrackedSmiles/S003-024.avi",face_widget2);
     //ui.verticalLayout_3->addWidget(trans_widget->getVideoWidget());
 
     ui.verticalLayout_3->addWidget(trans_widget->getPicLabel());    
@@ -48,7 +48,7 @@ MyMainWindow::MyMainWindow(QMainWindow *window)
     connect(ui.expComboBox,SIGNAL(activated(QString)),f_controller,SLOT(expression_activated(QString)));
     connect(ui.expSlider,SIGNAL(valueChanged(int)),f_controller,SLOT(slider_moved(int)));
     connect(ui.identSpinBox,SIGNAL(valueChanged(int)),f_controller,SLOT(identity_activated(int)));
-    connect(ui.renderButton,SIGNAL(clicked()),f_controller,SLOT(render_action()));
+    connect(ui.renderButton,SIGNAL(clicked()),f_controller,SLOT(render_action()));    
 
     //menu
     connect(f_dialog,SIGNAL(fileSelected(const QString)),f_controller,SLOT(face_file_changed(const QString)));
@@ -66,7 +66,7 @@ MyMainWindow::MyMainWindow(QMainWindow *window)
     connect(ui.extractBtn,SIGNAL(clicked()),trans_widget,SLOT(startFaceTransfer()));    
     connect(ui.dropButton,SIGNAL(clicked()),trans_widget,SLOT(dropFrame()));    
     connect(ui.modelButton,SIGNAL(clicked()),trans_widget,SLOT(playBack()));
-
+    connect(ui.cameraButton,SIGNAL(clicked()),trans_widget,SLOT(calibrate()));
 }
 
 

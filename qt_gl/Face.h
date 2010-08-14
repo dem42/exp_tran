@@ -22,7 +22,7 @@ class Face
   Point3 getPointFromPolygon(int);
   int getPointIndexFromPolygon(int);
 
-  void calculateBoundingSphere(float*cx,float*cy,float*cz) const;
+  void calculateBoundingSphere(float&cx,float&cy,float&cz,float&diameter) const;
 
   Point3 *vertexes;
   Vector3 *vertex_normals;

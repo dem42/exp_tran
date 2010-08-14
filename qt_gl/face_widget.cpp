@@ -37,8 +37,9 @@ FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
   center_y = 19.915;
   center_z =  1518;
 
-  cameraDistance = 200;
-  cameraZPosition = 1;
+  cameraDistance = 500;
+  cameraZPosition = 200;
+  upVector = 1;
 }
 
 void FaceWidget::refreshGL()
@@ -152,7 +153,7 @@ void FaceWidget::initializeGL(void)
 
   //scary lighting
   //GLfloat LightPosition[] =  { 2.8741, -19.915, 1.0, 0.0 };
-  GLfloat LightPosition[] =  { 0.0, 0.0, cameraZPosition, 0.0 };
+  //GLfloat LightPosition[] =  { 0.0, 0.0, cameraZPosition, 0.0 };
   GLfloat LightSpecular[] = { 1.0, 1.0, 1.0 };
   GLfloat LightAmbient[] = { 0.0, 0.0, 0.0 };
   GLfloat LightDiffuse[] = { 1.0, 1.0, 1.0 };
@@ -166,8 +167,9 @@ void FaceWidget::initializeGL(void)
 
   // Enable lighting
   glEnable (GL_LIGHTING);
-  glEnable (GL_LIGHT0);
-  glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
+  glEnable (GL_LIGHT0);  
+  //light position is transformed by model view matrix
+  //glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
   glLightfv(GL_LIGHT0, GL_AMBIENT,  LightAmbient);
   glLightfv(GL_LIGHT0, GL_DIFFUSE,  LightDiffuse);
   glLightfv(GL_LIGHT0, GL_SPECULAR, LightSpecular);
@@ -184,17 +186,28 @@ void FaceWidget::initializeGL(void)
 
 void FaceWidget::paintGL(void)
 {
+  cout << "in paintGL" << endl;
+
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW);  
   //reload so that transformations dont stack
   glLoadIdentity();
-  gluLookAt(0.0,0.0,cameraZPosition, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
-  //ok the 4th, 5th and 6th parameter are what im looking at and they should
-  //be the center of the sphere bounding my scene
-  //2.8741 -19.915 -1518.46
-  face_ptr->calculateBoundingSphere(&center_x,&center_y,&center_z);
+  //gluLookAt is a viewing not a modelling transformation!!
+  face_ptr->calculateBoundingSphere(center_x,center_y,center_z,diameter);
+  gluLookAt(0.0,0.0,cameraZPosition, 0.0, 0.0, 0.0, 0.0, upVector, 0.0);
+
+  //keep the viewing trans with gluLookAt on the stack
+  glPushMatrix();
+    GLfloat LightPosition[] =  { 0.0, 0.0, cameraZPosition, 0.0 };
+    glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
+  glPopMatrix();
+
+  //the order of applying transformations is REVERSE in opengl LAST TRANSFORMATION HAPPENS FIRST
+  //this means if we start with loadIdentity then rotate by R then translate by T we get
+  //I*R*T*v where v are our vertices
+
   //negative because we arent moving the camera , we are moving the scene to the center
-  glTranslatef(0,0,-cameraDistance);
+  //glTranslatef(0,0,-cameraDistance);
 
   //move the objects by:
   glTranslatef(trans_x,trans_y,trans_z);
@@ -213,19 +226,20 @@ void FaceWidget::paintGL(void)
   //rotate around norm(r) and r which is the rotation vector
   //glRotatef(145.89, 0.64663, 1.10562, 2.20011);
 
-  //if its too small use:
-  //glScalef(100,100,1);
+  //if its too small use:  
 
   glTranslatef(-center_x,-center_y,-center_z);
+  //glTranslatef(0,0,1500.0);
   //glTranslatef(center_x, center_y, center_z);
   //does the open gl glBegin(GL_POLYGON) glEnd() stuff
   render();
 }
 
-void FaceWidget::setCameraParameters(double cameraZPosition, double cameraDistance)
+void FaceWidget::setCameraParameters(double cameraZPosition, double upVector, double cameraDistance)
 {
     this->cameraZPosition = cameraZPosition;
     this->cameraDistance = cameraDistance;
+    this->upVector = upVector;
 }
 
 void FaceWidget::mouseDoubleClickEvent(QMouseEvent *event)

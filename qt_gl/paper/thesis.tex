@@ -3,6 +3,7 @@
 \usepackage{amsmath,amssymb,mathrsfs}
 \usepackage{here}
 \usepackage{subfig}
+\usepackage{multicol}
 \usepackage{sectsty}
 \usepackage[left=3.2cm, right=3.2cm, top=3cm, bottom=4cm]{geometry}
 
@@ -140,7 +141,7 @@ Given a deformable model, the machine then has to process the sensor input and
 locate instances of the model by adjusting the model's parameters. This task is
 known as \textit{model-based object recognition}. The parameters of the model then allow the
 machine to interpret the scene. In addition to locating an instance of the model
-in one sensory input the machine should also be ablo to track its movement given a sequence of snapshots of
+in one sensory input the machine should also be able to track its movement given a sequence of snapshots of
 the environment. In \textit{model-based tracking} an instance of the model is
 identified and tracked from snapshot to snapshot, in spite of deformations of shape
 and changes in position.
@@ -151,7 +152,7 @@ sensory snapshots, we will focus exclusively on images. As we will be dealing
 with images we will investigate motion tracking and feature detection
 algorithms. These are necessary to obtain cues from our input image which allow
 us to first locate the model in the image and then track its movements through
-sucessive images.
+successive images.
 
 \section{Contributions}
 
@@ -175,7 +176,7 @@ behind the movement that is responsible for expressions.
 \chapter{Background}
 Considerable amount of research has been done on using models to characterize a
 deformable object as well as on model-based object recognition and
-tracking. In this chapter we will present an overview of various modelling techniques. Likewise, we will discuss
+tracking. In this chapter we will present an overview of various modeling techniques. Likewise, we will discuss
 computer vision algorithms which will allow us to locate the features of
 interest in the image. These features then make it possible to fit an instance
 of the model to the image.
@@ -209,10 +210,10 @@ factors:
 \item Arbitrary scaling of the object, possibly due to distance from the observer.
 \item Arbitrary rotations of the object which may cause occlusions. 
 \item Some measure of Gaussian input noise.
-\item Differences in color or intensity caused by a change in lighting.
+\item Differences in color or intensity caused by a change in lighting conditions.
 \end{itemize}
 Some of these sources of variation may be explained away using standard machine
-vision techinques. Noisy input can be explained by means of Gaussian
+vision techniques. Noisy input can be explained by means of Gaussian
 filtering. Other sources of variation such as those due to deformations of the
 object need to be represented by appropriate parameters of the model. The
 deformable model simulates the deformations based on the parameter values. The
@@ -224,7 +225,7 @@ Physical models construct deformable models which mimic the elastic deformations
 of the class of object they model. The parameters of a physical model control the amount
 of actual physical deformation.
 
-Satistical deformable models are trained on a set of examples of a class of
+Statistical deformable models are trained on a set of examples of a class of
 objects. Through statistical analysis a basis for the deformations observed in
 this set of examples is constructed. This basis then allows the model to predict
 probable instances of the objects of this class.
@@ -239,23 +240,26 @@ object is rotated, moved and scaled to explain the variation in structure which
 is not caused by the deformations. The recognition algorithm also needs to be
 robust in order to deal with variations caused by noise.
 
-\subsection{Physically Based Models}
+\subsection{Physics Based Models}
 Natural objects all obey physical laws. Human and animal bodies change shape
 when their muscles contract and loosen, which in turn alters the shape of the
 elastic soft tissues which surround the muscles. Movement is further constrained
 by the skeletons and gravity. Due to the dynamic nature of such objects it is quite impractical to
 model the structure of these objects as consisting of only rigid components. To cope with
 these highly dynamic bodies researchers have turned to physics to describe the
-rules governing these dynamics in form of a set of equations \cite{FEM1pen}, \cite{FEM1ter}.  
+rules governing these dynamics in form of a set of equations. Pentland and
+Sclaroff in  \cite{FEM1pen} give a closed form solution for extracting a
+physical model from images. Terzopoulos and Metaxas combine physics-based
+deformable models with kalman filtering theory in \cite{FEM1ter}.  
 
 As the name suggests, physical models emulate the physical laws that govern
 deformations. Physical models are predominantly formulated using the finite
-element analysis. An indepth discussion of finite element
+element analysis. An in depth discussion of finite element
 analysis can be found in \cite{FEMbook}.
 
 \subsubsection{Finite Element Method (FEM)}
 The FEM method is a numerical engineering technique for the simulation of dynamic
-behaviour of solids and structures. With the finite element method the assumption is made that
+behavior of solids and structures. With the finite element method the assumption is made that
 the object alters shape as if it were made of a elastic material. In physics,
 \textit{strain} is the measure of deformation or displacement from a rigid body state. The stiffness
 of the material determines responses to strain and stress and thus describes the
@@ -275,7 +279,7 @@ u^{(m)}(x,y,z) = \mathbf{H}^{(m)}(x,y,z)*\mathbf{U}
 \end{equation}
 where $u^{(m)}$ is the displacement at $x$,$y$, and $z$ coordinate within the element $m$, $\mathbf{H}^{(m)}$
 the displacement interpolation matrix and $\mathbf{U}$ the global
-displacement measured at every nodel point. With equation
+displacement measured at every nodal point. With equation
 \ref{eq:FEMdisplacements} the displacements at any point in the object can be calculated.
 The values of the displacement interpolation matrix $\mathbf{H}^{(m)}$ depend on
 the choice of the finite elements that make up the mesh.
@@ -287,8 +291,8 @@ strain $\epsilon^{(m)}(x,y,z)$ at the element $m$ is given by
 \epsilon^{(m)}(x,y,z) = \mathbf{B}^{(m)}(x,y,z)*\mathbf{U}
 \end{equation}
 where $\mathbf{B}^{(m)}(x,y,z)$ is the strain-displacement matrix. This matrix can
-be calculated by differentiating the the displacement interpolation matirx
-$\mathbf{H}^{(m)}$. With equations \ref{eq:FEMdisplacements} and \ref{eq:FEMstrain} the behaviour of
+be calculated by differentiating the the displacement interpolation matrix
+$\mathbf{H}^{(m)}$. With equations \ref{eq:FEMdisplacements} and \ref{eq:FEMstrain} the behavior of
 the object structure given a global nodal point displacement $\mathbf{U}$ is
 defined. 
 
@@ -307,7 +311,7 @@ displacements $\mathbf{U}$ to the loads $\mathbf{R}$ as follows
 \mathbf{K}\mathbf{U} = \mathbf{R}
 \end{equation}
 The stiffness matrix $\mathbf{K}$ is calculated as the sum of the stiffness
-matrices $\mathbf{K}^{(m)}$ of the indivdual finite elements. The
+matrices $\mathbf{K}^{(m)}$ of the individual finite elements. The
 $\mathbf{K}^{(m)}$ are
 computed from the strain-displacement matrices $\mathbf{B}^{(m)}$ and the
 elasticity matrix $\mathbf{E}^{(m)}$ as
@@ -317,10 +321,18 @@ elasticity matrix $\mathbf{E}^{(m)}$ as
 \end{equation}
 where the integral goes over the volume $V^{(m)}$ of the element $m$. This
 approach to computing the stiffness matrix is known as the \textit{direct
-  stiffness method} \cite{FEMbook}. The elasticity matrix relates stress and
+  stiffness method}. The displacement interpolation matrix and strain-displacement
+interpolation matrix are constructed for each finite element. Their calculation
+depends on the displacement interpolation function seen in equation
+\ref{eq:FEMdisplacements}. Fortunately, these functions have a well defined
+formulation which depends on the degrees of freedom (nodal point connections) of
+the element. This formulation, along with numerical integration techinques for
+calculating the stiffness matrix can be found in chapter 5 of \cite{FEMbook}. The elasticity matrix relates stress and
 strain in the material. Its form depends on the dimensionality of the
 element. In a one dimensional element the elasticity matrix is a scalar known as
-\textit{Young's Modulus}.   
+\textit{Young's Modulus}. The value of Young's Modulus describes the elastic
+properties of materials and is computed as the constant ratio between stress and strain
+in the material.
 
 Equation \ref{eq:FEMequilibrium} describes a static equilibrium at a specific
 point in time. If the loads are applied rapidly then element inertial forces and
@@ -331,38 +343,93 @@ first and second time derivative of $\mathbf{U}$ respectively.
 \mathbf{M}\ddot{\mathbf{U}} + \mathbf{C}\dot{\mathbf{U}} + \mathbf{K}\mathbf{U}
 = \mathbf{R}
 \end{equation}
-Here $\mathbf{M}$ is the mass matrix and $\mathbf{C}$ the damping matrix. This
-equation is sometimes refered to as the governing equation.
+Here $\mathbf{M}$ is the mass matrix and $\mathbf{C}$ the damping matrix. This differential
+equation is often referred to as the FEM governing equation. To solve for the
+unknown nodal displacements $\mathbf{U}$ standard techniques for solving
+differential equations can be used.
 
 \subsubsection{Modal Analysis}
 Solving the dynamic equilibrium equation \ref{eq:FEMdynamic} by direct integration
-is very costly \cite{FEMbook}. However, it is possible to diagonilze the system
+is very costly \cite{FEMbook}. However, it is possible to diagonalize the system
 of equations by changing the finite element displacement basis to a generalized displacement
 basis $\Phi$ as 
 \begin{equation}
 \mathbf{U} = \Phi \mathbf{\tilde{U}}
 \end{equation}
-Equation \ref{eq:FEMdynamic} can further be premultiplied from the left by $\Phi^T$
+The advantage of the new generalized basis can be seen when equation \ref{eq:FEMdynamic} is premultiplied from the left by $\Phi^T$
 to give
 \begin{equation}\label{eq:FEMmodal}
-\Phi^T\mathbf{M}\Phi\ddot{\mathbf{\tilde{U}}} + \Phi^T\mathbf{C}\Phi\dot{\mathbf{\tilde{U}}} + \Phi^T\mathbf{K}\Phi^T\mathbf{\tilde{U}}
+\Phi^T\mathbf{M}\Phi\mathbf{\ddot{\tilde{U}}} + \Phi^T\mathbf{C}\Phi\mathbf{\dot{\tilde{U}}} + \Phi^T\mathbf{K}\Phi^T\mathbf{\tilde{U}}
 = \Phi^T\mathbf{R}
 \end{equation}
 The above equation can be diagonalized if $\Phi$ is chosen as consisting of the $n$ eigenvectors of the eigensolutions $(\omega_1^2,\phi_1)\,,\, \dots \,,(\omega_n^2,\phi_n)$ which solve the eigenproblem
-\begin{equation}
+\begin{equation}\label{eq:FEMbasis}
 \mathbf{K}\Phi = \Omega^2\mathbf{M}\Phi
 \end{equation}
-So that 
+so that 
 \begin{align}
 \Phi^T\mathbf{K}\Phi &= \Omega^2\\
 \Phi^T\mathbf{M}\Phi &= \mathbf{I}
 \end{align}
-The diagonalized equation \ref{eq:FEMmodal} can be solved for the displacements $\mathbf{\tilde{U}}$
-either in closed form or integrated numerically in fewer steps.
+These eigenvectors are the free vibrational modes of the equilibrium equation. Choosing $\Phi$ in this manner transforms equation \ref{eq:FEMmodal} into
+\begin{equation}\label{eq:FEMdiag}
+\mathbf{\ddot{\tilde{U}}} + \mathbf{\tilde{C}}\mathbf{\dot{\tilde{U}}} + \Omega^2\mathbf{\tilde{U}}
+= \mathbf{\tilde{R}}
+\end{equation}
+Under the assumption that the transformed damping matrix $\mathbf{\tilde{C}}$ is
+diagonal as well the above equation \ref{eq:FEMdiag} is diagonalized since
+$\Omega^2$ is a diagonal matrix.
+Diagonalizing
+decouples the individual components of $\mathbf{U}$. This means that we obtain a
+separate differential equation for each component of $\mathbf{U}$ and as such it
+is not necessary to compute the inverse of the $\mathbf{K}$. Computing this
+inverse is costly and may not always be possible if $\mathbf{U}$ is singular. Thus, the
+diagonalized equation \ref{eq:FEMdiag} can be solved for the displacements
+$\mathbf{\tilde{U}}$ either in closed form or integrated numerically in fewer steps.
+
 \subsubsection{Recovering shape with FEM} 
+Through Modal analysis it is possible to easily generate displacements of an
+arbitrary object given a
+stiffness matrix $\mathbf{K}$. These displacements deform the object. Since the
+matrix $\Phi$ encodes the free vibration modes, it is possible to generate a new
+face by taking a vector of weights $\mathbf{u}$ and calculating a deformed
+instance of the object class by adding the displacements to the mean shape
+$\mathbf{\bar{x}}$ using
+\begin{equation}\label{eq:FEMgenerate}
+\mathbf{x} =  \mathbf{\bar{x}} + \Phi\mathbf{u}
+\end{equation}
+Equation \ref{eq:FEMgenerate} synthesises a new object from a vector of
+parameters $\mathbf{u}$. It is therefore possible to fit a model of a class
+of objects with a known stiffness function to a canditate object in an
+image by solving an optimization problem which locates the parameters $\mathbf{u}$.
+
+Alternatively, it is also possible to use the equilibrium equation
+\ref{eq:FEMequilibrium} to recover the shape of the candidate object. Assuming
+that the positions of the nodal points are found in the image and that their 3D
+position is recovered then the load vector $\mathbf{R}$ can be calculated as
+\begin{equation}\label{eq:FEMload}
+[r_{3k}, r_{3k+1}, r_{3k+2}] = [x^w_{k}, y^w_{k}, z^w_{k}] - [x_{k}, y_{k},
+  z_{k}]
+\end{equation}
+where $x^w_{k}$, $y^w_{k}$ and $z^w_{k}$ is the position obtained from the image of the nodal point
+with index $k$. The rest position of this nodal point in the model is given by
+$x_{k}$, $y_{k}$ and $z_{k}$. This approach to constructing the load vector
+$\mathbf{R}$ is analogous to attaching springs between the nodal point
+measurements and their corresponding points in the model. Given the load vector
+the goal is now to solve the previously seen equilibrium equation 
+\begin{equation}
+\mathbf{K}\mathbf{U} = \mathbf{R}
+\end{equation}
+To solve for the displacements $\mathbf{U}$ the stiffness matrix $\mathbf{K}$
+needs to be inverted. This is often a very costly operation which can be avoided
+by diagonalizing the equilibrium equation. This is done using modal analysis
+with the generalized
+basis from equation \ref{eq:FEMbasis}.
+
+\subsubsection{Combining Statistical and FEM modes}
 
 \subsection{Satistical Models}
-A \textit{shape model} describes the boundaries of an object. figur. For instance, a
+A \textit{shape model} describes the boundaries of an object. figure. For instance, a
 shape model of a face will denote the location and measures of the defining
 contours of a face. To locate an object in an image the shape model must be able to
 account for the following
@@ -669,6 +736,111 @@ individual expression classes, thereby effectively increasing the dimension of
 the tensor. The expanded tensor model still retains the quality of independence
 along the modes of variance. However, due to the expansion the SDM can be
 applied to the tensor if we flatten the sub-tensors into matrices.
+
+
+\subsection{Morphable Model}
+Blanz et al use PCA to construct a statistical model of 3D face shape and
+texture \cite{blanz1}, \cite{blanz2}. The orthogonal matrix of basis vectors is
+extracted from a database of 3D faces with texture. This basis spans a vector
+space which Blanz refers to as the \textit{Morhable Model}.
+
+The faces in the database are encode as shape vectors with $S_i$ to being the vector representing the 3D shape of a human
+face, stored as the $x,y,z$-coordinates of all the vertices of that face. So
+
+\begin{equation}
+\mathbf{S_i} = (x_1,y_1,z_1,x_2,...,x_n,y_n,z_n)^T
+\end{equation}
+
+Similarly, the texture vectors are defined as
+
+\begin{equation}
+\mathbf{T_i} = (R_1,G_1,B_1,R_2,...,R_n,G_n,B_n)^T
+\end{equation}
+
+The idea behind the morhable model is that any linear combination of the
+$\mathbf{S_i}$ and $\mathbf{T_i}$ constitues a realistic face. The full
+morphable model is the linear combination of the examples given by the formula
+
+\begin{equation}
+\mathbf{S} = \sum_{i=1}^ma_i \mathbf{S_i} \indent \mathbf{T} = \sum_{i=1}^mb_i \mathbf{T_i}
+\end{equation}
+
+To allow the morphable model to fit well to the source image, dense
+point-to-point correspondence must be ensured on the example
+images, so that important features such as the tip of the nose are
+correctly matched up in the examples. Then the fitting process matches
+the features in the source image to those in the examples, in order to
+calculate the correct combinations of the basis vectors.
+
+Principal Component Analysis (PCA) is performed on the dataset of examples
+to produce orthogonal basis vectors that can be used in the morphable
+model instead of the examples directly.
+
+\begin{equation}
+\mathbf{S} = \mathbf{\bar{s}} + \sum_{i=1}^m\alpha_i.\mathbf{s_i} \indent \mathbf{T} = \mathbf{\bar{t}} + \sum_{i=1}^m\beta_i.\mathbf{t_i}
+\end{equation}
+
+This process identifies vectors which represent the most variance in
+the examples, and so contain the most information about
+the images. This means any image can now be represented by the linear
+combination of a smaller number of these components than would be
+required of the original examples. A limit can then be set on the number
+of components used in the model, via the value of $m$. This
+is generally set to 149, as the components beyond this contain
+mostly noise.
+
+However, to to fit the Morphable Model of 3D faces to an image, the user has to manually select
+about 7 feature points.
+\subsubsection{3D Reconstruction algorithm}
+%Pose and lighting etc in case of exchanging faces
+To be able to exchange the face we need the $\alpha_i$, $\beta_i$ parameters
+of the Morphable Model. We also need 22 rendering parameters
+$\rho$ to be able to apply standard graphics procedures to correctly illuminate and position the 3D source face into
+the target image. The $\rho$ parameters are:
+\begin{multicols}{2}
+\begin{itemize}
+\setlength{\itemsep}{0pt}
+\item 3D rotation (3 angles)
+\item 3D translation (3 dimensions)
+\item focal length of the camera
+\item angle of directed light (2 parameters)
+\item intensity of directed light (3 colours)
+\end{itemize}
+\begin{itemize}
+\setlength{\itemsep}{0pt}
+\item intensity of ambient light (3 colours)
+\item color contrast
+\item gain in each color channel (3 channels)
+\item offset in each color channel
+\end{itemize}
+\end{multicols}
+We apply the reconstruction algorithm to estimate the paramters for both images
+and then use these parameters to compute
+the colour image $I_{model}(x,y)$ of the face we are reconstructing.
+
+The parameters are all
+estimated in an analysis-by-synthesis stage in which we attempt to minimise the
+difference between the synthetic image $I_{model}$ and the original colour
+image $I_{input}$. We measure the quality of this minimisation based on a sum of squared error\\
+\begin{equation}
+E_l = \sum_x \sum_y \sum_{c\in\{r,g,b\}}(I_{c,input}(x,y) - I_{c,model}(x,y))^2
+\end{equation}
+To this cost error we add another term $E_F$ that measures the plausibility of the
+$\rho$ parameters based on a user provided set of 2D feature points. The
+resulting cost function that we minimize during the fitting stage is
+\begin{equation}
+E = \frac{1}{\sigma_l^2}E_l + \frac{1}{\sigma_F^2}E_F + \sum_i
+\frac{\alpha_i^2}{\sigma_{S,i}^2} + \sum_i \frac{\beta_i^2}{\sigma_{T,i}^2}
++\sum_i \frac{(\rho_i- \bar{\rho}_i)^2}{\sigma_{R,i}^2}
+\end{equation}
+where our standard deviations $\sigma$ are taken from the PCA.
+This cost function is minimised using a Stochastic Newton Algorithm to
+obtain a plausible result for the parameters.
+
+However, there are skin features like moles or scars that we cannot compute from
+the linear combinations of the textures $T_i$. Therefore we additionally extract the
+texture of the person's face using an
+illumination-corrected texture extraction algorithm.
 
 
 \section{Model-based tracking}

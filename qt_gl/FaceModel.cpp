@@ -15,7 +15,7 @@ FaceModel * FaceModel::getInstance()
     //lazy initialization
     if(instance == NULL)
     {
-        instance = new FaceModel("svd_result_object_3",
+        instance = new FaceModel("svd_result_object_4",
                                  "/home/martin/project/JaceyBinghamtonVTKFiles",
                                  "out_here.txt",
                                   56,7,5090);
@@ -174,23 +174,52 @@ void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bo
 }
 
 
-void meanCenterMatrix(Matrix &matrix)
+void FaceModel::computeMean(int first_dim, int second_dim, int n, double &m_x, double &m_y, double &m_z)
 {
     double sum_x = 0;
     double sum_y = 0;
     double sum_z = 0;
 
-//    for(int i=0;i<matrix.getM();i+=3)
-//    {
-//        sum[i]
-//            }
-    for(int i=0;i<matrix.getM();i++)
-    {
-        for(int i=0;i<matrix.getN();i++)
-        {
+    FILE *fid;
+    int i,j,k;
+    int num_dont_care;
+    double number;
+    char filename[256];
+    char str_dont_care[50];
 
+
+    for(i=0;i<first_dim;i++)
+    {
+        for(j=0;j<second_dim;j++)
+        {
+            sprintf(filename,"%s/%s",dir_name.c_str(),strs[i][j].c_str());
+            cout << filename <<" " << i << " " << j <<  endl;
+
+            fid = fopen(filename,"r");
+            fgets(str_dont_care,50,fid);
+            fgets(str_dont_care,50,fid);
+            fgets(str_dont_care,50,fid);
+            fgets(str_dont_care,50,fid);
+
+            fscanf(fid,"%s %d",str_dont_care,&num_dont_care);
+            fscanf(fid,"%s",str_dont_care);
+
+            for(k=0;k<n;k+=3)
+            {
+                fscanf(fid,"%lf",&number);
+                sum_x += number;
+                fscanf(fid,"%lf",&number);
+                sum_y += number;
+                fscanf(fid,"%lf",&number);
+                sum_z += number;
+            }
+
+            fclose(fid);
         }
     }
+    m_x = 3*sum_x / (n*first_dim*second_dim);
+    m_y = 3*sum_y / (n*first_dim*second_dim);
+    m_z = 3*sum_z / (n*first_dim*second_dim);
 }
 void FaceModel::computeIdentitySingularVectors(int m,int n)
 {
@@ -238,7 +267,8 @@ void FaceModel::compute_core_tensor(void)
     int m,n;
 
     m = n_f;
-    n = n_e * 3 * n_v;    
+    n = n_e * 3 * n_v;
+    computeMean(n_f,n_e,3*n_v,this->mean_x,this->mean_y,this->mean_z);
 
     /********************************/
     /*********first read indentity*/
@@ -383,6 +413,7 @@ void FaceModel::read_flat(double **a, int m, int n,
     int number;
     char filename[256];
     char str_dont_care[50];
+    double num;
 
     for(i=0;i<first_dim;i++)
     {
@@ -404,8 +435,15 @@ void FaceModel::read_flat(double **a, int m, int n,
             fscanf(fid,"%s %d",str_dont_care,&number);
             fscanf(fid,"%s",str_dont_care);
 
-            for(k=0;k<n;k++)
-                fscanf(fid,"%lf",&a[i][j*n+k]);
+            for(k=0;k<n;k+=3)
+            {
+                fscanf(fid,"%lf",&num);
+                a[i][j*n+k] = num - mean_x;
+                fscanf(fid,"%lf",&num);
+                a[i][j*n+k+1] = num - mean_y;
+                fscanf(fid,"%lf",&num);
+                a[i][j*n+k+2] = num - mean_z;
+            }
 
             fclose(fid);
         }
@@ -421,6 +459,7 @@ void FaceModel::read_flat_vertex(double **a, int m, int n,
     int number;
     char filename[256];
     char str_dont_care[50];
+    double num;
 
     if(flag != VERTEX)
         std::cerr << "use other function " << std::endl;
@@ -440,8 +479,15 @@ void FaceModel::read_flat_vertex(double **a, int m, int n,
             fscanf(fid,"%s %d",str_dont_care,&number);
             fscanf(fid,"%s",str_dont_care);
 
-            for(k=0;k<n;k++)
-                fscanf(fid,"%lf",&a[k][i*second_dim+j]);
+            for(k=0;k<n;k+=3)
+            {                
+                fscanf(fid,"%lf",&num);
+                a[k][i*second_dim+j] = num - mean_x;
+                fscanf(fid,"%lf",&num);
+                a[k+1][i*second_dim+j] = num - mean_y;
+                fscanf(fid,"%lf",&num);
+                a[k+2][i*second_dim+j] = num - mean_z;
+            }
 
             fclose(fid);
         }

@@ -28,7 +28,7 @@ public:
    void render();
    void setFace(Face* face_ptr);
    void setWireFrame(bool);
-   void setCameraParameters(double cameraZPosition, double cameraDistance);
+   void setCameraParameters(double cameraZPosition, double upVector, double cameraDistance);
 
    void refreshGL();
 
@@ -68,9 +68,11 @@ private:
   float center_x;
   float center_y;
   float center_z;
+  float diameter;
   //camera
   double cameraZPosition;
   double cameraDistance;
+  double upVector;
 
   QString face_filename;
 };

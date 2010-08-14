@@ -14,6 +14,8 @@
 #include "face_widget.h"
 #include "optimizer.h"
 
+#include "ui_cameraDialog.h"
+
 #include <cv.h>
 #include <vector>
 #include <string>
@@ -46,12 +48,11 @@ public slots:
     void playBack();
 
     void replayFrame();
-
+    void calibrate();
 private:
     void calcIntrinsicParams();
     void processVideo();
-    void calculateTransformation(vector<cv::Point2f> imagePoints, Face* face_ptr,
-                                 cv::Mat &rvec,cv::Mat &tvec,bool useExt=true);
+
 
     //video fileName
     QString fileName;
@@ -64,6 +65,10 @@ private:
 
     ClickableQLabel *picLabel;
     VectorFieldQLabel *flowLabel;
+
+    //camera parameters
+    Mat_<double> cameraMatrix;
+    Mat_<double> lensDist;
 
     //frameHistory .. this includes dropped frames and first frame
     std::vector<cv::Mat> frames;
@@ -93,6 +98,10 @@ private:
     vector<vector<double> >vector_weights_exp;
     vector<vector<double> >vector_weights_id;
     QTimer *timerReplay;
+
+    //camera dialog ui
+    Ui::cameraDialog cameraUi;
+    QDialog *cameraDialog;
 };
 
 #endif // TRANSFERWIDGET_H
