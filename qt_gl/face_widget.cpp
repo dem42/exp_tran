@@ -1,4 +1,6 @@
 #include <iostream>
+#include <vector>
+#include <algorithm>
 #include <cmath>
 #include <QGLFormat>
 #include <QFileDialog>
@@ -20,6 +22,8 @@ FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
   face_ptr = NULL;
   gl_display_style = GL_POLYGON;
 
+  face_index = -1;
+
   //initialize camera parameters
   rot_x = 0;
   rot_y = 0;
@@ -36,6 +40,7 @@ FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
   center_x = -2.8741;
   center_y = 19.915;
   center_z =  1518;
+  diameter = 100;
 
   cameraDistance = 500;
   cameraZPosition = 200;
@@ -50,7 +55,11 @@ void FaceWidget::refreshGL()
 void FaceWidget::setFace(Face* face_ptr)
 {
     this->face_ptr = face_ptr;
-    this->polygonNumber = face_ptr->getPolyNum();    
+    this->polygonNumber = face_ptr->getPolyNum();
+    face_ptr->calculateBoundingSphere(center_x,center_y,center_z,diameter);
+    cout << center_x << " " << center_y << " " << center_z << " " << diameter << endl;
+    this->resizeGL(this->width(), this->height());
+    this->updateGL();
 }
 
 void FaceWidget::render()
@@ -58,13 +67,18 @@ void FaceWidget::render()
   cout << "in my render Object with poly_num " << polygonNumber << endl;
   int v1,v2,v3;
 
-  //nothing to render
-  if(face_ptr == NULL)
-      return;
-  
   Point3 *vertexes = face_ptr->vertexes;
   Vector3 *vertex_normals = face_ptr->vertex_normals;
   float (*triangles)[3] = face_ptr->triangles;
+
+  vector<int>::iterator result;
+  vector<int> fPoints;
+  fPoints.assign(Face::fPoints,Face::fPoints+Face::fPoints_size);
+
+  //nothing to render
+  if(face_ptr == NULL)
+      return;
+
 
   for(int i=0; i<polygonNumber; i++)
     {
@@ -72,7 +86,11 @@ void FaceWidget::render()
       v2 = triangles[i][1];
       v3 = triangles[i][2];
 
-      if(i == face_index)
+      //try to find if polygon i is a feature point
+      result = std::find(fPoints.begin(),fPoints.end(),i);
+
+      //if the polygon i was double clicked or is a feature point .. highlight it
+      if(i == face_index || result != fPoints.end())
       {
           // enable color tracking
           glEnable(GL_COLOR_MATERIAL);
@@ -183,7 +201,9 @@ void FaceWidget::initializeGL(void)
 
 }
 
-
+//the order of applying transformations is REVERSE in opengl LAST TRANSFORMATION HAPPENS FIRST
+//this means if we start with loadIdentity then rotate by R then translate by T we get
+//I*R*T*v where v are our vertices
 void FaceWidget::paintGL(void)
 {
   cout << "in paintGL" << endl;
@@ -192,22 +212,20 @@ void FaceWidget::paintGL(void)
   glMatrixMode(GL_MODELVIEW);  
   //reload so that transformations dont stack
   glLoadIdentity();
-  //gluLookAt is a viewing not a modelling transformation!!
-  face_ptr->calculateBoundingSphere(center_x,center_y,center_z,diameter);
-  gluLookAt(0.0,0.0,cameraZPosition, 0.0, 0.0, 0.0, 0.0, upVector, 0.0);
+  //gluLookAt is a viewing not a modelling transformation!!  
+  gluLookAt(0.0, 0.0, upVector*2*diameter, center_x, center_y, center_z, 0.0, upVector, 0.0);
+  cout << cameraZPosition << " " << diameter << endl;
+  //gluLookAt(0.0, 0.0, cameraZPosition, 0, 0, 0, 0.0, upVector, 0.0);
+
 
   //keep the viewing trans with gluLookAt on the stack
+  //here we are trying to keep light movements independent of the
+  //viewing transformation of the scene objects
   glPushMatrix();
     GLfloat LightPosition[] =  { 0.0, 0.0, cameraZPosition, 0.0 };
     glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
   glPopMatrix();
 
-  //the order of applying transformations is REVERSE in opengl LAST TRANSFORMATION HAPPENS FIRST
-  //this means if we start with loadIdentity then rotate by R then translate by T we get
-  //I*R*T*v where v are our vertices
-
-  //negative because we arent moving the camera , we are moving the scene to the center
-  //glTranslatef(0,0,-cameraDistance);
 
   //move the objects by:
   glTranslatef(trans_x,trans_y,trans_z);
@@ -218,19 +236,9 @@ void FaceWidget::paintGL(void)
   glRotatef(rot_z, 0.0, 0.0, 1.0);
   glRotatef(rot_y, 0.0, 1.0, 0.0);
   glRotatef(rot_x, 1.0, 0.0, 0.0);
-//
-//  glRotatef(rot_x, 1.0, 0.0, 0.0);
-//  glRotatef(rot_y, 0.0, 1.0, 0.0);
-//  glRotatef(rot_z, 0.0, 0.0, 1.0);
 
-  //rotate around norm(r) and r which is the rotation vector
-  //glRotatef(145.89, 0.64663, 1.10562, 2.20011);
+  glTranslatef(-center_x,-center_y,-center_z);  
 
-  //if its too small use:  
-
-  glTranslatef(-center_x,-center_y,-center_z);
-  //glTranslatef(0,0,1500.0);
-  //glTranslatef(center_x, center_y, center_z);
   //does the open gl glBegin(GL_POLYGON) glEnd() stuff
   render();
 }
@@ -242,12 +250,62 @@ void FaceWidget::setCameraParameters(double cameraZPosition, double upVector, do
     this->upVector = upVector;
 }
 
+void FaceWidget::zoom(int step)
+{
+    double increment = std::abs(step) / 2.;
+    if(step > 0)
+        diameter *= increment;
+    else
+        diameter /= increment;
+    this->resizeGL(this->width(),this->height());
+    this->updateGL();
+}
+
+void FaceWidget::wheelEvent(QWheelEvent *event)
+{
+    cout << "IN WHEEL EVENT" << endl;
+    //mouse work in steps of 15 degrees and delta is in eights of a degree
+    int numDegrees = event->delta() / 8;
+    int numSteps = numDegrees / 15;
+
+    zoom(numSteps);
+
+    event->accept();
+}
+
 void FaceWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
     face_index = selectPoint(event->pos());
     cout << "FACE INDEX " << face_index << endl;    
     updateGL();
 }
+
+void FaceWidget::setupFrustumParameters(GLdouble &left, GLdouble &right, GLdouble &bottom,
+                                         GLdouble &top, GLdouble &near, GLdouble &far)
+{
+    left = center_x - diameter/2.;
+    right = center_x + diameter/2.;
+    bottom = center_y - diameter/2.;
+    top = center_y + diameter/2.;
+
+    near = center_z + diameter;
+    far = center_z + 5*diameter;
+
+    GLdouble aspect = (GLdouble) this->width() / this->height();
+    if ( aspect < 1.0 )
+    {
+        // window taller than wide
+        bottom /= aspect;
+        top /= aspect;
+    }
+    else
+    {
+        left *= aspect;
+        right *= aspect;
+    }
+    cout << left << " " << right << " " << top << " " << bottom << " " << near << " " << far << endl;
+}
+
 
 //standard opengl GL_SELECT render mode trickery to
 //get which polygon gets rendered at pos
@@ -256,6 +314,7 @@ int FaceWidget::selectPoint(const QPoint &pos)
     const int MaxSize = 512;
     GLuint buffer[MaxSize];
     GLint viewport[4];
+    GLdouble left,right,bottom,top,near,far;
 
     makeCurrent();
 
@@ -271,7 +330,11 @@ int FaceWidget::selectPoint(const QPoint &pos)
     glLoadIdentity();
     gluPickMatrix(GLdouble(pos.x()), GLdouble(viewport[3] - pos.y()),
                   5.0, 5.0, viewport);
-    gluPerspective(60, (GLfloat)width()/(GLfloat)height(), 1.0, 2000.0);
+    //gluPerspective(60, (GLfloat)width()/(GLfloat)height(), 1.0, 2000.0);
+
+    setupFrustumParameters(left,right,bottom,top,near,far);  
+    glFrustum(left,right,bottom,top,near,far);
+
     paintGL();
     glMatrixMode(GL_PROJECTION);
     glPopMatrix();
@@ -298,6 +361,7 @@ void FaceWidget::setWireFrame(bool on)
 void FaceWidget::resizeGL(int width, int height)
 {
   cout << "in resize" << endl;
+  GLdouble left,right,bottom,top,near,far;
 
   //coordinates of 2D plane (the one we're projecting to)
   glViewport(0, 0, (GLsizei)width, (GLsizei)height);
@@ -307,7 +371,13 @@ void FaceWidget::resizeGL(int width, int height)
   //reset to identity matrix
   glLoadIdentity();
   //now set projection coordinates .. FOV, aspect ratio, near, far plane
-  gluPerspective(60, (GLfloat)width/(GLfloat)height, 1.0, 2000.0);
+  //gluPerspective(60, (GLfloat)width/(GLfloat)height, 1.0, 2000.0);
+
+  //use frustum instead of gluPerspective .. frustum more flexible
+  //frustum specifies viewing volume
+  //perspective just does frustum with focal = trigonometry(fov)
+  setupFrustumParameters(left,right,bottom,top,near,far);
+  glFrustum(left,right,bottom,top,near,far);
 
   //switch back to transformation matrix
   glMatrixMode(GL_MODELVIEW);

@@ -24,10 +24,17 @@ SOURCES += qt_gl.cpp \
     opticalflowengine.cpp \
     opticalflowfarneback.cpp \
     vectorfieldqlabel.cpp \
-    featurepointqlabel.cpp
-QT += opengl \
-    phonon
-FORMS += applform.ui
+    featurepointqlabel.cpp \
+    mysimplex.cpp \
+    rosenerror.cpp \
+    modelimageerror.cpp \
+    facetabcontroller.cpp \
+    optimizer.cpp \
+    neldermeadoptimizer.cpp \
+    closedformoptimizer.cpp
+QT += opengl
+FORMS += applform.ui \
+    cameraDialog.ui
 HEADERS += my_main_window.h \
     Face.h \
     Vector3.h \
@@ -41,7 +48,15 @@ HEADERS += my_main_window.h \
     opticalflowengine.h \
     opticalflowfarneback.h \
     vectorfieldqlabel.h \
-    featurepointqlabel.h
+    featurepointqlabel.h \
+    mysimplex.h \
+    errorfunction.h \
+    rosenerror.h \
+    modelimageerror.h \
+    facetabcontroller.h \
+    optimizer.h \
+    neldermeadoptimizer.h \
+    closedformoptimizer.h
 LIBS += -L/usr/local/lib \
     -lml \
     -lcvaux \

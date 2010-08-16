@@ -6,6 +6,8 @@
 #include <QGLWidget>
 #include "Face.h"
 
+#include <QWheelEvent>
+
 
 
 class FaceWidget : public QGLWidget
@@ -41,11 +43,17 @@ protected:
   void mouseMoveEvent(QMouseEvent *event);
   void mouseDoubleClickEvent(QMouseEvent *event);
 
+  void wheelEvent(QWheelEvent *event);
+
+
 public slots:
    void wireFrameChecked(bool);
 
 private:
   int selectPoint(const QPoint &pos);
+  void setupFrustumParameters(GLdouble &left, GLdouble &right, GLdouble &bottom,
+                              GLdouble &top, GLdouble &near, GLdouble &far);
+  void zoom(int);
 
   Face *face_ptr;
   int polygonNumber;

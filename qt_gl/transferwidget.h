@@ -52,7 +52,8 @@ public slots:
 private:
     void calcIntrinsicParams();
     void processVideo();
-
+    void computeEulerAnglesFromRmatrix(const Mat &rmatrix,double &euler_x, double &euler_y, double &euler_z);
+    QImage mat2QImage(const Mat mat_rgb);
 
     //video fileName
     QString fileName;
@@ -72,6 +73,7 @@ private:
 
     //frameHistory .. this includes dropped frames and first frame
     std::vector<cv::Mat> frames;
+    const unsigned int FRAME_MAX;
 
     //object responsible for computing
     //optical flow

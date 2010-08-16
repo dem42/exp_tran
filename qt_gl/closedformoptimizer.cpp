@@ -5,10 +5,11 @@ ClosedFormOptimizer::ClosedFormOptimizer() : max_iterations(1)
 {    
 }
 
-void ClosedFormOptimizer::estimateParametersAndPose(const vector<Mat> &frames, const vector<vector<Point2f> > &featurePoints,
-                                   const Mat &cameraMatrix, const Mat& lensDist, vector<Mat> &rotations, vector<Mat> &translations,
-                                   vector<vector<double> >&weights_id, vector<vector<double> >&weights_ex,
-                                   vector<vector<Point2f> > &generatedPoints)
+void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector<Point2f> &featurePoints,
+                                                  const Mat &cameraMatrix, const Mat& lensDist,
+                                                  Face* face_ptr,const vector<int> &point_indices,
+                                                  const Mat &rotation, const Mat &translation,
+                                                  vector<double> &weights_id, vector<double> &weights_ex)
 {
     Mat_<double> weakCamera(2,3);
     //matrices for A_ex * w_ex = B_ex and A_id * w_id = B_id
@@ -21,11 +22,10 @@ void ClosedFormOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
     Mat_<double> W, WT;
 
     //core tensor rows
-    vector<vector<Mat_<double> > > Mi;
+    vector<Mat_<double> > Mi;
 
     //featurePoints converted to 2x1 matrices
-    vector<vector<Mat_<double> > >featurePointsMat;
-    vector<Mat_<double> >helpVector;
+    vector<Mat_<double> >featurePointsMat;    
     Mat_<double> helpMat;
 
     //initialize model-morph bases
@@ -33,13 +33,14 @@ void ClosedFormOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
     Matrix core = model->getCoreTensor();
     Mat_<double> u_id = model->getUIdentity();
     Mat_<double> u_ex = model->getUExpression();
-    //point indices
-    vector<vector<int> >point_indices;
 
     int index = 0;
 
     const int exr_size = 7;
     const int id_size = 56;
+
+    double *w_id = new double[id_size];
+    double *w_exp = new double[exr_size];
 
     Mat_<double> rmatrix;
     Matrix x_t(1,exr_size);
@@ -50,36 +51,8 @@ void ClosedFormOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
     Matrix lin_comb_x(exr_size,1);
     Matrix lin_comb_y(id_size,1);
 
-    const unsigned int FRAME_NUMBER = frames.size();
-    Face *face_ptr = new Face();
-    double *w_id = new double[56];
-    double *w_exp = new double[7];
-
-
-    //make a face guess
-    for(int i=0;i<56;i++)
-    {
-        if(i==33)w_id[i] = 0.1;
-        else if(i==7)w_id[i] = 0.8;
-        else if(i==20)w_id[i] = 0.1;
-        else w_id[i] = 0;
-    }
-    w_exp[0] = 0.0;
-    w_exp[1] = 0.0;
-    w_exp[2] = 0.0;
-    w_exp[3] = 0.2;
-    w_exp[4] = 0.0;
-    w_exp[5] = 0.8;
-    w_exp[6] = 0.0;
-
-    face_ptr->interpolate(w_id,w_exp);
-
-    //estimate the pose parameters and place estimations into vectors rotations and translations
-    //the rotations vector holds the rodrigues rotation vectors which can be converted to a rotation matrix
-    estimatePose(featurePoints,face_ptr,cameraMatrix,lensDist,rotations,translations);
-
-    //generate points to improve tracking
-    generatePoints(rotations,translations,cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,generatedPoints,point_indices);
+    //get weights from the current face instance
+    face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
 
     /***************************************************************/
     /*create weak-perspecitve camera matrix from camera matrix*/
@@ -89,43 +62,31 @@ void ClosedFormOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
             weakCamera(i,j) = cameraMatrix.at<double>(i,j);
 
     //preprocess points and core tensor rows
-    vector<vector<Point2f> >::const_iterator it = featurePoints.begin(),
-                                       it_end = featurePoints.end();
-    vector<Point2f>::const_iterator it_inside, it_inside_end;
 
-    for(; it != it_end; ++it)
-    {
-        it_inside = (*it).begin();
-        it_inside_end = (*it).end();
-        helpVector.clear();
-        for(; it_inside != it_inside_end; ++it_inside)
-        {
-            helpMat = Mat_<double>(2,1);
-            helpMat(0,0) = (*it_inside).x;
-            helpMat(1,0) = (*it_inside).y;
-            helpVector.push_back(helpMat);
-        }
-        featurePointsMat.push_back(helpVector);
-    }
-    vector<vector<int> >::const_iterator it2 = point_indices.begin(),
-                                        it2_end = point_indices.end();
-    vector<int>::const_iterator it2_inside, it2_inside_end;
+    vector<Point2f>::const_iterator it_inside = featurePoints.begin(),
+                                    it_inside_end = featurePoints.end();
 
-    for(; it2 != it2_end; ++it2)
+    for(; it_inside != it_inside_end; ++it_inside)
     {
-        it2_inside = (*it2).begin();
-        it2_inside_end = (*it2).end();
-        helpVector.clear();
-        for(; it2_inside != it2_inside_end; ++it2_inside)
-        {
-            helpMat = Mat_<double>(3,exr_size*id_size);
-            index = *it2_inside;
-            helpMat = core.submatrix( index*3 , index*3 + 2 );
-            helpVector.push_back(helpMat);
-        }
-        Mi.push_back(helpVector);
+        helpMat = Mat_<double>(2,1);
+        helpMat(0,0) = (*it_inside).x;
+        helpMat(1,0) = (*it_inside).y;        
+        featurePointsMat.push_back(helpMat);
     }
 
+
+    vector<int>::const_iterator it2_inside = point_indices.begin(),
+                                it2_inside_end = point_indices.end();
+
+
+    for(; it2_inside != it2_inside_end; ++it2_inside)
+    {
+        helpMat = Mat_<double>(3,exr_size*id_size);
+        index = *it2_inside;
+        cout << index << endl;
+        helpMat = core.submatrix( index*3 , index*3 + 2 );
+        Mi.push_back(helpMat);
+    }
 
     //do not use the guess in the first frame but do for every following frame
     for(int i=0;i<exr_size;i++)
@@ -135,116 +96,110 @@ void ClosedFormOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
 
 
     for(int count = 0;count < max_iterations; count++)
-    {
-
-        //put the guesses into matrix y and x
-        x.transpose(x_t);
-        Matrix::matrix_mult(x_t,u_ex).transpose(lin_comb_x);
-        y_t.transpose(y);
-
-        for(unsigned int i=0; i<1; i++)
-        {
-            Rodrigues(rotations[i],rmatrix);
-            Z_id = Matrix::kron(Matrix::eye(id_size),lin_comb_x);
-            ZU = Z_id*(u_id.t());
-
-            PR = weakCamera*rmatrix;
-            Pt = (1/translations[i].at<double>(2,0)) * (weakCamera*translations[i]);
-
-            A_id = Mat_<double>::zeros(Size(id_size,id_size));
-            B_id = Mat_<double>::zeros(Size(1,id_size));
-
-            /* compute the formula :
-         * Sum( U*Z'*Mi'*R'*PW'*PW*R*Mi*Z*U' )*y = Sum( U*Z'*Mi'*R'*PW'*fi - (1/tz)*U*Z'*Mi'*R'*PW'*PW'*t )
-         */
-            for(unsigned int j=0;j<point_indices[i].size();j++)
-            {
-                W = PR*(Mi[i][j])*ZU;
-                WT = W.t();
-                A_id = A_id + WT*W;
-                B_id = B_id + WT*(featurePointsMat[i][j] - Pt);
-            }
-
-            y = Matrix::solveLinSysSvd(A_id,B_id);
-
-            cout << "this should work ... O_O : " << endl << x;
-            cout << "in ID optim" << endl;
-            Mat_<double> yM = y;
-
-            for(unsigned int j=0;j<point_indices[i].size();j++)
-            {
-                W = PR*(Mi[i][j])*ZU*yM + Pt;
-                Mat_<double> pp =  (Mi[i][j])*ZU*yM;
-                cout << pp(0,0) << " " << pp(1,0) << " " << pp(2,0) << endl;
-                cout << W(0,0) << " " << W(1,0) << " vs " << featurePointsMat[i][j](0,0) << " " << featurePointsMat[i][j](1,0) << endl;
-
-            }
-        }
-
+    {        
         //put the guesses into matrix y and x
         y.transpose(y_t);
         Matrix::matrix_mult(y_t,u_id).transpose(lin_comb_y);
         x_t.transpose(x);
 
-        //TODO smaller coz its too slow
-        for(unsigned int i=0; i<1; i++)
-        {
-            Rodrigues(rotations[i],rmatrix);
-            Z_ex = Matrix::kron(lin_comb_y,Matrix::eye(exr_size));
-            ZU = Z_ex*(u_ex.t());
 
-            PR = weakCamera*rmatrix;
-            Pt = (1/translations[i].at<double>(2,0)) * (weakCamera*translations[i]);
+        Rodrigues(rotation,rmatrix);
+        Z_ex = Matrix::kron(lin_comb_y,Matrix::eye(exr_size));
+        ZU = Z_ex*(u_ex.t());
 
-            A_ex = Mat_<double>::zeros(Size(exr_size,exr_size));
-            B_ex = Mat_<double>::zeros(Size(1,exr_size));
+        PR = weakCamera*rmatrix;
+        Pt = (1/translation.at<double>(2,0)) * (weakCamera*translation);
 
-            /* compute the formula :
+        A_ex = Mat_<double>::zeros(Size(exr_size,exr_size));
+        B_ex = Mat_<double>::zeros(Size(1,exr_size));
+
+        /* compute the formula :
          * Sum( U*Z'*Mi'*R'*PW'*PW*R*Mi*Z*U' )*x = Sum( U*Z'*Mi'*R'*PW'*fi - (1/tz)*U*Z'*Mi'*R'*PW'*PW'*t )
          */
-            for(unsigned int j=0;j<point_indices[i].size();j++)
-            {
-                W = PR*(Mi[i][j])*ZU;
-                WT = W.t();
-                A_ex = A_ex + WT*W;
-                B_ex = B_ex + WT*(featurePointsMat[i][j] - Pt);
-            }
+        for(unsigned int j=0;j<point_indices.size();j++)
+        {
+            W = PR*(Mi[j])*ZU;
+            WT = W.t();
+            A_ex = A_ex + WT*W;
+            B_ex = B_ex + WT*(featurePointsMat[j] - Pt);
+        }
 
-            x = Matrix::solveLinSysSvd(A_ex,B_ex);
-            cout << "in EX optim" << endl;
-            Mat_<double> xM = x;
+        x = Matrix::solveLinSysSvd(A_ex,B_ex);
+        cout << "in EX optim" << endl;
+        Mat_<double> xM = x;
 
-            for(unsigned int j=0;j<point_indices[i].size();j++)
-            {
-                W = PR*(Mi[i][j])*ZU*xM + Pt;
-                Mat_<double> pp =  (Mi[i][j])*ZU*xM;
-                cout << pp(0,0) << " " << pp(1,0) << " " << pp(2,0) << endl;
-                cout << W(0,0) << " " << W(1,0) << " vs " << featurePointsMat[i][j](0,0) << " " << featurePointsMat[i][j](1,0) << endl;
+        for(unsigned int j=0;j<point_indices.size();j++)
+        {
+            W = PR*(Mi[j])*ZU*xM + Pt;
+            Mat_<double> pp =  (Mi[j])*ZU*xM;
+            cout << pp(0,0) << " " << pp(1,0) << " " << pp(2,0) << endl;
+            cout << W(0,0) << " " << W(1,0) << " vs " << featurePointsMat[j](0,0) << " " << featurePointsMat[j](1,0) << endl;
 
-            }
+        }
+        //put the guesses into matrix y and x
+        x.transpose(x_t);
+        Matrix::matrix_mult(x_t,u_ex).transpose(lin_comb_x);
+        y_t.transpose(y);
 
-        }        
+
+        Rodrigues(rotation,rmatrix);
+        Z_id = Matrix::kron(Matrix::eye(id_size),lin_comb_x);
+        ZU = Z_id*(u_id.t());
+
+        PR = weakCamera*rmatrix;
+        Pt = (1/translation.at<double>(2,0)) * (weakCamera*translation);
+
+        A_id = Mat_<double>::zeros(Size(id_size,id_size));
+        B_id = Mat_<double>::zeros(Size(1,id_size));
+
+        /* compute the formula :
+         * Sum( U*Z'*Mi'*R'*PW'*PW*R*Mi*Z*U' )*y = Sum( U*Z'*Mi'*R'*PW'*fi - (1/tz)*U*Z'*Mi'*R'*PW'*PW'*t )
+         */
+        cout << "here " << point_indices.size() << endl;
+        for(unsigned int j=0;j<point_indices.size();j++)
+        {
+            W = PR*(Mi[j])*ZU;
+            WT = W.t();
+            A_id = A_id + WT*W;
+            cout << featurePointsMat[j](0,0) << " " << featurePointsMat[j](1,0)  << endl;
+            B_id = B_id + WT*(featurePointsMat[j] - Pt);
+        }
+
+        y = Matrix::solveLinSysSvd(A_id,B_id);
+
+        cout << "this should work ... O_O : " << endl << x;
+        cout << "in ID optim" << endl;
+        Mat_<double> yM = y;
+
+        for(unsigned int j=0;j<point_indices.size();j++)
+        {
+            W = PR*(Mi[j])*ZU*yM + Pt;
+            Mat_<double> pp =  (Mi[j])*ZU*yM;
+            cout << pp(0,0) << " " << pp(1,0) << " " << pp(2,0) << endl;
+            cout << W(0,0) << " " << W(1,0) << " vs " << featurePointsMat[j](0,0) << " " << featurePointsMat[j](1,0) << endl;
+
+        }
     }
+
+    Vector3::normalize(w_exp, exr_size);
+    Vector3::normalize(w_id, id_size);
 
     for(int i=0;i<exr_size;i++){
         w_exp[i] = x[i][0];
-        cout << w_exp[i] << " ";
+        weights_ex.push_back(w_exp[i]);
+        cout << w_exp[i] << " == " << weights_ex[i] << " ";
     }
     cout << endl;
 
     for(int i=0;i<id_size;i++){
         w_id[i] = y[i][0];
+        weights_id.push_back(w_id[i]);
         cout << w_id[i] << " ";
     }
     cout << endl;
 
     face_ptr->interpolate(w_id,w_exp);
 
-    //here you should clear generated points
-    generatedPoints.clear();
-    generatePoints(rotations,translations,weakCamera,lensDist,FRAME_NUMBER,face_ptr,generatedPoints,point_indices,true);
-
-    delete face_ptr;
     delete[] w_id;
     delete[] w_exp;
 }

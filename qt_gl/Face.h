@@ -17,6 +17,7 @@ class Face
   Color3 interpolate_color(Color3 a,Color3 b,Color3 c,Color3 d,float r,float s);
 
   void interpolate(double *w_id,double *w_exp,bool brute=false);
+  void getWeights(double *w_id, int w_id_size, double *w_exp, int w_exp_size);
 
   int getPolyNum() const;
   Point3 getPointFromPolygon(int);
@@ -27,6 +28,8 @@ class Face
   Point3 *vertexes;
   Vector3 *vertex_normals;
   float (*triangles)[3];
+  static const int fPoints[20];
+  static const int fPoints_size;
 
 private:
   void loadPolygonDataFromModel();
@@ -50,6 +53,14 @@ private:
 
   //SVD *model;
   FaceModel *model;
+
+  //weights corresponding to the face
+  double *w_exp;
+  double *w_id;
+
+  int ID;
+  int EXP;
+  int VER;
 
  protected:
   void generate_vertex_normals(void);

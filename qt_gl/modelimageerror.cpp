@@ -3,7 +3,7 @@
 using namespace std;
 using namespace cv;
 
-ModelImageError::ModelImageError()
+ModelImageError::ModelImageError() : type(IDENTITY)
 {
     model = FaceModel::getInstance();
     core = model->getCoreTensor();
@@ -11,7 +11,7 @@ ModelImageError::ModelImageError()
     u_ex = model->getUExpression();
 }
 
-ModelImageError::ModelImageError(Mat P,Mat R,Mat t) : P(P), R(R), t(t)
+ModelImageError::ModelImageError(Mat P,Mat R,Mat t,ModelImageError::ErrorType type) : P(P), R(R), t(t), type(type)
 {    
     model = FaceModel::getInstance();
     core = model->getCoreTensor();
@@ -19,13 +19,20 @@ ModelImageError::ModelImageError(Mat P,Mat R,Mat t) : P(P), R(R), t(t)
     u_ex = model->getUExpression(); 
 }
 
-void ModelImageError::setWeights(vector<double>& w)
+void ModelImageError::setWeights(const vector<double>& w)
 {   
     weights = w;
-    linear_combination_id = Matrix::matrix_mult(Matrix(w),u_id);
+    //if error type is identity then the parameter w here are the expression weights
+    //which will remain constant
+    if(type == IDENTITY)
+        linear_combination_exp = Matrix::matrix_mult(weights,u_ex);
+    else if(type == EXPRESSION)
+        linear_combination_id = Matrix::matrix_mult(weights,u_id);
+    else
+        cerr << "uknown error type" << endl;
 }
 
-void ModelImageError::setPoints(vector<Point2f> &p, vector<int> &i)
+void ModelImageError::setPoints(const vector<Point2f> &p,const vector<int> &i)
 {
     points = p;
     indices = i;
@@ -51,8 +58,13 @@ double ModelImageError::operator()(vector<double>& x)
     Mat_<double> K;
     Mat_<double> point2d(3,1);
 
-    Matrix weights_exp(x);
-    Matrix linear_combination_exp = Matrix::matrix_mult(weights_exp,u_ex);
+    Matrix w(x);
+
+    //here inside of operator() if error is identity then the parameter w is identity weights
+    if(type == IDENTITY)
+        linear_combination_id = Matrix::matrix_mult(Matrix(w),u_id);
+    else if(type == EXPRESSION)
+        linear_combination_exp = Matrix::matrix_mult(Matrix(w),u_ex);
 
     K = Matrix::kron(linear_combination_id,linear_combination_exp);
     K = K.t();

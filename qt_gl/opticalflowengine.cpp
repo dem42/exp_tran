@@ -10,6 +10,8 @@ OpticalFlowEngine::OpticalFlowEngine()
 void OpticalFlowEngine::computeFlow(const Mat& prevImg, const Mat& nextImg,
                                     const vector<Point2f>& prevPoints, vector<Point2f>& nextPoints)
 {
+    std::cout << "in compute flow" << std::endl;
+
     vector<uchar> status;
     vector<float> err;
 
@@ -60,7 +62,13 @@ void OpticalFlowEngine::computeFlow(const Mat& prevImg, const Mat& nextImg,
 
     for(int i=0;i<number_of_features;i++)
     {
-        nextPoints.push_back(Point2f(guess[i].x,guess[i].y));
+        if(flow_status[i] != 0)
+            nextPoints.push_back(Point2f(guess[i].x,guess[i].y));
+        else
+        {
+            cout << "LOST a FEATURE" << endl;
+            nextPoints.push_back(Point2f(features[i].x,features[i].y));
+        }
     }
 
 //    for(int i=0;i<err.size();i++)

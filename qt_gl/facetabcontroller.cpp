@@ -22,7 +22,7 @@ FaceTabController::FaceTabController(QSlider *exp_slider, FaceWidget *face_widge
 //    w_exp[0] = 0.0;
 //    w_exp[1] = 0.0;
 //    w_exp[2] = 0.0;
-//    w_exp[3] = -0.4;
+//    w_exp[3] = -0.2;
 //    w_exp[4] = 0.0;
 //    w_exp[5] = 0.8;
 //    w_exp[6] = 0.0;
@@ -43,7 +43,7 @@ FaceTabController::FaceTabController(QSlider *exp_slider, FaceWidget *face_widge
     w_exp[5] = 0.00532823;
     w_exp[6] = 0.00375425;
 
-    Vector3::normalize(w_exp,7);
+    //Vector3::normalize(w_exp,7);
 
     for(int i=0;i<7;i++)
         cout << w_exp[i] << endl;

@@ -63,8 +63,8 @@ void FeaturePointQLabel::paintEvent ( QPaintEvent * e)
             x = marked[i].x;
             y = marked[i].y;
 
-            paint.drawText(QRectF(x,y,20,20),QString("%1").arg(i));
-            //paint.fillRect(x,y,w,h,Qt::red);
+            //paint.drawText(QRectF(x,y,20,20),QString("%1").arg(i));
+            paint.fillRect(x,y,w,h,Qt::red);
 
         }
     }

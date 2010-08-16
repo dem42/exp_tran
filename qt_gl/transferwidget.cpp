@@ -30,7 +30,7 @@ const int TransferWidget::fPoints[20] = {9521,8899,310,7240,1183,8934,8945,6284,
 const int TransferWidget::fPoints_size = 20;
 
 
-QImage mat2QImage(const Mat mat_rgb)
+QImage TransferWidget::mat2QImage(const Mat mat_rgb)
 {
     QImage qframe;
     //converting to rgb not necessary it seems
@@ -42,13 +42,14 @@ QImage mat2QImage(const Mat mat_rgb)
     return qframe;
 }
 
-TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : fileName(fileName)
+TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : fileName(fileName), FRAME_MAX(1)
 {
     picLabel = new FeaturePointQLabel();
     flowLabel = new VectorFieldQLabel();
     this->face_widget = face_widget;
     this->face_widget->setCameraParameters(-200,-1,-200);
     face_ptr  = new Face();
+    face_widget->setFace(face_ptr);
 
     cameraDialog = new QDialog();
     cameraUi.setupUi(cameraDialog);
@@ -238,6 +239,38 @@ void TransferWidget::calcIntrinsicParams()
 void TransferWidget::processVideo()
 {
     Mat frame, rgb_frame, copyFrame;
+    //point indices
+    vector<vector<int> >point_indices;
+    vector<int> indices;
+    bool useExt = false;
+    Face *face_ptr = new Face();
+    double *w_id = new double[56];
+    double *w_exp = new double[7];
+
+    Mat_<double> rvec, tvec;
+    vector<Point2f> imagePoints;
+    vector<Point2f> newPoints;
+
+    vector<double> weights_id;
+    vector<double> weights_exp;
+
+    //make a face guess
+    for(int i=0;i<56;i++)
+    {
+        if(i==33)w_id[i] = 0.1;
+        else if(i==7)w_id[i] = 0.8;
+        else if(i==20)w_id[i] = 0.1;
+        else w_id[i] = 0;
+    }
+    w_exp[0] = 0.0;
+    w_exp[1] = 0.0;
+    w_exp[2] = 0.0;
+    w_exp[3] = 0.2;
+    w_exp[4] = 0.0;
+    w_exp[5] = 0.8;
+    w_exp[6] = 0.0;
+
+    face_ptr->interpolate(w_id,w_exp);
 
     /**********************/
     /*first collect frames*/
@@ -256,44 +289,80 @@ void TransferWidget::processVideo()
         frameData.push_back(copyFrame);
     }
 
-    for(int i=0;i<frameData[i];++i)
-    {
-        /**********************/
-        /*calculate points in all
+    /**********************/
+    /*calculate points in all
     frames using optical flow*/
+    /**********************/
+    vector<Point2f> currentPoints = picLabel->getMarked();
+    vector<Point2f> nextPoints;
+
+    featurePoints.push_back(currentPoints);
+
+    vector<Mat>::iterator it = frameData.begin(),
+    it_last = frameData.begin(),
+    it_end = frameData.end();
+
+    for(;it != it_end; ++it)
+    {
+        flowEngine->computeFlow(*it_last,*it,currentPoints,nextPoints);
+        it_last = it;
+
+        featurePoints.push_back(nextPoints);
+        currentPoints.clear();
+        //assigns a copy of next points as the new content for currentPoints
+        currentPoints = nextPoints;
+        nextPoints.clear();
+    }
+
+    const unsigned int FRAME_NUMBER = frameData.size();
+    for(unsigned int i=0;i<FRAME_MAX;++i)
+    {
+
         /**********************/
-        vector<Point2f> currentPoints = picLabel->getMarked();
-        vector<Point2f> nextPoints;
+        /*estimate pose*/
+        /**********************/
 
-        featurePoints.push_back(currentPoints);
+        //estimate the pose parameters and place estimations into vectors rotations and translations
+        //the rotations vector holds the rodrigues rotation vectors which can be converted to a rotation matrix
+        paramOptimizer->calculateTransformation(featurePoints[i],face_ptr,cameraMatrix,lensDist,rvec,tvec);
+        frameRotation.push_back(rvec.clone());
+        frameTranslation.push_back(tvec.clone());
+        useExt |= true;
 
-        vector<Mat>::iterator it = frameData.begin(),
-        it_last = frameData.begin(),
-        it_end = frameData.end();
+        //generate points to improve tracking
+        //and to obtain point indices
+        indices.clear();
+        paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,newPoints,indices);
 
-        for(;it != it_end; ++it)
-        {
-            flowEngine->computeFlow(*it_last,*it,currentPoints,nextPoints);
-            it_last = it;
+        point_indices.push_back(indices);
 
-            featurePoints.push_back(nextPoints);
-            currentPoints.clear();
-            //assigns a copy of next points as the new content for currentPoints
-            currentPoints = nextPoints;
-            nextPoints.clear();
-        }
 
         /**********************/
         /*estimate model parameters + pose*/
         /**********************/
-        paramOptimizer->estimateParametersAndPose(frameData[i],featurePoints[i],cameraMatrix,lensDist,frameRotation[i],frameTranslation[i],
-                                                  vector_weights_id[i],vector_weights_exp[i],generatedPoints[i]);
+        weights_exp.clear();
+        weights_id.clear();
+        paramOptimizer->estimateModelParameters(frameData[i],featurePoints[i],cameraMatrix,lensDist,face_ptr,
+                                                point_indices[i], frameRotation[i],frameTranslation[i],
+                                                weights_id,weights_exp);
+        vector_weights_exp.push_back(weights_exp);
+        vector_weights_id.push_back(weights_id);
+
+        //generate points to improve tracking
+        newPoints.clear();
+        paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,newPoints,point_indices[i],false,true);
+
+        paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,newPoints,point_indices[i],true,true);
+        generatedPoints.push_back(newPoints);
     }
     timerReplay = new QTimer(this);
     connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
-    timerReplay->start(900);
+    timerReplay->start(3000);
 
-    face_widget->setFace(face_ptr);
+    //face_widget->setFace(face_ptr);
+
+    delete[] w_id;
+    delete[] w_exp;
 }
 
 /**********************************************/
@@ -302,6 +371,17 @@ void TransferWidget::processVideo()
 void TransferWidget::replayFrame()
 {
     static unsigned int i;
+    double euler_x, euler_y, euler_z;
+    Mat_<double> rmatrix;
+
+    double tx = frameTranslation[i].at<double>(0,0);
+    double ty = frameTranslation[i].at<double>(0,1);
+    double tz = frameTranslation[i].at<double>(0,2);
+
+    double *w_id = new double[56];
+    double *w_exp = new double[7];
+
+
     QImage img_q = mat2QImage(frameData[i]);
     QPixmap p_map;
     p_map = QPixmap::fromImage(img_q);
@@ -309,14 +389,41 @@ void TransferWidget::replayFrame()
 
     picLabel->setMarked(generatedPoints[i]);
 
+    //compute and set the pose parameters
+    Rodrigues(frameRotation[i],rmatrix);
+    computeEulerAnglesFromRmatrix(rmatrix,euler_x,euler_y,euler_z);
+    //only y needs to be negative so that it agrees with the transposes
+    face_widget->setTransParams(euler_x,-euler_y,euler_z,tx,ty,tz);
+
+    //generate the corresponding face    
+    cout << "begin w_id and w_exp in frame : " << i << endl;
+    for(int j=0;j<56;j++)
+    {
+        w_id[j] = vector_weights_id[i][j];
+        cout << w_id[j] << " ";
+    }
+    cout << endl;
+    for(int j=0;j<7;j++)
+    {
+        w_exp[j] = vector_weights_exp[i][j];
+        cout << w_exp[j] << " ";
+    }
+    cout << endl;
+
+    face_ptr->interpolate(w_id,w_exp);
+    face_widget->setFace(face_ptr);
+
+
     i++;
-    if(i == frameData.size())
+    if(i == FRAME_MAX)
     {
         timerReplay->stop();
         i = 0;
         frameData.clear();
         featurePoints.clear();
     }
+    delete[] w_id;
+    delete[] w_exp;
 }
 
 void TransferWidget::playBack()
@@ -330,6 +437,33 @@ void TransferWidget::playBack()
 void TransferWidget::calibrate()
 {
     cameraDialog->show();
+}
+
+void TransferWidget::computeEulerAnglesFromRmatrix(const Mat &rmatrix,double &euler_x, double &euler_y, double &euler_z)
+{
+    const double PI = 3.141593;
+
+
+    double rot_y, rot_x, rot_z,cy, cx,sx,cz,sz;
+    rot_y = asin( rmatrix.at<double>(2,0));        /* Calculate Y-axis angle */
+    cy           =  cos( rot_y );
+
+    if ( fabs( cy ) > 0.005 )             /* Gimball lock? */
+    {
+        cx      =  rmatrix.at<double>(2,2) / cy;           /* No, so get X-axis angle */
+        sx      = rmatrix.at<double>(2,1)  / cy;
+
+        rot_x  = atan2( sx, cx );
+
+        cz      =  rmatrix.at<double>(0,0) / cy;            /* Get Z-axis angle */
+        sz      = rmatrix.at<double>(1,0) / cy;
+
+        rot_z  = atan2( sz, cz );
+    }
+
+    euler_x = rot_x * 180./PI;
+    euler_y = rot_y * 180./PI;
+    euler_z = rot_z * 180./PI;
 }
 
 //later do a pyramid version
@@ -433,9 +567,9 @@ void TransferWidget::startFaceTransfer()
 
     double scale = 1;
 
-    for(int i=0; i<fPoints_size; i++)
+    for(int i=0; i<Face::fPoints_size; i++)
     {
-        p = face_ptr->getPointFromPolygon(fPoints[i]);
+        p = face_ptr->getPointFromPolygon(Face::fPoints[i]);
         point3dMat(0,0) = p.x;
         point3dMat(1,0) = p.y;
         point3dMat(2,0) = p.z;
@@ -461,6 +595,13 @@ void TransferWidget::startFaceTransfer()
         points.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));
     }
     picLabel->setMarked(points);
+
+    double euler_x = rot_x * 180./PI;
+    double euler_y = rot_y * 180./PI;
+    double euler_z = rot_z * 180./PI;
+
+    cout << "my euler : " << euler_x << " " << euler_y << " " << euler_z << endl;
+    cout << "their euler : " << euler[0]<< " " << euler[1]<< " " << euler[2] << endl;
 
     //the sign here doesnt seem to make a difference as far as orientation of
     //the object is concerned .. however it does flip the extreme head

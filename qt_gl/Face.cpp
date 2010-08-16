@@ -12,7 +12,7 @@ using namespace std;
 //possibly add an xml config file for the stuff like exp and database dir
 Face::Face()
 {
-    int expr = 56, id = 7, ver = 5090;
+    ID = 56, EXP = 7, VER = 5090;
 
     //model = new SVD("svd_result_object_2",expr,id,ver);
     model = FaceModel::getInstance();
@@ -32,10 +32,10 @@ Face::Face()
     }
 
     //finally we use default weights to interpolate values for vertexes
-    double *w_id = new double[56];
-    double *w_exp = new double[7];
+    w_id = new double[ID];
+    w_exp = new double[EXP];
 
-    for(int i=0;i<56;i++)
+    for(int i=0;i<ID;i++)
     {
         if(i==33)w_id[i] = 0.2;
         else if(i==10)w_id[i] = 0.2;
@@ -60,6 +60,8 @@ Face::~Face()
   delete[] vertex_normals;
   delete[] triangles;
   cout << "face destroyed" << endl;
+  delete[] w_exp;
+  delete[] w_id;
   //singleton so we do not explicitly call its destructor
   //delete model
 
@@ -67,6 +69,10 @@ Face::~Face()
   //delete[] texture_2d_coord;
 }
   
+const int Face::fPoints[20] = {9521,8899,310,7240,1183,8934,8945,6284,7140,8197,
+                                    2080,2851,3580,6058,8825,1680,3907,8144,6540,2519};
+const int Face::fPoints_size = 20;
+
 int Face::getPolyNum() const
 {
     return poly_num;
@@ -122,9 +128,25 @@ void Face::interpolate(double *w_id,double *w_exp,bool brute)
 //        for(int i=0;i<56;i++)
 //            w_id[i] = w_id[i]/sum;
 
+    //remember the new weights
+    for(int i=0;i<ID;i++)
+        this->w_id[i] = w_id[i];
+    for(int i=0;i<EXP;i++)
+        this->w_exp[i] = w_exp[i];
+
     model->interpolate_expression(vertexes,w_id,w_exp,brute);
     //now recalculate the vertex normals for the newly interpolated face
     generate_vertex_normals();
+}
+
+void Face::getWeights(double *w_id, int w_id_size, double *w_exp, int w_exp_size)
+{
+    assert(w_id_size == ID);
+    assert(w_exp_size == EXP);
+    for(int i=0;i<ID;i++)
+        w_id[i] = this->w_id[i];
+    for(int i=0;i<EXP;i++)
+        w_exp[i] = this->w_exp[i];
 }
 
 //right now we are merely selecting the first point in the polygon
@@ -151,6 +173,7 @@ void Face::calculateBoundingSphere(float &cx,float &cy,float &cz, float &diamete
     bx_u = by_u = bz_u = -5000;
     bx_d = by_d = bz_d = 5000;
 
+    cout << poly_num << endl;
     for(int i=0; i<poly_num; i++)
     {
         v1 = triangles[i][0];
@@ -196,6 +219,7 @@ void Face::calculateBoundingSphere(float &cx,float &cy,float &cz, float &diamete
     std::cout <<(bx_u + bx_d)/2.0 << " " << (by_u + by_d)/2.0 << " " << (bz_u+bz_d)/2.0 << std::endl;
     diameter = std::max(fabs(bx_d - bx_u), fabs(by_d - by_u));
     diameter = std::max(diameter, fabs(bz_d - bz_u));
+    //diameter += 40;
 }
 
   

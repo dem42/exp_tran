@@ -11,17 +11,14 @@ NelderMeadOptimizer::NelderMeadOptimizer()
 {
 }
 
-void NelderMeadOptimizer::estimateParametersAndPose(const vector<Mat> &frames, const vector<vector<Point2f> > &featurePoints,
-                                   const Mat &cameraMatrix, const Mat& lensDist, vector<Mat> &rotations, vector<Mat> &translations,
-                                   vector<vector<double> >&weights_id, vector<vector<double> >&weights_ex,
-                                   vector<vector<Point2f> > &generatedPoints)
+void NelderMeadOptimizer::estimateModelParameters(const Mat &frame, const vector<Point2f> &featurePoints,
+                                                    const Mat &cameraMatrix, const Mat& lensDist,
+                                                    Face* face_ptr,const vector<int> &point_indices,
+                                                    const Mat &rotation, const Mat &translation,
+                                                    vector<double> &weights_id, vector<double> &weights_ex)
 {
-    const unsigned int FRAME_NUMBER = frames.size();
-    Face *face_ptr = new Face();
     double *w_id = new double[56];
     double *w_exp = new double[7];
-
-    vector<vector<int> >point_indices_for_frame;
 
     Mat_<double> rmatrix;
 
@@ -29,32 +26,6 @@ void NelderMeadOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
     ModelImageError *error;
     vector<double> id;
     vector<double> ex;
-
-     //make a face guess
-    for(int i=0;i<56;i++)
-    {
-        if(i==33)w_id[i] = 0.1;
-        else if(i==7)w_id[i] = 0.8;
-        else if(i==20)w_id[i] = 0.1;
-        else w_id[i] = 0;
-    }
-    w_exp[0] = 0.0;
-    w_exp[1] = 0.0;
-    w_exp[2] = 0.0;
-    w_exp[3] = 0.2;
-    w_exp[4] = 0.0;
-    w_exp[5] = 0.8;
-    w_exp[6] = 0.0;
-
-    face_ptr->interpolate(w_id,w_exp);
-
-    //estimate the pose parameters and place estimations into vectors rotations and translations
-    //the rotations vector holds the rodrigues rotation vectors which can be converted to a rotation matrix
-    estimatePose(featurePoints,face_ptr,cameraMatrix,lensDist,rotations,translations);
-
-
-    //generate new points for the frames to help tracking
-    generatePoints(rotations,translations,cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,generatedPoints,point_indices_for_frame);
 
     /***********************/
     /* now use the newly */
@@ -68,33 +39,32 @@ void NelderMeadOptimizer::estimateParametersAndPose(const vector<Mat> &frames, c
     //TODO smaller coz its too slow
     for(unsigned int i=0; i<1; i++)
     {
-        Rodrigues(rotations[i],rmatrix);
-        error = new ModelImageError(cameraMatrix,rmatrix,translations[i],ModelImageError::EXPRESSION);
+        Rodrigues(rotation,rmatrix);
+        error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::EXPRESSION);
         error->setWeights(id);
 
-        error->setPoints(featurePoints[i],point_indices_for_frame[i]);
+        error->setPoints(featurePoints,point_indices);
         cout << "min before exp : " << (*error)(ex) << endl;
         min=mysimplex(*error,ex,ex.size(),1);
-        weights_ex.push_back(ex);
+        weights_ex = ex;
         cout << "min after exp : " << min << endl;
         delete error;
     }
     //then identity using the expression guess
     for(unsigned int i=0; i<1; i++)
     {
-        Rodrigues(rotations[i],rmatrix);
-        error = new ModelImageError(cameraMatrix,rmatrix,translations[i],ModelImageError::IDENTITY);
-        error->setWeights(weights_ex[i]);
+        Rodrigues(rotation,rmatrix);
+        error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::IDENTITY);
+        error->setWeights(weights_ex);
 
-        error->setPoints(featurePoints[i],point_indices_for_frame[i]);
+        error->setPoints(featurePoints,point_indices);
         cout << "min before id : " << (*error)(id) << endl;
         min=mysimplex(*error,id,id.size(),1);
-        weights_id.push_back(id);
+        weights_id = id;
         cout << "min after id : " << min << endl;
         delete error;
     }   
 
-    delete face_ptr;
     delete[] w_id;
     delete[] w_exp;
 }
