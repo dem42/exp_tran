@@ -34,7 +34,6 @@
 \cfoot{\thepage}
 \rfoot{}
 
-
 \makeatletter
 \renewcommand{\@makechapterhead}[1]{%
 \vspace*{50 pt}%
@@ -146,7 +145,7 @@ the environment. In \textit{model-based tracking} an instance of the model is
 identified and tracked from snapshot to snapshot, in spite of deformations of shape
 and changes in position.
 
-In this paper we  describe convenient deformable shape
+We will describe convenient deformable shape
 and appearance models and effective algorithms for locating these models. For our
 sensory snapshots, we will focus exclusively on images. As we will be dealing
 with images we will investigate motion tracking and feature detection
@@ -156,7 +155,7 @@ successive images.
 
 \section{Contributions}
 
-The area where deformable models are applicable is quite large. This paper will focus on one very interesting application of dynamical
+The area where deformable models are applicable is quite large. We will focus on one very interesting application of dynamical
 models and model extraction which is
 \textit{expression transfer}. The purpose of expression transfer is to capture
 the expressions and visemes -
@@ -165,7 +164,7 @@ generate a video of another individual mimicking these
 expressions and visemes. The alternative to transferring these expressions would
 be to construct a physical model of the face and simulate the observed
 expressions and visemes using the model. However, transferring the dynamics of a subjects face to that of another enables us to
-create very realistic animations without much difficulty. On the other hand, it
+create very realistic animations without much intervention. On the other hand, it
 is quite difficult to generate realistic expressions by setting the appropriate
 parameters of a physical model simply because of the complexity of the physics
 behind the movement that is responsible for expressions.
@@ -326,7 +325,7 @@ interpolation matrix are constructed for each finite element. Their calculation
 depends on the displacement interpolation function seen in equation
 \ref{eq:FEMdisplacements}. Fortunately, these functions have a well defined
 formulation which depends on the degrees of freedom (nodal point connections) of
-the element. This formulation, along with numerical integration techinques for
+the element. This formulation, along with numerical integration techniques for
 calculating the stiffness matrix can be found in chapter 5 of \cite{FEMbook}. The elasticity matrix relates stress and
 strain in the material. Its form depends on the dimensionality of the
 element. In a one dimensional element the elasticity matrix is a scalar known as
@@ -400,7 +399,7 @@ $\mathbf{\bar{x}}$ using
 \end{equation}
 Equation \ref{eq:FEMgenerate} synthesises a new object from a vector of
 parameters $\mathbf{u}$. It is therefore possible to fit a model of a class
-of objects with a known stiffness function to a canditate object in an
+of objects with a known stiffness function to a candidate object in an
 image by solving an optimization problem which locates the parameters $\mathbf{u}$.
 
 Alternatively, it is also possible to use the equilibrium equation
@@ -485,21 +484,21 @@ faces are partially occluded in images it causes difficulties to the technique.
 The eigenfaces approach is based heavily information and coding theory
 \cite{eigenfaces91}. With the PCA it is possible to encapsulate a face image
 using low dimensional vector. As such PCA and eigenfaces are often used to
-reduce dimensionality in more sophisticated modelling approaches.
+reduce dimensionality in more sophisticated modeling approaches.
 
 
 \subsection{Statistical Models of Appearance}
 In their paper Statistical Models of Appearance \cite{activeApp04} Cootes and Taylor
-describe modelling approaches that consider texture variance, shape variance and the
+describe modeling approaches that consider texture variance, shape variance and the
 correlations between these two variances. The models they introduce are well suited for highly
-variables structures such as faces or internal organs. Using the shape and
+variable structures such as faces or internal organs. Using the shape and
 texture models, Cootes and Taylor show that it is possible to construct Active
 Shape and Active Appearance models that successfully locate
 shapes and even faces in images.
 
 Cootes and Taylor separate the shape and the information of a target image into
 two distinct vectors - the shape parameter vector $b_s$ and the texture
-represented by the grey-level vector $b_g$ (here the image is cray-scaled). Thus
+represented by the grey-level vector $b_g$ (here the image is gray-scaled). Thus
 texture can be manipulated and investigated independent of the shape. They
 then perform PCA on both vectors, which allows them to express grey-levels and
 shape as functions of a parameter vector $c$ as follows
@@ -522,7 +521,7 @@ shape in an image using an iterative
 procedure as shown in figure \ref{gr:asm}. To search for objects in an image
 using the ASM, we first place the shape model, which we obtained from the training data, into
 the centre of the image. In the next iterations a texture profile of $k$
-neighbouring points around each point of the shape model is taken and compared
+neighboring points around each point of the shape model is taken and compared
 with the texture profile of this point obtained when training the model. Then
 the point of the shape model is moved to make the difference between the two
 profiles smaller. This process is repeated until convergence is reached.
@@ -536,25 +535,25 @@ profiles smaller. This process is repeated until convergence is reached.
 \end{figure}
 
 The ASM moves the point only based on the texture profile of a
-local neighbourhood of this point. The obvious problem with this approach is
+local neighborhood of this point. The obvious problem with this approach is
 that as it is a local search technique and thus it depends too much on the choice of the
 starting point. If the target image is not centered on the face and the
-algorithm begins in the centre of the image, then it can possibly converge on incorrect
+algorithm begins in the center of the image, then it can possibly converge on incorrect
 shapes such as the nose as can be seen in figure \ref{gr:bad_asm}. This is due to
 the fact that as a local search method, the ASM cannot escape a local minimum.
 
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.7]{images/bad_asm.png}
-\caption{ Incorrect convergence of the ASM when the search is initialised
+\caption{ Incorrect convergence of the ASM when the search is initialized
   incorrectly. This can happen when the face is not centered in the image or
-  when the search does not begin in the centre of the image. Taken from \cite{cootesOverview01} }
+  when the search does not begin in the center of the image. Taken from \cite{cootesOverview01} }
 \label{gr:bad_asm}
 \end{figure}
 
 An interesting improvement of the technique is proposed by Cootes et al
 \cite{activeApp04}. To improve the efficiency and the robustness of ASM, Cootes
-suggests to perform several searches at different resolutions. First a coarse
+suggests performing several searches at different resolution. First a coarse
 search is performed on the image with a low resolution until the search converges. The resulting configuration
 of the shape model points from this coarse search
 then serves as the starting point for a search in the same image with a better
@@ -565,17 +564,17 @@ face. Once the search is restarted with a higher resolution shapes like the
 mouth and the nose can be identified.
 
 \subsubsection{Active Appearance Model}
-Modelling faces using the Active Appearance Model (AAM) is a technique explored
-by Cootes and Taylor \cite{activeApp04}. AMM takes advantage of the
+Modeling faces using the Active Appearance Model (AAM) is a technique explored
+by Cootes and Taylor \cite{activeApp04}. AAM takes advantage of the
 Active Shape Model which allows us to locate interesting shapes in a new
 image. The set of points defining this shape are called landmark or feature
-points. The AMM enhances the AMS search by also considering the texture
+points. The AAM enhances the AMS search by also considering the texture
 information.
 
-The AMM search attempts to minimise the difference between the texture (the
+The AMM search attempts to minimize the difference between the texture (the
 grey-levels) of the image we are searching and the grey-levels of the
 image generated with the current model parameters. The difference vector that is
-minimised is defined as:
+minimized is defined as:
 \begin{equation}
 \delta I = I_i - I_m
 \end{equation}
@@ -583,7 +582,7 @@ where $I_m$ is the vector of the grey-levels generated with the current model
 parameters and $I_i$ is a vector containing the grey-levels of the image we are
 searching in.
 
-To simplify this optimisation problem, Cootes and Taylor learn the relationship
+To simplify this optimization problem, Cootes and Taylor learn the relationship
 between the difference vector $\delta I$ and the error in the model
 parameters. Learning this relationship makes it possible to correctly improve the
 model for a given measured error in an iterative procedure.
@@ -600,13 +599,13 @@ minimising the differences between pixels at the landmark points.
 \label{gr:amm}
 \end{figure}
 
-The drawback of the AMM search is that it is required of the user to specify
+The drawback of the AAM search is that it is required of the user to specify
 landmark points on the target image. This means the technique is not well suited
 for applications where the model would have to be matched to a large number of
 faces. To combat this problem, a number of automatic 2D and 3D landmark location
 solutions can be used \cite{activeApp04}.
 
-Another problem of both the ASM and the AMM lies in the fact that it does not
+Another problem of both the ASM and the AAM lies in the fact that it does not
 distinguish or model the different variation sources. The variation caused by
 identity and the variation caused by expression are not perceived as two
 fundamentally different sources. Thus, it is impossible to only alter one
@@ -621,17 +620,17 @@ multilinear face model which allowed for expressions and even for speech related
 movements to be transferred between video-recordings of two different subjects. The multilinear
 model was estimated from geometric variations in 3D face scans that Vlasic and
 his group collected. Vlasic et al utilised two tensor models with
-different dimensionality. Their first model was a lower dimensional bilinear model that organised the data into three
-groups of vertexes, identity and expression. Their higher dimensional model
-organised faces into groups of expressions, vertexes, identities and visemes. The parameters for the multilinear face model which were used to generate new expressions were
+different dimensionality. Their first model was a lower dimensional bilinear model that organized the data into three
+groups of vertices, identity and expression. Their higher dimensional model
+organized faces into groups of expressions, vertices, identities and visemes. The parameters for the multilinear face model which were used to generate new expressions were
 extracted from the video input using an optical flow algorithm.
 
 To construct a bilinear face model it is necessary to separate the faces from the
-database into groups of expressions and identities in order to organise them
-into the tensor. The tensor based approach allows us to organise
+database into groups of expressions and identities in order to organize them
+into the tensor. The tensor based approach allows us to organize
 the data in a way that makes for easier manipulation with a transformation
 matrix. The groups are aligned in the tensor along the modes as shown in figure
-\ref{gr:tensor}. In this example the vertexes change along the mode-1 space, the identity changes
+\ref{gr:tensor}. In this example the vertices change along the mode-1 space, the identity changes
 along the mode-2 space and the expressions change along the mode-3 space. 
 \begin{figure}[H]
 \centering
@@ -672,7 +671,7 @@ matrices for the corresponding mode space.
 Vlasic et al constructed a multilinear
 face model using mode-n SVD and decomposing the organised tensor into the
 matrices of eigenvectors of all modes except for the mode-1
-space which holds the vertexes. Using equation \ref{eq:core_tensor} the
+space which holds the vertices. Using equation \ref{eq:core_tensor} the
 multilinear face model then becomes:
 \begin{equation} \label{eq:multilin_face}
 \mathscr{T} \approx \mathscr{M} \times_2
@@ -695,15 +694,15 @@ tensor to be fully populated. This means that we require all
 expressions to be performed by all subjects to have a full tensor. This raises
 issues when some data is corrupted or lost during data gathering. There are two
 ways of coping with this problem. The first approach is to use a
-statistical method to model the data. Or the missing data can be estimated from the current data.
+statistical method to model the data. Alternatively the missing data can be estimated from the current data.
 \subsection{Tensor-based Statistical Discriminant Method}
 The tensor-based statistical discriminant methods (SDM) was successfully used by Minoi and Gillies
-\cite{sdm,jacey} to synthesise expressions and to neutralise faces displaying an
+\cite{sdm,jacey} to synthesize expressions and to neutralize faces displaying an
 expression. The SDM is based on Fischer's linear discriminant analysis (LDA) \cite{lda}. The LDA
 differs from the standard PCA eigenfaces approach in that it seeks to separate
 data into distinct classes. The way this is done is by projecting the data into
-a lower dimensional subspace that maximises the between class separability and
-minimises the within class variance.
+a lower dimensional subspace that maximizes the between class separability and
+minimizes the within class variance.
 
 In LDA we first separate the training data set into a number of groups. Then we
 look for the between class scatter matrix $S_b$ and the within class scatter
@@ -714,12 +713,12 @@ space is defined as:
 \end{equation}
 In equation \ref{eq:lda} the ratio of the determinant of the between class
 separability and the determinant of the within class variability is
-maximised. The maximum of this equation is the optimal projection.
+maximized. The maximum of this equation is the optimal projection.
 
 However, the LDA approach has difficulties when the training data set is small
 in comparison to the dimensions of the image. This is called the \textit{small
-  size problem} and it causes the scatter matrices to be singular due to not
-having a full rank.To overcome the small size problem the statistical discriminant method can be used.
+sample size problem} and it causes the scatter matrices to be singular when the
+number of data items is less than the number of variables. To overcome the small size problem the statistical discriminant method can be used.
 
 The SDM approach consists of two stages. In the first stage the PCA
 and LDA are used to reduce the dimensionality and find the discriminant
@@ -727,7 +726,7 @@ directions of the classes. The PCA helps to overcome the small size problem
 common to stand-alone LDA. In the second stage the most discriminant vectors of
 our classes are projected back into the original high dimensional space. This
 back projection will give us a vector for every class in the high dimensional
-space. These vectors allow us to synthesise an expression for a new face image by moving the the surface
+space. These vectors allow us to synthesize an expression for a new face image by moving the the surface
 points of this new image in the direction of one of the vectors. 
 
 The SDM technique can be extended to tensor models by expanding the mode
@@ -757,20 +756,13 @@ Similarly, the texture vectors are defined as
 \mathbf{T_i} = (R_1,G_1,B_1,R_2,...,R_n,G_n,B_n)^T
 \end{equation}
 
-The idea behind the morhable model is that any linear combination of the
-$\mathbf{S_i}$ and $\mathbf{T_i}$ constitues a realistic face. The full
+The idea behind the morphable model is that any linear combination of the
+$\mathbf{S_i}$ and $\mathbf{T_i}$ constitutes a realistic face. The full
 morphable model is the linear combination of the examples given by the formula
 
 \begin{equation}
 \mathbf{S} = \sum_{i=1}^ma_i \mathbf{S_i} \indent \mathbf{T} = \sum_{i=1}^mb_i \mathbf{T_i}
 \end{equation}
-
-To allow the morphable model to fit well to the source image, dense
-point-to-point correspondence must be ensured on the example
-images, so that important features such as the tip of the nose are
-correctly matched up in the examples. Then the fitting process matches
-the features in the source image to those in the examples, in order to
-calculate the correct combinations of the basis vectors.
 
 Principal Component Analysis (PCA) is performed on the dataset of examples
 to produce orthogonal basis vectors that can be used in the morphable
@@ -789,11 +781,22 @@ of components used in the model, via the value of $m$. This
 is generally set to 149, as the components beyond this contain
 mostly noise.
 
+
+To allow the morphable model to fit well to the source image, dense
+point-to-point correspondence must be ensured on the example
+images, so that important features such as the tip of the nose are
+correctly matched up in the examples. Then the fitting process matches
+the features in the source image to those in the examples, in order to
+calculate the correct combinations of the basis vectors.
+
+
 However, to to fit the Morphable Model of 3D faces to an image, the user has to manually select
 about 7 feature points.
+
+\begin{comment}
 \subsubsection{3D Reconstruction algorithm}
 %Pose and lighting etc in case of exchanging faces
-To be able to exchange the face we need the $\alpha_i$, $\beta_i$ parameters
+To be able to exchange the face need the $\alpha_i$, $\beta_i$ parameters
 of the Morphable Model. We also need 22 rendering parameters
 $\rho$ to be able to apply standard graphics procedures to correctly illuminate and position the 3D source face into
 the target image. The $\rho$ parameters are:
@@ -804,24 +807,24 @@ the target image. The $\rho$ parameters are:
 \item 3D translation (3 dimensions)
 \item focal length of the camera
 \item angle of directed light (2 parameters)
-\item intensity of directed light (3 colours)
+\item intensity of directed light (3 colors)
 \end{itemize}
 \begin{itemize}
 \setlength{\itemsep}{0pt}
-\item intensity of ambient light (3 colours)
+\item intensity of ambient light (3 colors)
 \item color contrast
 \item gain in each color channel (3 channels)
 \item offset in each color channel
 \end{itemize}
 \end{multicols}
-We apply the reconstruction algorithm to estimate the paramters for both images
+We apply the reconstruction algorithm to estimate the parameters for both images
 and then use these parameters to compute
-the colour image $I_{model}(x,y)$ of the face we are reconstructing.
+the color image $I_{model}(x,y)$ of the face we are reconstructing.
 
 The parameters are all
-estimated in an analysis-by-synthesis stage in which we attempt to minimise the
-difference between the synthetic image $I_{model}$ and the original colour
-image $I_{input}$. We measure the quality of this minimisation based on a sum of squared error\\
+estimated in an analysis-by-synthesis stage in which we attempt to minimize the
+difference between the synthetic image $I_{model}$ and the original color
+image $I_{input}$. We measure the quality of this minimization based on a sum of squared error\\
 \begin{equation}
 E_l = \sum_x \sum_y \sum_{c\in\{r,g,b\}}(I_{c,input}(x,y) - I_{c,model}(x,y))^2
 \end{equation}
@@ -834,23 +837,285 @@ E = \frac{1}{\sigma_l^2}E_l + \frac{1}{\sigma_F^2}E_F + \sum_i
 +\sum_i \frac{(\rho_i- \bar{\rho}_i)^2}{\sigma_{R,i}^2}
 \end{equation}
 where our standard deviations $\sigma$ are taken from the PCA.
-This cost function is minimised using a Stochastic Newton Algorithm to
+This cost function is minimized using a Stochastic Newton Algorithm to
 obtain a plausible result for the parameters.
 
 However, there are skin features like moles or scars that we cannot compute from
 the linear combinations of the textures $T_i$. Therefore we additionally extract the
 texture of the person's face using an
 illumination-corrected texture extraction algorithm.
+\end{comment}
+
+\section{3D Pose Estimation !!! NEW}
+The goal of 3D pose estimation is to determine the position and orientation of
+an object from a 2D image of this object. The problem is specified as follows -
+given are the exact locations of a set of feature points on the object and the
+positions of points in the 2D
+image. The points in the 2D image correspond to the 3D feature points. The goal
+is to find how the object must be moved, rotated, scaled so that when the
+3D feature points are projected using a camera model the result will approximate
+the input set of corresponding 2D points.  
+
+\subsection{Camera Model}
+The camera model describes a \textit{projective transformation}. This transformation maps a 3D
+point $\mathbf{X} = (X,Y,Z)^T$ to a 2D image point $\mathbf{x} = (x,y)^T$. The
+three most important camera models are the perspective model, the orthogonal
+model and the weak perspective model.
+
+
+\subsubsection{Perspective Camera Model}
+In perspective projection rays coming from points in the scene all enter the \textit{center of
+projection}. These points are then ``projected'' onto an imaging surface, the
+\textit{image plane}. The size of the image relative to the distant object is given by
+the parameter \textit{focal length}. The focal length is the distance of the
+center of projection from the image plane. If the image plane is in behind the
+center of projection then the image of the object on the image plane is
+inverted. If the image plane is placed in front of the center of projection then the image and
+the object have the same orientation. The center of projection in essence
+corresponds to an ideal pinhole camera. The perspective projection in therefore known as the
+pinhole camera model. 
+
+The normal vector to the pinhole plane, which goes through the pinhole itself is
+called the \textit{optical axis}. The optical axis is usually chosen either the
+negative or positive $z$ axis and the pinhole is chosen to lie at the origin. The intersection of the optical axis and the
+image plane is known as the \textit{principal point}. The configuration of the
+pinhole camera model is shown in figure \ref{fg:pin}.
+\begin{figure}[H] 
+\centering
+\includegraphics[scale=0.75]{images/pinhole.png}
+\caption{Perspective projection camera model with the image plane behind the camera}
+\label{fg:pin}
+\end{figure}
+
+From figure \ref{fg:pin}, we can see that the image plane is located at $Z=f$
+where $f$ is the focal length. The coordinates of the projection of $X$ can
+therefore be calculated using similar triangles to obtain $-x/f = X/Z$.
+If the image plane were to be place in front of the camera then the ratio given
+by the similar triangles will stay the same but the new coordinate will no
+longer be negative.
+
+Hence, assuming that the principal point is given by $(c_x,c_y)^T$ and the focal
+length is $f$, then the projection $(x,y)^T$ of the point $\mathbf{X} = (X,Y,Z)^T$ is given by
+\begin{align}\label{eq:pinCoord}
+\begin{pmatrix}x\\y\end{pmatrix} = \frac{f}{Z}\begin{pmatrix}X\\Y\end{pmatrix} + \begin{pmatrix}c_x\\c_y\end{pmatrix}
+\end{align}
+
+
+The perspective projection is a non-linear transformation which cannot be written
+as a multiplication of a 3D points in Cartesian coordinates with a matrix. To obtain a matrix formulation, we must
+use homogeneous coordinates. The homogeneous coordinates of a point are $P_h =
+[p_x,p_y,p_z,s]^T$. The fourth coordinate component $s$ is called
+\textit{scale}. We transform a point in homogeneous coordinates into Cartesian
+coordinates by dividing the first three components by the scale to get the point
+$P_c = [p_x/s, p_y/s, p_z/s]^T$. Using homogeneous coordinates the pin hole
+camera model has the form
+\begin{equation}\label{eq:projective}
+\gamma\begin{pmatrix}x\\y\\1\end{pmatrix}
+= \begin{pmatrix}f_x&0&c_x&0\\0&f_y&c_y&0\\0&0&1&0\end{pmatrix} \begin{pmatrix}X\\Y\\Z\end{pmatrix}
+\end{equation}
+where $\gamma = 1/s$ is responsible for converting the homogeneous result of the
+multiplication to Cartesian coordinates. In equation \ref{eq:projective} two
+different focal lengths have been used. This is due to the fact that with any
+camera equipment the image plane will have dimensions in millimeters. The values
+$f_x$ and $f_y$ therefore incorporate the focal length as well as the conversion
+from units of the imaging equipment to pixels.
+
+\subsubsection{Orthogonal Camera Model}
+In the orthogonal camera model the image of an object is obtained by casting
+rays parallel to the optical axis from points $(X,Y,Z)$ on the object and intersecting
+these rays with the image plane. The $Z$ component is thereby dropped
+entirely. The projected point is thus given by $x = X$ and $y = Y$. The geometry
+of the orthogonal projection is shown in figure \ref{fg:weakOrtho}. Orthographic
+projection is sometimes called parallel projection, since unlike in perspective
+projection, parallel lines remain after being projected into the image plane.
+
+\subsubsection{Weak Perspective Camera Model}
+The weak perspective camera model is in essence just a scaled orthographic
+projection. With this camera model it is possible to approximate a perspective
+transformation under the following conditions.
+\begin{itemize}
+\item The object lies close to the optical axis.
+\item The object's depth (the difference between the maximum and minimum $z$ value of the
+  object) is small in comparison to the object's average distance from the
+  center of projection.
+\end{itemize}
+Since the depths of the different points on the object are close to each other,
+we make the assumption all these depths are equal. Then a perspective projection
+of any object point $(X,Y,Z)$ can be approximated as
+\begin{equation}
+\begin{pmatrix}x\\y\end{pmatrix} = \frac{f}{Z_{avg}}\begin{pmatrix}X\\Y\end{pmatrix}
+    + \begin{pmatrix}c_x\\c_y\end{pmatrix}
+\end{equation}
+where $Z_{avg}$ is the average distance of the object's point from the
+camera. Geometrically, we place a plane parallel to the image plane at a
+distance $Z_{avg}$ from the center of projection. Then the object points
+orthogonally projected onto this new plane. Finally, we perspectively project
+these projected points onto the image plane. The geometry of the weak perspective projection is shown in figure \ref{fg:weakOrtho}.
+
+Moreover, the weak perspective transformation is a linear
+transformation unlike the strong perspective transformation, since we are
+dividing by a constant $Z_avg$ and not the $Z$ component of the
+point.
+
+\begin{figure}[H] 
+\centering
+\includegraphics[scale=0.75]{images/weak_persp.png}
+\caption{Weak perspective projection is a scaled orthographic projection. The
+  image obtained by orthographic projection is scaled by the constant $f/Z_{avg}$.}
+\label{fg:weakOrtho}
+\end{figure}
+  
+
+\subsection{Rotation and Translation}
+It is usual in most 3D rendering frameworks to define two coordinate systems. One
+coordinate system for the camera and one for the object. This makes it possible
+to apply transformations to objects independently since the points that make up each object are defined
+in each object's separate coordinate system. A transformation translates the points
+from the object coordinate system into the camera coordinate system. In case of $n$ objects there are $n$
+independent object coordinate systems thereby making it possible to apply a
+different transformation to each of the $n$ object coordinate systems and move
+the objects independently which is a crucial task for 3D rendering frameworks.
+
+The transformations of the objects are based on the degrees of freedom for
+movement in 3D space. The two classes of transformations are rotation and
+translation. The origin of the object coordinate system is moved to the origin
+of the camera coordinate system during translation. Rotation aligns the viewing direction
+of the camera coordinate system with the viewing direction of the object coordinate
+system. The mapping from object coordinate space to camera coordinate space
+is shown in figure \ref{fg:objCam}.
+
+\begin{figure}[H] 
+\centering
+\includegraphics[scale=0.55]{images/camera_object5.png}
+\caption{ Mapping points from object coordinates to camera coordinates using
+  rotation and translation. The displacement of the origin of the camera system
+  from the origin of the object system is $\mathbf{C}$. The camera is viewing in
+the direction of the vector $d$.}
+\label{fg:objCam}
+\end{figure}
+
+The rotation of the object in $n$ dimensions can described using
+\textit{Givens rotations}. A Givens rotation has the form
+\begin{equation}\label{eq:givens}
+\mathit{G}(i,k,\theta) = 
+\bordermatrix{
+&&&i&&k& \cr
+&1&\dotso&0&\dotso&0&\dotso&0 \cr
+&\vdots&\ddots&\vdots&&\vdots&&\vdots \cr
+i&0&\dotso&c_\theta&\dotso&s_\theta&\dotso&0 \cr
+&\vdots&&\vdots&\ddots&\vdots&&\vdots \cr
+k&0&\dotso&-s_\theta&\dotso&c_\theta&\dotso&0 \cr
+&\vdots&&\vdots&&\vdots&\ddots&\vdots \cr
+&0&\dotso&0&\dotso&0&\dotso&1 \cr
+}
+\end{equation}
+where $c_\theta = \cos(\theta)$ and $s_\theta = \sin(\theta)$. Pre-multiplying with the Givens
+rotation $\mathit{G}(i,k,\theta)^T$ corresponds to a counterclockwise rotation
+by $\theta$ radians in the $(i,k)$ coordinate plane, pre-multiplying with
+$\mathit{G}(i,k,\theta)$ rotates the the $(i,k)$ plane by $\theta$ radians in
+clockwise direction.
+
+From the Pythagorean theorem $\cos(\theta)^2 + \sin(\theta)^2 = 1$ and the symmetries of the sine and cosine function $\cos(-\theta) =
+\cos(\theta)$, $\sin(-\theta) = -\sin(\theta)$, it is obvious that Givens rotations are
+orthogonal.
+\begin{equation}
+\mathit{G}(i,k,\theta)^T\mathit{G}(i,k,\theta) =
+\mathit{G}(i,k,\theta)\mathit{G}(i,k,\theta)^T = \mathbf{I}
+\end{equation}
+The transposed Givens rotation amounts to a rotation in the opposite direction by
+the same angle thus the two rotations cancel out.
+
+To describe the rotation of the object in three dimensional space we
+use the following Givens rotations
+\begin{align}\label{eq:rotations}
+R_x(\phi) &= \begin{pmatrix}1&0&0\\0&c_\phi&s_\phi\\0&-s_\phi&c_\phi\end{pmatrix} &  R_y(\psi)
+  &= \begin{pmatrix}c_\psi&0&-s_\psi\\0&1&0\\s_\psi&0&c_\psi\end{pmatrix}
+ & R_z(\theta) &= \begin{pmatrix}c_\theta&s_\theta&0\\-s_\theta&c_\theta&0\\0&0&1\end{pmatrix}
+\end{align}
+Note that the matrix $R_y(\psi)$ is in fact the transposed Givens rotation. This
+is due to the fact that we are interested in describing a left handed coordinate\footnotemark \footnotetext{Some authors
+  prefer to instead use the right handed coordinate system to describe an arbitrary 3D
+  rotation.} system with the positive $X$ axis pointing up, the positive $Y$
+axis pointing to the right and the $Z$ axis pointing into the page. As such the
+rotation around the $(X,Z)$ plane needs to be described by the 
+Given a point $\mathbf{x} = (x,y,z)^T$ the pre-multiplication with the
+Givens rotation $R_z(\theta)$ produces a new point $\mathbf{x'} = (x',y',z')^T$ such that 
+\begin{equation}\label{eq:rotated}
+R_z(\theta) \mathbf{x} = \begin{pmatrix}c_\theta&s_\theta&0\\-s_\theta&c_\theta&0\\0&0&1\end{pmatrix}\begin{pmatrix}x\\y\\z\end{pmatrix}
+    = \begin{pmatrix}c_\theta x + s_\theta y\\c_\theta y - s_\theta
+      x\\z\end{pmatrix} = \begin{pmatrix}x'\\y'\\z'\end{pmatrix} = \mathbf{x'}
+\end{equation}
+The expressions for the $x'$ and $y'$ component of the new point correspond to a
+rotation of the $(X,Y)$ coordinate system by $\theta$ radians about the $Z$
+axis. These expressions are computed using simple trigonometrics where the point
+is decomposed into its $x$ and $y$ components which are then projected on the rotated
+$(X',Y')$ axes as can be seen in figure \ref{fg:rotations}. 
+
+\begin{figure}[H] 
+\centering
+\includegraphics[scale=0.75]{images/rotation.png}
+\caption{Transforming one point into another by rotating the coordinate system
+  counterclockwise by $\theta$ radians. The point $[x,y]^T$ can be written as $[x,0]^T+[0,y]^T.$ These components
+are then individually transformed by projecting them onto the axes of the new
+coordinate system $(X',Y')$ to obtain the new point $[x',y']^T$. The new point
+is the result of turning the original point clockwise by $\theta$ radians.}
+\label{fg:rotations}
+\end{figure}
+
+After the transformation in equation \ref{eq:rotated} the $z$ component of the original point is left
+unchanged. From similar calculations it can be seen that with matrix $R_y$ the $y$ component, with $R_z$ the $z$ component
+remain unchanged. It is therefore apparent that the matrix $R_x(\phi)$ rotates by $\phi$ about the $X$ axis, matrix $R_y(\psi)$ rotates
+by $\psi$ about the $Y$ axis and $R_z(\theta)$ rotates by $\theta$ about the $Z$
+axis. Any arbitrary rotation in 3D space can then be
+achieved using the total \textit{rotation matrix} $R = R_x(\phi)R_y(\psi)R_z(\theta)$ with the
+appropriate angles. Since all the total rotation matrix is a product of three
+orthogonal Givens rotations it likewise orthogonal with $R^T R = RR^T =
+\mathbf{I}$, with $\mathbf{I}$ being the identity matrix. The three angles $\theta$, $\phi$ and $\psi$ represent the three
+rotational degrees of freedom (DOF) of the object.
+
+Any position in three dimensional space can be achieved through a
+linear combination of movements in any of the three unit directions given by the $X$, $Y$
+and $Z$ axes. The \textit{translation vector} allows us to represent the shift
+from one coordinate system to another. In terms of the camera coordinate system
+and the object coordinate system, the translation vector is the offset between
+the origin of the camera system and the object system. Thus, to represent the
+position of the object we use the translation vector $t = origin_{object} -
+origin_{camera}$. The displacements in the the the unit directions $(1,0,0)^T$,
+$(0,1,0)^T$, $(0,0,1)^T$ are given by the components vector $t =
+(t_x,t_y,t_z)^T$. 
+
+Equation \ref{eq:rottran} shows how the rotation matrix and the translation vector allow us to transform a point $P
+= (p_x,p_y,p_z)^T$
+from the object coordinate system to the camera coordinate system. 
+
+\begin{equation}\label{eq:rottran}
+\begin{pmatrix}x\\y\\z\end{pmatrix} =
+  R\begin{pmatrix}p_x\\p_y\\p_z\end{pmatrix} + t
+\end{equation}
+
+With homogeneous coordinates the 6 degrees of freedom (also known as the
+extrinsic parameters) can be used to
+construct a joint rotation-translation matrix which transforms the 3D point
+$Q = (p_x,p_y,p_z,1)^T$ in the object coordinate system to a point $\mathbf{x}
+= (x,y,z,s)^T$ in the camera coordinate system as
+\begin{equation}\label{eq:jointrottran}
+\begin{pmatrix}x\\y\\z\\s\end{pmatrix} =
+  \begin{pmatrix}R&t\\\mathbf{0}&1\end{pmatrix}\begin{pmatrix}p_x\\p_y\\p_z\\1\end{pmatrix}
+\end{equation}
+where $\mathbf{0} = (0,0,0)$. 
+
+
+\subsection{Pose estimation with the POSIT algorithm}
 
 
 \section{Model-based tracking}
 
 \subsection{Kanade-Lucas-Tomasi Feature Tracker}
-The problem of registering a displaced image can be formalised by assuming we
+The problem of registering a displaced image can be formalized by assuming we
 are given two functions $F(x)$ and $G(x)$. These function take a vector $x$ as input
-and output the pixel intensity at $x$. Thus, we can think of think of these
-functions as representing images. 
-The goal in image registration is to find a disparity vector $h$ which minimises
+and output the pixel intensity at $x$. Therefore, these functions can be thought
+of as representing images. 
+The goal in image registration is to find a disparity vector $h$ which minimizes
 a measure of difference between $F(x + h)$ and $G(x)$ for a given region of
 interest $R$ \cite{kanade}. This region of interest $R$ is the feature which we
 are tracking. The image registration problem is shown below:
@@ -875,7 +1140,7 @@ as follows for the registration problem:
 L_2 \mathrm{norm} = (\sum_{x \in R} [F(x + h) - G(x)]^2)^{\frac{1}{2}}
 \end{equation}
 
-The naive way to locate the $h$ that minimises the $L_2$ norm would be to
+The naive way to locate the $h$ that minimizes the $L_2$ norm would be to
 iterate through all the possible values of $h$ and measure the $L_2$ norm. A
 better approach was proposed by Kanade and Lucas \cite{kanade}. Their algorithm
 specifies the order in which possible values of $h$ will be explored. The procedure
@@ -910,7 +1175,7 @@ transformation allows us
 to apply the algorithm.
 
 The Kanade-Lucas-Tomasi feature tracker has been successfully applied to
-tracking facial feature points \cite{faceTransfer05}. Vlasic et al localised
+tracking facial feature points \cite{faceTransfer05}. Vlasic et al localized
 feature points in the initial frame manually and then used the
 Kanade-Lucas-Tomasi feature tracker to obtain the displacements between pairs of
 frames. From these displacements they were able to derive parameters for their
@@ -938,7 +1203,7 @@ and has since proven itself to be comparable in efficiency to the more popular
 gradient based optimization methods. The method was designed
 for the optimization of multidimensional, unconstrained functions
 that have either no gradients or when the gradient exist only for
-portions of the search space sucha as in the case of discontinuous functions
+portions of the search space such as in the case of discontinuous functions
 \cite{Nelder2009}. However, the drawback of the method is that many fitness function evaluations
 are required. Therefore, when the computational complexity of the
 fitness function is very high, other optimization methods need to
@@ -1002,7 +1267,7 @@ function largest value to a new point where the value will be
 smaller. 
 
 \begin{enumerate}
-\item[\textbf{1.}] The first step is to sort the vertexes
+\item[\textbf{1.}] The first step is to sort the vertices
 $x_{i}$ of the simplex from worst to best, where $h$ is the index
 of the worst vertex, $s$ the second worst index and $l$ the best
 index.
@@ -1082,4 +1347,4 @@ restarts of the downhill algorithm are also sometimes utilized \cite{Press1992}.
 
 \end{document}
 
-% LocalWords:  Nelder
+% LocalWords:  Nelder Dantzig's

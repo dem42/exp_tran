@@ -121,7 +121,7 @@ void FaceModel::initializeDbStrings()
 
 
 //@param brute .. whether we interpolate using U2 and U3 or just the weights right away
-void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bool brute)
+void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bool brute_exp, bool brute_id)
 {
     Matrix m_wid(1,n_f);
     Matrix m_wex(1,n_e);
@@ -136,20 +136,28 @@ void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bo
     for(i=0;i<n_e;i++)
         m_wex[0][i] = w_ex[i];
 
-    if(brute == false)
+    if(brute_exp == false)
     {
-        //multiply with u2 and u3
-        row_id = Matrix::matrix_mult(m_wid,U_id);
+        //multiply with u2 and u3     
         row_ex = Matrix::matrix_mult(m_wex,U_ex);
     }
     else
     {
         //brute == true so
-        //just copy w_id and w_exp over from the output
-        for(i=0;i<n_f;i++)
-            row_id[0][i] = w_id[i];
+        //just copy w_exp over from the output
+        //brute means we are turning the dials that correspond to the basis vectors
         for(i=0;i<n_e;i++)
             row_ex[0][i] = w_ex[i];
+    }
+    if(brute_id == false)
+    {
+        //multiply with u2 and u3
+        row_id = Matrix::matrix_mult(m_wid,U_id);        
+    }
+    else
+    {        
+        for(i=0;i<n_f;i++)
+            row_id[0][i] = w_id[i];        
     }
 
 

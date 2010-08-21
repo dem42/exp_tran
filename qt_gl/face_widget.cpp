@@ -63,8 +63,7 @@ void FaceWidget::setFace(Face* face_ptr)
 }
 
 void FaceWidget::render()
-{
-  cout << "in my render Object with poly_num " << polygonNumber << endl;
+{  
   int v1,v2,v3;
 
   Point3 *vertexes = face_ptr->vertexes;
@@ -134,17 +133,16 @@ void FaceWidget::setTransParams(double r_x, double r_y, double r_z, double t_x, 
     rot_x = r_x;
     rot_y = r_y;
     rot_z = r_z;
-    cout << rot_x << " " << rot_y << " " << rot_z << endl;
+    cout << "ROTATION" << rot_x << " " << rot_y << " " << rot_z << endl;
     trans_x = t_x;
     trans_y = t_y;
     trans_z = t_z;
-    cout << trans_x << " " << trans_y << " " << trans_z << endl;
+    cout << "TRANSLATION" << trans_x << " " << trans_y << " " << trans_z << endl;
 }
 
 void FaceWidget::mousePressEvent(QMouseEvent *event)
 {
-  lastPos = event->pos();
-  //cout << "in press .. location: " << event->pos().x() << " " << event->pos().y() << endl;
+  lastPos = event->pos();  
 }
 
 void FaceWidget::mouseMoveEvent(QMouseEvent *event)
@@ -165,7 +163,6 @@ void FaceWidget::mouseMoveEvent(QMouseEvent *event)
 
 void FaceWidget::initializeGL(void)
 {
-  cout << "initializing" << endl;
 
   qglClearColor(Qt::black);
 
@@ -206,7 +203,6 @@ void FaceWidget::initializeGL(void)
 //I*R*T*v where v are our vertices
 void FaceWidget::paintGL(void)
 {
-  cout << "in paintGL" << endl;
 
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
   glMatrixMode(GL_MODELVIEW);  
@@ -214,7 +210,7 @@ void FaceWidget::paintGL(void)
   glLoadIdentity();
   //gluLookAt is a viewing not a modelling transformation!!  
   gluLookAt(0.0, 0.0, upVector*2*diameter, center_x, center_y, center_z, 0.0, upVector, 0.0);
-  cout << cameraZPosition << " " << diameter << endl;
+
   //gluLookAt(0.0, 0.0, cameraZPosition, 0, 0, 0, 0.0, upVector, 0.0);
 
 
@@ -228,7 +224,7 @@ void FaceWidget::paintGL(void)
 
 
   //move the objects by:
-  glTranslatef(trans_x,trans_y,trans_z);
+  //glTranslatef(trans_x,trans_y,trans_z);
 
   //rotations which will be updated anytime the values of rot_x, rot_y change
   //to get the rotations around the object (which isnt at 0,0,0) we need to

@@ -65,8 +65,8 @@
 \citation{cootesOverview01}
 \citation{activeApp04}
 \citation{activeApp04}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces  Incorrect convergence of the ASM when the search is initialised incorrectly. This can happen when the face is not centered in the image or when the search does not begin in the centre of the image. Taken from \cite  {cootesOverview01} }}{13}{figure.2.3}}
-\newlabel{gr:bad_asm}{{2.3}{13}{ Incorrect convergence of the ASM when the search is initialised incorrectly. This can happen when the face is not centered in the image or when the search does not begin in the centre of the image. Taken from \cite {cootesOverview01} \relax }{figure.2.3}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.3}{\ignorespaces  Incorrect convergence of the ASM when the search is initialized incorrectly. This can happen when the face is not centered in the image or when the search does not begin in the center of the image. Taken from \cite  {cootesOverview01} }}{13}{figure.2.3}}
+\newlabel{gr:bad_asm}{{2.3}{13}{ Incorrect convergence of the ASM when the search is initialized incorrectly. This can happen when the face is not centered in the image or when the search does not begin in the center of the image. Taken from \cite {cootesOverview01} \relax }{figure.2.3}{}}
 \@writefile{toc}{\contentsline {subsubsection}{Active Appearance Model}{13}{section*.8}}
 \citation{activeApp04}
 \citation{activeApp04}
@@ -90,37 +90,58 @@
 \citation{blanz1}
 \citation{blanz2}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.1.6}Morphable Model}{17}{subsection.2.1.6}}
+\@writefile{toc}{\contentsline {section}{\numberline {2.2}3D Pose Estimation !!! NEW}{18}{section.2.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2.1}Camera Model}{18}{subsection.2.2.1}}
+\@writefile{toc}{\contentsline {subsubsection}{Perspective Camera Model}{18}{section*.9}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.6}{\ignorespaces Perspective projection camera model with the image plane behind the camera}}{19}{figure.2.6}}
+\newlabel{fg:pin}{{2.6}{19}{Perspective projection camera model with the image plane behind the camera\relax }{figure.2.6}{}}
+\newlabel{eq:pinCoord}{{2.25}{19}{Perspective Camera Model\relax }{equation.2.25}{}}
+\newlabel{eq:projective}{{2.26}{19}{Perspective Camera Model\relax }{equation.2.26}{}}
+\@writefile{toc}{\contentsline {subsubsection}{Orthogonal Camera Model}{19}{section*.10}}
+\@writefile{toc}{\contentsline {subsubsection}{Weak Perspective Camera Model}{20}{section*.11}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.7}{\ignorespaces Weak perspective projection is a scaled orthographic projection. The image obtained by orthographic projection is scaled by the constant $f/Z_{avg}$.}}{20}{figure.2.7}}
+\newlabel{fg:weakOrtho}{{2.7}{20}{Weak perspective projection is a scaled orthographic projection. The image obtained by orthographic projection is scaled by the constant $f/Z_{avg}$}{figure.2.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2.2}Rotation and Translation}{21}{subsection.2.2.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.8}{\ignorespaces  Mapping points from object coordinates to camera coordinates using rotation and translation. The displacement of the origin of the camera system from the origin of the object system is $\mathbf  {C}$. The camera is viewing in the direction of the vector $d$.}}{21}{figure.2.8}}
+\newlabel{fg:objCam}{{2.8}{21}{ Mapping points from object coordinates to camera coordinates using rotation and translation. The displacement of the origin of the camera system from the origin of the object system is $\mathbf {C}$. The camera is viewing in the direction of the vector $d$}{figure.2.8}{}}
+\newlabel{eq:givens}{{2.28}{21}{Rotation and Translation\relax }{equation.2.28}{}}
+\newlabel{eq:rotations}{{2.30}{22}{Rotation and Translation\relax }{equation.2.30}{}}
+\newlabel{eq:rotated}{{2.31}{22}{Rotation and Translation\relax }{equation.2.31}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.9}{\ignorespaces Transforming one point into another by rotating the coordinate system counterclockwise by $\theta $ radians. The point $[x,y]^T$ can be written as $[x,0]^T+[0,y]^T.$ These components are then individually transformed by projecting them onto the axes of the new coordinate system $(X',Y')$ to obtain the new point $[x',y']^T$. The new point is the result of turning the original point clockwise by $\theta $ radians.}}{23}{figure.2.9}}
+\newlabel{fg:rotations}{{2.9}{23}{Transforming one point into another by rotating the coordinate system counterclockwise by $\theta $ radians. The point $[x,y]^T$ can be written as $[x,0]^T+[0,y]^T.$ These components are then individually transformed by projecting them onto the axes of the new coordinate system $(X',Y')$ to obtain the new point $[x',y']^T$. The new point is the result of turning the original point clockwise by $\theta $ radians}{figure.2.9}{}}
 \citation{kanade}
-\@writefile{toc}{\contentsline {subsubsection}{3D Reconstruction algorithm}{18}{section*.9}}
+\newlabel{eq:rottran}{{2.32}{24}{Rotation and Translation\relax }{equation.2.32}{}}
+\newlabel{eq:jointrottran}{{2.33}{24}{Rotation and Translation\relax }{equation.2.33}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.2.3}Pose estimation with the POSIT algorithm}{24}{subsection.2.2.3}}
+\@writefile{toc}{\contentsline {section}{\numberline {2.3}Model-based tracking}{24}{section.2.3}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.1}Kanade-Lucas-Tomasi Feature Tracker}{24}{subsection.2.3.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.10}{\ignorespaces  The image registration problem. The task is to find the disparity vector $h$.}}{24}{figure.2.10}}
 \citation{kanade}
 \citation{kanade}
-\@writefile{toc}{\contentsline {section}{\numberline {2.2}Model-based tracking}{19}{section.2.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.2.1}Kanade-Lucas-Tomasi Feature Tracker}{19}{subsection.2.2.1}}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.6}{\ignorespaces  The image registration problem. The task is to find the disparity vector $h$.}}{19}{figure.2.6}}
-\newlabel{eq:weights}{{2.28}{19}{Kanade-Lucas-Tomasi Feature Tracker\relax }{equation.2.28}{}}
 \citation{faceTransfer05}
+\newlabel{eq:weights}{{2.35}{25}{Kanade-Lucas-Tomasi Feature Tracker\relax }{equation.2.35}{}}
 \citation{Nelder2009}
 \citation{Press1992}
-\@writefile{toc}{\contentsline {section}{\numberline {2.3}Optimization}{20}{section.2.3}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {2.3.1}Nelder Mead Downhill Simplex}{20}{subsection.2.3.1}}
 \citation{Press1992}
 \citation{Nelder2009}
+\@writefile{toc}{\contentsline {section}{\numberline {2.4}Optimization}{26}{section.2.4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {2.4.1}Nelder Mead Downhill Simplex}{26}{subsection.2.4.1}}
+\@writefile{toc}{\contentsline {subsubsection}{The Downhill Simplex Algorithm}{26}{section*.12}}
 \citation{Press1992}
-\@writefile{toc}{\contentsline {subsubsection}{The Downhill Simplex Algorithm}{21}{section*.10}}
-\newlabel{eq:right_angle_simplex}{{2.31}{21}{The Downhill Simplex Algorithm\relax }{equation.2.31}{}}
-\newlabel{eq:centroid}{{2.32}{21}{The Downhill Simplex Algorithm\relax }{Item.1}{}}
 \citation{Nelder2009}
 \citation{Nelder2009}
-\newlabel{eq:reflection}{{2.33}{22}{The Downhill Simplex Algorithm\relax }{Item.2}{}}
-\newlabel{eq:expansion}{{2.34}{22}{The Downhill Simplex Algorithm\relax }{Item.3}{}}
-\newlabel{eq:contraction}{{2.35}{22}{The Downhill Simplex Algorithm\relax }{Item.4}{}}
+\newlabel{eq:right_angle_simplex}{{2.38}{27}{The Downhill Simplex Algorithm\relax }{equation.2.38}{}}
+\newlabel{eq:centroid}{{2.39}{27}{The Downhill Simplex Algorithm\relax }{Item.1}{}}
+\newlabel{eq:reflection}{{2.40}{27}{The Downhill Simplex Algorithm\relax }{Item.2}{}}
+\newlabel{eq:expansion}{{2.41}{27}{The Downhill Simplex Algorithm\relax }{Item.3}{}}
+\newlabel{eq:contraction}{{2.42}{27}{The Downhill Simplex Algorithm\relax }{Item.4}{}}
 \citation{Press1992}
 \citation{Nelder2009}
 \citation{Press1992}
 \bibstyle{plain}
 \bibdata{references}
-\@writefile{lof}{\contentsline {figure}{\numberline {2.7}{\ignorespaces Geometric interpretations of the simplex transformations. Taken from \cite  {Nelder2009}}}{23}{figure.2.7}}
-\newlabel{fg:amoeba}{{2.7}{23}{Geometric interpretations of the simplex transformations. Taken from \cite {Nelder2009}\relax }{figure.2.7}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {2.11}{\ignorespaces Geometric interpretations of the simplex transformations. Taken from \cite  {Nelder2009}}}{28}{figure.2.11}}
+\newlabel{fg:amoeba}{{2.11}{28}{Geometric interpretations of the simplex transformations. Taken from \cite {Nelder2009}\relax }{figure.2.11}{}}
 \bibcite{FEMbook}{1}
 \bibcite{blanz1}{2}
 \bibcite{blanz2}{3}

@@ -16,9 +16,15 @@
 \contentsline {subsection}{\numberline {2.1.4}Tensor-Based Model}{15}{subsection.2.1.4}
 \contentsline {subsection}{\numberline {2.1.5}Tensor-based Statistical Discriminant Method}{16}{subsection.2.1.5}
 \contentsline {subsection}{\numberline {2.1.6}Morphable Model}{17}{subsection.2.1.6}
-\contentsline {subsubsection}{3D Reconstruction algorithm}{18}{section*.9}
-\contentsline {section}{\numberline {2.2}Model-based tracking}{19}{section.2.2}
-\contentsline {subsection}{\numberline {2.2.1}Kanade-Lucas-Tomasi Feature Tracker}{19}{subsection.2.2.1}
-\contentsline {section}{\numberline {2.3}Optimization}{20}{section.2.3}
-\contentsline {subsection}{\numberline {2.3.1}Nelder Mead Downhill Simplex}{20}{subsection.2.3.1}
-\contentsline {subsubsection}{The Downhill Simplex Algorithm}{21}{section*.10}
+\contentsline {section}{\numberline {2.2}3D Pose Estimation !!! NEW}{18}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Camera Model}{18}{subsection.2.2.1}
+\contentsline {subsubsection}{Perspective Camera Model}{18}{section*.9}
+\contentsline {subsubsection}{Orthogonal Camera Model}{19}{section*.10}
+\contentsline {subsubsection}{Weak Perspective Camera Model}{20}{section*.11}
+\contentsline {subsection}{\numberline {2.2.2}Rotation and Translation}{21}{subsection.2.2.2}
+\contentsline {subsection}{\numberline {2.2.3}Pose estimation with the POSIT algorithm}{24}{subsection.2.2.3}
+\contentsline {section}{\numberline {2.3}Model-based tracking}{24}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Kanade-Lucas-Tomasi Feature Tracker}{24}{subsection.2.3.1}
+\contentsline {section}{\numberline {2.4}Optimization}{26}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}Nelder Mead Downhill Simplex}{26}{subsection.2.4.1}
+\contentsline {subsubsection}{The Downhill Simplex Algorithm}{26}{section*.12}

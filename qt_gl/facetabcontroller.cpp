@@ -1,9 +1,10 @@
 #include "facetabcontroller.h"
 #include "Vector3.h"
 
-FaceTabController::FaceTabController(QSlider *exp_slider, FaceWidget *face_widget)
+FaceTabController::FaceTabController(QSlider *exp_slider, QSlider *ident_slider, FaceWidget *face_widget)
 {
     this->exp_slider = exp_slider;
+    this->ident_slider = ident_slider;
     this->face_widget = face_widget;
 
     face_ptr = new Face();
@@ -19,13 +20,13 @@ FaceTabController::FaceTabController(QSlider *exp_slider, FaceWidget *face_widge
         else if(i==20)w_id[i] = 0.1;
         else w_id[i] = 0;
     }
-//    w_exp[0] = 0.0;
-//    w_exp[1] = 0.0;
-//    w_exp[2] = 0.0;
-//    w_exp[3] = -0.2;
-//    w_exp[4] = 0.0;
-//    w_exp[5] = 0.8;
-//    w_exp[6] = 0.0;
+    w_exp[0] = 1;
+    w_exp[1] = 0;
+    w_exp[2] = 0;
+    w_exp[3] = 0;
+    w_exp[4] = 0;
+    w_exp[5] = 0;
+    w_exp[6] = 0;
 
 //    w_exp[0] = 0.021423;
 //    w_exp[1] = 0.00498108;
@@ -35,13 +36,13 @@ FaceTabController::FaceTabController(QSlider *exp_slider, FaceWidget *face_widge
 //    w_exp[5] = -0.0193017;
 //    w_exp[6] = -0.021784;
 
-    w_exp[0] = 0.00883634;
-    w_exp[1] = -0.0029592;
-    w_exp[2] = -0.00662942;
-    w_exp[3] = 0.000328165;
-    w_exp[4] = -0.00611554;
-    w_exp[5] = 0.00532823;
-    w_exp[6] = 0.00375425;
+//    w_exp[0] = 0.00883634;
+//    w_exp[1] = -0.0029592;
+//    w_exp[2] = -0.00662942;
+//    w_exp[3] = 0.000328165;
+//    w_exp[4] = -0.00611554;
+//    w_exp[5] = 0.00532823;
+//    w_exp[6] = 0.00375425;
 
     //Vector3::normalize(w_exp,7);
 
@@ -77,12 +78,20 @@ void FaceTabController::face_file_changed(const QString str)
     face_widget->refreshGL();
 }
 
-void FaceTabController::slider_moved(int val)
+void FaceTabController::exp_slider_moved(int val)
 {
     w_exp[current_expr] = (float)val/100.0;
+    cout << "exp slider at : " << val/100. << endl;
     face_ptr->interpolate(w_id,w_exp);
-    face_widget->setFace(face_ptr);
-    face_widget->refreshGL();
+    face_widget->setFace(face_ptr);    
+}
+
+void FaceTabController::id_slider_moved(int val)
+{
+    w_id[current_ident] = (float)val/100.0;
+    cout << "id slider at : " << val/100. << endl;
+    face_ptr->interpolate(w_id,w_exp);
+    face_widget->setFace(face_ptr); 
 }
 
 void FaceTabController::expression_activated(const QString str)
@@ -98,6 +107,7 @@ void FaceTabController::identity_activated(int ident)
     w_id[current_ident] = 0;
     w_id[ident-1] = 1;
     current_ident = ident-1;
+    ident_slider->setSliderPosition(w_id[current_ident]*100);
 }
 
 void FaceTabController::render_action()

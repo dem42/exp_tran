@@ -1,4 +1,5 @@
 #include "modelimageerror.h"
+#include <limits>
 
 using namespace std;
 using namespace cv;
@@ -57,8 +58,19 @@ double ModelImageError::operator()(vector<double>& x)
     Mat_<double> projection(3,1);
     Mat_<double> K;
     Mat_<double> point2d(3,1);
+    Mat_<double> projectedT;
+
+    double sum = 0;
+    double x_error_sqrt;
+    double y_error_sqrt;
 
     Matrix w(x);
+
+    //implement non-negativity constraints
+    for(int i=0;i<x.size();i++)
+    {
+        if(x[i] < 0) return numeric_limits<double>::max();    
+    }
 
     //here inside of operator() if error is identity then the parameter w is identity weights
     if(type == IDENTITY)
@@ -69,22 +81,12 @@ double ModelImageError::operator()(vector<double>& x)
     K = Matrix::kron(linear_combination_id,linear_combination_exp);
     K = K.t();
 
-    projection = P*t;
+    projectedT = P*t;
 
-    double sum = 0;
-    double x_error_sqrt;
-    double y_error_sqrt;
 
    for(unsigned int i=0; i<points.size(); ++i)
     {        
-//        cout << "in error " << endl;
-//        cout << P.size().height << " " << P.size().width << endl;
-//        cout << R.size().height << " " << R.size().width << endl;
-//        cout << core_extracted.size().height << " " << core_extracted.size().width << endl;
-//        cout << K.size().height << " " << K.size().width << endl;
-//        cout << t.size().height << " " << t.size().width << endl;
-
-       projection = projection + Z[i]*K;
+       projection = projectedT + Z[i]*K;
 
         //convert from homogenous coordinates
         projection.at<double>(0,0) /= projection.at<double>(2,0);

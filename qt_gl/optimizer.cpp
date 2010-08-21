@@ -27,7 +27,7 @@ void Optimizer::generatePoints(const Mat &rotation, const Mat &translation,
 
     int MAX = Face::fPoints_size;
     if(newPoints == true)
-        MAX = 1000;
+        MAX = 500;
     for(int i=0;i<MAX;i++)
     {
         //now generate random numbers from range based on unifrom sampling dist formula
@@ -39,11 +39,13 @@ void Optimizer::generatePoints(const Mat &rotation, const Mat &translation,
 
         if(newPoints == false)
         {
+            cout << "omg nice bday" << endl;
             p = face_ptr->getPointFromPolygon(Face::fPoints[i]);
             point_indices.push_back(face_ptr->getPointIndexFromPolygon(Face::fPoints[i]));
         }
         else
         {
+            cout << " yeah thnx " << endl;
             p = face_ptr->getPointFromPolygon(random);
             point_indices.push_back(face_ptr->getPointIndexFromPolygon(random));
         }
@@ -71,10 +73,8 @@ void Optimizer::generatePoints(const Mat &rotation, const Mat &translation,
             point2dMat = cameraMatrix*(rmatrix * point3dMat) + Pt;
         }
 
-        //objectPoints.push_back(Point3f(p.x,p.y,p.z+1500.0));
 
-
-        //cout << "feature point : " << point3dMat(0,0) << " " << point3dMat(1,0) << " " << point3dMat(2,0) << endl;
+        cout << "feature point : " << point3dMat(0,0) << " " << point3dMat(1,0) << " " << point3dMat(2,0) << endl;
         cout << "generated new point : " << point2dMat(0,0) << " " << point2dMat(1,0) << endl;
 
         generatedPoints.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));

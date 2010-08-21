@@ -9,7 +9,11 @@
 \BOOKMARK [2][-]{subsection.2.1.4}{Tensor-Based Model}{section.2.1}
 \BOOKMARK [2][-]{subsection.2.1.5}{Tensor-based Statistical Discriminant Method}{section.2.1}
 \BOOKMARK [2][-]{subsection.2.1.6}{Morphable Model}{section.2.1}
-\BOOKMARK [1][-]{section.2.2}{Model-based tracking}{chapter.2}
-\BOOKMARK [2][-]{subsection.2.2.1}{Kanade-Lucas-Tomasi Feature Tracker}{section.2.2}
-\BOOKMARK [1][-]{section.2.3}{Optimization}{chapter.2}
-\BOOKMARK [2][-]{subsection.2.3.1}{Nelder Mead Downhill Simplex}{section.2.3}
+\BOOKMARK [1][-]{section.2.2}{3D Pose Estimation !!! NEW}{chapter.2}
+\BOOKMARK [2][-]{subsection.2.2.1}{Camera Model}{section.2.2}
+\BOOKMARK [2][-]{subsection.2.2.2}{Rotation and Translation}{section.2.2}
+\BOOKMARK [2][-]{subsection.2.2.3}{Pose estimation with the POSIT algorithm}{section.2.2}
+\BOOKMARK [1][-]{section.2.3}{Model-based tracking}{chapter.2}
+\BOOKMARK [2][-]{subsection.2.3.1}{Kanade-Lucas-Tomasi Feature Tracker}{section.2.3}
+\BOOKMARK [1][-]{section.2.4}{Optimization}{chapter.2}
+\BOOKMARK [2][-]{subsection.2.4.1}{Nelder Mead Downhill Simplex}{section.2.4}

@@ -42,7 +42,7 @@ QImage TransferWidget::mat2QImage(const Mat mat_rgb)
     return qframe;
 }
 
-TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : fileName(fileName), FRAME_MAX(1)
+TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : fileName(fileName), FRAME_MAX(2)
 {
     picLabel = new FeaturePointQLabel();
     flowLabel = new VectorFieldQLabel();
@@ -57,7 +57,7 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
     //initialize the optical flow engine
     flowEngine = new OpticalFlowEngine();
     //init the optimizer
-    paramOptimizer = new ClosedFormOptimizer();
+    paramOptimizer = new NelderMeadOptimizer();
 
     //setup the timer
     timer = new QTimer(this);
@@ -125,12 +125,6 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
 //    lensDist(0,0) = 0;
 //    lensDist(0,1) = 0;
 //    lensDist(0,1) = 0;
-
-
-    MatConstIterator_<double> it = cameraMatrix.begin(), it_end = cameraMatrix.end();
-    for(; it != it_end; ++it)
-        cout << *it << " ";
-    cout << endl;
 }
 
 ClickableQLabel* TransferWidget::getPicLabel() const
@@ -149,10 +143,6 @@ void TransferWidget::calcIntrinsicParams()
 
     imgs.push_back(imread("../../camera1.jpg"));
     imgs.push_back(imread("../../camera2.jpg"));
-
-    cout << " CALIBRATE SIZE" << endl;
-    cout << imgs[0].size().height << " " << imgs[0].size().width << endl;
-
 
     //the size here is very important .. it cannot be a subset
     //of the inner corners in the image but the max number in there
@@ -191,7 +181,6 @@ void TransferWidget::calcIntrinsicParams()
 
         bool out = findChessboardCorners(img,s,corners);
         cout << out << endl;
-
 
         drawChessboardCorners(img,s,Mat(corners),out);
 
@@ -314,17 +303,23 @@ void TransferWidget::processVideo()
         nextPoints.clear();
     }
 
+    NelderMeadOptimizer *nel = new NelderMeadOptimizer();
+    ClosedFormOptimizer *closed = new ClosedFormOptimizer();
+
     const unsigned int FRAME_NUMBER = frameData.size();
     for(unsigned int i=0;i<FRAME_MAX;++i)
     {
-
+        if(i==0)
+            paramOptimizer = nel;
+        else
+            paramOptimizer = closed;
         /**********************/
         /*estimate pose*/
         /**********************/
 
         //estimate the pose parameters and place estimations into vectors rotations and translations
         //the rotations vector holds the rodrigues rotation vectors which can be converted to a rotation matrix
-        paramOptimizer->calculateTransformation(featurePoints[i],face_ptr,cameraMatrix,lensDist,rvec,tvec);
+        paramOptimizer->calculateTransformation(featurePoints[i],face_ptr,cameraMatrix,lensDist,rvec,tvec,useExt);
         frameRotation.push_back(rvec.clone());
         frameTranslation.push_back(tvec.clone());
         useExt |= true;
@@ -333,7 +328,9 @@ void TransferWidget::processVideo()
         //and to obtain point indices
         indices.clear();
         paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,newPoints,indices);
-
+//        cout << "ugh " << endl;
+        if(i>0)
+            paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,featurePoints[i],indices,true,false);
         point_indices.push_back(indices);
 
 
@@ -350,9 +347,14 @@ void TransferWidget::processVideo()
 
         //generate points to improve tracking
         newPoints.clear();
-        paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,newPoints,point_indices[i],false,true);
 
-        paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,newPoints,point_indices[i],true,true);
+        bool weakP = false;
+        if(i > 0)
+            weakP = true;
+        //could overload generatePoints in closedform optim to do weak perspective
+        paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,newPoints,point_indices[i],false,weakP);
+
+        //paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,newPoints,point_indices[i],true,true);
         generatedPoints.push_back(newPoints);
     }
     timerReplay = new QTimer(this);
@@ -393,6 +395,9 @@ void TransferWidget::replayFrame()
     Rodrigues(frameRotation[i],rmatrix);
     computeEulerAnglesFromRmatrix(rmatrix,euler_x,euler_y,euler_z);
     //only y needs to be negative so that it agrees with the transposes
+    cout << "setting trans param " << euler_x << " " << euler_y << " "
+         << euler_z  << " " << tx << " " << ty << " " << tz  << endl;
+
     face_widget->setTransParams(euler_x,-euler_y,euler_z,tx,ty,tz);
 
     //generate the corresponding face    
@@ -689,6 +694,10 @@ void TransferWidget::restartCapturing()
     frameData.clear();
     frameRotation.clear();
     frameTranslation.clear();
+
+    //get rid of the old face
+    delete face_ptr;
+    face_ptr = new Face();
 
     capture = new VideoCapture(fileName.toStdString());
 

@@ -6,7 +6,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>1129</width>
+    <width>1210</width>
     <height>705</height>
    </rect>
   </property>
@@ -21,13 +21,13 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>20</y>
-      <width>1111</width>
+      <y>30</y>
+      <width>1191</width>
       <height>731</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="faceTab">
      <attribute name="title">
@@ -49,8 +49,8 @@
        <rect>
         <x>810</x>
         <y>10</y>
-        <width>104</width>
-        <height>311</height>
+        <width>209</width>
+        <height>381</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -70,6 +70,32 @@
           <number>56</number>
          </property>
         </widget>
+       </item>
+       <item>
+        <widget class="QSlider" name="identSlider">
+         <property name="minimum">
+          <number>-50</number>
+         </property>
+         <property name="maximum">
+          <number>50</number>
+         </property>
+         <property name="orientation">
+          <enum>Qt::Horizontal</enum>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
        </item>
        <item>
         <widget class="QLabel" name="label_2">
@@ -122,8 +148,11 @@
        </item>
        <item>
         <widget class="QSlider" name="expSlider">
+         <property name="minimum">
+          <number>-50</number>
+         </property>
          <property name="maximum">
-          <number>100</number>
+          <number>50</number>
          </property>
          <property name="singleStep">
           <number>1</number>
@@ -160,6 +189,20 @@
          </property>
         </widget>
        </item>
+       <item>
+        <widget class="QRadioButton" name="bruteExpRadio">
+         <property name="text">
+          <string>expression interpolation off</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QRadioButton" name="bruteIdRadio">
+         <property name="text">
+          <string>identity interpolation off</string>
+         </property>
+        </widget>
+       </item>
       </layout>
      </widget>
     </widget>
@@ -172,7 +215,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>621</width>
+        <width>631</width>
         <height>541</height>
        </rect>
       </property>
@@ -181,9 +224,9 @@
      <widget class="QWidget" name="verticalLayoutWidget_4">
       <property name="geometry">
        <rect>
-        <x>640</x>
+        <x>650</x>
         <y>10</y>
-        <width>461</width>
+        <width>531</width>
         <height>541</height>
        </rect>
       </property>
@@ -247,9 +290,9 @@
      <widget class="QWidget" name="horizontalLayoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>620</x>
+        <x>545</x>
         <y>560</y>
-        <width>476</width>
+        <width>581</width>
         <height>31</height>
        </rect>
       </property>
@@ -307,6 +350,13 @@
         </widget>
        </item>
        <item>
+        <widget class="QPushButton" name="cameraButton">
+         <property name="text">
+          <string>cameraButton</string>
+         </property>
+        </widget>
+       </item>
+       <item>
         <widget class="QPushButton" name="dropButton">
          <property name="sizePolicy">
           <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
@@ -329,7 +379,7 @@
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>1129</width>
+     <width>1210</width>
      <height>27</height>
     </rect>
    </property>

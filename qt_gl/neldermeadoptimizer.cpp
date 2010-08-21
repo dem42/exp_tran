@@ -27,6 +27,9 @@ void NelderMeadOptimizer::estimateModelParameters(const Mat &frame, const vector
     vector<double> id;
     vector<double> ex;
 
+    //get weights from the current face instance
+    face_ptr->getWeights(w_id,56,w_exp,7);
+
     /***********************/
     /* now use the newly */
     /* projected points to */
@@ -37,33 +40,41 @@ void NelderMeadOptimizer::estimateModelParameters(const Mat &frame, const vector
     //sizeof(w_exp)/sizeof(double)
     //first expression
     //TODO smaller coz its too slow
-    for(unsigned int i=0; i<1; i++)
-    {
-        Rodrigues(rotation,rmatrix);
-        error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::EXPRESSION);
-        error->setWeights(id);
 
-        error->setPoints(featurePoints,point_indices);
-        cout << "min before exp : " << (*error)(ex) << endl;
-        min=mysimplex(*error,ex,ex.size(),1);
-        weights_ex = ex;
-        cout << "min after exp : " << min << endl;
-        delete error;
-    }
+    Rodrigues(rotation,rmatrix);
+    error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::EXPRESSION);
+    error->setWeights(id);
+
+    error->setPoints(featurePoints,point_indices);
+    cout << "min before exp : " << (*error)(ex) << endl;
+    min=mysimplex(*error,ex,ex.size(),1);
+    weights_ex = ex;
+    cout << "min after exp : " << min << endl;
+    delete error;
+
     //then identity using the expression guess
-    for(unsigned int i=0; i<1; i++)
-    {
-        Rodrigues(rotation,rmatrix);
-        error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::IDENTITY);
-        error->setWeights(weights_ex);
 
-        error->setPoints(featurePoints,point_indices);
-        cout << "min before id : " << (*error)(id) << endl;
-        min=mysimplex(*error,id,id.size(),1);
-        weights_id = id;
-        cout << "min after id : " << min << endl;
-        delete error;
-    }   
+    Rodrigues(rotation,rmatrix);
+    error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::IDENTITY);
+    error->setWeights(weights_ex);
+
+    error->setPoints(featurePoints,point_indices);
+    cout << "min before id : " << (*error)(id) << endl;
+    min=mysimplex(*error,id,id.size(),1);
+    weights_id = id;
+    cout << "min after id : " << min << endl;
+    delete error;
+
+
+    for(int i=0;i<7;i++){
+
+        cout << weights_ex[i] << " ";
+    }
+
+    for(int i=0;i<56;i++){
+
+        cout  << weights_id[i] << " ";
+    }    
 
     delete[] w_id;
     delete[] w_exp;

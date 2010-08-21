@@ -79,6 +79,11 @@ public:
     //@return .. the solution x = inv(svd(A)) * b
     static Matrix solveLinSysSvd(const Matrix &A, const Matrix &b);
 
+    //solve a linear programming problem max cTx given Ax <= b
+//    static Matrix solveLinearProg(const Matrix &A, const Matrix &b,
+//                                  const Matrix &m1, const Matrix &m2,
+//                                  const Matrix &m3);
+
 
     /********************************************/
     /*      OPERATORS                           */

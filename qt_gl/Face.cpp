@@ -98,7 +98,7 @@ Color3 Face::interpolate_color(Color3 a,Color3 b,Color3 c,Color3 d,float r,float
 
 //standard interpolate where w_id and w_exp are multiplied with
 //the singular value matricies U2 and U3
-void Face::interpolate(double *w_id,double *w_exp,bool brute)
+void Face::interpolate(double *w_id,double *w_exp,bool brute_exp,bool brute_id)
 {
 //    double sum = 0;
 //    for(int i=0;i<7;i++)
@@ -134,7 +134,7 @@ void Face::interpolate(double *w_id,double *w_exp,bool brute)
     for(int i=0;i<EXP;i++)
         this->w_exp[i] = w_exp[i];
 
-    model->interpolate_expression(vertexes,w_id,w_exp,brute);
+    model->interpolate_expression(vertexes,w_id,w_exp,brute_exp,brute_id);
     //now recalculate the vertex normals for the newly interpolated face
     generate_vertex_normals();
 }
@@ -210,16 +210,12 @@ void Face::calculateBoundingSphere(float &cx,float &cy,float &cz, float &diamete
         bz_u = (v>bz_u)?v:bz_u;
         bz_d = (v<bz_d)?v:bz_d;
     }
-
-    std::cout << bx_u <<" " << bx_d <<" " << by_u <<" " << by_d <<" " << bz_u <<" " << bz_d << std::endl;
-    std::cout << "bounding sphere" << std::endl;
     cx = (bx_u + bx_d)/2.0;
     cy = (by_u + by_d)/2.0;
     cz = (bz_u + bz_d)/2.0;
-    std::cout <<(bx_u + bx_d)/2.0 << " " << (by_u + by_d)/2.0 << " " << (bz_u+bz_d)/2.0 << std::endl;
+
     diameter = std::max(fabs(bx_d - bx_u), fabs(by_d - by_u));
     diameter = std::max(diameter, fabs(bz_d - bz_u));
-    //diameter += 40;
 }
 
   

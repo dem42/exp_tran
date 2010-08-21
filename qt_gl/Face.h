@@ -16,7 +16,7 @@ class Face
   void load(string filename, const char *tex_map_filename);
   Color3 interpolate_color(Color3 a,Color3 b,Color3 c,Color3 d,float r,float s);
 
-  void interpolate(double *w_id,double *w_exp,bool brute=false);
+  void interpolate(double *w_id,double *w_exp,bool brute_exp=false, bool brute_id=false);
   void getWeights(double *w_id, int w_id_size, double *w_exp, int w_exp_size);
 
   int getPolyNum() const;

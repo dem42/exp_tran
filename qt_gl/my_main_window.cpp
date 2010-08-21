@@ -34,7 +34,7 @@ MyMainWindow::MyMainWindow(QMainWindow *window)
 
 
     //setup controllers
-    f_controller = new FaceTabController(ui.expSlider,face_widget1);
+    f_controller = new FaceTabController(ui.expSlider,ui.identSlider,face_widget1);
 
     /*********************/
     /* connect signals and slots*/
@@ -45,8 +45,9 @@ MyMainWindow::MyMainWindow(QMainWindow *window)
     connect(ui.actionVideo_File,SIGNAL(triggered()),v_dialog,SLOT(show()));
 
 
-    connect(ui.expComboBox,SIGNAL(activated(QString)),f_controller,SLOT(expression_activated(QString)));
-    connect(ui.expSlider,SIGNAL(valueChanged(int)),f_controller,SLOT(slider_moved(int)));
+    connect(ui.expComboBox,SIGNAL(activated(QString)),f_controller,SLOT(expression_activated(QString)));    
+    connect(ui.expSlider,SIGNAL(valueChanged(int)),f_controller,SLOT(exp_slider_moved(int)));
+    connect(ui.identSlider,SIGNAL(valueChanged(int)),f_controller,SLOT(id_slider_moved(int)));
     connect(ui.identSpinBox,SIGNAL(valueChanged(int)),f_controller,SLOT(identity_activated(int)));
     connect(ui.renderButton,SIGNAL(clicked()),f_controller,SLOT(render_action()));    
 
