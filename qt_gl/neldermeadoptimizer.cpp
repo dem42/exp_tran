@@ -42,28 +42,32 @@ void NelderMeadOptimizer::estimateModelParameters(const Mat &frame, const vector
     //TODO smaller coz its too slow
 
     Rodrigues(rotation,rmatrix);
-    error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::EXPRESSION);
-    error->setWeights(id);
 
-    error->setPoints(featurePoints,point_indices);
-    cout << "min before exp : " << (*error)(ex) << endl;
-    min=mysimplex(*error,ex,ex.size(),1);
-    weights_ex = ex;
-    cout << "min after exp : " << min << endl;
-    delete error;
+    for(int i=0;i<3;i++)
+    {
+        error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::EXPRESSION);
+        error->setWeights(id);
 
-    //then identity using the expression guess
+        error->setPoints(featurePoints,point_indices);
+        cout << "min before exp : " << (*error)(ex) << endl;
+        min=mysimplex(*error,ex,ex.size(),1);
+        weights_ex = ex;
+        cout << "min after exp : " << min << endl;
+        delete error;
 
-    Rodrigues(rotation,rmatrix);
-    error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::IDENTITY);
-    error->setWeights(weights_ex);
+        //then identity using the expression guess
 
-    error->setPoints(featurePoints,point_indices);
-    cout << "min before id : " << (*error)(id) << endl;
-    min=mysimplex(*error,id,id.size(),1);
-    weights_id = id;
-    cout << "min after id : " << min << endl;
-    delete error;
+
+        error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::IDENTITY);
+        error->setWeights(weights_ex);
+
+        error->setPoints(featurePoints,point_indices);
+        cout << "min before id : " << (*error)(id) << endl;
+        min=mysimplex(*error,id,id.size(),1);
+        weights_id = id;
+        cout << "min after id : " << min << endl;
+        delete error;
+    }
 
 
     for(int i=0;i<7;i++){

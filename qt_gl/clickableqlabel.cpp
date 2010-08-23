@@ -58,8 +58,6 @@ void ClickableQLabel::setDrawable(bool drawable)
 
 void ClickableQLabel::mousePressEvent ( QMouseEvent * ev )
 {
-    if(this->pixmap() != 0) cout << "there is a pixmap" << endl;
-    cout << "clicked" << ev->x() << " " << ev->y() << endl;    
     cv::Point2f point(ev->x(),ev->y());
     if(drawable == true)
          drawing = true;
@@ -95,7 +93,7 @@ void ClickableQLabel::paintEvent ( QPaintEvent * e)
 
     if(this->pixmap() == 0)
     {
-        cout << "there is no pixmap" << endl;
+        cerr << "there is no pixmap" << endl;
     }
     else
     {

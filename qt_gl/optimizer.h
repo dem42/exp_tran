@@ -19,15 +19,18 @@ public:
 
     void calculateTransformation(const vector<Point2f> &imagePoints, Face *face_ptr,
                                  const Mat &cameraMatrix, const Mat &lensDist,
+                                 const vector<int> &indices,
                                  Mat &rvec,Mat &tvec,bool useExt=true);
 
     void generatePoints(const Mat &rotation, const Mat &translation,
                         const Mat& cameraMatrix, const Mat& lensDist,
-                        int frame_number, Face *face_ptr,
+                        int point_number, Face *face_ptr,
                         vector<Point2f> &generatedPoints,
-                        vector<int> &point_indices_for_frame,
-                        bool newPoints = false, bool test=false);
-
+                        vector<int> &point_indices_for_frame);
+    void weakPerspectiveProjectPoints(const Mat &rotation, const Mat &translation,
+                                      const Mat& cameraMatrix, const Mat& lensDist,
+                                      const vector<int> &point_indices, Face *face_ptr,
+                                      vector<Point2f> &projectedPoints);
 };
 
 

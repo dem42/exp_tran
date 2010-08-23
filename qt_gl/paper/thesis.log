@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  19 AUG 2010 03:41
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  23 AUG 2010 04:23
 entering extended mode
  %&-line parsing enabled.
 **thesis.tex
@@ -536,20 +536,20 @@ Chapter 2.
 [6
 
 ] [7] [8] [9] [10]
-<images/eigenfaces_comb_from_nn_vienna.png, id=210, 770.88pt x 362.85562pt>
+<images/eigenfaces_comb_from_nn_vienna.png, id=230, 770.88pt x 362.85562pt>
 File: images/eigenfaces_comb_from_nn_vienna.png Graphic file (type png)
 
 <use images/eigenfaces_comb_from_nn_vienna.png> [11 <./images/eigenfaces_comb_f
 rom_nn_vienna.png (PNG copy)>]
-<images/scary_face2.png, id=227, 815.29594pt x 257.46187pt>
+<images/scary_face2.png, id=247, 815.29594pt x 257.46187pt>
 File: images/scary_face2.png Graphic file (type png)
 
 <use images/scary_face2.png> [12 <./images/scary_face2.png (PNG copy)>]
-<images/bad_asm.png, id=242, 576.65437pt x 213.04594pt>
+<images/bad_asm.png, id=262, 576.65437pt x 213.04594pt>
 File: images/bad_asm.png Graphic file (type png)
 
 <use images/bad_asm.png> [13 <./images/bad_asm.png (PNG copy)>]
-<images/amm_example.png, id=255, 602.25pt x 392.96812pt>
+<images/amm_example.png, id=275, 602.25pt x 392.96812pt>
 File: images/amm_example.png Graphic file (type png)
 
 <use images/amm_example.png>
@@ -558,11 +558,11 @@ Overfull \hbox (66.39021pt too wide) in paragraph at lines 596--598
  []
 
 [14 <./images/amm_example.png (PNG copy)>]
-<images/modes_faces.png, id=266, 317.68687pt x 173.89969pt>
+<images/modes_faces.png, id=286, 317.68687pt x 173.89969pt>
 File: images/modes_faces.png Graphic file (type png)
 
 <use images/modes_faces.png> [15 <./images/modes_faces.png (PNG copy)>]
-[16] [17] <images/pinhole.png, id=307, 563.85657pt x 220.57407pt>
+[16] [17] <images/pinhole.png, id=327, 563.85657pt x 220.57407pt>
 File: images/pinhole.png Graphic file (type png)
 
 <use images/pinhole.png>
@@ -571,7 +571,7 @@ Overfull \hbox (7.48096pt too wide) in paragraph at lines 885--886
  []
 
 [18] [19 <./images/pinhole.png (PNG copy)>]
-<images/weak_persp.png, id=326, 609.02531pt x 246.1697pt>
+<images/weak_persp.png, id=346, 609.02531pt x 246.1697pt>
 File: images/weak_persp.png Graphic file (type png)
 
 <use images/weak_persp.png>
@@ -580,11 +580,11 @@ Overfull \hbox (41.35742pt too wide) in paragraph at lines 962--964
  []
 
 [20 <./images/weak_persp.png (PNG copy)>]
-<images/camera_object5.png, id=335, 721.69624pt x 290.08376pt>
+<images/camera_object5.png, id=355, 721.69624pt x 290.08376pt>
 File: images/camera_object5.png Graphic file (type png)
 
 <use images/camera_object5.png> [21 <./images/camera_object5.png>]
-<images/rotation.png, id=345, 565.36218pt x 326.72063pt>
+<images/rotation.png, id=365, 565.36218pt x 326.72063pt>
 File: images/rotation.png Graphic file (type png)
 
 <use images/rotation.png>
@@ -593,10 +593,10 @@ Overfull \hbox (8.61015pt too wide) in paragraph at lines 1056--1061
  []
 
 [22] [23 <./images/rotation.png (PNG copy)>]
-<images/fx.png, id=365, 602.25pt x 432.61626pt>
+<images/fx.png, id=385, 602.25pt x 432.61626pt>
 File: images/fx.png Graphic file (type png)
  <use images/fx.png>
-<images/gx.png, id=366, 401.5pt x 359.3425pt>
+<images/gx.png, id=386, 401.5pt x 359.3425pt>
 File: images/gx.png Graphic file (type png)
  <use images/gx.png> [24 <./images/fx.png> <./images/gx.png>] [25] [26]
 Underfull \hbox (badness 10000) in paragraph at lines 1274--1276
@@ -618,17 +618,29 @@ Underfull \hbox (badness 10000) in paragraph at lines 1301--1305
 
  []
 
-<images/amoeba.png, id=410, 602.25pt x 602.25pt>
+<images/amoeba.png, id=430, 602.25pt x 602.25pt>
 File: images/amoeba.png Graphic file (type png)
  <use images/amoeba.png>
-[27] (./thesis.bbl [28 <./images/amoeba.png>] [29
+[27] [28 <./images/amoeba.png>]
+Chapter 3.
+[29
 
-]) [30] (./thesis.aux) ) 
+] [30]
+Chapter 4.
+[31
+
+]
+Chapter 5.
+(./thesis.bbl [32
+
+] [33
+
+]) [34] (./thesis.aux) ) 
 Here is how much of TeX's memory you used:
- 6636 strings out of 95086
- 95876 string characters out of 1183256
- 158108 words of memory out of 1500000
- 9536 multiletter control sequences out of 10000+50000
+ 6651 strings out of 95086
+ 96020 string characters out of 1183256
+ 158193 words of memory out of 1500000
+ 9542 multiletter control sequences out of 10000+50000
  19578 words of font info for 72 fonts, out of 1200000 for 2000
  28 hyphenation exceptions out of 8191
  43i,14n,43p,541b,426s stack positions out of 5000i,500n,6000p,200000b,5000s
@@ -649,9 +661,9 @@ y/cm/cmsy8.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmti10.pfb></us
 r/share/texmf-texlive/fonts/type1/bluesky/cm/cmti12.pfb></usr/share/texmf-texli
 ve/fonts/type1/bluesky/ams/msbm10.pfb></usr/share/texmf-texlive/fonts/type1/hoe
 kwater/rsfs/rsfs10.pfb>
-Output written on thesis.pdf (31 pages, 1691231 bytes).
+Output written on thesis.pdf (35 pages, 1699794 bytes).
 PDF statistics:
- 538 PDF objects out of 1000 (max. 8388607)
- 136 named destinations out of 1000 (max. 131072)
- 229 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 580 PDF objects out of 1000 (max. 8388607)
+ 145 named destinations out of 1000 (max. 131072)
+ 261 words of extra memory for PDF output out of 10000 (max. 10000000)
 

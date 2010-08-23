@@ -80,6 +80,11 @@ J.~Nelder S.~Singer.
 \newblock
   [http://www.scholar-\linebreak[1]pedia.org/article/Nelder-Mead\_algorithm].
 
+\bibitem{deformTri}
+Robert~W. Sumner and Jovan Popovic.
+\newblock Deformation transfer for triangle meshes.
+\newblock {\em SIGGRAPH}, 2004.
+
 \bibitem{eigenfaces91}
 M.~Turk and A.~Pentland.
 \newblock Eigenfaces for recognition.

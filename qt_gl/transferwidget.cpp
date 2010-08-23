@@ -18,6 +18,7 @@
 
 #include "neldermeadoptimizer.h"
 #include "closedformoptimizer.h"
+#include "nnlsoptimizer.h"
 
 using namespace cv;
 using namespace std;
@@ -64,11 +65,42 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
     connect(timer, SIGNAL(timeout()), this, SLOT(captureFrame()));
 
 
-    //m = imread("/home/martin/iowndis.png");
-    //img = cvLoadImage("/home/martin/iowndis.png");
-    //std::cout << img->nChannels <<" " << img->depth << " " <<   IPL_DEPTH_8U << std::endl;
+    //initalize the camera based on precalculated intrinsic parameters
+    //283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}
+    //389.515 0 303.703 0 394.657 159.174 0 0 1
+    //initialize intrinsic parameters of the camera
+    //double mat[3][3] = {{389.515, 0, 303.703},{0, 394.657, 159.174},{0, 0, 1}};
+    //     double mat[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}};
+    //    cameraMatrix = Mat(3,3,CV_64F,mat);
+    cameraMatrix = Mat_<double>(3,3);
+    cameraMatrix(0,0) = 900;//589.515;
+    cameraMatrix(0,1) = 0;
+    cameraMatrix(0,2) = 337.789;//303.703;
+    cameraMatrix(1,0) = 0;
+    cameraMatrix(1,1) = 900;//594.657;
+    cameraMatrix(1,2) = 299.076;//159.174;
+    cameraMatrix(2,0) = 0;
+    cameraMatrix(2,1) = 0;
+    cameraMatrix(2,2) = 1;
 
 
+    //double l[1][5] = {{-0.0865513, 0.197476, 0.00430749, 0.0072667, -0.114125}};
+    //-0.20357 0.423957 -0.00415811 -0.00633922 -0.295448
+    //double l[1][5] = {{-0.20357, 0.423957, -0.00415811, -0.00633922, -0.295448}};
+    lensDist = Mat_<double>(1,5);
+//    lensDist(0,0) = -0.20357;
+//    lensDist(0,1) = 0.423957;
+//    lensDist(0,2) = -0.00415811;
+//    lensDist(0,3) = -0.00633922;
+//    lensDist(0,4) = -0.295448;
+        lensDist(0,0) = 0;
+        lensDist(0,1) = 0;
+        lensDist(0,2) = 0;
+        lensDist(0,3) = 0;
+        lensDist(0,4) = 0;
+
+
+    //setup video
     Mat m;
     grabThumbnailForVideo(fileName.toStdString(),m);
 
@@ -92,39 +124,9 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
      cout << "frame count is : " << frameCount << endl;     
 
 
-     //initalize the camera based on precalculated intrinsic parameters
-     //283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}
-    //389.515 0 303.703 0 394.657 159.174 0 0 1
-    //initialize intrinsic parameters of the camera
-    //double mat[3][3] = {{389.515, 0, 303.703},{0, 394.657, 159.174},{0, 0, 1}};
-//     double mat[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}};
-//    cameraMatrix = Mat(3,3,CV_64F,mat);
-    cameraMatrix = Mat_<double>(3,3);
-    cameraMatrix(0,0) = 389.515;
-    cameraMatrix(0,1) = 0;
-    cameraMatrix(0,2) = 337.789;//303.703;
-    cameraMatrix(1,0) = 0;
-    cameraMatrix(1,1) = 394.657;
-    cameraMatrix(1,2) = 299.076;//159.174;
-    cameraMatrix(2,0) = 0;
-    cameraMatrix(2,1) = 0;
-    cameraMatrix(2,2) = 1;
+    NNLSOptimizer *nnls = new NNLSOptimizer();
+    nnls->test();
 
-
-    //double l[1][5] = {{-0.0865513, 0.197476, 0.00430749, 0.0072667, -0.114125}};
-    //-0.20357 0.423957 -0.00415811 -0.00633922 -0.295448
-    //double l[1][5] = {{-0.20357, 0.423957, -0.00415811, -0.00633922, -0.295448}};
-    lensDist = Mat_<double>(1,5);
-    lensDist(0,0) = -0.20357;
-    lensDist(0,1) = 0.423957;
-    lensDist(0,2) = -0.00415811;
-    lensDist(0,3) = -0.00633922;
-    lensDist(0,4) = -0.295448;
-//    lensDist(0,0) = 0;
-//    lensDist(0,1) = 0;
-//    lensDist(0,0) = 0;
-//    lensDist(0,1) = 0;
-//    lensDist(0,1) = 0;
 }
 
 ClickableQLabel* TransferWidget::getPicLabel() const
@@ -231,6 +233,7 @@ void TransferWidget::processVideo()
     //point indices
     vector<vector<int> >point_indices;
     vector<int> indices;
+    vector<int> nextIndices;
     bool useExt = false;
     Face *face_ptr = new Face();
     double *w_id = new double[56];
@@ -287,53 +290,75 @@ void TransferWidget::processVideo()
 
     featurePoints.push_back(currentPoints);
 
+    cout << "feature points bfore" << endl;
+    for(int i=0;i<featurePoints[0].size();i++)
+        cout << featurePoints[0][i].x << " " << featurePoints[0][i].y << endl;
+
     vector<Mat>::iterator it = frameData.begin(),
     it_last = frameData.begin(),
     it_end = frameData.end();
 
+    //estimate the pose in the first frame
+    paramOptimizer = new NNLSOptimizer();    
+
+    //place feature point indices in indices
+    indices.insert(indices.begin(),Face::fPoints,Face::fPoints+Face::fPoints_size);
+    point_indices.push_back(indices);
+
+    cout << "now first frame pose " << endl;
+    //calculate the rot,trans of the intial frame
+    paramOptimizer->calculateTransformation(featurePoints[0],face_ptr,cameraMatrix,lensDist,indices,rvec,tvec,useExt);
+    frameRotation.push_back(rvec.clone());
+    frameTranslation.push_back(tvec.clone());
+    useExt |= true;
+    
+    newPoints.clear();
+    cout << "now new points " << endl;
+    paramOptimizer->generatePoints(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,20,face_ptr,newPoints,indices);
+    //add new points so that we start tracking them
+    //we arent actually altering the first featurePoints[0] just the rest throught compute flow
+    cout << "cur points b4 " << currentPoints.size() << endl;
+    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+    cout << " after " << currentPoints.size() << endl;
+
     for(;it != it_end; ++it)
     {
-        flowEngine->computeFlow(*it_last,*it,currentPoints,nextPoints);
+        flowEngine->computeFlow(*it_last,*it,currentPoints,nextPoints,indices,nextIndices);
         it_last = it;
 
         featurePoints.push_back(nextPoints);
+        point_indices.push_back(nextIndices);
         currentPoints.clear();
+        indices.clear();
         //assigns a copy of next points as the new content for currentPoints
         currentPoints = nextPoints;
+        indices = nextIndices;
         nextPoints.clear();
+        nextIndices.clear();
     }
 
-    NelderMeadOptimizer *nel = new NelderMeadOptimizer();
-    ClosedFormOptimizer *closed = new ClosedFormOptimizer();
-
-    const unsigned int FRAME_NUMBER = frameData.size();
-    for(unsigned int i=0;i<FRAME_MAX;++i)
+    FRAME_MAX = 3;
+    
+    for(unsigned int i=1;i<FRAME_MAX;++i)
     {
-        if(i==0)
-            paramOptimizer = nel;
-        else
-            paramOptimizer = closed;
         /**********************/
         /*estimate pose*/
         /**********************/
 
         //estimate the pose parameters and place estimations into vectors rotations and translations
         //the rotations vector holds the rodrigues rotation vectors which can be converted to a rotation matrix
-        paramOptimizer->calculateTransformation(featurePoints[i],face_ptr,cameraMatrix,lensDist,rvec,tvec,useExt);
+        paramOptimizer->calculateTransformation(featurePoints[i],face_ptr,cameraMatrix,lensDist,point_indices[i],rvec,tvec,useExt);
         frameRotation.push_back(rvec.clone());
         frameTranslation.push_back(tvec.clone());
         useExt |= true;
+    }
 
-        //generate points to improve tracking
-        //and to obtain point indices
-        indices.clear();
-        paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,newPoints,indices);
-//        cout << "ugh " << endl;
-        if(i>0)
-            paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,featurePoints[i],indices,true,false);
-        point_indices.push_back(indices);
+    cout << "feature points after" << endl;
+    for(int i=0;i<featurePoints[0].size();i++)
+        cout << featurePoints[0][i].x << " " << featurePoints[0][i].y << endl;
 
-
+    for(unsigned int i=0;i<FRAME_MAX;++i)
+    {
         /**********************/
         /*estimate model parameters + pose*/
         /**********************/
@@ -345,16 +370,10 @@ void TransferWidget::processVideo()
         vector_weights_exp.push_back(weights_exp);
         vector_weights_id.push_back(weights_id);
 
-        //generate points to improve tracking
-        newPoints.clear();
-
-        bool weakP = false;
-        if(i > 0)
-            weakP = true;
         //could overload generatePoints in closedform optim to do weak perspective
-        paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,newPoints,point_indices[i],false,weakP);
-
-        //paramOptimizer->generatePoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,FRAME_NUMBER,face_ptr,newPoints,point_indices[i],true,true);
+        cout << "frame : " << i << endl;
+        newPoints.clear();
+        paramOptimizer->weakPerspectiveProjectPoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,point_indices[i],face_ptr,newPoints);
         generatedPoints.push_back(newPoints);
     }
     timerReplay = new QTimer(this);
@@ -479,6 +498,7 @@ void TransferWidget::startFaceTransfer()
 
     //first align our face guess over the marked feature points
     vector<Point2f> marked = picLabel->getMarked();
+
     //marked points should get recentered but we are gonna get rid of shifts anyway
     //marked points are ordered (should be ordered if the user clicked correctly)
     //the order is the same as the index order in fPoints
@@ -490,11 +510,18 @@ void TransferWidget::startFaceTransfer()
     for(; it != it_end; ++it)
         cout << *it << " ";
     cout << endl;
+    lensDist(0,0) = 0;
+    lensDist(0,1) = 0;
+    lensDist(0,2) = 0;
+    lensDist(0,3) = 0;
+    lensDist(0,4) = 0;
 
     //setup the result vectors for the extrinsic parameters
     Mat_<double> rvec, tvec;
 
-    paramOptimizer->calculateTransformation(marked,face_ptr,cameraMatrix,lensDist,rvec,tvec,false);
+
+    vector<int> indices(Face::fPoints,Face::fPoints+Face::fPoints_size);
+    paramOptimizer->calculateTransformation(marked,face_ptr,cameraMatrix,lensDist,indices,rvec,tvec,false);
 
     Mat_<double> rmatrix;
     //convert the rotation vector to a rotation matrix
@@ -564,7 +591,7 @@ void TransferWidget::startFaceTransfer()
 
     double fovy, fovx, fl, aratio;
     Point2d pp;
-    cv::calibrationMatrixValues(cameraMatrix,frames[0].size(),200,200,fovx,fovy,fl,pp,aratio);
+    cv::calibrationMatrixValues(cameraMatrix,frames[frames.size()-1].size(),200,200,fovx,fovy,fl,pp,aratio);
 
     cout << "fovx " << fovx << " fovy " << fovy << " focal length " << fl
          << " pp.x " << pp.x << " pp.y " << pp.y << " aratio " << aratio << endl;
@@ -574,7 +601,7 @@ void TransferWidget::startFaceTransfer()
 
     for(int i=0; i<Face::fPoints_size; i++)
     {
-        p = face_ptr->getPointFromPolygon(Face::fPoints[i]);
+        p = face_ptr->getPoint(Face::fPoints[i]);
         point3dMat(0,0) = p.x;
         point3dMat(1,0) = p.y;
         point3dMat(2,0) = p.z;
@@ -599,6 +626,7 @@ void TransferWidget::startFaceTransfer()
 
         points.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));
     }
+
     picLabel->setMarked(points);
 
     double euler_x = rot_x * 180./PI;
@@ -672,6 +700,13 @@ void TransferWidget::grabThumbnailForVideo(string videoName, Mat& thumbnail)
     cap >> frame;
     cvtColor(frame, thumbnail, CV_BGR2RGB);
 
+
+    double c_x = thumbnail.size().width / 2.;
+    double c_y = thumbnail.size().height / 2.;
+    //set this when you load a video
+    cameraMatrix.at<double>(0,2) = c_x;
+    cameraMatrix.at<double>(1,2) = c_y;
+
     cap.release();
 }
 
@@ -704,9 +739,11 @@ void TransferWidget::restartCapturing()
     picLabel->clearMarked();
     flowLabel->clearMarked();
 
-    Mat m;
+    Mat m,um;
 
     grabThumbnailForVideo(fileName.toStdString(),m);
+
+    //undistort(m,um,cameraMatrix,lensDist);
     frames.push_back(m);
 
     QImage img_q = mat2QImage(m);
@@ -844,6 +881,7 @@ void TransferWidget::video_file_changed(const QString str)
 {
     cout << str.toStdString() << endl;
     fileName = str;
+
     restartCapturing();
 }
 

@@ -17,3 +17,7 @@
 \BOOKMARK [2][-]{subsection.2.3.1}{Kanade-Lucas-Tomasi Feature Tracker}{section.2.3}
 \BOOKMARK [1][-]{section.2.4}{Optimization}{chapter.2}
 \BOOKMARK [2][-]{subsection.2.4.1}{Nelder Mead Downhill Simplex}{section.2.4}
+\BOOKMARK [0][-]{chapter.3}{Design and Implementation}{}
+\BOOKMARK [1][-]{section.3.1}{Tensor-based Model of the Face}{chapter.3}
+\BOOKMARK [0][-]{chapter.4}{Results and Evaluation}{}
+\BOOKMARK [0][-]{chapter.5}{Conclusion}{}

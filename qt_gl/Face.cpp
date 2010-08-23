@@ -69,9 +69,35 @@ Face::~Face()
   //delete[] texture_2d_coord;
 }
   
-const int Face::fPoints[20] = {9521,8899,310,7240,1183,8934,8945,6284,7140,8197,
-                                    2080,2851,3580,6058,8825,1680,3907,8144,6540,2519};
+const int Face::fPoints[20] = {4925,4609,261,3878,702,4733,4632,3285,3828,4147,
+                                    1058,1451,1824,3278,4572,953,1992,4332,3196,1930};
+const int Face::fPolygons[20] = {9521,8899,310,7455,1386,8934,8945,6284,7140,8197,
+                                    2080,2851,3580,6058,8825,1680,3907,8144,6111,3786};
 const int Face::fPoints_size = 20;
+
+
+double Face::getAverageDepth() const
+{
+    double zavg = 0;
+    if(point_num == 0)
+        return 0.0;
+
+    for(int i=0;i<point_num;i++)
+        zavg += vertexes[i].z;
+
+    zavg /= point_num;
+
+    return zavg;
+}
+
+//changes the average depth of the face
+//compute the current average and moves it
+void Face::setAverageDepth(double d)
+{
+    double avg = getAverageDepth();
+    for(int i=0;i<point_num;i++)
+        vertexes[i].z = vertexes[i].z - avg + d;
+}
 
 int Face::getPolyNum() const
 {
@@ -158,6 +184,16 @@ Point3 Face::getPointFromPolygon(int index)
 {
     int p_index = triangles[index][0];
     return vertexes[p_index];
+}
+
+Point3 Face::getPoint(int index) const
+{
+    return vertexes[index];
+}
+
+int Face::getPointNum() const
+{
+    return point_num;
 }
 
 int Face::getPointIndexFromPolygon(int index)

@@ -71,8 +71,8 @@ void FaceWidget::render()
   float (*triangles)[3] = face_ptr->triangles;
 
   vector<int>::iterator result;
-  vector<int> fPoints;
-  fPoints.assign(Face::fPoints,Face::fPoints+Face::fPoints_size);
+  vector<int> fPoly;
+  fPoly.assign(Face::fPolygons,Face::fPolygons+Face::fPoints_size);
 
   //nothing to render
   if(face_ptr == NULL)
@@ -86,10 +86,10 @@ void FaceWidget::render()
       v3 = triangles[i][2];
 
       //try to find if polygon i is a feature point
-      result = std::find(fPoints.begin(),fPoints.end(),i);
+      result = std::find(fPoly.begin(),fPoly.end(),i);
 
       //if the polygon i was double clicked or is a feature point .. highlight it
-      if(i == face_index || result != fPoints.end())
+      if(i == face_index || result != fPoly.end())
       {
           // enable color tracking
           glEnable(GL_COLOR_MATERIAL);
@@ -223,7 +223,10 @@ void FaceWidget::paintGL(void)
   glPopMatrix();
 
 
-  //move the objects by:
+  //move the objects by: we dont really need to display this
+  //since the objects may get smaller after param optimization
+  //we would have to consider them getting smaller and move camera
+  //by this too or something .. its just very messy
   //glTranslatef(trans_x,trans_y,trans_z);
 
   //rotations which will be updated anytime the values of rot_x, rot_y change
@@ -273,6 +276,7 @@ void FaceWidget::mouseDoubleClickEvent(QMouseEvent *event)
 {
     face_index = selectPoint(event->pos());
     cout << "FACE INDEX " << face_index << endl;    
+    cout << "POINT INDEX " << face_ptr->getPointIndexFromPolygon(face_index) << endl;
     updateGL();
 }
 

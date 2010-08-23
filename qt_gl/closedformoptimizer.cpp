@@ -79,7 +79,7 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
 
     //preprocess points and core tensor rows
     //for points subtract translation too
-    for(int i=0;i<featurePoints.size();i++)
+    for(unsigned int i=0;i<featurePoints.size();i++)
     {        
         fi = Mat_<double>(2,1);
         fi(0,0) = featurePoints[i].x;
@@ -92,7 +92,7 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
     M = Mat_<double>(3*featurePoints.size(),exr_size*id_size);
     Mi = Mat_<double>(3,exr_size,id_size);
 
-    for(int i=0;i<point_indices.size();++i)
+    for(unsigned int i=0;i<point_indices.size();++i)
     {
         index = point_indices[i];
         Mi = core.submatrix( index*3 , index*3 + 2 );        
@@ -115,7 +115,7 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
     pr = weakCamera*rmatrix;
     PR = Mat_<double>::zeros(2*featurePoints.size(),3*featurePoints.size());
     PRT = Mat_<double>(3*featurePoints.size(),2*featurePoints.size());
-    for(int i=0;i<featurePoints.size();i++)
+    for(unsigned int i=0;i<featurePoints.size();i++)
     {
         PR(Range(2*i,2*i+2),Range(3*i,3*i+3)) = pr + 0;
     }

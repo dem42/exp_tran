@@ -1,7 +1,7 @@
 #include "nnlsoptimizer.h"
 #include "FaceModel.h"
 
-NNLSOptimizer::NNLSOptimizer() : NNLS_MAX_ITER(1000), max_iterations(1)
+NNLSOptimizer::NNLSOptimizer() : NNLS_MAX_ITER(1000), max_iterations(3)
 {
 
 
@@ -105,6 +105,7 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
     Matrix lin_comb_y(id_size,1);
 
     double Z_avg;
+    double average_depth;
     Point3f p;
     Mat_<double> proP;
     Mat_<double> pM(3,1);
@@ -115,10 +116,11 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
     //get weights from the current face instance
     face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
     p = face_ptr->getPointFromPolygon(7403);
-    cout << "huh2" << endl;
+    average_depth = face_ptr->getAverageDepth();
+    cout << "huh2 avg depth : " << face_ptr->getAverageDepth() << endl;
     pM(0,0) = p.x;
     pM(1,0) = p.y;
-    pM(2,0) = p.z;
+    pM(2,0) = face_ptr->getAverageDepth();
     cout << "face is at a distance " << p.z << endl;
     proP = cameraMatrix*rmatrix*pM;
     proP = proP + cameraMatrix*translation;
@@ -138,24 +140,27 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
     //precompute translation
     Pt = (1/translation.at<double>(2,0)) * (weakCamera*translation);
 
+    cout << "here " << featurePoints.size() << " &  " << point_indices.size() << endl;
     //preprocess points and core tensor rows
     //for points subtract translation too
-    for(int i=0;i<featurePoints.size();i++)
-    {
+    for(unsigned int i=0;i<featurePoints.size();i++)
+    {        
         fi = Mat_<double>(2,1);
         fi(0,0) = featurePoints[i].x;
         fi(1,0) = featurePoints[i].y;
+
         fi = fi - Pt;
         f.row(2*i) = fi.row(0) + 0;
-        f.row(2*i+1) = fi.row(1) + 0;
+        f.row(2*i+1) = fi.row(1) + 0;        
     }
 
     M = Mat_<double>(3*featurePoints.size(),exr_size*id_size);
     Mi = Mat_<double>(3,exr_size,id_size);
 
-    for(int i=0;i<point_indices.size();++i)
+    for(unsigned int i=0;i<point_indices.size();++i)
     {
         index = point_indices[i];
+        cout << "hey : " << index << endl;
         Mi = core.submatrix( index*3 , index*3 + 2 );
         M.row(3*i) = Mi.row(0) + 0;
         M.row(3*i+1) = Mi.row(1) + 0;
@@ -169,12 +174,13 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
     for(int i=0;i<id_size;i++)
         y_t(0,i) = y(i,0) = w_id[i];
 
+    cout << "and here! " << endl;
 
     //initialize variables which dont need to be computed at every step    
     pr = (1.0/Z_avg)*weakCamera*rmatrix;
     PR = Mat_<double>::zeros(2*featurePoints.size(),3*featurePoints.size());
     PRT = Mat_<double>(3*featurePoints.size(),2*featurePoints.size());
-    for(int i=0;i<featurePoints.size();i++)
+    for(unsigned int i=0;i<featurePoints.size();i++)
     {
         PR(Range(2*i,2*i+2),Range(3*i,3*i+3)) = pr + 0;
     }
@@ -316,7 +322,9 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
     }
     cout << endl;
 
-    //face_ptr->interpolate(w_id,w_exp);
+    face_ptr->interpolate(w_id,w_exp);
+    cout << " avg depth after : " << face_ptr->getAverageDepth() << "avg depth before : " << average_depth << endl;
+    face_ptr->setAverageDepth(average_depth);
 
     delete[] w_id;
     delete[] w_exp;

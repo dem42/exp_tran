@@ -28,3 +28,7 @@
 \contentsline {section}{\numberline {2.4}Optimization}{26}{section.2.4}
 \contentsline {subsection}{\numberline {2.4.1}Nelder Mead Downhill Simplex}{26}{subsection.2.4.1}
 \contentsline {subsubsection}{The Downhill Simplex Algorithm}{26}{section*.12}
+\contentsline {chapter}{\numberline {3}Design and Implementation}{29}{chapter.3}
+\contentsline {section}{\numberline {3.1}Tensor-based Model of the Face}{29}{section.3.1}
+\contentsline {chapter}{\numberline {4}Results and Evaluation}{31}{chapter.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{32}{chapter.5}

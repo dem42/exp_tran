@@ -73,7 +73,7 @@ private:
 
     //frameHistory .. this includes dropped frames and first frame
     std::vector<cv::Mat> frames;
-    const unsigned int FRAME_MAX;
+    unsigned int FRAME_MAX;
 
     //object responsible for computing
     //optical flow

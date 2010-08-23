@@ -612,7 +612,7 @@ fundamentally different sources. Thus, it is impossible to only alter one
 variational source while leaving the other source constant. This makes the
 models unsuitable for expression transfer.
 
-\subsection{Tensor-Based Model}
+\subsection{Tensor-Based Model}\label{works}
 The possibility of using a multilinear approach to construct face models for face transfer was explored
 by Vlasic, Brand, Pfister and Popovic \cite{faceTransfer05}. The group
 successfully managed to implemented a face transfer application based on
@@ -1341,10 +1341,59 @@ Since either of these criteria could occur in a single anomalous step,
 restarts of the downhill algorithm are also sometimes utilized \cite{Press1992}. 
 
 
+\chapter{Design and Implementation}
+
+The purpose of the application is to transfer the expressions between two
+subjects. Given are video recordings of two persons and a database of
+faces. One recording is the source of the expressions, henceforth just source. The
+other recording is the target. The goal is to alter the target recording so that
+the target person's face is animated to perform the expressions seen in the
+source.
+
+We approach this problem by constructing a deformable model of a face from the
+face database. The model is constructed so that every expression corresponds to a specific instance of the model
+parameters. The model is fitted frame-by-frame to the source recording, wherein
+the face is located and the model parameters are estimated. The model
+is also fitted to the target recording to obtain a model of the target face. The
+parameters from the source model are then used to animate the target model.
+
+\section{Tensor-based Model of the Face}
+The main task of the application is to manipulate the expression and
+identity of the model separately. This suggests that the optimal model should have
+separate parameters for these two attributes, to allow the user to manipulate
+the identity independently of the expression or vice versa.
+The tensor-based model is our deformable model of choice. As discussed in
+section \ref{works}, the tensor-based model it possess the very
+important quality of separability.
+
+The primary drawback to the tensor-based model is that it requires the faces in
+the database to be in \textit{correspondence}. For the purpose of this
+application we consider two polygon meshes to be in correspondence
+if for any point in one polygon mesh the point in the other polygon mesh, which corresponds to the
+same position on the object, has the same index value. So for example if the
+point corresponding to the tip of the nose has an index value of $i$ in one
+face, then a in the other face there  will be a point with perhaps
+different $x$, $y$ and $z$ but the same $i$ index that also corresponds to the
+tip of the nose. So essentially, the order of the indices must be the same in both
+polygon meshes which represent the faces. 
+
+In the case when the two polygon meshes are not in correspondence, then a
+optimization algorithm must be applied to defrom the mesh to correspond to a
+reference mesh. There may be fewer vertices, which in turn requires
+generation of new vertices in the mesh. Or the vertices can be have a different
+ordering than in the reference mesh. In both cases the minimal deformation of
+the object that transforms the mesh into the reference mesh. Sumner and Popovic \cite{deformTri}
+describe an algorithm to transfer deformation between triangle meshes. This
+algorithm is suitable when meshes are not in correspondence.
+
+The database used for our appliaction is the Brighthampton database
+
+\chapter{Results and Evaluation}
+
+\chapter{Conclusion}
+
 
 \bibliographystyle{plain}
 \bibliography{references}
 
 \end{document}
-
-% LocalWords:  Nelder Dantzig's

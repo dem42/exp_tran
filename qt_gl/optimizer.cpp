@@ -5,13 +5,13 @@
 
 void Optimizer::generatePoints(const Mat &rotation, const Mat &translation,
                                const Mat& cameraMatrix, const Mat& lensDist,
-                               int frame_number, Face *face_ptr,
+                               int pnumber, Face *face_ptr,
                                vector<Point2f> &generatedPoints,
-                               vector<int> &point_indices, bool newPoints ,bool test)
+                               vector<int> &point_indices)
 {
     int random;
     double low = 0;
-    double high = face_ptr->getPolyNum();
+    double high = face_ptr->getPointNum();
     cout << "HIGH is : " << high << endl;
 
     vector<Point3f> objectPoints;
@@ -25,9 +25,8 @@ void Optimizer::generatePoints(const Mat &rotation, const Mat &translation,
     //seed our pseudorandom number generator to give different numbers each time
     srand( (unsigned int)time(0) );
 
-    int MAX = Face::fPoints_size;
-    if(newPoints == true)
-        MAX = 500;
+    double zavg = 0;
+    int MAX = pnumber;
     for(int i=0;i<MAX;i++)
     {
         //now generate random numbers from range based on unifrom sampling dist formula
@@ -37,42 +36,23 @@ void Optimizer::generatePoints(const Mat &rotation, const Mat &translation,
         //U = a + (b-a+1)*rand()/(1+RAND_MAX);
         random = low + (high - low + 1.0)*rand()/(1.0 + RAND_MAX);
 
-        if(newPoints == false)
-        {
-            cout << "omg nice bday" << endl;
-            p = face_ptr->getPointFromPolygon(Face::fPoints[i]);
-            point_indices.push_back(face_ptr->getPointIndexFromPolygon(Face::fPoints[i]));
-        }
-        else
-        {
-            cout << " yeah thnx " << endl;
-            p = face_ptr->getPointFromPolygon(random);
-            point_indices.push_back(face_ptr->getPointIndexFromPolygon(random));
-        }
+        p = face_ptr->getPoint(random);
+        point_indices.push_back(random);
 
         point3dMat(0,0) = p.x;
         point3dMat(1,0) = p.y;
-        point3dMat(2,0) = p.z;
+        point3dMat(2,0) = face_ptr->getAverageDepth();
 
         Rodrigues(rotation,rmatrix);
         transpose = translation;
 
-        if(test == false)
-        {
+        point2dMat = cameraMatrix*((rmatrix * point3dMat) + transpose);
 
-            point2dMat = cameraMatrix*((rmatrix * point3dMat) + transpose);
-
-            //homogenous coord
-
-            point2dMat(0,0) /= point2dMat(2,0);
-            point2dMat(1,0) /= point2dMat(2,0);
-        }
-        else
-        {
-            Mat_<double> Pt = (1./transpose(0,2))*(cameraMatrix*transpose);
-            point2dMat = cameraMatrix*(rmatrix * point3dMat) + Pt;
-        }
-
+        //homogenous coord
+        if(zavg == 0)
+            zavg = point2dMat(2,0);
+        cout << "zavg : " << zavg << " point z : " << point2dMat(2,0) << endl;
+        point2dMat  = (1./zavg)*point2dMat;
 
         cout << "feature point : " << point3dMat(0,0) << " " << point3dMat(1,0) << " " << point3dMat(2,0) << endl;
         cout << "generated new point : " << point2dMat(0,0) << " " << point2dMat(1,0) << endl;
@@ -81,9 +61,39 @@ void Optimizer::generatePoints(const Mat &rotation, const Mat &translation,
     }
 }
 
+void Optimizer::weakPerspectiveProjectPoints(const Mat &rotation, const Mat &translation,
+                                             const Mat& cameraMatrix, const Mat& lensDist,
+                                             const vector<int> &point_indices, Face *face_ptr,
+                                             vector<Point2f> &projectedPoints)
+{
+    Point3f p;
+    Mat_<double> point3dMat(3,1);
+    Mat_<double> point2dMat(3,1);
+    Mat_<double> transpose;
+    Mat_<double> rmatrix;
+
+    for(unsigned int i=0;i<point_indices.size();i++)
+    {        
+        p = face_ptr->getPoint(point_indices[i]);
+
+        point3dMat(0,0) = p.x;
+        point3dMat(1,0) = p.y;
+        point3dMat(2,0) = face_ptr->getAverageDepth();
+
+        Rodrigues(rotation,rmatrix);
+        transpose = translation;
+
+        //homogenous and dehomogenized with zavg
+        point2dMat = cameraMatrix*((rmatrix * point3dMat) + transpose);
+        point2dMat  = (1./point2dMat(2,0))*point2dMat;
+
+        projectedPoints.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));
+    }
+}
 
 void Optimizer::calculateTransformation(const vector<Point2f> &imagePoints, Face *face_ptr,
                                         const Mat &cameraMatrix, const Mat &lensDist,
+                                        const vector<int> &indices,
                                         Mat &rvec,Mat &tvec,bool useExt)
 { 
     vector<Point3f> objectPoints;
@@ -91,9 +101,9 @@ void Optimizer::calculateTransformation(const vector<Point2f> &imagePoints, Face
     cout << " size of image points " << imagePoints.size() << endl;
 
     Point3f p3;
-    for(int i=0;i<Face::fPoints_size;i++)
+    for(int i=0;i<indices.size();i++)
     {
-        p3 = face_ptr->getPointFromPolygon(Face::fPoints[i]);
+        p3 = face_ptr->getPoint(indices[i]);
 
         //cout << "point at polygon " << face_ptr->getPointIndexFromPolygon(fPoints[i]) << endl;
 

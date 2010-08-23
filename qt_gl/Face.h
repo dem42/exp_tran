@@ -20,24 +20,37 @@ class Face
   void getWeights(double *w_id, int w_id_size, double *w_exp, int w_exp_size);
 
   int getPolyNum() const;
+  int getPointNum() const;
   Point3 getPointFromPolygon(int);
+  Point3 getPoint(int index) const;
   int getPointIndexFromPolygon(int);
 
+  //the following functions allow us to use weak perspective projection
+  //in conjunction with parameter estimation
+  //we never really consider the depth from points generated from the parameters we estimated
+  //instead we just use the average depth of the initial guess
+  //BUT .. do we lose the ability to scale? yes i think we do
+  double getAverageDepth() const;
+  void setAverageDepth(double d);
+
+  //used to position the frustum in opengl
   void calculateBoundingSphere(float&cx,float&cy,float&cz,float&diameter) const;
 
+
+  //vertexes are sorted and the points in triangles therefore as well
+  //so we do not need to worry about keeping cross product order consistent
+  //as long as we always calculate the cross product the same way in all triangles
+  //public to make the drawing happen in faceWidget but not lose efficient or cause a mem leak
   Point3 *vertexes;
   Vector3 *vertex_normals;
   float (*triangles)[3];
   static const int fPoints[20];
+  static const int fPolygons[20];
   static const int fPoints_size;
 
 private:
   void loadPolygonDataFromModel();
   //Vector3 *surface_normals;
-    
-  //vertexes are sorted and the points in triangles therefore as well
-  //so we do not need to worry about keeping cross product order consistent
-  //as long as we always calculate the cross product the same way in all triangles
 
   float (*texture_2d_coord)[2];
   Color3 *vertex_texture;  
