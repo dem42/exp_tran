@@ -4,31 +4,45 @@
 \contentsline {chapter}{\numberline {2}Background}{6}{chapter.2}
 \contentsline {section}{\numberline {2.1}Deformable Models}{6}{section.2.1}
 \contentsline {subsection}{\numberline {2.1.1}Physics Based Models}{7}{subsection.2.1.1}
-\contentsline {subsubsection}{Finite Element Method (FEM)}{7}{section*.2}
+\contentsline {subsubsection}{Finite Element Method (FEM)}{8}{section*.2}
 \contentsline {subsubsection}{Modal Analysis}{9}{section*.3}
 \contentsline {subsubsection}{Recovering shape with FEM}{10}{section*.4}
 \contentsline {subsubsection}{Combining Statistical and FEM modes}{10}{section*.5}
-\contentsline {subsection}{\numberline {2.1.2}Satistical Models}{10}{subsection.2.1.2}
-\contentsline {subsubsection}{PCA and Eigenfaces}{10}{section*.6}
-\contentsline {subsection}{\numberline {2.1.3}Statistical Models of Appearance}{12}{subsection.2.1.3}
-\contentsline {subsubsection}{Active Shape Model}{12}{section*.7}
-\contentsline {subsubsection}{Active Appearance Model}{13}{section*.8}
-\contentsline {subsection}{\numberline {2.1.4}Tensor-Based Model}{15}{subsection.2.1.4}
-\contentsline {subsection}{\numberline {2.1.5}Tensor-based Statistical Discriminant Method}{16}{subsection.2.1.5}
-\contentsline {subsection}{\numberline {2.1.6}Morphable Model}{17}{subsection.2.1.6}
-\contentsline {section}{\numberline {2.2}3D Pose Estimation !!! NEW}{18}{section.2.2}
-\contentsline {subsection}{\numberline {2.2.1}Camera Model}{18}{subsection.2.2.1}
-\contentsline {subsubsection}{Perspective Camera Model}{18}{section*.9}
-\contentsline {subsubsection}{Orthogonal Camera Model}{19}{section*.10}
-\contentsline {subsubsection}{Weak Perspective Camera Model}{20}{section*.11}
-\contentsline {subsection}{\numberline {2.2.2}Rotation and Translation}{21}{subsection.2.2.2}
-\contentsline {subsection}{\numberline {2.2.3}Pose estimation with the POSIT algorithm}{24}{subsection.2.2.3}
-\contentsline {section}{\numberline {2.3}Model-based tracking}{24}{section.2.3}
-\contentsline {subsection}{\numberline {2.3.1}Kanade-Lucas-Tomasi Feature Tracker}{24}{subsection.2.3.1}
-\contentsline {section}{\numberline {2.4}Optimization}{26}{section.2.4}
-\contentsline {subsection}{\numberline {2.4.1}Nelder Mead Downhill Simplex}{26}{subsection.2.4.1}
-\contentsline {subsubsection}{The Downhill Simplex Algorithm}{26}{section*.12}
-\contentsline {chapter}{\numberline {3}Design and Implementation}{29}{chapter.3}
-\contentsline {section}{\numberline {3.1}Tensor-based Model of the Face}{29}{section.3.1}
-\contentsline {chapter}{\numberline {4}Results and Evaluation}{31}{chapter.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{32}{chapter.5}
+\contentsline {subsection}{\numberline {2.1.2}Statistical Models}{10}{subsection.2.1.2}
+\contentsline {subsubsection}{PCA and Eigenfaces}{11}{section*.6}
+\contentsline {subsection}{\numberline {2.1.3}Morphable Model}{12}{subsection.2.1.3}
+\contentsline {subsection}{\numberline {2.1.4}Statistical Models of Appearance}{13}{subsection.2.1.4}
+\contentsline {subsubsection}{Active Shape Model}{13}{section*.7}
+\contentsline {subsubsection}{Active Appearance Model}{14}{section*.8}
+\contentsline {subsection}{\numberline {2.1.5}Tensor Models >>>>> NEW <<<<<<<}{16}{subsection.2.1.5}
+\contentsline {subsubsection}{Multilinear Algebra}{16}{section*.9}
+\contentsline {paragraph}{Tensors.}{16}{section*.10}
+\contentsline {paragraph}{Tensor Flattening.}{16}{section*.11}
+\contentsline {paragraph}{Frobenius Norm.}{17}{section*.12}
+\contentsline {paragraph}{Mode-$n$ product.}{17}{section*.13}
+\contentsline {paragraph}{High Order Singular Value Decomposition (HOSVD).}{17}{section*.14}
+\contentsline {paragraph}{HOSVD Algorithm.}{18}{section*.15}
+\contentsline {subsubsection}{Tensor-Based Model >>>>> ALTERED <<<<<<<}{19}{section*.16}
+\contentsline {subsubsection}{Tensor-based Statistical Discriminant Method}{20}{section*.17}
+\contentsline {section}{\numberline {2.2}3D Pose Estimation}{21}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Camera Model}{21}{subsection.2.2.1}
+\contentsline {subsubsection}{Perspective Camera Model}{21}{section*.18}
+\contentsline {subsubsection}{Orthogonal Camera Model}{22}{section*.19}
+\contentsline {subsubsection}{Weak Perspective Camera Model}{23}{section*.20}
+\contentsline {subsection}{\numberline {2.2.2}Rotation and Translation}{24}{subsection.2.2.2}
+\contentsline {subsection}{\numberline {2.2.3}Pose estimation with the POSIT algorithm}{27}{subsection.2.2.3}
+\contentsline {section}{\numberline {2.3}Model-based tracking}{27}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Kanade-Lucas-Tomasi Feature Tracker}{27}{subsection.2.3.1}
+\contentsline {section}{\numberline {2.4}Optimization}{29}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}Nelder Mead Downhill Simplex}{29}{subsection.2.4.1}
+\contentsline {subsubsection}{The Downhill Simplex Algorithm}{29}{section*.21}
+\contentsline {chapter}{\numberline {3}Design and Implementation >>>>> NEW <<<<<}{32}{chapter.3}
+\contentsline {section}{\numberline {3.1}Design Challenges}{33}{section.3.1}
+\contentsline {section}{\numberline {3.2}Pre-processing}{34}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Correspondence}{34}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}Database}{34}{subsection.3.2.2}
+\contentsline {section}{\numberline {3.3}Model Construction}{36}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Data Tensor}{36}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}Computing the HOSVD}{37}{subsection.3.3.2}
+\contentsline {chapter}{\numberline {4}Results and Evaluation}{39}{chapter.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{40}{chapter.5}

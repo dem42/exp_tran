@@ -7,45 +7,48 @@ Warning--empty year in jacey
 Warning--empty journal in sdm
 Warning--empty year in sdm
 Warning--empty journal in Nelder2009
-You've used 17 entries,
+Warning--empty journal in Ter2
+Warning--empty journal in binghamton
+Warning--empty year in binghamton
+You've used 23 entries,
             2118 wiz_defined-function locations,
-            591 strings with 6147 characters,
-and the built_in function-call counts, 4665 in all, are:
-= -- 448
-> -- 231
-< -- 1
-+ -- 92
-- -- 74
-* -- 293
-:= -- 836
-add.period$ -- 51
-call.type$ -- 17
-change.case$ -- 86
+            622 strings with 7016 characters,
+and the built_in function-call counts, 6544 in all, are:
+= -- 627
+> -- 318
+< -- 3
++ -- 127
+- -- 102
+* -- 406
+:= -- 1143
+add.period$ -- 68
+call.type$ -- 23
+change.case$ -- 118
 chr.to.int$ -- 0
-cite$ -- 22
-duplicate$ -- 186
-empty$ -- 343
-format.name$ -- 74
-if$ -- 936
+cite$ -- 31
+duplicate$ -- 272
+empty$ -- 495
+format.name$ -- 102
+if$ -- 1335
 int.to.chr$ -- 0
-int.to.str$ -- 17
-missing$ -- 18
-newline$ -- 88
-num.names$ -- 34
-pop$ -- 93
+int.to.str$ -- 23
+missing$ -- 23
+newline$ -- 117
+num.names$ -- 46
+pop$ -- 142
 preamble$ -- 1
-purify$ -- 71
+purify$ -- 97
 quote$ -- 0
-skip$ -- 135
+skip$ -- 195
 stack$ -- 0
-substring$ -- 187
-swap$ -- 23
-text.length$ -- 1
+substring$ -- 266
+swap$ -- 43
+text.length$ -- 3
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 64
-warning$ -- 5
-while$ -- 43
-width$ -- 19
-write$ -- 176
-(There were 5 warnings)
+type$ -- 88
+warning$ -- 8
+while$ -- 61
+width$ -- 25
+write$ -- 236
+(There were 8 warnings)

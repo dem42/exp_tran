@@ -8,28 +8,33 @@ Klaus-Juergen Bathe.
 \bibitem{blanz1}
 V.~Blanz, C.~Basso, T.~Poggio, and T.~Vetter.
 \newblock Reanimating faces in images and video.
-\newblock {\em EUROGRAPHICS 2003}, 22(3), 2003.
+\newblock {\em EUROGRAPHICS}, 22(3), 2003.
 
 \bibitem{blanz2}
 V.~Blanz, K.~Scherbaum, T.~Vetter, and H.P Seidel.
 \newblock Exchanging faces in images.
-\newblock {\em EUROGRAPHICS 2004}, 23(3), 2004.
+\newblock {\em EUROGRAPHICS}, 23(3), 2004.
 
 \bibitem{cootesOverview01}
 T.F. Cootes and C.J. Taylor.
-\newblock Statistical models of appearance for medical image analysis and
-  computer vision.
+\newblock Statistical {M}odels of {A}ppearance for {M}edical {I}mage {A}nalysis
+  and {C}omputer {V}ision.
 \newblock {\em Proc. SPIE Medical Imaging}, 2001.
 
 \bibitem{activeApp04}
 T.F. Cootes and C.J. Taylor.
-\newblock Statistical models of appearance for computer vision.
+\newblock Statistical {M}odels of {A}ppearance for {C}omputer {V}ision.
 \newblock mar 2004.
 
 \bibitem{lda}
 D.F. Gillies.
 \newblock Intelligent data and probabalistic inference lecture notes.
 \newblock {\em Imperial College London}, 2009.
+
+\bibitem{multilinear}
+L.~De Lathauwer.
+\newblock {\em Signal Processing based on Multilinear Algebra}.
+\newblock {Phd} dissertation, Katholieke Universitiet Leuven, Belgium, 1997.
 
 \bibitem{kanade}
 Bruce~D. Lucas and Takeo Kanade.
@@ -46,8 +51,8 @@ Dimitri Metaxas and Demetri Terzopoulos.
 
 \bibitem{jacey}
 Jacey-Lynn Minoi.
-\newblock {\em Geometric Expression Invariant 3D Face Recognition using
-  Statistical Discriminant Models}.
+\newblock {\em Geometric {E}xpression {I}nvariant 3D {F}ace {R}ecognition using
+  {S}tatistical {D}iscriminant {M}odels}.
 \newblock {Phd} dissertation, Imperial College London.
 
 \bibitem{sdm}
@@ -73,6 +78,12 @@ M.~Reiter.
 \newblock Neural computation ws 2006/2007 lecture notes.
 \newblock {\em Vienna University of Technology}, 2006.
 
+\bibitem{ICP}
+Szymon Rusinkiewicz and Marc Levoy.
+\newblock Efficient {V}ariants of the {ICP} {A}lgorithm.
+\newblock In {\em Third International Conference on 3-D Digital Imaging and
+  Modeling}, 2001.
+
 \bibitem{Nelder2009}
 J.~Nelder S.~Singer.
 \newblock Nelder-\textsc{M}ead algorithm.
@@ -82,17 +93,39 @@ J.~Nelder S.~Singer.
 
 \bibitem{deformTri}
 Robert~W. Sumner and Jovan Popovic.
-\newblock Deformation transfer for triangle meshes.
+\newblock Deformation {T}ransfer for {T}riangle {M}eshes.
 \newblock {\em SIGGRAPH}, 2004.
 
 \bibitem{eigenfaces91}
 M.~Turk and A.~Pentland.
-\newblock Eigenfaces for recognition.
+\newblock Eigenfaces for {R}ecognition.
 \newblock {\em Journal of Cognitive Neuroscience}, 3(1):71--86, 1991.
+
+\bibitem{Ter1}
+M.~Alex~O. Vasilescu and Demetri Terzopoulos.
+\newblock Multilinear analysis of image ensambles: Tensorfaces.
+\newblock In {\em Proc. European Conf. on Computer Vision}, pages 447--460, May
+  2002.
+
+\bibitem{Ter3}
+M.~Alex~O. Vasilescu and Demetri Terzopoulos.
+\newblock Multilinear independent components analysis.
+\newblock In {\em IEEE Computer Vision and Pattern Recognition Conference}, San
+  Diego, CA, June 2005.
+
+\bibitem{Ter2}
+M.~Alex~O. Vasilescu and Demetri Terzopoulos.
+\newblock Multilinear projection for appearance-based recognition in the tensor
+  framework.
+\newblock pages 1--8, October 2007.
 
 \bibitem{faceTransfer05}
 D.~Vlasic, M.~Brand, H.~Pfister, and J.~Popovic.
-\newblock Face transfer with multilinear models.
+\newblock Face {T}ransfer with {M}ultilinear {M}odels.
 \newblock {\em ACM Transactions on Graphics}, 24(3), 2005.
+
+\bibitem{binghamton}
+Lijun Yin, Xiaozhou Wei, Yi~Sun, Jun Wang, and Matthew~J. Rosato.
+\newblock A 3d facial expression database for facial behavior research.
 
 \end{thebibliography}

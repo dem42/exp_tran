@@ -5,6 +5,9 @@
 \usepackage{subfig}
 \usepackage{multicol}
 \usepackage{sectsty}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+
 \usepackage[left=3.2cm, right=3.2cm, top=3cm, bottom=4cm]{geometry}
 
 %setup links
@@ -46,6 +49,14 @@
 \makeatother
 \end{comment}
 \begin{document}
+
+%pmatrix with verical bar
+\makeatletter
+\renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
+  \hskip -\arraycolsep
+  \let\@ifnextchar\new@ifnextchar
+  \array{#1}}
+\makeatother
 
 \begin{titlepage}
 
@@ -100,7 +111,7 @@ Professor ~Duncan \textsc{Gillies}
 \section{Motivation}
 Allowing computers to understand the world around them is one of the most
 intriguing goals of computer science. In order to aid humans in day-to-day
-tasks, the ideal computer should be able to perceive his surroundings, correctly identify the objects and beings around him and act based
+tasks, the ideal computer should be able to perceive its surroundings, correctly identify the objects and beings around it and act based
 on this information. Achieving this level of sophisticated, environment-aware
 behavior is the focus of popular computer science fields such as machine
 learning, computer vision and logic.
@@ -196,7 +207,7 @@ is capable of representing any realistic deformation of the object.
 On the other hand, the computer should only to be able to find an instance of this
 model in its surroundings if and only if this object is present. The deformable model
 therefore has to be \textit{specific} so that it does not locate non-existent
-instances of a model in the input.Clearly, a model that is too general will inadvertently fit objects from a
+instances of a model in the input. Clearly, a model that is too general will inadvertently fit objects from a
 different class and vice versa a model that is too specific will not be able to
 explain all the variations of the object structure and thus fail to locate
 instances of the correct class. The optimal deformable model should balance these two
@@ -227,11 +238,15 @@ of actual physical deformation.
 Statistical deformable models are trained on a set of examples of a class of
 objects. Through statistical analysis a basis for the deformations observed in
 this set of examples is constructed. This basis then allows the model to predict
-probable instances of the objects of this class.
+probable instances of the objects of this class. 
+
+An important subgroup of statistical models are the \textit{tensor models}. The
+tensor models are obtained as a generalization of statistical analysis
+techniques in higher dimensions.
 
 Finally, given that a deformable model is uniquely defined by its parameters,
  the goal of model-based object recognition is then to fit an instance of a model to
-an the appropriate object in the image. The problem of fitting the model to the
+an appropriate object in the image. The problem of fitting the model to the
 image is in essence an optimization problem. In order to fit the model we need to
 correctly adjust parameters that control the model. In addition to determining
 the intrinsic parameters of the model it is necessary to also find how the
@@ -249,7 +264,7 @@ these highly dynamic bodies researchers have turned to physics to describe the
 rules governing these dynamics in form of a set of equations. Pentland and
 Sclaroff in  \cite{FEM1pen} give a closed form solution for extracting a
 physical model from images. Terzopoulos and Metaxas combine physics-based
-deformable models with kalman filtering theory in \cite{FEM1ter}.  
+deformable models with Kalman filtering theory in \cite{FEM1ter}.  
 
 As the name suggests, physical models emulate the physical laws that govern
 deformations. Physical models are predominantly formulated using the finite
@@ -259,7 +274,7 @@ analysis can be found in \cite{FEMbook}.
 \subsubsection{Finite Element Method (FEM)}
 The FEM method is a numerical engineering technique for the simulation of dynamic
 behavior of solids and structures. With the finite element method the assumption is made that
-the object alters shape as if it were made of a elastic material. In physics,
+the object alters shape as if it were made of a clay-like material. In physics,
 \textit{strain} is the measure of deformation or displacement from a rigid body state. The stiffness
 of the material determines responses to strain and stress and thus describes the
 degrees of freedom of the material.
@@ -290,7 +305,7 @@ strain $\epsilon^{(m)}(x,y,z)$ at the element $m$ is given by
 \epsilon^{(m)}(x,y,z) = \mathbf{B}^{(m)}(x,y,z)*\mathbf{U}
 \end{equation}
 where $\mathbf{B}^{(m)}(x,y,z)$ is the strain-displacement matrix. This matrix can
-be calculated by differentiating the the displacement interpolation matrix
+be calculated by differentiating the displacement interpolation matrix
 $\mathbf{H}^{(m)}$. With equations \ref{eq:FEMdisplacements} and \ref{eq:FEMstrain} the behavior of
 the object structure given a global nodal point displacement $\mathbf{U}$ is
 defined. 
@@ -427,11 +442,12 @@ basis from equation \ref{eq:FEMbasis}.
 
 \subsubsection{Combining Statistical and FEM modes}
 
-\subsection{Satistical Models}
-A \textit{shape model} describes the boundaries of an object. figure. For instance, a
+\subsection{Statistical Models}
+A \textit{shape model} describes the boundaries of an object. For instance, a
 shape model of a face will denote the location and measures of the defining
 contours of a face. To locate an object in an image the shape model must be able to
 account for the following
+
 
 \subsubsection{PCA and Eigenfaces}
 In 1991, Turk and Pentland \cite{eigenfaces91} pioneered a face recognition approach
@@ -487,261 +503,11 @@ using low dimensional vector. As such PCA and eigenfaces are often used to
 reduce dimensionality in more sophisticated modeling approaches.
 
 
-\subsection{Statistical Models of Appearance}
-In their paper Statistical Models of Appearance \cite{activeApp04} Cootes and Taylor
-describe modeling approaches that consider texture variance, shape variance and the
-correlations between these two variances. The models they introduce are well suited for highly
-variable structures such as faces or internal organs. Using the shape and
-texture models, Cootes and Taylor show that it is possible to construct Active
-Shape and Active Appearance models that successfully locate
-shapes and even faces in images.
-
-Cootes and Taylor separate the shape and the information of a target image into
-two distinct vectors - the shape parameter vector $b_s$ and the texture
-represented by the grey-level vector $b_g$ (here the image is gray-scaled). Thus
-texture can be manipulated and investigated independent of the shape. They
-then perform PCA on both vectors, which allows them to express grey-levels and
-shape as functions of a parameter vector $c$ as follows
-\begin{gather} \label{gth:shape_mod} 
-x = \bar{x} + Q_s c\\ \label{gth:texture_mod}
-g = \bar{g} + Q_g c
-\end{gather}
-Where the shape vector $x$ and the grey-level (texture) vector $g$ are functions of the
-mean shape $\bar{x}$, the mean texture $\bar{g}$ and the matrices $Q_s$ and
-$Q_g$ which describe the modes of variation learned from the training data set
-\cite{activeApp04}. To reconstruct a new face using the model we first determine the $b_s$ and
-$b_g$ parameters from the new face image. These parameters are then
-used to calculate the $c$. Finally, the reconstruction is obtained using the
-formulas \ref{gth:shape_mod} and \ref{gth:texture_mod}.
-
-\subsubsection{Active Shape Model}
-The active shape model (ASM) proposed by Codee's and Taylor \cite{activeApp04} is based
-on the statistical models of shape and texture. The ASM enables us to locate a
-shape in an image using an iterative
-procedure as shown in figure \ref{gr:asm}. To search for objects in an image
-using the ASM, we first place the shape model, which we obtained from the training data, into
-the centre of the image. In the next iterations a texture profile of $k$
-neighboring points around each point of the shape model is taken and compared
-with the texture profile of this point obtained when training the model. Then
-the point of the shape model is moved to make the difference between the two
-profiles smaller. This process is repeated until convergence is reached.
-
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.5]{images/scary_face2.png}
-\caption{ Active Shape Model iterations shown on on finding the shape of a
-  previously unseen face. Taken from \cite{cootesOverview01} }
-\label{gr:asm}
-\end{figure}
-
-The ASM moves the point only based on the texture profile of a
-local neighborhood of this point. The obvious problem with this approach is
-that as it is a local search technique and thus it depends too much on the choice of the
-starting point. If the target image is not centered on the face and the
-algorithm begins in the center of the image, then it can possibly converge on incorrect
-shapes such as the nose as can be seen in figure \ref{gr:bad_asm}. This is due to
-the fact that as a local search method, the ASM cannot escape a local minimum.
-
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.7]{images/bad_asm.png}
-\caption{ Incorrect convergence of the ASM when the search is initialized
-  incorrectly. This can happen when the face is not centered in the image or
-  when the search does not begin in the center of the image. Taken from \cite{cootesOverview01} }
-\label{gr:bad_asm}
-\end{figure}
-
-An interesting improvement of the technique is proposed by Cootes et al
-\cite{activeApp04}. To improve the efficiency and the robustness of ASM, Cootes
-suggests performing several searches at different resolution. First a coarse
-search is performed on the image with a low resolution until the search converges. The resulting configuration
-of the shape model points from this coarse search
-then serves as the starting point for a search in the same image with a better
-resolution. The advantage of adopting this coarse to fine search approach is
-that it makes the search less susceptible to converging on incorrect shapes. When
-searching at a lower resolutions it will be easier to find the outlines of the
-face. Once the search is restarted with a higher resolution shapes like the
-mouth and the nose can be identified.
-
-\subsubsection{Active Appearance Model}
-Modeling faces using the Active Appearance Model (AAM) is a technique explored
-by Cootes and Taylor \cite{activeApp04}. AAM takes advantage of the
-Active Shape Model which allows us to locate interesting shapes in a new
-image. The set of points defining this shape are called landmark or feature
-points. The AAM enhances the AMS search by also considering the texture
-information.
-
-The AMM search attempts to minimize the difference between the texture (the
-grey-levels) of the image we are searching and the grey-levels of the
-image generated with the current model parameters. The difference vector that is
-minimized is defined as:
-\begin{equation}
-\delta I = I_i - I_m
-\end{equation}
-where $I_m$ is the vector of the grey-levels generated with the current model
-parameters and $I_i$ is a vector containing the grey-levels of the image we are
-searching in.
-
-To simplify this optimization problem, Cootes and Taylor learn the relationship
-between the difference vector $\delta I$ and the error in the model
-parameters. Learning this relationship makes it possible to correctly improve the
-model for a given measured error in an iterative procedure.
-
-The AAM iterations are depicted in figure \ref{gr:amm}. The process attempts
-change model parameters to fit it to an unseen face. This fitting is done by
-minimising the differences between pixels at the landmark points.
-
-\begin{figure}[H]
-
-\includegraphics[scale=0.8]{images/amm_example.png}
-\caption{ Active Appearance Model iterations shown when searching for previously
- unseen faces. Taken from \cite{activeApp04} }
-\label{gr:amm}
-\end{figure}
-
-The drawback of the AAM search is that it is required of the user to specify
-landmark points on the target image. This means the technique is not well suited
-for applications where the model would have to be matched to a large number of
-faces. To combat this problem, a number of automatic 2D and 3D landmark location
-solutions can be used \cite{activeApp04}.
-
-Another problem of both the ASM and the AAM lies in the fact that it does not
-distinguish or model the different variation sources. The variation caused by
-identity and the variation caused by expression are not perceived as two
-fundamentally different sources. Thus, it is impossible to only alter one
-variational source while leaving the other source constant. This makes the
-models unsuitable for expression transfer.
-
-\subsection{Tensor-Based Model}\label{works}
-The possibility of using a multilinear approach to construct face models for face transfer was explored
-by Vlasic, Brand, Pfister and Popovic \cite{faceTransfer05}. The group
-successfully managed to implemented a face transfer application based on
-multilinear face model which allowed for expressions and even for speech related
-movements to be transferred between video-recordings of two different subjects. The multilinear
-model was estimated from geometric variations in 3D face scans that Vlasic and
-his group collected. Vlasic et al utilised two tensor models with
-different dimensionality. Their first model was a lower dimensional bilinear model that organized the data into three
-groups of vertices, identity and expression. Their higher dimensional model
-organized faces into groups of expressions, vertices, identities and visemes. The parameters for the multilinear face model which were used to generate new expressions were
-extracted from the video input using an optical flow algorithm.
-
-To construct a bilinear face model it is necessary to separate the faces from the
-database into groups of expressions and identities in order to organize them
-into the tensor. The tensor based approach allows us to organize
-the data in a way that makes for easier manipulation with a transformation
-matrix. The groups are aligned in the tensor along the modes as shown in figure
-\ref{gr:tensor}. In this example the vertices change along the mode-1 space, the identity changes
-along the mode-2 space and the expressions change along the mode-3 space. 
-\begin{figure}[H]
-\centering
-\includegraphics[scale=0.8]{images/modes_faces.png}
-\caption{Multilinear face model showing how different attributes change along
-  the modes. Taken from \cite{faceTransfer05} }
-\label{gr:tensor}
-\end{figure}
-
-A mode spaces of
-a tensor can be altered independently of the other
-mode spaces by a linear transformations called \textit{mode-n product}. The
-mode-n product is defined between a matrix $\mathbf{M}$ and a tensor
-$\mathscr{T}$ and is written as $\mathscr{T} \times_n \mathbf{M}$. The mode-n
-product transforms the vectors in the n-th mode of the tensor by the matrix
-$\mathbf{M}$. Thus, it is possible to separately transform the expressions in
-mode-3 and the identity in mode-2. This separability of the model is convenient for the face transfer application.
-
-
-The \textit{mode-n singular value decomposition
-  (SVD)} is a linear transformation of a tensor that produces a \textit{core
-  tensor}. The core tensor is analogous to a diagonal matrix of eigenvalues used
-in PCA. Eigenvalues can be seen as measures of the variance along the
-corresponding eigenvector directions. In the core tensor the variance decreases from first element of the
-core tensor to the last, which makes it possible to reduce the dimensionality of
-the data set by truncating the core tensor. Therefore, it is possible to
-approximate the original tensor using a reduced core tensor. The approximation
-of a tensor
-$\mathscr{T}$ using a reduced core tensor $\mathscr{C}_{reduced}$ is derived from the
-mode-n SVD and thus defined as:
-\begin{equation} \label{eq:core_tensor}
-\mathscr{T} \approx \mathscr{C}_{reduced} \times_1 \hat{\mathbf{U}}_1 \times_2
-\hat{\mathbf{U}}_2 \times_3 \hat{\mathbf{U}}_3 \dotsb \times_N \hat{\mathbf{U}}_N
-\end{equation}
-The matrices $\hat{\mathbf{U}}_i$ are truncated versions of the eigenvector
-matrices for the corresponding mode space.
-
-Vlasic et al constructed a multilinear
-face model using mode-n SVD and decomposing the organised tensor into the
-matrices of eigenvectors of all modes except for the mode-1
-space which holds the vertices. Using equation \ref{eq:core_tensor} the
-multilinear face model then becomes:
-\begin{equation} \label{eq:multilin_face}
-\mathscr{T} \approx \mathscr{M} \times_2
-\hat{\mathbf{U}}_2 \times_3 \hat{\mathbf{U}}_3 \dotsb \times_N \hat{\mathbf{U}}_N
-\end{equation}
-The tensor $\mathscr{M}$ is called the \textit{multilinear model}. Multiplying
-the multilinear model $\mathscr{M}$ with a linear combination of rows from the truncated eigenvectors
-then gives us exactly one original face \cite{faceTransfer05}. 
-
-The described tensor-based model is
-similar to what we saw in the eigenfaces PCA approach in figure
-\ref{gr:eigenfaces}. However, the tensor-based approach has the advantage that
-we can manipulate the different sources of variance (i.e. the identity, the
-expressions) separately. This advantage outweighs the additional computational
-complexity carried by the high order SVD and makes this model suitable for the
-task of expression transfer.
-
-The drawback of the method described by Vlasic et al is that it requires the
-tensor to be fully populated. This means that we require all
-expressions to be performed by all subjects to have a full tensor. This raises
-issues when some data is corrupted or lost during data gathering. There are two
-ways of coping with this problem. The first approach is to use a
-statistical method to model the data. Alternatively the missing data can be estimated from the current data.
-\subsection{Tensor-based Statistical Discriminant Method}
-The tensor-based statistical discriminant methods (SDM) was successfully used by Minoi and Gillies
-\cite{sdm,jacey} to synthesize expressions and to neutralize faces displaying an
-expression. The SDM is based on Fischer's linear discriminant analysis (LDA) \cite{lda}. The LDA
-differs from the standard PCA eigenfaces approach in that it seeks to separate
-data into distinct classes. The way this is done is by projecting the data into
-a lower dimensional subspace that maximizes the between class separability and
-minimizes the within class variance.
-
-In LDA we first separate the training data set into a number of groups. Then we
-look for the between class scatter matrix $S_b$ and the within class scatter
-matrix $S_w$. The matrix $\Phi_{lda}$ that defines the projection onto the desired low dimensional
-space is defined as:
-\begin{equation} \label{eq:lda}
-\Phi_{lda} = \textrm{arg} \max_{\Phi}\frac{\lvert \Phi^T S_b \Phi \rvert}{\lvert \Phi^T S_w \Phi \rvert}
-\end{equation}
-In equation \ref{eq:lda} the ratio of the determinant of the between class
-separability and the determinant of the within class variability is
-maximized. The maximum of this equation is the optimal projection.
-
-However, the LDA approach has difficulties when the training data set is small
-in comparison to the dimensions of the image. This is called the \textit{small
-sample size problem} and it causes the scatter matrices to be singular when the
-number of data items is less than the number of variables. To overcome the small size problem the statistical discriminant method can be used.
-
-The SDM approach consists of two stages. In the first stage the PCA
-and LDA are used to reduce the dimensionality and find the discriminant
-directions of the classes. The PCA helps to overcome the small size problem
-common to stand-alone LDA. In the second stage the most discriminant vectors of
-our classes are projected back into the original high dimensional space. This
-back projection will give us a vector for every class in the high dimensional
-space. These vectors allow us to synthesize an expression for a new face image by moving the the surface
-points of this new image in the direction of one of the vectors. 
-
-The SDM technique can be extended to tensor models by expanding the mode
-responsible for expressions into a number of modes representing
-individual expression classes, thereby effectively increasing the dimension of
-the tensor. The expanded tensor model still retains the quality of independence
-along the modes of variance. However, due to the expansion the SDM can be
-applied to the tensor if we flatten the sub-tensors into matrices.
-
-
 \subsection{Morphable Model}
 Blanz et al use PCA to construct a statistical model of 3D face shape and
 texture \cite{blanz1}, \cite{blanz2}. The orthogonal matrix of basis vectors is
 extracted from a database of 3D faces with texture. This basis spans a vector
-space which Blanz refers to as the \textit{Morhable Model}.
+space which Blanz refers to as the \textit{Morphable Model}.
 
 The faces in the database are encode as shape vectors with $S_i$ to being the vector representing the 3D shape of a human
 face, stored as the $x,y,z$-coordinates of all the vertices of that face. So
@@ -846,9 +612,408 @@ texture of the person's face using an
 illumination-corrected texture extraction algorithm.
 \end{comment}
 
-\section{3D Pose Estimation !!! NEW}
+
+\subsection{Statistical Models of Appearance}
+In their paper Statistical Models of Appearance \cite{activeApp04} Cootes and Taylor
+describe modeling approaches that consider texture variance, shape variance and the
+correlations between these two variances. The models they introduce are well suited for highly
+variable structures such as faces or internal organs. Using the shape and
+texture models, Cootes and Taylor show that it is possible to construct Active
+Shape and Active Appearance models that successfully locate
+shapes and even faces in images.
+
+Cootes and Taylor separate the shape and the information of a target image into
+two distinct vectors - the shape parameter vector $b_s$ and the texture
+represented by the grey-level vector $b_g$ (here the image is gray-scaled). Thus
+texture can be manipulated and investigated independent of the shape. They
+then perform PCA on both vectors, which allows them to express grey-levels and
+shape as functions of a parameter vector $c$ as follows
+\begin{gather} \label{gth:shape_mod} 
+x = \bar{x} + Q_s c\\ \label{gth:texture_mod}
+g = \bar{g} + Q_g c
+\end{gather}
+Where the shape vector $x$ and the grey-level (texture) vector $g$ are functions of the
+mean shape $\bar{x}$, the mean texture $\bar{g}$ and the matrices $Q_s$ and
+$Q_g$ which describe the modes of variation learned from the training data set
+\cite{activeApp04}. To reconstruct a new face using the model we first determine the $b_s$ and
+$b_g$ parameters from the new face image. These parameters are then
+used to calculate the $c$. Finally, the reconstruction is obtained using the
+formulas \ref{gth:shape_mod} and \ref{gth:texture_mod}.
+
+\subsubsection{Active Shape Model}
+The active shape model (ASM) proposed by Cootes and Taylor \cite{activeApp04} is based
+on the statistical models of shape and texture. The ASM enables us to locate a
+shape in an image using an iterative
+procedure as shown in figure \ref{gr:asm}. To search for objects in an image
+using the ASM, we first place the shape model, which we obtained from the training data, into
+the centre of the image. In the next iterations a texture profile of $k$
+neighboring points around each point of the shape model is taken and compared
+with the texture profile of this point obtained when training the model. Then
+the point of the shape model is moved to make the difference between the two
+profiles smaller. This process is repeated until convergence is reached.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.5]{images/scary_face2.png}
+\caption{ Active Shape Model iterations shown on on finding the shape of a
+  previously unseen face. Taken from \cite{cootesOverview01} }
+\label{gr:asm}
+\end{figure}
+
+The ASM moves the point only based on the texture profile of a
+local neighborhood of this point. The obvious problem with this approach is
+that it is a local search technique and thus it depends too much on the choice of the
+starting point. If the target image is not centered on the face and the
+algorithm begins in the center of the image, then it can possibly converge on incorrect
+shapes such as the nose as can be seen in figure \ref{gr:bad_asm}. This is due to
+the fact that as a local search method, the ASM cannot escape a local minimum.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.7]{images/bad_asm.png}
+\caption{ Incorrect convergence of the ASM when the search is initialized
+  incorrectly. This can happen when the face is not centered in the image or
+  when the search does not begin in the center of the image. Taken from \cite{cootesOverview01} }
+\label{gr:bad_asm}
+\end{figure}
+
+An interesting improvement of the technique is proposed by Cootes et al
+\cite{activeApp04}. To improve the efficiency and the robustness of ASM, Cootes
+suggests performing several searches at different resolution. First a coarse
+search is performed on the image with a low resolution until the search converges. The resulting configuration
+of the shape model points from this coarse search
+then serves as the starting point for a search in the same image with a better
+resolution. The advantage of adopting this coarse to fine search approach is
+that it makes the search less susceptible to converging on incorrect shapes. When
+searching at a lower resolutions it will be easier to find the outlines of the
+face. Once the search is restarted with a higher resolution, shapes like the
+mouth and the nose can be identified.
+
+\subsubsection{Active Appearance Model}
+Modeling faces using the Active Appearance Model (AAM) is a technique explored
+by Cootes and Taylor \cite{activeApp04}. AAM takes advantage of the
+Active Shape Model which allows us to locate interesting shapes in a new
+image. The set of points defining this shape are called landmark or feature
+points. The AAM enhances the AMS search by also considering the texture
+information.
+
+The AAM search attempts to minimize the difference between the texture (the
+grey-levels) of the image we are searching and the grey-levels of the
+image generated with the current model parameters. The difference vector that is
+minimized is defined as:
+\begin{equation}
+\delta I = I_i - I_m
+\end{equation}
+where $I_m$ is the vector of the grey-levels generated with the current model
+parameters and $I_i$ is a vector containing the grey-levels of the image we are
+searching in.
+
+To simplify this optimization problem, Cootes and Taylor learn the relationship
+between the difference vector $\delta I$ and the error in the model
+parameters. Learning this relationship makes it possible to correctly improve the
+model for a given measured error in an iterative procedure.
+
+The AAM iterations are depicted in figure \ref{gr:amm}. The process attempts
+change model parameters to fit it to an unseen face. This fitting is done by
+minimizing the differences between pixels at the landmark points.
+
+\begin{figure}[H]
+
+\includegraphics[scale=0.8]{images/amm_example.png}
+\caption{ Active Appearance Model iterations shown when searching for previously
+ unseen faces. Taken from \cite{activeApp04} }
+\label{gr:amm}
+\end{figure}
+
+The drawback of the AAM search is that it is required of the user to specify
+landmark points on the target image. This means the technique is not well suited
+for applications where the model would have to be matched to a large number of
+faces. To combat this problem, a number of automatic 2D and 3D landmark location
+solutions can be used \cite{activeApp04}.
+
+Another problem of both the ASM and the AAM lies in the fact that it does not
+distinguish or model the different variation sources. The variation caused by
+identity and the variation caused by expression are not perceived as two
+fundamentally different sources. Thus, it is impossible to only alter one
+variational source while leaving the other source constant. This makes the
+models unsuitable for expression transfer.
+
+\subsection{Tensor Models >>>>> NEW <<<<<<<}
+Vasilescu and Terzopoulos \cite{Ter1}, \cite{Ter2}, \cite{Ter3} defined a
+generalization of statistical methods using multilinear algebra. Statistical
+analysis of images using PCA determine the variation of the training
+dataset. The drawback of the PCA is that it only addresses one factor -- one
+source of variance in the images. All variation is explained using the
+orthogonal eigenvectors and the eigenvalues. With images of faces, the PCA
+approach works well when only the identity or only the expression varies. Using
+methods of multilinear analysis it is possible to model the interaction of
+several sources of variation.
+
+The multilinear approach has mostly replaced the PCA method and will be also used in the
+expression transfer application we develop. Here we will go over an overview of
+multilinear algebra to elucidate the advantages of multilinear
+models. Details concerning design and implementation specifics of the tensor
+based model will be covered
+in chapter \ref{design}. A comprehensive discussion of multilinear algebra and
+its application was compiled by De Lathauwer in \cite{multilinear}.
+
+\subsubsection{Multilinear Algebra}
+Multilinear algebra is based on the generalization of matrix
+operations. Matrices are linear operators and can be seen as linear functions
+defined over vector spaces. In multilinear algebra the operators are
+\textit{tensors}. 
+
+\paragraph{Tensors.} In multilinear algebra tensors
+define multilinear operators over a set of vector
+spaces. Tensors are organized into mode spaces. The $N$-mode tensor contains $N$
+mode spaces and each item of data contained in the tensor is indexed by $N$
+values. The number of modes determines the order of a tensor, so an $N$-mode tensor has order $N$. If
+$\mathcal{A}$ is a tensor of
+order $N$, then $\mathcal{A} \in \mathbb{R}^{I_1 \times I_2 \times \ldots \times
+  I_N}$ where $I_i$ are the mode spaces. Vectors are 1$^{st}$ order tensors, matrices are 2$^{nd}$ order
+tensors. In a matrix the first mode space is the row space, the $2$-mode space
+is the column space.
+
+\paragraph{Tensor Flattening.} Any tensor can be flattened into a matrix. Tensor
+flattening (or matrix unfolding) is defined as follows; given
+an $N$th-order tensor $\mathcal{A} \in \mathbb{R}^{I_1 \times I_2 \times \ldots
+  \times I_N}$, this tensor can be flattened along mode $i \in
+\{1,2,\ldots,N\}$ to give $\mathbf{A_{(i)}} \in \mathbb{R}^{I_i \times I_1 I_2 \ldots I_{i-1} I_{i+1} \ldots I_N}$. 
+
+The flattening corresponds to aligning the vectors from the mode space $i$ into a matrix. To illustrate tensor flattening lets define the 3$^{rd}$ order
+  tensor $\mathcal{B} \in \mathbb{R}^{3\times 2\times 3}$ by $b_{111} = b_{112}
+  = b_{113} = b_{211} = b_{123} = -b_{212} = -b_{313} = 1$, $b_{311} = b_{122} =
+  b_{322} = b_{323} = -b_{213} = -b_{222} = 2$, $b_{312} = 0$, $b_{121} =
+  b_{221} = 4$ and $b_{223} = -5$. Then tensor flattening along mode $1$ is given by
+
+\begin{align*}
+\mathbf{B_{(1)}} = 
+\begin{pmatrix}[ccc|ccc]
+1&1&1&4&2&1\\
+1&-1&-2&4&-2&-5\\
+2&0&-1&2&2&2
+\end{pmatrix}
+\end{align*}
+The flattening along mode $2$ are the vectors along the second mode space
+\begin{align*}
+\mathbf{B_{(2)}} = 
+\begin{pmatrix}[ccc|ccc|ccc]
+1&1&2&1&-1&0&1&-2&-1\\
+4&4&2&2&-2&2&1&-5&2
+\end{pmatrix}
+\end{align*}
+Tensor flattening is useful since it makes it possible to express tensor
+operations using matrices. The schema for flattening a 3$^{rd}$ order tensor is shown in figure \ref{fg:flat}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.75]{images/flattening3.png}
+\caption{ Flattening of the $(I_1\times I_2 \times I_3)$-tensor $\mathcal{A}$
+into three matrices; the $(I_1\times I_2 I_3)$-matrix $\mathbf{A_{(1)}}$,
+the $(I_2\times I_3 I_1)$-matrix $\mathbf{A_{(2)}}$ and the $(I_3\times I_1 I_2)$-matrix $\mathbf{A_{(3)}}$. Taken from \cite{multilinear}.}
+\label{fg:flat}
+\end{figure}
+
+\paragraph{Frobenius Norm.} The Frobenius-norm of a tensor is a measure of the
+size of the tensor. It is defined as
+\begin{equation}\label{eq:frob}
+\lVert \mathcal{A} \rVert = \sqrt{ \sum_{i_1} \sum_{i_2} \ldots \sum_{i_N}
+  a_{i_1 i_2 \ldots i_N}^2 }
+\end{equation}
+Thus the Frobenius norm is merely the sum over the square of all elements. For matrices the Frobenius norm simplifies to a square root of the
+trace of the squared matrix.
+
+\paragraph{Mode-$n$ product.}
+The mode spaces of
+a tensor can be altered independently of the other
+mode spaces by a linear transformations called \textit{mode-$n$ product}. The
+mode-$n$ product is defined between a matrix $\mathbf{M}$ and a tensor
+$\mathcal{A}$ with the result being another tensor $\mathcal{B}$. The product is
+written as $\mathcal{B} = \mathcal{A} \times_n \mathbf{M}$. The mode-$n$ product
+by the matrix $\mathbf{M}$ transforms all the vectors $\mathbf{v}$ in the $n$-th mode of the tensor into vectors
+$\mathbf{M}\mathbf{v}$. It is therefore possible to separately transform the vectors in
+mode-$3$ and the vectors in mode-$2$. The mode-$n$ product can also be expressed in
+terms of flattened matrices as $\mathbf{B}_{(n)} = \mathbf{M} \mathbf{A}_{(n)}
+$. We can therefore rewrite the singular value decomposition (SVD) of a matrix $\mathbf{D
+  = U\Sigma V^T}$ using the mode-$n$ product as $\mathbf{D} = \mathbf{\Sigma} \times_1
+\mathbf{U} \times_2 \mathbf{V}$.  
+
+\paragraph{High Order Singular Value Decomposition (HOSVD).}
+
+The \textit{N-Mode singular value decomposition} (or high order SVD) is a linear
+transformation of a tensor. An $N$-order tensor has $N$ mode spaces. The high
+order SVD orthogonalizes the mode spaces by finding the $N$ sets of orthonormal basis vectors
+which span the column space along the respective mode space. The HOSVD
+decomposition is as follows \cite{multilinear}
+\begin{equation}\label{eq:HOSVD}
+\mathcal{A} = \mathcal{S} \times_1 \mathbf{U}_1 \times_2
+\mathbf{U}_2 \times_3 \mathbf{U}_3 \dotsb \times_N \mathbf{U}_N
+\end{equation}
+
+Equation \ref{eq:HOSVD} decomposes the tensor into a \textit{core
+  tensor} $\mathcal{S}$ and orthonormal mode matrices $\mathbf{U}_1 \ldots
+\mathbf{U}_N$. The mode matrix $\mathbf{U}_i$ contains the orthonormal vectors
+$u_ij$ which form the orthogonal basis of the column space of the flattened
+tensor $\mathbf{A}_{(n)}$. The core tensor governs the interaction between these
+mode matrices and is as such analogous to a diagonal matrix of eigenvalues used
+in PCA. Eigenvalues can be seen as measures of the variance along the
+corresponding eigenvector directions. However, the core tensor does not have a
+diagonal structure. Rather it has the property of all-orthogonality whereby all
+subtensors of $\mathcal{S}$, obtained by fixing one index, are orthogonal. The
+Forbenius norms of these subtensors decrease, which makes it possible to reduce the dimensionality of
+the data set by truncating the core tensor. It is therefore possible to
+approximate the original tensor using a reduced core tensor. The approximation
+of a tensor
+$\mathcal{A}$ using a reduced core tensor $\mathcal{S}_{reduced}$ is derived from the
+mode-n SVD and is defined as:
+\begin{equation} \label{eq:core_tensor}
+\mathcal{A} \approx \mathcal{S}_{reduced} \times_1 \hat{\mathbf{U}}_1 \times_2
+\hat{\mathbf{U}}_2 \times_3 \hat{\mathbf{U}}_3 \dotsb \times_N \hat{\mathbf{U}}_N
+\end{equation}
+The matrices $\hat{\mathbf{U}}_i$ are truncated versions of the eigenvector
+matrices for the corresponding mode space. Figure \ref{fg:hosvd} depicts the
+approximate HOSVD using the truncated core tensor and mode matrices.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.755]{images/n_mode_svd2.png}
+\caption{Multilinear face model showing how different attributes change along
+  the modes. Taken from \cite{multilinear} }
+\label{fg:hosvd}
+\end{figure}
+
+\paragraph{HOSVD Algorithm.} The HOSVD decomposition of a tensor $\mathcal{A}$
+of order $N$ is computed as follows:
+\begin{itemize}
+\item \textbf{Step 1}. For $i=1,\ldots,N$ compute the mode matrix $\mathbf{U}_i$
+  by calculating the SVD of the flattened matrix $\mathbf{D}_{(i)} = \mathbf{U_i
+    \Sigma_i V_i^T}$. The left singular matrix of $\mathbf{D}_{(i)}$ is the mode
+  matrix for mode $i$.
+\item  \textbf{Step 2}. Compute the core tensor by reversing equation
+  \ref{eq:HOSVD} to get the core tensor as 
+\begin{equation}\label{eq:core}
+\mathcal{S} = \mathcal{A} \times_1 \mathbf{U}_1^T \times_2
+\mathbf{U}_2^T \times_3 \mathbf{U}_3^T \dotsb \times_N \mathbf{U}_N^T
+\end{equation}
+\end{itemize}
+
+
+\subsubsection{Tensor-Based Model >>>>> ALTERED <<<<<<<}\label{works}
+The possibility of using a multilinear approach to construct face models was explored
+by numerous researchers. Vasilescu and Terzopoulos \cite{Ter1} build a tensor from a
+database of face images and construct \textit{tensorfaces} by performing HOSVD
+on the data tensor. Tensorfaces are contained as vector the mode matrices
+$\mathbf{U}_i$. Vlasic, Brand, Pfister and Popovic \cite{faceTransfer05} build a
+tensor model of 3D faces an utilize it to recognize faces in video sequences for
+the purpose of expression transfer. The group
+successfully managed to implemented a face transfer application based on a
+multilinear face model which allowed for expressions and even for speech related
+movements to be transferred between video-recordings of two different subjects. The multilinear
+model was estimated from geometric variations in 3D face scans that Vlasic and
+his group collected. Two tensor models with different dimensionality were utilized. Their first model was a lower dimensional bilinear model that organized the data into three
+groups of vertices, identity and expression. Their higher dimensional model
+organized faces into groups of expressions, vertices, identities and visemes. The parameters for the multilinear face model, which were used to synthesize new expressions, were
+extracted from the video input using an optical flow algorithm.
+
+To construct a bilinear face model it is necessary to separate the faces from the
+database into groups of expressions and identities in order to organize them
+into the tensor. The tensor based approach allows us to organize
+the data in a way that makes for easier manipulation with a transformation
+matrix. The groups are aligned in the tensor along the modes as shown in figure
+\ref{gr:tensor}. In this example the vertices change along the mode-1 space, the identity changes
+along the mode-2 space and the expressions change along the mode-3 space. 
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.8]{images/modes_faces.png}
+\caption{Multilinear face model showing how different attributes change along
+  the modes. Taken from \cite{faceTransfer05} }
+\label{gr:tensor}
+\end{figure}
+
+
+Vlasic et al constructed a multilinear
+face model using mode-n SVD and decomposing the organized tensor into mode
+matrices. A generative model can be constructed when the core tensor and the the
+mode-$1$ matrix are combined together using the mode-$n$ product. The first mode
+space which holds the vertices, which the model should be capable of generating. Using equation \ref{eq:core_tensor} the
+data tensor $\mathcal{D}$ is decomposed as
+\begin{equation} \label{eq:multilin_face}
+\mathcal{D} \approx \mathcal{M} \times_2
+\hat{\mathbf{U}}_2 \times_3 \hat{\mathbf{U}}_3 \dotsb \times_N \hat{\mathbf{U}}_N
+\end{equation}
+where tensor $\mathcal{M}$ is called the \textit{multilinear model}. The
+multilinear model can then be used to synthesize new faces. Mode multiplying the
+multilinear model with one row from
+each mode matrix we recover exactly one of the original faces. Mode multiplying
+the model $\mathcal{M}$ with a linear combination of rows from the truncated
+mode matrices synthesizes a new face $\mathbf{f}$ giving us the generative
+tensor model as
+\begin{equation} \label{eq:generative_model}
+\mathbf{f} = \mathcal{M} \times_2
+\mathbf{w}_{2}^T \times_3 \mathbf{w}_3^T \dotsb \times_N \mathbf{w}_N^T
+\end{equation}
+The weight vectors $\mathbf{w}_{2}, \ldots ,\mathbf{w}_{N}$ are column vectors
+which encode the attribute of the corresponding mode space.
+
+The tensor-based model is
+similar to what we saw in the eigenfaces PCA approach in figure
+\ref{gr:eigenfaces}. However, the tensor-based approach has the advantage that
+we can manipulate the different sources of variance (i.e. in the case of a face
+model the identity, the
+expressions) separately. This advantage outweighs the additional computational
+complexity carried by the high order SVD and makes this model suitable for the
+task of expression transfer.
+
+The drawback of the method described by Vlasic et al is that it requires the
+tensor to be fully populated. This means that we require all
+expressions to be performed by all subjects to have a full tensor. This raises
+issues when some data is corrupted or lost during data gathering. There are two
+ways of coping with this problem. The first approach is to use a
+statistical method to model the data. Alternatively the missing data can be estimated from the current data.
+\subsubsection{Tensor-based Statistical Discriminant Method}
+The tensor-based statistical discriminant methods (SDM) was successfully used by Minoi and Gillies
+\cite{sdm,jacey} to synthesize expressions and to neutralize faces displaying an
+expression. The SDM is based on Fischer's linear discriminant analysis (LDA) \cite{lda}. The LDA
+differs from the standard PCA eigenfaces approach in that it seeks to separate
+data into distinct classes. The way this is done is by projecting the data into
+a lower dimensional subspace that maximizes the between class separability and
+minimizes the within class variance.
+
+In LDA we first separate the training data set into a number of groups. Then we
+look for the between class scatter matrix $S_b$ and the within class scatter
+matrix $S_w$. The matrix $\Phi_{lda}$ that defines the projection onto the desired low dimensional
+space is defined as:
+\begin{equation} \label{eq:lda}
+\Phi_{lda} = \textrm{arg} \max_{\Phi}\frac{\lvert \Phi^T S_b \Phi \rvert}{\lvert \Phi^T S_w \Phi \rvert}
+\end{equation}
+In equation \ref{eq:lda} the ratio of the determinant of the between class
+separability and the determinant of the within class variability is
+maximized. The maximum of this equation is the optimal projection.
+
+However, the LDA approach has difficulties when the training data set is small
+in comparison to the dimensions of the image. This is called the \textit{small
+sample size problem} and it causes the scatter matrices to be singular when the
+number of data items is less than the number of variables. To overcome the small size problem the statistical discriminant method can be used.
+
+The SDM approach consists of two stages. In the first stage the PCA
+and LDA are used to reduce the dimensionality and find the discriminant
+directions of the classes. The PCA helps to overcome the small size problem
+common to stand-alone LDA. In the second stage the most discriminant vectors of
+our classes are projected back into the original high dimensional space. This
+back projection will give us a vector for every class in the high dimensional
+space. These vectors allow us to synthesize an expression for a new face image by moving the the surface
+points of this new image in the direction of one of the vectors. 
+
+The SDM technique can be extended to tensor models by expanding the mode
+responsible for expressions into a number of modes representing
+individual expression classes, thereby effectively increasing the dimension of
+the tensor. The expanded tensor model still retains the quality of independence
+along the modes of variance. However, due to the expansion the SDM can be
+applied to the tensor if we flatten the sub-tensors into matrices.
+
+\section{3D Pose Estimation}
 The goal of 3D pose estimation is to determine the position and orientation of
-an object from a 2D image of this object. The problem is specified as follows -
+an object from a 2D image of the object. The problem is specified as follows -
 given are the exact locations of a set of feature points on the object and the
 positions of points in the 2D
 image. The points in the 2D image correspond to the 3D feature points. The goal
@@ -911,7 +1076,7 @@ $P_c = [p_x/s, p_y/s, p_z/s]^T$. Using homogeneous coordinates the pin hole
 camera model has the form
 \begin{equation}\label{eq:projective}
 \gamma\begin{pmatrix}x\\y\\1\end{pmatrix}
-= \begin{pmatrix}f_x&0&c_x&0\\0&f_y&c_y&0\\0&0&1&0\end{pmatrix} \begin{pmatrix}X\\Y\\Z\end{pmatrix}
+= \begin{pmatrix}f_x&0&c_x&0\\0&f_y&c_y&0\\0&0&1&0\end{pmatrix} \begin{pmatrix}X\\Y\\Z\\1\end{pmatrix}
 \end{equation}
 where $\gamma = 1/s$ is responsible for converting the homogeneous result of the
 multiplication to Cartesian coordinates. In equation \ref{eq:projective} two
@@ -954,7 +1119,7 @@ these projected points onto the image plane. The geometry of the weak perspectiv
 
 Moreover, the weak perspective transformation is a linear
 transformation unlike the strong perspective transformation, since we are
-dividing by a constant $Z_avg$ and not the $Z$ component of the
+dividing by a constant $Z_{avg}$ and not the $Z$ component of the
 point.
 
 \begin{figure}[H] 
@@ -990,7 +1155,7 @@ is shown in figure \ref{fg:objCam}.
 \caption{ Mapping points from object coordinates to camera coordinates using
   rotation and translation. The displacement of the origin of the camera system
   from the origin of the object system is $\mathbf{C}$. The camera is viewing in
-the direction of the vector $d$.}
+the direction of the vector $d$. Taken from \cite{graphics}}
 \label{fg:objCam}
 \end{figure}
 
@@ -1105,7 +1270,7 @@ $Q = (p_x,p_y,p_z,1)^T$ in the object coordinate system to a point $\mathbf{x}
 where $\mathbf{0} = (0,0,0)$. 
 
 
-\subsection{Pose estimation with the POSIT algorithm}
+\subsection{Pose estimation with the POSIT algorithm}\label{posit}
 
 
 \section{Model-based tracking}
@@ -1341,7 +1506,7 @@ Since either of these criteria could occur in a single anomalous step,
 restarts of the downhill algorithm are also sometimes utilized \cite{Press1992}. 
 
 
-\chapter{Design and Implementation}
+\chapter{Design and Implementation >>>>> NEW <<<<<}\label{design}
 
 The purpose of the application is to transfer the expressions between two
 subjects. Given are video recordings of two persons and a database of
@@ -1352,23 +1517,108 @@ source.
 
 We approach this problem by constructing a deformable model of a face from the
 face database. The model is constructed so that every expression corresponds to a specific instance of the model
-parameters. The model is fitted frame-by-frame to the source recording, wherein
-the face is located and the model parameters are estimated. The model
-is also fitted to the target recording to obtain a model of the target face. The
-parameters from the source model are then used to animate the target model.
-
-\section{Tensor-based Model of the Face}
-The main task of the application is to manipulate the expression and
+parameters. The main task of the application is to manipulate the expression and
 identity of the model separately. This suggests that the optimal model should have
 separate parameters for these two attributes, to allow the user to manipulate
 the identity independently of the expression or vice versa.
 The tensor-based model is our deformable model of choice. As discussed in
-section \ref{works}, the tensor-based model it possess the very
+section \ref{works}, the tensor-based model possess the very
 important quality of separability.
 
-The primary drawback to the tensor-based model is that it requires the faces in
-the database to be in \textit{correspondence}. For the purpose of this
-application we consider two polygon meshes to be in correspondence
+Then the model is fitted frame-by-frame to the source recording using an
+algorithm that estimates the 3D pose of the model, the expression parameters and
+the identity parameters. The model is also fitted to the target recording to obtain a model of the target face. The
+parameters from the source model are then used to animate the target model.
+
+The application therefore needs to be designed to support the following functionality:
+
+\begin{enumerate}
+\item Pre-processing of the face database.
+\item Learning a tensor-based model from the face scans in pre-processed database.
+\item Implementation of an algorithm to find the expression, identity and pose
+  parameters of the face in the source and target recording.
+\item Animating the target face with the expression parameters estimated from
+  the source face.
+\end{enumerate}
+
+The implementation of the this functionality needs to be encapsulated in
+graphical user interface (GUI). This GUI needs to be built with support for a 3D
+rendering framework since the application needs to display the three-dimensional models and to animate
+the target face. Additionally, most of the tasks that the application needs to
+solve either involve linear algebra computations or can be solved with standard
+computer vision algorithms. The implementations of these computations and
+algorithms need to be as efficient as possible to ensure that the application is
+highly responsive to the users actions and commands.
+
+\section{Design Challenges}
+While it may seem like a trivial problem to a human, the task of transferring expressions involves many
+challenges. The computer is attempting to understand a face using its model of
+what a face should look like, as well as recognize the face in images and follow
+its movements through successive frames. All the while, the application has to 
+correctly interpret all the observed deformations as corresponding expressions.  
+
+The first challenge lies in developing an algorithm that fits a model to a face in
+the image. Two expressions can differ in only very little detail and yet this
+small amount of detail can make a huge difference to how a human observer
+interprets the expression. A slight difference in the position of the corner of
+the mouth is all that separates a smirk from a genuine smile. However, model based
+recognition revolves around approximating an object in the image with an
+instance of the model. So if it is to correctly identify expression, the
+algorithm needs to operate on a large
+number of points to minimize the error between the approximation and the
+observed face as much as possible. This first of all causes the algorithm to take
+more time, but it also directly leads to the second problem of how these points
+are to be chosen. 
+
+The model fitting is performed with an error minimization algorithm. To perform
+this minimization, reference measurements are needed against which the minimization is
+performed. These measurements will be points in the frames which comprise the
+video sequences. These points should of course be points located on the
+face. So before the algorithm can be begin fitting a model, it first needs some
+information about where the face is located in the image. However, it is not
+only necessary to identify the general position of the face -- it is in fact
+imperative to know the position of points on the face which correspond to points in the
+model. Depending on how the face is located it may prove to be difficult to
+obtain more points to use in the fitting.
+
+A convenient approach is to locate the face in only the first frame of the video
+sequence. Its position in the successive frames is then obtained by tracking the
+movement of the face from the first frame. Therefore, before applying the
+fitting algorithm the application needs to perform the following two steps:
+\begin{enumerate}
+\item Locating feature points in the first frame of both the source and target
+  recording.
+\item Tracking the movement of the feature points to obtain a guess for feature
+  points in every frame.
+\end{enumerate}
+
+Yet this tracking is again an approximation. It often also happens that certain points in the face are lost
+during the tracking procedure. So again it is impossible to guarantee that the
+fitting algorithm will be able to recover the sufficient level of detail it
+needs to correctly estimate the expression.
+
+
+The final and most crucial problem lies in the fact that usually only very specific
+areas of the face contribute to expressions. The mouth or the brow are excellent
+areas for reference points for the fitting algorithm. However, should points these
+areas be lost during tracking, or misidentified during face location then it is
+very likely that an incorrect expression will be estimated. Even if only a small
+number of points is lost, the algorithm can still fail badly if these were
+points from an important part of the face.
+
+It is clear that that error accumulates in every step of the model
+fitting. A robust application must therefore attempt to enforce constraint to limit this
+accumulation. The fitting algorithm and the model therefore need to be design
+with these considerations in mind.
+
+\section{Pre-processing}
+The primary drawback of the tensor-based model is that it requires the faces in
+the database to be in \textit{correspondence}. To put faces in the database into correspondence
+so that a tensor model can be constructed we must perform pre-processing of the
+database data.
+
+\subsection{Correspondence}
+For the purpose of this application we consider two polygon meshes to be in correspondence
 if for any point in one polygon mesh the point in the other polygon mesh, which corresponds to the
 same position on the object, has the same index value. So for example if the
 point corresponding to the tip of the nose has an index value of $i$ in one
@@ -1378,15 +1628,200 @@ tip of the nose. So essentially, the order of the indices must be the same in bo
 polygon meshes which represent the faces. 
 
 In the case when the two polygon meshes are not in correspondence, then a
-optimization algorithm must be applied to defrom the mesh to correspond to a
+optimization algorithm must be applied to deform the mesh to correspond to a
 reference mesh. There may be fewer vertices, which in turn requires
 generation of new vertices in the mesh. Or the vertices can be have a different
-ordering than in the reference mesh. In both cases the minimal deformation of
-the object that transforms the mesh into the reference mesh. Sumner and Popovic \cite{deformTri}
-describe an algorithm to transfer deformation between triangle meshes. This
-algorithm is suitable when meshes are not in correspondence.
+ordering than in the reference mesh. To standardize the meshes the vertices in
+one meshes need to be aligned with vertices in the other mesh. 
 
-The database used for our appliaction is the Brighthampton database
+Correspondence can be computed in two ways. One approach is to use a registration algorithm where the rigid-transformations are located
+which transform a misaligned mesh into the reference mesh. An popular algorithm
+for 3D registration is the Iterated Closest Point (ICP) algorithm. Rusinkiewicz
+and Levoy give a comprehensive overview of efficient implementations of the ICP
+algorithm in \cite{ICP}. The other approach involves finding the minimal deformation of
+the polygon mesh which transforms it into the reference mesh. Sumner and Popovic \cite{deformTri}
+describe an algorithm to transfer deformation between triangle meshes.
+
+Other irregularities in the polygonal meshes can be present depending on how the
+3D face scans in the database were obtained. For example there can be holes or spikes in the
+mesh, which need to be removed by interpolating new points to fill the holes or
+by Gaussian smoothing the spikes. 
+
+\subsection{Database}
+The face database used in the application is the Binghamton database of 3D
+scans of expressions \cite{binghamton}. This database of 3D face scans was developed at the Department of
+Computer Science, State University of New York at Binghamton. The subjects 
+in the face database perform seven expressions -- neutral, angry,
+disgust, fear, happy, sad and surprise. Every subject carried out each of these
+expressions (except for neutral) in four levels of intensity. 
+
+The Binghamton database was constructed with the help of 100 students who participated in the face
+scans. Various ethnic groups are represented and the database consists of about
+60\% female and 40\% male subjects. There is an unfortunate lack of middle aged to older
+ subjects in the database, due to the fact that mostly students were
+involved in face scans. For purposes of the face transfer application this is a clear
+disadvantage since it makes the model we construct much less powerful.
+
+The advantage of a 3D face database lies in the fact that it allows us to
+construct a 3D model. This 3D model will clearly be more powerful then a 2D
+model since it has more degrees of freedom. When the task is to transfer
+expressions between two recordings of 3D faces it is preferable to have a 3D model
+which should in theory be able to duplicate the exact motions and rotations of the recorded
+objects. If the face database consisted of only 2D face images then the model
+would also have to be two-dimensional.
+
+The face scans were captured using the 3DMD digitizer which utilizes structured light to
+calculate the depth. The captured surfaces contained between 20,000 and 35,000
+polygons. Example original face scans, along with the captured texture maps are
+shown in figure \ref{fg:binghamton} 
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.80]{images/binghamton.png}
+\par\end{centering}
+
+\caption{Sample 3D face scans from the Binghamton database along with the
+  corresponding texture maps. Taken from \cite{binghamton}}
+\label{fg:binghamton}
+
+\end{figure}
+
+The Binghamton database consists of faces stored as polygon mesh data in VMRL
+format and texture information in bit map format. For the project the pre-processed Binghamton
+database was used. This pre-processed database was created by Dr. Lynn-Minoi
+\cite{jacey} and consists of VTK files of the pre-processed polygon meshes. The
+VTK file lists the $x$, $y$ and $z$ values of every vertex, the topology data
+of the face scan and the texture coordinates for every vertex. The face scans in
+pre-processed database are in correspondence, meaning that the order of the
+vertices in every face scan is the same. Conveniently, having the face scans in
+correspondence also means that the topology data stays constant.
+
+The final pre-processing step before building a model is to move the center the
+face scans to the origin of the object coordinate system. This step is not always required. However, the vertices in the
+pre-processed Binghamton database have a $z$-component with an average value of
+$z_{avg}=-1500$. It serves no purpose to have the face at such a distance. It
+can even cause problems to some algorithms like the POSIT algorithm discussed in
+\ref{posit}. Centering the face scans at the origin of the object coordinate
+system can be done by merely calculating the average $x$, $y$ and $z$ of the
+entire dataset and then subtracting this average from every vertex.
+
+\section{Model Construction}
+Given a database of 3D face scans that are in correspondence, the tensor-based
+model can be constructed by first organizing this data in a tensor and
+then using multilinear algebra to find a decomposition of this tensor.
+
+\subsection{Data Tensor}
+The tensor model should be designed to address expression and identity as sources of variation in
+the data. We assume that the points are defined by the set $I_{pts}$, the
+expressions by the set $I_{exp}$ and the identities by $I_{id}$. Then we can
+construct a data tensor $\mathcal{D} \in \mathbb{R}^{I_{pts} \times I_{id}
+  \times I_{exp}}$. Each face scan in the database is vector from
+$R^{I_{pts}}$. There are $I_{id}I_{exp}$ such vectors in the database. To load data into the the tensor we need to read each vector
+representing a face into the tensor and index the elements of this vector
+appropriately. This is done as follows
+
+\begin{algorithm}\label{a:load}
+\caption{Loading the Data Tensor}
+\begin{algorithmic}[1]
+\Procedure{Load}{database,$\mathcal{D}$} \Comment{Input the database and the
+  empty data tensor}
+\For {$i \in I_{id}$}
+\For {$j \in I_{exp}$}
+
+\State $v \gets $ database($i,j$)
+
+\For {$k \in I_{pts}$}
+
+\State $\mathcal{D}(i,j,k) \gets v_i $
+\EndFor
+\EndFor
+\EndFor
+\State \textbf{return} $\mathcal{D}$ \Comment{return the initialized data tensor}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+Due to the fact that most algorithms operate on matrices instead of tensors, it
+may be preferable to flatten the data tensor right after loading it. Flattening
+the tensor along a mode is done by successively fixing the values of the index of
+the corresponding mode and iterating through the values of the other indices to
+obtain the data. The procedure for flattening a tensor along the identity mode space is given in
+\ref{a:flat}.
+
+\begin{algorithm}\label{a:load}
+\caption{Flattening a Tensor along the identity mode space}
+\begin{algorithmic}[1]
+\Procedure{Flatten}{$\mathcal{D}$, $\mathbf{D_{(2)}}$} \Comment{The input
+  tensor, the output matrix}
+\For {$i \in I_{id}$}
+
+\For {$j \in I_{exp}$}
+\For {$k \in I_{pts}$}
+
+\State index $\gets j*\lvert I_{pts} \rvert + k$
+\State $\mathbf{D_{(2)}}$($i$,index) $\gets \mathcal{D}(i,j,k)$
+
+\EndFor
+\EndFor
+\EndFor
+\State \textbf{return} $\mathbf{D_{(2)}}$ \Comment{return the flattened tensor}
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+The data tensor itself will need to be loaded once and flattened three times for
+the computation of the HOSVD decomposition. 
+
+\subsection{Computing the HOSVD}
+The generative tensor model is given by 
+\begin{equation} \label{eq:generative_model2}
+\mathbf{f} = \mathcal{M} \times_2 \mathbf{w}_i^T \times_3 \mathbf{w}_e^T
+\end{equation}
+where $\mathbf{f}$ is the generated 3D face scans in form of a vector and
+$\mathbf{w}_i$ with $\mathbf{w}_e$ are column vectors of identity and expression
+parameters respectively. Ideally, we should be able to generate new faces using
+equation \ref{eq:generative_model2} by choosing values for the identity and
+expression parameters and obtaining a 3D face scan in form of the $\mathbf{f}$
+vector. To do this it is necessary to compute the multilinear model
+$\mathcal{M}$ tensor which governs this mapping between the vector spaces.
+
+As discussed in equation \ref{eq:core} the core tensor is obtained by reversing
+the HOSVD decomposition. The multilinear model tensor $\mathcal{M}$ is obtained
+by the mode product of the core tensor and the mode matrix of the points. This
+is equivalent to not factoring along the point mode space during the HOSVD.
+To construct the model we therefore have to implement the following formula
+\begin{equation}\label{eq:model}
+\mathcal{M} = \mathcal{C} \times_1 \mathbf{U}_{pts}^T = \mathcal{D} \times_2
+\mathbf{U}_{id}^T \times_3 \mathbf{U}_{exp}^T
+\end{equation}
+which relates the data tensor $\mathcal{D}$ with the mode matrices $\mathbf{U}_{id}$
+and $\mathbf{U}_{exp}$. The column vectors of $\mathbf{U}_{id}$ span the space
+of identities and its row vectors encode an identity and point invariant
+representation of each identity seen in the database. Similarly, the column
+vectors of $\mathbf{U}_{exp}$ form the basis of the space of expressions and the
+rows are invariant representations of the various expressions. These matrices
+are obtained through singular value decomposition of the flattened
+matrices as
+\begin{align}\label{eq:svd}
+\mathcal{D}_{(2)} &= \mathbf{U}_{id} \mathbf{\Sigma}_{id} \mathbf{V}_{id}^T\\
+\mathcal{D}_{(3)} &= \mathbf{U}_{exp} \mathbf{\Sigma}_{exp} \mathbf{V}_{exp}^T
+\end{align}
+However, computing the mode matrices using the above equations is often not
+feasible due to computer memory constraints. This can be easily seen if one considers the magnitude of the matrices
+involved in the computation. In an application with 56 identities, 7 expressions
+and 5090 vertices, the data tensor has three dimensions and a size $56\times
+7\times (5090*3)$. A
+matrix flattened along the expression mode space then has two dimensions and a size
+$7 \times (56*5090*3)$.  Decomposing this flattened matrix into
+$\mathbf{U}_{exp} \mathbf{\Sigma}_{exp} \mathbf{V}_{exp}^T$ requires the
+allocation of memory for matrices of sizes
+$7\times 7$ for $\mathbf{U}_{exp}$, $7$ non-zero singular values in $\mathbf{\Sigma}_{exp}$ and a matrix of size
+$(56*5090*3)\times (56*5090*3)$ for $\mathbf{V}_{exp}$. This means that
+$\mathbf{V}_{exp}$ matrix needs to be represented using $855120*855120$ float values. The memory requirement of this is approximately $4*700*10^9$
+bytes. Clearly the $\mathbf{V}_{exp}$ matrix is too large and exceeds the memory constraints of
+most personal computers.
+
+
 
 \chapter{Results and Evaluation}
 
