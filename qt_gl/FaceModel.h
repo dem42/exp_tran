@@ -23,6 +23,8 @@ class FaceModel
     Matrix getCoreTensor() const;
     Matrix getUIdentity() const;
     Matrix getUExpression() const;
+    double getSigmaIdAt(int i) const;
+    double getSigmaExpAt(int i) const;
 
     //polygon information
     float (*triangles)[3];
@@ -55,6 +57,9 @@ private:
     Matrix U_id;
     Matrix U_ex;
     Matrix core;
+
+    double *sigma_id;
+    double *sigma_exp;
 
     int poly_num;
     int point_num;

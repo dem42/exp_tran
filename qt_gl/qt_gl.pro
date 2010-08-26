@@ -19,7 +19,6 @@ SOURCES += qt_gl.cpp \
     Tensor.cpp \
     FaceModel.cpp \
     Matrix.cpp \
-    transferwidget.cpp \
     clickableqlabel.cpp \
     opticalflowengine.cpp \
     opticalflowfarneback.cpp \
@@ -31,7 +30,12 @@ SOURCES += qt_gl.cpp \
     facetabcontroller.cpp \
     optimizer.cpp \
     neldermeadoptimizer.cpp \
-    closedformoptimizer.cpp
+    closedformoptimizer.cpp \
+    nnlsoptimizer.cpp \
+    videotabcontroller.cpp \
+    videoprocessor.cpp \
+    transfertabcontroller.cpp \
+    utility.cpp
 QT += opengl
 FORMS += applform.ui \
     cameraDialog.ui
@@ -43,7 +47,6 @@ HEADERS += my_main_window.h \
     Tensor.h \
     FaceModel.h \
     Matrix.h \
-    transferwidget.h \
     clickableqlabel.h \
     opticalflowengine.h \
     opticalflowfarneback.h \
@@ -56,7 +59,12 @@ HEADERS += my_main_window.h \
     facetabcontroller.h \
     optimizer.h \
     neldermeadoptimizer.h \
-    closedformoptimizer.h
+    closedformoptimizer.h \
+    nnlsoptimizer.h \
+    videotabcontroller.h \
+    videoprocessor.h \
+    transfertabcontroller.h \
+    utility.h
 LIBS += -L/usr/local/lib \
     -lml \
     -lcvaux \

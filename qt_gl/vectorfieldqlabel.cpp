@@ -1,5 +1,6 @@
 #include "vectorfieldqlabel.h"
 #include "clickableqlabel.h"
+#include "utility.h"
 
 #include <QPainter>
 #include <QPointF>
@@ -33,16 +34,16 @@ void VectorFieldQLabel::paintEvent( QPaintEvent * )
 {
     QPainter paint(this);
     paint.setPen(Qt::red);
+    if(this->pixmap() == 0)
+    {
+        return;
+    }
     QPixmap pmap = *(this->pixmap());
     int x,y,w,h;
     //make the points smaller if we are drawing vs larger when we are just clicking
      w = h = 4;
 
-    if(this->pixmap() == 0)
-    {
-        cout << "there is no pixmap" << endl;
-        return;
-    }
+
     int x_shift = getXShift();
     int y_shift = getYShift();
 
@@ -52,6 +53,9 @@ void VectorFieldQLabel::paintEvent( QPaintEvent * )
     Vec2f v;
     float angle;
     const float PI = 3.1415926f;
+
+    if(vectorField.size() == 0)
+        return;
 
     for(unsigned int i=0;i<curPoints.size();i++)
     {

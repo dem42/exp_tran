@@ -15,7 +15,7 @@ FaceModel * FaceModel::getInstance()
     //lazy initialization
     if(instance == NULL)
     {
-        instance = new FaceModel("svd_result_object_4",
+        instance = new FaceModel("svd_result_object_3",
                                  "/home/martin/project/JaceyBinghamtonVTKFiles",
                                  "out_here.txt",
                                   56,7,5090);
@@ -28,10 +28,15 @@ FaceModel::FaceModel(string filename,string dir,string db_list,int f,int e,int v
         filename(filename), dir_name(dir), db_list(db_list),
         n_f(f), n_e(e), n_v(v), U_id(f,f), U_ex(e,e), core(3*v,f*e)
 {
+    //initialize the sigmas
+    sigma_id = new double[f];
+    sigma_exp = new double[e];
+
     bool loaded = load();
+
     if(!loaded)
     {
-        strs = new string*[f];        
+        strs = new string*[f];
         for(int i=0;i<f;i++)
             strs[i] = new string[e];        
 
@@ -65,13 +70,7 @@ Matrix FaceModel::getCoreTensor() const
 {
     cout << "core" << endl;
     return core;
-}//    w_exp[0] = 0.0;
-//    w_exp[1] = 0.0;
-//    w_exp[2] = 0.0;
-//    w_exp[3] = 0.2;
-//    w_exp[4] = 0.0;
-//    w_exp[5] = 0.8;
-//    w_exp[6] = 0.0;
+}
 
 Matrix FaceModel::getUIdentity() const
 {
@@ -84,6 +83,22 @@ Matrix FaceModel::getUExpression() const
     return U_ex;
 }
 
+double FaceModel::getSigmaIdAt(int i) const
+{
+    if(i >= 0 && i < n_f)
+        return sigma_id[i];
+    else
+        cerr << "incorrect index of sigma_id" << endl;
+    return 0;
+}
+double FaceModel::getSigmaExpAt(int i) const
+{
+    if(i >= 0 && i < n_e)
+        return sigma_exp[i];
+    else
+        cerr << "incorrect index of sigma_exp" << endl;
+    return 0;
+}
 void FaceModel::initializeDbStrings()
 {
     FILE *fid;
@@ -95,13 +110,6 @@ void FaceModel::initializeDbStrings()
     const char *dir = dir_name.c_str();
 
     fid = fopen(file_list,"r");
-
-    std::cout << "max(float): "
-            << std::numeric_limits<float>::max() << std::endl;
-    std::cout << "max(double): "
-            << std::numeric_limits<double>::max() << std::endl;
-    std::cout << "max(double): "
-            << std::numeric_limits<double>::max() << std::endl;
 
     fscanf(fid,"%d",&num);
     if(num != n_f * n_e) printf("problem\n");
@@ -140,6 +148,16 @@ void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bo
     {
         //multiply with u2 and u3     
         row_ex = Matrix::matrix_mult(m_wex,U_ex);
+
+        cout << "interpolated exp row vector" << endl;
+        for(int i=0;i<n_e;i++)
+            cout << row_ex[0][i] << " ";
+        cout << endl;
+        Vector3::normalize(row_ex.mat[0],n_e);
+
+        for(int i=0;i<n_e;i++)
+            cout << row_ex[0][i] << " ";
+        cout << endl;
     }
     else
     {
@@ -175,10 +193,6 @@ void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bo
         face[j].y = (float)(f[i+1][0]);
         face[j].z = (float)(f[i+2][0]);
     }
-//    fstream f_strm("check_inter",fstream::out);
-//    for(i=0;i<n_v;i++)
-//        f_strm << face[i].x <<" "<< face[i].y << " " << face[i].z << " ";
-//    f_strm.close();
 }
 
 
@@ -242,11 +256,13 @@ void FaceModel::computeIdentitySingularVectors(int m,int n)
     A.transpose(AT);
     A2 = Matrix::matrix_mult(A,AT);
 
-    double *d = new double[n];
+    sigma_id = new double[n];
 
-    Matrix::svd(m,m,1,0,0.000001,0.000001,A2.mat,d,U_id.mat,NULL);
-
-    delete[] d;
+    Matrix::svd(m,m,1,0,0.000001,0.000001,A2.mat,sigma_id,U_id.mat,NULL);
+    cout << "sigma id"<< endl;
+    for(int i=0;i<m;i++)
+        cout << 10000.*sigma_id[i] << " ";
+    cout << endl;
 }
 
 void FaceModel::computeExpressionSingularVectors(int m,int n)
@@ -263,11 +279,11 @@ void FaceModel::computeExpressionSingularVectors(int m,int n)
     A.transpose(AT);
     A2 = Matrix::matrix_mult(A,AT);
 
-    double *d = new double[n];
-
-    Matrix::svd(m,m,1,0,0.000001,0.000001,A2.mat,d,U_ex.mat,NULL);
-
-    delete[] d;
+    Matrix::svd(m,m,1,0,0.000001,0.000001,A2.mat,sigma_exp,U_ex.mat,NULL);
+    cout << "sigma exp"<< endl;
+    for(int i=0;i<m;i++)
+        cout << 10000.*sigma_exp[i] << " ";
+    cout << endl;
 }
 
 void FaceModel::compute_core_tensor(void)
@@ -335,17 +351,28 @@ void FaceModel::compute_core_tensor(void)
 void FaceModel::persist()
 {
     fstream fstr(filename.c_str(),fstream::out);
+    //persist U_id and sigma_id (diagonal sigma matrix)
     for(int i=0;i<n_f;i++)
         for(int j=0;j<n_f;j++)
             fstr << U_id[i][j] << " ";
     fstr << endl;
+    for(int j=0;j<n_f;j++)
+        fstr << sigma_id[j] << " ";
+    fstr << endl;
+    //persist U_ex and sigma_exp (diagonal sigma matrix)
     for(int i=0;i<n_e;i++)
         for(int j=0;j<n_e;j++)
             fstr << U_ex[i][j] << " ";
     fstr << endl;
+    for(int j=0;j<n_e;j++)
+        fstr << sigma_exp[j] << " ";
+    fstr << endl;
+    //persist the core tensor
     for(int i=0;i<3*n_v;i++)
         for(int j=0;j<n_f*n_e;j++)
             fstr << core[i][j] << " ";
+    fstr << endl;
+    //persist the topology data
     fstr << point_num << " " << poly_num << endl;
     for(int i=0; i<poly_num; i++)
     {
@@ -369,15 +396,20 @@ bool FaceModel::load()
     fstr.exceptions ( ifstream::eofbit | ifstream::failbit | ifstream::badbit );
     try
     {
-        //allocate memory .. throw bad_alloc if something goes awry
+        //matrix memory allocation happens in the constructor
+        //.. throw bad_alloc if something goes awry
         //now read from file
         for(int i=0;i<n_f;i++)
             for(int j=0;j<n_f;j++)
                 fstr >> U_id[i][j];
+        for(int j=0;j<n_f;j++)
+            fstr >> sigma_id[j];
 
         for(int i=0;i<n_e;i++)
             for(int j=0;j<n_e;j++)
                 fstr >> U_ex[i][j];
+        for(int j=0;j<n_e;j++)
+            fstr >> sigma_exp[j];
 
         for(int i=0;i<3*n_v;i++)
             for(int j=0;j<n_f*n_e;j++)

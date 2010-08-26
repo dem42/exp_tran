@@ -1,5 +1,5 @@
-#ifndef TRANSFERWIDGET_H
-#define TRANSFERWIDGET_H
+#ifndef VIDEOTABCONTROLLER_H
+#define VIDEOTABCONTROLLER_H
 
 #include <highgui.h>
 #include <QWidget>
@@ -13,6 +13,7 @@
 #include "Face.h"
 #include "face_widget.h"
 #include "optimizer.h"
+#include "videoprocessor.h"
 
 #include "ui_cameraDialog.h"
 
@@ -21,15 +22,13 @@
 #include <string>
 
 //really should be called transfer controller
-class TransferWidget : public QWidget
+class VideoTabController : public QWidget
 {
     Q_OBJECT
 public:
-    TransferWidget(QString fileName, FaceWidget *face_widget);
-    ~TransferWidget();    
-    ClickableQLabel* getPicLabel() const;
-    ClickableQLabel* getFlowLabel() const;
-    void grabThumbnailForVideo(std::string videoName,cv::Mat& thumbnail);
+    VideoTabController(QString fileName, ClickableQLabel *picLabel, VectorFieldQLabel *flowLabel, FaceWidget *face_widget);
+    ~VideoTabController();
+
     void selectGoodFeaturePoints(const cv::Mat& m);
 
     void setInteractiveLabel(QLabel *);   
@@ -51,10 +50,6 @@ public slots:
     void calibrate();
 private:
     void calcIntrinsicParams();
-    void processVideo();
-    void computeEulerAnglesFromRmatrix(const Mat &rmatrix,double &euler_x, double &euler_y, double &euler_z);
-    QImage mat2QImage(const Mat mat_rgb);
-
     //video fileName
     QString fileName;
     bool autoSelectFeaturePoints;
@@ -73,19 +68,20 @@ private:
 
     //frameHistory .. this includes dropped frames and first frame
     std::vector<cv::Mat> frames;
-    unsigned int FRAME_MAX;
 
     //object responsible for computing
     //optical flow
     OpticalFlowEngine *flowEngine;
     //model parameters optimization
     Optimizer *paramOptimizer;
-    
+    //model fitting engine
+    VideoProcessor *videoProcessor;
+
     Face *face_ptr;
     FaceWidget *face_widget;
     //static here could be read from an xml config
-    static const int fPoints[20];
-    static const int fPoints_size;
+//    static const int fPoints[20];
+//    static const int fPoints_size;
 
     //for now so that we can use them in a timer
     vector<cv::Mat> frameData;
@@ -106,4 +102,4 @@ private:
     QDialog *cameraDialog;
 };
 
-#endif // TRANSFERWIDGET_H
+#endif // VIDEOTABCONTROLLER_H

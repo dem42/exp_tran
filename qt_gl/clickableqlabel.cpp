@@ -83,36 +83,31 @@ void ClickableQLabel::paintEvent ( QPaintEvent * e)
 {
     QPainter paint(this);
     paint.setPen(Qt::red);
-    //cout << "painting" << endl;
-    //QImage img("/home/martin/iowndis.png");
-    //QPixmap pmap = QPixmap::fromImage(img);
+    if(this->pixmap() == 0)
+    {      
+        return;
+    }
     QPixmap pmap = *(this->pixmap());
     int x,y,w,h;
     //make the points smaller if we are drawing vs larger when we are just clicking
      w = h = 4;
 
-    if(this->pixmap() == 0)
-    {
-        cerr << "there is no pixmap" << endl;
-    }
-    else
-    {
-        paint.drawPixmap(0,0,pmap,x_shift,y_shift,600,650);
 
-        QPointF *points = new QPointF[marked.size()];
-        for(int i=0; i < marked.size(); i++)
-        {
-            x = marked[i].x;
-            y = marked[i].y;
+     paint.drawPixmap(0,0,pmap,x_shift,y_shift,600,650);
 
-            if(drawable == false)
-                paint.fillRect(x,y,w,h,Qt::red);
-            else
-                points[i] = QPointF(x,y);
-        }
-        if(drawable == true)
-            paint.drawPoints(points,marked.size());
-        delete points;
-    }
+     QPointF *points = new QPointF[marked.size()];
+     for(int i=0; i < marked.size(); i++)
+     {
+         x = marked[i].x;
+         y = marked[i].y;
+
+         if(drawable == false)
+             paint.fillRect(x,y,w,h,Qt::red);
+         else
+             points[i] = QPointF(x,y);
+     }
+     if(drawable == true)
+         paint.drawPoints(points,marked.size());
+     delete points;
 }
 

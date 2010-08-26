@@ -1,6 +1,6 @@
-#include "transferwidget.h"
-#include "featurepointqlabel.h"
+#include "videotabcontroller.h"
 #include "opticalflowfarneback.h"
+#include "utility.h"
 
 #include <iostream>
 #include <QImage>
@@ -14,7 +14,6 @@
 #include "errorfunction.h"
 #include "modelimageerror.h"
 #include "rosenerror.h"
-#include "mysimplex.h"
 
 #include "neldermeadoptimizer.h"
 #include "closedformoptimizer.h"
@@ -24,29 +23,13 @@ using namespace cv;
 using namespace std;
 
 
-//const int TransferWidget::fPoints[5] = {9521,646,8144,4979,4525};
-//const int TransferWidget::fPoints_size = 5;
-const int TransferWidget::fPoints[20] = {9521,8899,310,7240,1183,8934,8945,6284,7140,8197,
-                                         2080,2851,3580,6058,8825,1680,3907,8144,6540,2519};
-const int TransferWidget::fPoints_size = 20;
 
-
-QImage TransferWidget::mat2QImage(const Mat mat_rgb)
+VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLabel,
+                                       VectorFieldQLabel *flowLabel,
+                                       FaceWidget *face_widget) : fileName(fileName)
 {
-    QImage qframe;
-    //converting to rgb not necessary it seems
-    //cvtColor(mat_bgr, mat_rgb, CV_BGR2RGB);
-
-    qframe = QImage((const unsigned char*)(mat_rgb.data), mat_rgb.cols,
-    mat_rgb.rows, QImage::Format_RGB888);
-    //rgb QImage::Format_RGB888
-    return qframe;
-}
-
-TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : fileName(fileName), FRAME_MAX(2)
-{
-    picLabel = new FeaturePointQLabel();
-    flowLabel = new VectorFieldQLabel();
+    this->picLabel = picLabel;
+    this->flowLabel = flowLabel;
     this->face_widget = face_widget;
     this->face_widget->setCameraParameters(-200,-1,-200);
     face_ptr  = new Face();
@@ -60,9 +43,42 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
     //init the optimizer
     paramOptimizer = new NelderMeadOptimizer();
 
+    //init the video processor with default optimizer and optical flow engine
+    videoProcessor = new VideoProcessor();
+
     //setup the timer
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(captureFrame()));
+
+    //initialize the capture so that we can capture
+    //successive frames
+     capture = new VideoCapture(fileName.toStdString());
+     frameCount = capture->get(CV_CAP_PROP_FRAME_COUNT); //SEEMS TO BE UNSUPPORTED AND RETURNS 0
+
+     //setup video
+    Mat m;
+    Utility::grabThumbnailForVideo(fileName.toStdString(),m);
+
+    double c_x = m.size().width / 2.;
+    double c_y = m.size().height / 2.;
+    cout << "frame count is : " << frameCount << " " << c_x << " " << c_y << endl;
+
+    frames.push_back(m);
+
+    QImage img_q = Utility::mat2QImage(m);
+
+    QPixmap p_map;
+    p_map = QPixmap::fromImage(img_q);
+
+    picLabel->setPixmap(p_map);
+    flowLabel->setPixmap(p_map);
+    flowLabel->show();
+    picLabel->show();
+    //ui.picLabel->showFullScreen();
+
+
+    NNLSOptimizer *nnls = new NNLSOptimizer();
+    nnls->test();
 
 
     //initalize the camera based on precalculated intrinsic parameters
@@ -75,10 +91,10 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
     cameraMatrix = Mat_<double>(3,3);
     cameraMatrix(0,0) = 900;//589.515;
     cameraMatrix(0,1) = 0;
-    cameraMatrix(0,2) = 337.789;//303.703;
+    cameraMatrix(0,2) = c_x;//337.789;//303.703;
     cameraMatrix(1,0) = 0;
     cameraMatrix(1,1) = 900;//594.657;
-    cameraMatrix(1,2) = 299.076;//159.174;
+    cameraMatrix(1,2) = c_y;//299.076;//159.174;
     cameraMatrix(2,0) = 0;
     cameraMatrix(2,1) = 0;
     cameraMatrix(2,2) = 1;
@@ -88,58 +104,19 @@ TransferWidget::TransferWidget(QString fileName, FaceWidget *face_widget) : file
     //-0.20357 0.423957 -0.00415811 -0.00633922 -0.295448
     //double l[1][5] = {{-0.20357, 0.423957, -0.00415811, -0.00633922, -0.295448}};
     lensDist = Mat_<double>(1,5);
-//    lensDist(0,0) = -0.20357;
-//    lensDist(0,1) = 0.423957;
-//    lensDist(0,2) = -0.00415811;
-//    lensDist(0,3) = -0.00633922;
-//    lensDist(0,4) = -0.295448;
-        lensDist(0,0) = 0;
-        lensDist(0,1) = 0;
-        lensDist(0,2) = 0;
-        lensDist(0,3) = 0;
-        lensDist(0,4) = 0;
-
-
-    //setup video
-    Mat m;
-    grabThumbnailForVideo(fileName.toStdString(),m);
-
-    frames.push_back(m);
-
-    QImage img_q = mat2QImage(m);
-
-    QPixmap p_map;
-    p_map = QPixmap::fromImage(img_q);
-
-    picLabel->setPixmap(p_map);
-    flowLabel->setPixmap(p_map);
-    flowLabel->show();
-    picLabel->show();
-    //ui.picLabel->showFullScreen();
-
-    //initialize the capture so that we can capture
-    //successive frames
-     capture = new VideoCapture(fileName.toStdString());
-     frameCount = capture->get(CV_CAP_PROP_FRAME_COUNT); //SEEMS TO BE UNSUPPORTED AND RETURNS 0
-     cout << "frame count is : " << frameCount << endl;     
-
-
-    NNLSOptimizer *nnls = new NNLSOptimizer();
-    nnls->test();
-
+    //    lensDist(0,0) = -0.20357;
+    //    lensDist(0,1) = 0.423957;
+    //    lensDist(0,2) = -0.00415811;
+    //    lensDist(0,3) = -0.00633922;
+    //    lensDist(0,4) = -0.295448;
+    lensDist(0,0) = 0;
+    lensDist(0,1) = 0;
+    lensDist(0,2) = 0;
+    lensDist(0,3) = 0;
+    lensDist(0,4) = 0;
 }
 
-ClickableQLabel* TransferWidget::getPicLabel() const
-{
-    return picLabel;
-}
-
-ClickableQLabel* TransferWidget::getFlowLabel() const
-{
-    return flowLabel;
-}
-
-void TransferWidget::calcIntrinsicParams()
+void VideoTabController::calcIntrinsicParams()
 {
     vector<Mat> imgs;
 
@@ -186,7 +163,7 @@ void TransferWidget::calcIntrinsicParams()
 
         drawChessboardCorners(img,s,Mat(corners),out);
 
-        QImage img_q = mat2QImage(img);
+        QImage img_q = Utility::mat2QImage(img);
         QPixmap p_map;
         p_map = QPixmap::fromImage(img_q);
         picLabel->setPixmap(p_map);
@@ -227,169 +204,11 @@ void TransferWidget::calcIntrinsicParams()
     cout << endl;
 }
 
-void TransferWidget::processVideo()
-{
-    Mat frame, rgb_frame, copyFrame;
-    //point indices
-    vector<vector<int> >point_indices;
-    vector<int> indices;
-    vector<int> nextIndices;
-    bool useExt = false;
-    Face *face_ptr = new Face();
-    double *w_id = new double[56];
-    double *w_exp = new double[7];
-
-    Mat_<double> rvec, tvec;
-    vector<Point2f> imagePoints;
-    vector<Point2f> newPoints;
-
-    vector<double> weights_id;
-    vector<double> weights_exp;
-
-    //make a face guess
-    for(int i=0;i<56;i++)
-    {
-        if(i==33)w_id[i] = 0.1;
-        else if(i==7)w_id[i] = 0.8;
-        else if(i==20)w_id[i] = 0.1;
-        else w_id[i] = 0;
-    }
-    w_exp[0] = 0.0;
-    w_exp[1] = 0.0;
-    w_exp[2] = 0.0;
-    w_exp[3] = 0.2;
-    w_exp[4] = 0.0;
-    w_exp[5] = 0.8;
-    w_exp[6] = 0.0;
-
-    face_ptr->interpolate(w_id,w_exp);
-
-    /**********************/
-    /*first collect frames*/
-    /**********************/
-    //use the VideoCapture attribute capture of this transferWidget instance
-    //to collect frame data
-
-    //note that the first frame is not captured (the one wherein we mark the
-    //feature points so we add it first
-    frameData.push_back(frames[frames.size()-1]);
-    while( capture->grab() == true)
-    {        
-        capture->retrieve(frame);
-        cvtColor(frame, rgb_frame, CV_BGR2RGB);
-        copyFrame = rgb_frame.clone();
-        frameData.push_back(copyFrame);
-    }
-
-    /**********************/
-    /*calculate points in all
-    frames using optical flow*/
-    /**********************/
-    vector<Point2f> currentPoints = picLabel->getMarked();
-    vector<Point2f> nextPoints;
-
-    featurePoints.push_back(currentPoints);
-
-    cout << "feature points bfore" << endl;
-    for(int i=0;i<featurePoints[0].size();i++)
-        cout << featurePoints[0][i].x << " " << featurePoints[0][i].y << endl;
-
-    vector<Mat>::iterator it = frameData.begin(),
-    it_last = frameData.begin(),
-    it_end = frameData.end();
-
-    //estimate the pose in the first frame
-    paramOptimizer = new NNLSOptimizer();    
-
-    //place feature point indices in indices
-    indices.insert(indices.begin(),Face::fPoints,Face::fPoints+Face::fPoints_size);
-    point_indices.push_back(indices);
-
-    cout << "now first frame pose " << endl;
-    //calculate the rot,trans of the intial frame
-    paramOptimizer->calculateTransformation(featurePoints[0],face_ptr,cameraMatrix,lensDist,indices,rvec,tvec,useExt);
-    frameRotation.push_back(rvec.clone());
-    frameTranslation.push_back(tvec.clone());
-    useExt |= true;
-    
-    newPoints.clear();
-    cout << "now new points " << endl;
-    paramOptimizer->generatePoints(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,20,face_ptr,newPoints,indices);
-    //add new points so that we start tracking them
-    //we arent actually altering the first featurePoints[0] just the rest throught compute flow
-    cout << "cur points b4 " << currentPoints.size() << endl;
-    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
-    cout << " after " << currentPoints.size() << endl;
-
-    for(;it != it_end; ++it)
-    {
-        flowEngine->computeFlow(*it_last,*it,currentPoints,nextPoints,indices,nextIndices);
-        it_last = it;
-
-        featurePoints.push_back(nextPoints);
-        point_indices.push_back(nextIndices);
-        currentPoints.clear();
-        indices.clear();
-        //assigns a copy of next points as the new content for currentPoints
-        currentPoints = nextPoints;
-        indices = nextIndices;
-        nextPoints.clear();
-        nextIndices.clear();
-    }
-
-    FRAME_MAX = 3;
-    
-    for(unsigned int i=1;i<FRAME_MAX;++i)
-    {
-        /**********************/
-        /*estimate pose*/
-        /**********************/
-
-        //estimate the pose parameters and place estimations into vectors rotations and translations
-        //the rotations vector holds the rodrigues rotation vectors which can be converted to a rotation matrix
-        paramOptimizer->calculateTransformation(featurePoints[i],face_ptr,cameraMatrix,lensDist,point_indices[i],rvec,tvec,useExt);
-        frameRotation.push_back(rvec.clone());
-        frameTranslation.push_back(tvec.clone());
-        useExt |= true;
-    }
-
-    cout << "feature points after" << endl;
-    for(int i=0;i<featurePoints[0].size();i++)
-        cout << featurePoints[0][i].x << " " << featurePoints[0][i].y << endl;
-
-    for(unsigned int i=0;i<FRAME_MAX;++i)
-    {
-        /**********************/
-        /*estimate model parameters + pose*/
-        /**********************/
-        weights_exp.clear();
-        weights_id.clear();
-        paramOptimizer->estimateModelParameters(frameData[i],featurePoints[i],cameraMatrix,lensDist,face_ptr,
-                                                point_indices[i], frameRotation[i],frameTranslation[i],
-                                                weights_id,weights_exp);
-        vector_weights_exp.push_back(weights_exp);
-        vector_weights_id.push_back(weights_id);
-
-        //could overload generatePoints in closedform optim to do weak perspective
-        cout << "frame : " << i << endl;
-        newPoints.clear();
-        paramOptimizer->weakPerspectiveProjectPoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,point_indices[i],face_ptr,newPoints);
-        generatedPoints.push_back(newPoints);
-    }
-    timerReplay = new QTimer(this);
-    connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
-    timerReplay->start(3000);
-
-    //face_widget->setFace(face_ptr);
-
-    delete[] w_id;
-    delete[] w_exp;
-}
 
 /**********************************************/
 /* PUBLIC SLOTS */
 /**********************************************/
-void TransferWidget::replayFrame()
+void VideoTabController::replayFrame()
 {
     static unsigned int i;
     double euler_x, euler_y, euler_z;
@@ -402,17 +221,13 @@ void TransferWidget::replayFrame()
     double *w_id = new double[56];
     double *w_exp = new double[7];
 
-
-    QImage img_q = mat2QImage(frameData[i]);
-    QPixmap p_map;
-    p_map = QPixmap::fromImage(img_q);
-    picLabel->setPixmap(p_map);
+    picLabel->setPixmap(Utility::mat2QPixmap(frameData[i]));
 
     picLabel->setMarked(generatedPoints[i]);
 
     //compute and set the pose parameters
     Rodrigues(frameRotation[i],rmatrix);
-    computeEulerAnglesFromRmatrix(rmatrix,euler_x,euler_y,euler_z);
+    Utility::computeEulerAnglesFromRmatrix(rmatrix,euler_x,euler_y,euler_z);
     //only y needs to be negative so that it agrees with the transposes
     cout << "setting trans param " << euler_x << " " << euler_y << " "
          << euler_z  << " " << tx << " " << ty << " " << tz  << endl;
@@ -439,7 +254,7 @@ void TransferWidget::replayFrame()
 
 
     i++;
-    if(i == FRAME_MAX)
+    if(i == generatedPoints.size())
     {
         timerReplay->stop();
         i = 0;
@@ -450,48 +265,47 @@ void TransferWidget::replayFrame()
     delete[] w_exp;
 }
 
-void TransferWidget::playBack()
+void VideoTabController::playBack()
 {
+    Mat frame, rgb_frame, copyFrame;
+
     flowLabel->setVisible(false);
     face_widget->setVisible(true);
 
-    processVideo();
+    /**********************/
+    /*first collect frames*/
+    /**********************/
+    //use the VideoCapture attribute capture of to collect frame data
+    //note that the first frame is not captured (the one wherein we mark the
+    //feature points so we add it first
+    frameData.push_back(frames[frames.size()-1]);
+    while( capture->grab() == true)
+    {
+        capture->retrieve(frame);
+        cvtColor(frame, rgb_frame, CV_BGR2RGB);
+        copyFrame = rgb_frame.clone();
+        frameData.push_back(copyFrame);
+    }
+
+    videoProcessor->processVideo(picLabel->getMarked(),frameData, cameraMatrix, lensDist,
+                                 frameTranslation,frameRotation, generatedPoints,vector_weights_exp,vector_weights_id);
+
+    //after processing is complete start the timer
+    timerReplay = new QTimer(this);
+    connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
+    timerReplay->start(3000);
+
 }
 
-void TransferWidget::calibrate()
+void VideoTabController::calibrate()
 {
     cameraDialog->show();
 }
 
-void TransferWidget::computeEulerAnglesFromRmatrix(const Mat &rmatrix,double &euler_x, double &euler_y, double &euler_z)
-{
-    const double PI = 3.141593;
 
-
-    double rot_y, rot_x, rot_z,cy, cx,sx,cz,sz;
-    rot_y = asin( rmatrix.at<double>(2,0));        /* Calculate Y-axis angle */
-    cy           =  cos( rot_y );
-
-    if ( fabs( cy ) > 0.005 )             /* Gimball lock? */
-    {
-        cx      =  rmatrix.at<double>(2,2) / cy;           /* No, so get X-axis angle */
-        sx      = rmatrix.at<double>(2,1)  / cy;
-
-        rot_x  = atan2( sx, cx );
-
-        cz      =  rmatrix.at<double>(0,0) / cy;            /* Get Z-axis angle */
-        sz      = rmatrix.at<double>(1,0) / cy;
-
-        rot_z  = atan2( sz, cz );
-    }
-
-    euler_x = rot_x * 180./PI;
-    euler_y = rot_y * 180./PI;
-    euler_z = rot_z * 180./PI;
-}
 
 //later do a pyramid version
-void TransferWidget::startFaceTransfer()
+void VideoTabController::startFaceTransfer()
 {
     flowLabel->setVisible(false);
     face_widget->setVisible(true);
@@ -648,7 +462,7 @@ void TransferWidget::startFaceTransfer()
     face_widget->refreshGL();
 }
 
-void TransferWidget::dropFrame()
+void VideoTabController::dropFrame()
 {
    Mat frame, rgb_frame;
    if( capture->grab() == true)
@@ -662,14 +476,12 @@ void TransferWidget::dropFrame()
 
     frames.push_back(rgb_frame);
 
-    QImage img_q = mat2QImage(rgb_frame);
-    QPixmap p_map;
-    p_map = QPixmap::fromImage(img_q);
+    QPixmap p_map = Utility::mat2QPixmap(rgb_frame);
     picLabel->setPixmap(p_map);
     flowLabel->setPixmap(p_map);    
 }
 
-void TransferWidget::captureFrame()
+void VideoTabController::captureFrame()
 {
     Mat frame, rgb_frame;
 
@@ -684,36 +496,17 @@ void TransferWidget::captureFrame()
 
     frames.push_back(rgb_frame);
 
-    QImage img_q = mat2QImage(rgb_frame);
-    QPixmap p_map;
-    p_map = QPixmap::fromImage(img_q);
-    picLabel->setPixmap(p_map);
+    picLabel->setPixmap(Utility::mat2QPixmap(rgb_frame));
 
     computeFlow();
 }
 
-void TransferWidget::grabThumbnailForVideo(string videoName, Mat& thumbnail)
-{
-    Mat frame;
 
-    VideoCapture cap(videoName);
-    cap >> frame;
-    cvtColor(frame, thumbnail, CV_BGR2RGB);
-
-
-    double c_x = thumbnail.size().width / 2.;
-    double c_y = thumbnail.size().height / 2.;
-    //set this when you load a video
-    cameraMatrix.at<double>(0,2) = c_x;
-    cameraMatrix.at<double>(1,2) = c_y;
-
-    cap.release();
-}
 
 //restart caputring by clearing marked points
 //refreshing the picture to the thumbnail
 //and stopping the timer and clearing old frames
-void TransferWidget::restartCapturing()
+void VideoTabController::restartCapturing()
 {
     timer->stop();
 
@@ -741,12 +534,16 @@ void TransferWidget::restartCapturing()
 
     Mat m,um;
 
-    grabThumbnailForVideo(fileName.toStdString(),m);
-
+    Utility::grabThumbnailForVideo(fileName.toStdString(),m);
+    double c_x = m.size().width / 2.;
+    double c_y = m.size().height / 2.;
+    //set this when you load a video
+    cameraMatrix.at<double>(0,2) = c_x;
+    cameraMatrix.at<double>(1,2) = c_y;
     //undistort(m,um,cameraMatrix,lensDist);
     frames.push_back(m);
 
-    QImage img_q = mat2QImage(m);
+    QImage img_q = Utility::mat2QImage(m);
 
     QPixmap p_map;
     p_map = QPixmap::fromImage(img_q);
@@ -755,7 +552,7 @@ void TransferWidget::restartCapturing()
     flowLabel->setPixmap(p_map);
 }
 
-void TransferWidget::playTransfer()
+void VideoTabController::playTransfer()
 {
     flowLabel->setVisible(true);
     face_widget->setVisible(false);
@@ -764,44 +561,29 @@ void TransferWidget::playTransfer()
     timer->start(200);
 }
 
-void TransferWidget::pauseTransfer()
+void VideoTabController::pauseTransfer()
 {
     timer->stop();
 }
 
 
-void TransferWidget::findGoodFeaturePoints()
+void VideoTabController::findGoodFeaturePoints()
 {
     Mat curFrame, curFrame2;
 
     if(frames.size() > 0)
         curFrame = *(frames.end()-1);
     else
-        grabThumbnailForVideo(this->fileName.toStdString(),curFrame);
+        Utility::grabThumbnailForVideo(this->fileName.toStdString(),curFrame);
 
     cvtColor(curFrame,curFrame2,CV_RGB2GRAY);
 
     selectGoodFeaturePoints(curFrame);
 }
 
-void TransferWidget::selectGoodFeaturePoints(const Mat& m)
+void VideoTabController::selectGoodFeaturePoints(const Mat& m)
 {
-//    Mat col,row,reshaped;
-//    reshaped = m.reshape(1);
-//    //        col = reshaped.colRange(117,240);
-//    //        row = col.rowRange(170,330);
-//    col = reshaped.colRange(0,300);
-//    row = col.rowRange(0,300);
-
-
     vector<Point2f> marked;
-//    goodFeaturesToTrack(row,marked,40,0.01,0.01);
-//    cout << marked[1].x << " " << marked[1].y << endl;
-//    for(int k=0;k<40;k++)
-//    {
-//        //marked[k].x+=117;
-//        // marked[k].y+=170;
-//    }
 
     int number_of_features = 60;
 
@@ -818,20 +600,17 @@ void TransferWidget::selectGoodFeaturePoints(const Mat& m)
     CvPoint2D32f features[number_of_features];
 
     cvGoodFeaturesToTrack(frame,eigen_image,temp_img,features,&number_of_features,0.01,0.01,NULL,5,0,0.04);
-    int x_shift = picLabel->getXShift();
-    int y_shift = picLabel->getYShift();
+
     for(int i=0;i<number_of_features;i++)
-    {
-        //subtract the shift of the piclabel to account for shifted images
-        marked.push_back(Point2f(features[i].x - x_shift,features[i].y - y_shift));
-        cout << features[i].x << " " << features[i].y << endl;
+    {    
+        marked.push_back(Point2f(features[i].x,features[i].y));
     }
     picLabel->setMarked(marked);
 }
 
 
 //alot of shift nonesense .. plz just display the entire image
-void TransferWidget::computeFlow()
+void VideoTabController::computeFlow()
 {
     if(frames.size() < 2)
         return;
@@ -869,7 +648,7 @@ void TransferWidget::computeFlow()
     }
     flowLabel->setVectorField(vectors);
 
-    QImage img_q = mat2QImage( *(frames.end()-1) );
+    QImage img_q = Utility::mat2QImage( *(frames.end()-1) );
     QPixmap p_map;
     p_map = QPixmap::fromImage(img_q);
     flowLabel->setPixmap(p_map);
@@ -877,7 +656,7 @@ void TransferWidget::computeFlow()
     flowLabel->show();
 }
 
-void TransferWidget::video_file_changed(const QString str)
+void VideoTabController::video_file_changed(const QString str)
 {
     cout << str.toStdString() << endl;
     fileName = str;
@@ -885,7 +664,7 @@ void TransferWidget::video_file_changed(const QString str)
     restartCapturing();
 }
 
-void TransferWidget::toggleDrawable(bool drawable)
+void VideoTabController::toggleDrawable(bool drawable)
 {
     picLabel->clearMarked();
     flowLabel->clearMarked();
@@ -893,7 +672,7 @@ void TransferWidget::toggleDrawable(bool drawable)
     flowLabel->setDrawable(drawable);
 }
 
-TransferWidget::~TransferWidget()
+VideoTabController::~VideoTabController()
 {
     frames.clear();
     delete capture;

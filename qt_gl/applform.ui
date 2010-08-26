@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1210</width>
-    <height>705</height>
+    <height>704</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -21,17 +21,17 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>30</y>
+      <y>10</y>
       <width>1191</width>
-      <height>731</height>
+      <height>641</height>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="faceTab">
      <attribute name="title">
-      <string>Tab 1</string>
+      <string>Face Model</string>
      </attribute>
      <widget class="QWidget" name="verticalLayoutWidget">
       <property name="geometry">
@@ -208,7 +208,7 @@
     </widget>
     <widget class="QWidget" name="videoTab">
      <attribute name="title">
-      <string>Tab 2</string>
+      <string>Video</string>
      </attribute>
      <widget class="QWidget" name="verticalLayoutWidget_3">
       <property name="geometry">
@@ -370,6 +370,118 @@
         </widget>
        </item>
       </layout>
+     </widget>
+    </widget>
+    <widget class="QWidget" name="transferTab">
+     <attribute name="title">
+      <string>Transfer</string>
+     </attribute>
+     <widget class="QWidget" name="verticalLayoutWidget_5">
+      <property name="geometry">
+       <rect>
+        <x>9</x>
+        <y>20</y>
+        <width>856</width>
+        <height>521</height>
+       </rect>
+      </property>
+      <layout class="QVBoxLayout" name="srcLayout"/>
+     </widget>
+     <widget class="QWidget" name="gridLayoutWidget">
+      <property name="geometry">
+       <rect>
+        <x>10</x>
+        <y>560</y>
+        <width>854</width>
+        <height>31</height>
+       </rect>
+      </property>
+      <layout class="QGridLayout" name="gridLayout">
+       <item row="0" column="0">
+        <widget class="QLabel" name="source">
+         <property name="text">
+          <string>source file</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="2">
+        <widget class="QPushButton" name="browseS">
+         <property name="text">
+          <string>Browse</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="6">
+        <widget class="QPushButton" name="browseD">
+         <property name="text">
+          <string>Browse</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLineEdit" name="srcText"/>
+       </item>
+       <item row="0" column="4">
+        <widget class="QLineEdit" name="targetTxt"/>
+       </item>
+       <item row="0" column="3">
+        <widget class="QLabel" name="target">
+         <property name="text">
+          <string>target file</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+     <widget class="QWidget" name="horizontalLayoutWidget_3">
+      <property name="geometry">
+       <rect>
+        <x>620</x>
+        <y>20</y>
+        <width>856</width>
+        <height>521</height>
+       </rect>
+      </property>
+      <layout class="QHBoxLayout" name="targetLayout"/>
+     </widget>
+     <widget class="QPushButton" name="dropT">
+      <property name="geometry">
+       <rect>
+        <x>990</x>
+        <y>560</y>
+        <width>90</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>drop target</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="startT">
+      <property name="geometry">
+       <rect>
+        <x>1090</x>
+        <y>560</y>
+        <width>90</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Begin</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="dropS">
+      <property name="geometry">
+       <rect>
+        <x>900</x>
+        <y>560</y>
+        <width>90</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>drop src</string>
+      </property>
      </widget>
     </widget>
    </widget>

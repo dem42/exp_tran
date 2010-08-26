@@ -34,9 +34,11 @@ void FeaturePointQLabel::paintEvent ( QPaintEvent * e)
 {
     QPainter paint(this);
     paint.setPen(Qt::red);
-    //cout << "painting" << endl;
-    //QImage img("/home/martin/iowndis.png");
-    //QPixmap pmap = QPixmap::fromImage(img);
+
+    if(this->pixmap() == 0)
+    {        
+        return;
+    }
     QPixmap pmap = *(this->pixmap());
     int x,y,w,h;
     //make the points smaller if we are drawing vs larger when we are just clicking
@@ -47,25 +49,17 @@ void FeaturePointQLabel::paintEvent ( QPaintEvent * e)
     //marked from superclass is private so this covers its visibility
     vector<Point2f> marked = getMarked();
 
-    if(this->pixmap() == 0)
+    paint.drawPixmap(0,0,pmap,x_shift,y_shift,600,650);
+
+    paint.drawText(QRectF(0,0,100,30),label_msgs[marked.size()%msgs_size]);
+
+    QPointF *points = new QPointF[marked.size()];
+    for(int i=0; i < marked.size(); i++)
     {
-        cout << "there is no pixmap" << endl;
-    }
-    else
-    {
-        paint.drawPixmap(0,0,pmap,x_shift,y_shift,600,650);
+        x = marked[i].x;
+        y = marked[i].y;
 
-        paint.drawText(QRectF(0,0,100,30),label_msgs[marked.size()%msgs_size]);
-
-        QPointF *points = new QPointF[marked.size()];
-        for(int i=0; i < marked.size(); i++)
-        {
-            x = marked[i].x;
-            y = marked[i].y;
-
-            //paint.drawText(QRectF(x,y,20,20),QString("%1").arg(i));
-            paint.fillRect(x,y,w,h,Qt::red);
-
-        }
+        //paint.drawText(QRectF(x,y,20,20),QString("%1").arg(i));
+        paint.fillRect(x,y,w,h,Qt::red);
     }
 }

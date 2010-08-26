@@ -7,8 +7,25 @@ OpticalFlowEngine::OpticalFlowEngine()
 {
 }
 
+
 void OpticalFlowEngine::computeFlow(const Mat& prevImg, const Mat& nextImg,
                                     const vector<Point2f>& prevPoints, vector<Point2f>& nextPoints)
+{
+    vector<int> dummy1, dummy2;
+    computeFlow(prevImg,nextImg,prevPoints,nextPoints,dummy1,dummy2,false);
+}
+
+void OpticalFlowEngine::computeFlow(const Mat& prevImg, const Mat& nextImg,
+                                    const vector<Point2f>& prevPoints, vector<Point2f>& nextPoints,
+                                    const std::vector<int> &curIndices, std::vector<int> &nextIndices)
+{
+    computeFlow(prevImg,nextImg,prevPoints,nextPoints,curIndices,nextIndices,true);
+}
+
+void OpticalFlowEngine::computeFlow(const Mat& prevImg, const Mat& nextImg,
+                                    const vector<Point2f>& prevPoints, vector<Point2f>& nextPoints,
+                                    const std::vector<int> &curIndices, std::vector<int> &nextIndices,
+                                    bool indicesOn)
 {
     std::cout << "in compute flow" << std::endl;
 
@@ -63,11 +80,15 @@ void OpticalFlowEngine::computeFlow(const Mat& prevImg, const Mat& nextImg,
     for(int i=0;i<number_of_features;i++)
     {
         if(flow_status[i] != 0)
+        {
             nextPoints.push_back(Point2f(guess[i].x,guess[i].y));
+            if(indicesOn)
+                nextIndices.push_back(curIndices[i]);
+        }
         else
         {
             cout << "LOST a FEATURE" << endl;
-            nextPoints.push_back(Point2f(features[i].x,features[i].y));
+            //nextPoints.push_back(Point2f(features[i].x,features[i].y));
         }
     }
 
