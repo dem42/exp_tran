@@ -108,13 +108,17 @@ void TransferTabController::replayFrame()
     static unsigned int i;
     double euler_x, euler_y, euler_z;
     Mat_<double> rmatrix;
-
+    vector<Point2f> imagePoints;
+    vector<Point3f> objectPoints;
+    Point2 *textureData;
     double tx = frameTranslation[i].at<double>(0,0);
     double ty = frameTranslation[i].at<double>(0,1);
     double tz = frameTranslation[i].at<double>(0,2);
 
     double *w_id = new double[56];
     double *w_exp = new double[7];
+
+    int img_width, img_height;
 
     sourceLabel->setPixmap(Utility::mat2QPixmap(frameData[i]));
 
@@ -144,8 +148,30 @@ void TransferTabController::replayFrame()
     }
     cout << endl;
 
+    //converts and loads the texture into opengl
+    convertFrameIntoTexture(frameData[i]);
     face_ptr->interpolate(w_id,w_exp);
-    face_widget->setFace(face_ptr);
+
+    for(int j=0;j<face_ptr->getPointNum();j++)
+        objectPoints.push_back(face_ptr->vertexes[j]);
+
+    cv::projectPoints(Mat(objectPoints),frameRotation[i],frameTranslation[i],cameraSrc,lensDist,imagePoints);
+    textureData = new Point2[imagePoints.size()];
+
+    img_width = Utility::closestLargetPowerOf2(frameData[i].size().width);
+    img_height = Utility::closestLargetPowerOf2(frameData[i].size().height);
+
+    for(int j=0;j<imagePoints.size();j++)
+    {
+        textureData[j].x = imagePoints[j].x / img_width;
+        textureData[j].y = imagePoints[j].y / img_height;
+        if(j%1000==0)
+            cout << "texture for j " << j << " is " << textureData[j].x << " " << textureData[j].y
+                 <<  "from points " << imagePoints[j].x << " " << imagePoints[j].y << endl;
+    }
+
+    face_widget->setFace(face_ptr,textureData);
+    delete[] textureData;
 
 
     i++;
@@ -158,6 +184,50 @@ void TransferTabController::replayFrame()
     }
     delete[] w_id;
     delete[] w_exp;
+}
+
+
+void TransferTabController::convertFrameIntoTexture(Mat &imgO)
+{
+    int img_width = Utility::closestLargetPowerOf2(imgO.size().width);
+    int img_height = Utility::closestLargetPowerOf2(imgO.size().height);
+    cout << "huh" << img_height << " " <<  img_width << endl;
+    Mat img = Mat::ones(img_height,img_width,CV_8UC3);
+
+    int height,width,step,channels;
+    uchar * data, *img_data;
+
+    int count = 0;
+
+    for(int i=0;i<imgO.rows;i++)
+        for(int j=0;j<imgO.cols;j++)
+            img.at<char>(i,j) = imgO.at<char>(i,j);
+    //imgO.copyTo(img,Mat::ones(imgO.rows,imgO.cols,CV_8UC3));
+    //cv::resize(imgO,img,Size(512,512));
+
+    // get the image data
+    height = img.rows;
+    width = img.cols;
+    step = img.step;
+    channels = img.channels();
+    data = img.data;
+    cout << "in convert frame into texture " << endl;
+    cout << height << " " << width << " " << channels << " " << step << endl;;
+    img_data = new uchar[width*height*3];
+
+
+    for(int i=0;i<height;i++)
+    {
+        for(int j=0;j<width;j++)
+        {
+            for(int k=0;k<channels;k++)
+            {
+                img_data[count] = data[i*step+j*channels+k];
+                count++;
+            }
+        }
+    }
+    face_widget->setTexture(img_data,img_height,img_width);
 }
 
 

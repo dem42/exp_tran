@@ -29,8 +29,12 @@ public:
 
    void render();
    void setFace(Face* face_ptr);
+   void setFace(Face* face_ptr, Point2 *texture_coord);
+
    void setWireFrame(bool);
    void setCameraParameters(double cameraZPosition, double upVector, double cameraDistance);
+
+   void setTexture(uchar *img_data, int img_height, int img_width);
 
    void refreshGL();
 
@@ -56,6 +60,9 @@ private:
   void zoom(int);
 
   Face *face_ptr;
+  //in our application its not a face
+  //which has a texture .. rather a face widget has a texture
+  Point2 *texture_coord;
   int polygonNumber;
   int face_index;
   //whether we display using (line loop)wireframe or polygon (default)
@@ -81,6 +88,9 @@ private:
   double cameraZPosition;
   double cameraDistance;
   double upVector;
+
+  //texture id
+  GLuint texture_id;
 
   QString face_filename;
 };

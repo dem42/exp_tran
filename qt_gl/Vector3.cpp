@@ -85,8 +85,11 @@ double* Vector3::normalize(double*d, int len)
     for(int i=0;i<len;i++)
         sum += d[i]*d[i];
     sum = sqrt(sum);
-    for(int i=0;i<len;i++)
-        d[i] = d[i]/sum;
+    if(sum != 0)
+    {
+        for(int i=0;i<len;i++)
+            d[i] = d[i]/sum;
+    }
     return d;
 }
 

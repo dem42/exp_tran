@@ -30,6 +30,8 @@ public slots:
 
     void replayFrame();
 private:
+    void convertFrameIntoTexture(Mat &frame);
+
     ClickableQLabel *sourceLabel;
     ClickableQLabel *targetLabel;
     VideoProcessor *videoProcessor;

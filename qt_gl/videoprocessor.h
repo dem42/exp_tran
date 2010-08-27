@@ -21,7 +21,7 @@ public:
     void setFlowEngine(OpticalFlowEngine *flowEngine);
     void setOptimizer(Optimizer *paramOptimizer);
 
-private:
+private:    
     const unsigned int FRAME_MAX;
     Optimizer *paramOptimizer;
     OpticalFlowEngine *flowEngine;    

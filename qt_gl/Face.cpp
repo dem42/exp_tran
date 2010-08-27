@@ -36,21 +36,26 @@ Face::Face()
     w_exp = new double[EXP];
 
     for(int i=0;i<ID;i++)
-    {
-        if(i==33)w_id[i] = 0.2;
-        else if(i==10)w_id[i] = 0.2;
-        else if(i==20)w_id[i] = 0.2;
-        else if(i==1)w_id[i] = 0.2;
-        else if(i==50)w_id[i] = 0.2;
-        else w_id[i] = 0;
-    }
-    w_exp[0] = 0.0;
-    w_exp[1] = 0.0;
-    w_exp[2] = 0.0;
-    w_exp[3] = 0.0;
-    w_exp[4] = 1.0;
-    w_exp[5] = 0.0;
-    w_exp[6] = 0.0;
+        w_id[i] = 0.0;
+    for(int i=0;i<EXP;i++)
+        w_exp[i] = 0;
+
+//    for(int i=0;i<ID;i++)
+//    {
+//        if(i==33)w_id[i] = 0.2;
+//        else if(i==10)w_id[i] = 0.2;
+//        else if(i==20)w_id[i] = 0.2;
+//        else if(i==1)w_id[i] = 0.2;
+//        else if(i==50)w_id[i] = 0.2;
+//        else w_id[i] = 0;
+//    }
+//    w_exp[0] = 0.0;
+//    w_exp[1] = 0.0;
+//    w_exp[2] = 0.0;
+//    w_exp[3] = 0.0;
+//    w_exp[4] = 1.0;
+//    w_exp[5] = 0.0;
+//    w_exp[6] = 0.0;
     interpolate(w_id,w_exp);
 }
 
@@ -277,11 +282,6 @@ void Face::test(void)
       cout << vertex_normals[v1].x << " " << vertex_normals[v1].y << " " << vertex_normals[v1].z << endl;  
       cout << vertex_normals[v2].x << " " << vertex_normals[v2].y << " " << vertex_normals[v2].z << endl;
 
-
-      cout << "texture coord" << endl;
-      cout << texture_2d_coord[v0][0] << " " << texture_2d_coord[v0][1] << endl;
-      cout << texture_2d_coord[v1][0] << " " << texture_2d_coord[v1][1] << endl;  
-      cout << texture_2d_coord[v2][0] << " " << texture_2d_coord[v2][1] << endl;  
     }
 
   cout << "test some vector math" << endl;

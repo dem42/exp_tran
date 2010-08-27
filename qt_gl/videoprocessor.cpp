@@ -4,7 +4,7 @@
 #include "closedformoptimizer.h"
 #include "nnlsoptimizer.h"
 
-VideoProcessor::VideoProcessor() : FRAME_MAX(4)
+VideoProcessor::VideoProcessor() : FRAME_MAX(10)
 {
     flowEngine = new OpticalFlowEngine();
     paramOptimizer = new NNLSOptimizer();

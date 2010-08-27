@@ -17,6 +17,17 @@ struct Point3
         }
 };
 
+struct Point2
+{
+        float x;
+        float y;
+        operator cv::Point2f() const
+        {
+            return cv::Point2f(x,y);
+        }
+};
+
+
 struct Color3
 {
 	float r;

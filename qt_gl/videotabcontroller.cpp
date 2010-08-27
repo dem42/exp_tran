@@ -293,7 +293,7 @@ void VideoTabController::playBack()
     //after processing is complete start the timer
     timerReplay = new QTimer(this);
     connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
-    timerReplay->start(3000);
+    timerReplay->start(500);
 
 }
 

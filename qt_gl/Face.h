@@ -52,7 +52,6 @@ private:
   void loadPolygonDataFromModel();
   //Vector3 *surface_normals;
 
-  float (*texture_2d_coord)[2];
   Color3 *vertex_texture;  
   //here we are declaring pointers to an array of 3 floats (or 2 floats)
 

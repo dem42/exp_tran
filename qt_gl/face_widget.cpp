@@ -19,10 +19,14 @@ FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
   setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
 
   polygonNumber = 0;
-  face_ptr = NULL;
+
   gl_display_style = GL_POLYGON;
 
   face_index = -1;
+
+  face_ptr = new Face();
+  texture_coord = new Point2[face_ptr->getPointNum()];
+  texture_id = -1;
 
   //initialize camera parameters
   rot_x = 0;
@@ -62,6 +66,24 @@ void FaceWidget::setFace(Face* face_ptr)
     this->updateGL();
 }
 
+void FaceWidget::setFace(Face* face_ptr, Point2 *texture_coord)
+{
+    cout << "in set face with text coord" << endl;
+    this->face_ptr = face_ptr;
+    this->polygonNumber = face_ptr->getPolyNum();
+
+    for(int i=0;i<face_ptr->getPointNum();i++)
+    {
+        this->texture_coord[i].x = texture_coord[i].x;
+        this->texture_coord[i].y = texture_coord[i].y;
+    }
+
+    face_ptr->calculateBoundingSphere(center_x,center_y,center_z,diameter);
+    cout << center_x << " " << center_y << " " << center_z << " " << diameter << endl;
+    this->resizeGL(this->width(), this->height());
+    this->updateGL();
+}
+
 void FaceWidget::render()
 {  
   int v1,v2,v3;
@@ -77,6 +99,12 @@ void FaceWidget::render()
   //nothing to render
   if(face_ptr == NULL)
       return;
+
+  if(texture_id != -1)
+  {
+      glEnable(GL_TEXTURE_2D);
+      glBindTexture(GL_TEXTURE_2D, texture_id);
+  }
 
 
   for(int i=0; i<polygonNumber; i++)
@@ -103,29 +131,30 @@ void FaceWidget::render()
           glEnable(GL_COLOR_MATERIAL);
           glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
           glColor3f(0.0f, 0.2f, 0.4f);
-      }
+      }      
+
       //calls to glLoadName are ignored if we arent in GL_SELECT render mode
       //its used to tell us what the user clicked on
       glLoadName(i);
       glBegin(gl_display_style);
 
-      // glTexCoord2f(vertex_texture[v1],vertex_texture[v1]);
-      //glColor3f(vertex_texture[v1].r,vertex_texture[v1].g,vertex_texture[v1].b);
+      glTexCoord2f(texture_coord[v1].x,texture_coord[v1].y);
       glNormal3f(vertex_normals[v1].x,vertex_normals[v1].y,vertex_normals[v1].z);
       glVertex3f(vertexes[v1].x,vertexes[v1].y,vertexes[v1].z);
 
-      //glTexCoord2f(vertex_texture[v2],vertex_texture[v2]);
-      //glColor3f(vertex_texture[v2].r,vertex_texture[v2].g,vertex_texture[v2].b);
+      glTexCoord2f(texture_coord[v2].x,texture_coord[v2].y);
       glNormal3f(vertex_normals[v2].x,vertex_normals[v2].y,vertex_normals[v2].z);
       glVertex3f(vertexes[v2].x,vertexes[v2].y,vertexes[v2].z);
 
-      //glTexCoord2f(vertex_texture[v3],vertex_texture[v3]);
-      //glColor3f(vertex_texture[v3].r,vertex_texture[v3].g,vertex_texture[v3].b);
+      glTexCoord2f(texture_coord[v3].x,texture_coord[v3].y);
       glNormal3f(vertex_normals[v3].x,vertex_normals[v3].y,vertex_normals[v3].z);
       glVertex3f(vertexes[v3].x,vertexes[v3].y,vertexes[v3].z);
       glEnd();
 
     }
+
+  if(texture_id != -1)
+      glDisable(GL_TEXTURE_2D);
 }
 
 void FaceWidget::setTransParams(double r_x, double r_y, double r_z, double t_x, double t_y, double t_z)
@@ -330,7 +359,6 @@ int FaceWidget::selectPoint(const QPoint &pos)
     glLoadIdentity();
     gluPickMatrix(GLdouble(pos.x()), GLdouble(viewport[3] - pos.y()),
                   5.0, 5.0, viewport);
-    //gluPerspective(60, (GLfloat)width()/(GLfloat)height(), 1.0, 2000.0);
 
     setupFrustumParameters(left,right,bottom,top,near,far);  
     glFrustum(left,right,bottom,top,near,far);
@@ -381,4 +409,31 @@ void FaceWidget::resizeGL(int width, int height)
 
   //switch back to transformation matrix
   glMatrixMode(GL_MODELVIEW);
+}
+
+void FaceWidget::setTexture(uchar *img_data, int img_height, int img_width)
+{
+    GLuint texture;
+
+    //get a texture name
+    glGenTextures(1, &texture);
+
+    cout << "in set texture with texture " << texture << endl;
+
+    //bind to the texture name
+    glBindTexture (GL_TEXTURE_2D, texture);
+    glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+    /* glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST); */
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    /* glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); */
+    glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    //glTexImage2D (GL_TEXTURE_2D, 0, texFormat, imageWidth, imageHeight, 0, texFormat, GL_UNSIGNED_BYTE, imageData);
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB8, img_width, img_height, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, img_data);
+
+    delete[] img_data;
+
+    texture_id = texture;
 }
