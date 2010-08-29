@@ -446,34 +446,68 @@ basis from equation \ref{eq:FEMbasis}.
 
 \subsubsection{Combining Statistical and FEM modes}
 
-\subsection{Statistical Models}
+\subsection{Statistical Models !ALTERED}
 Statiscal models attempt to understand and model the variation inherent in the
 deformable object through stastical analysis. In statistical analysis a data set
 is examined and characterised so that predictions and judgements based on the
 underlying data distributions can be made. To use the techniques of statistical
-analysis to build a model it is necessary to have a dataset to analyze. The less
-sophisticated models attempt to model the variation in the shape of an
-object. The more sophisticated ones perform statistical analysis on the entire
-appearance of the object -- including the texture, lighting etc. 
+analysis to build a model it is necessary to have a dataset to analyze. This
+dataset is made up of many instances of the class of objects we want to
+model. These instances are usually given as a set of vertices (either 2D or 3D)
+which define the object. 
 
-A \textit{shape model} describes the boundaries of an object. For instance, a
-shape model of a face will denote the location and measures of the defining
-contours of a face. To locate an object in an image the shape model must be able to
-account for the following
+The less sophisticated models attempt to model the variation of the data that defines the shape of an
+object. A \textit{shape model} describes the boundaries of an object. For instance, a
+shape model of a face will denote the location and measure of the defining
+contours of a face.
 
-An \textit{appearance model} 
+The more sophisticated models perform statistical analysis on the entire
+appearance of the object -- which includes variance coming from the texture, lighting etc. 
+This \textit{appearance model} describes the location and color of the pixels
+that define the object.
 
+\subsubsection{PCA and Eigenfaces !ALTERED}
+In 1991, Turk and Pentland \cite{eigenfaces91} pioneered a 2D model-based face recognition approach
+based on the statistical
+technique called \textit{principal component analysis} (PCA). The PCA is an orthogonal
+projection of the data onto a lower dimensional linear space such that the
+variance of the projected data is maximized. The PCA therefore
+identifies the primary directions in which data varies, since these are the
+vector directions which maximize variance. These vectors span
+the \textit{principal subspace}. The formula to compute the principal directions
+is derived from maximizing the variance of a projection of the data
+\cite{bishop}. By solving this maximization problem we find that variance in the
+$M$-dimensional principal subspace, spanned by the vectors $\mathbf{u}_i$, is given by
+\begin{equation}\label{eq:pca_eig}
+\mathbf{S}\mathbf{u}_i = \lambda_i \mathbf{u}_i
+\end{equation}
+where $\mathbf{S}$ is the $D \times D$ covariance matrix of the $D$-dimensional
+data set. From \ref{eq:pca_eig} we see that the vectors $\mathbf{u}_i$ are the
+eigenvectors, and that the $\lambda_i$ are the eigenvalues of the covariance matrix of
+data set. In order to maximize the variance of the $M$-dimensional principal subspace, given by
+this equation, we pick the $M$ eigenvectors which correspond to the largest
+eigenvalues. These $M$ eigenvectors are the principal directions which span the
+$M$-dimensional principal subspace. If $D = M$, then there is no
+dimensionality reduction and the PCA reduces to just a rotation
+of the coordinate axes to align with the axes of the principal subspace.  
+To express PCA as a linear transformation we combine the $M$ eigenvectors into a
+matrix $\mathbf{\Phi}_{pca}$ = $[\mathbf{u}_1 \ldots \mathbf{u}_m]$ to get
+\begin{equation}\label{eq:pca}
+\mathbf{S}\mathbf{\Phi}_{pca} = \mathbf{\Phi}_{pca}\mathbf{\Lambda}
+\end{equation}
+Given the $D$-dimensional data set represented as a matrix $\mathbf{D}$, then the PCA transformation matrix $\mathbf{\Phi}_{pca}$ can be calculated in two
+equivalent ways. Either we compute the covariance matrix $\mathbf{S} =
+\mathbf{U}^T\mathbf{U} / (D-1)$, where $\mathbf{U}$ is the mean centered data set
+matrix. Or the PCA transformation matrix is obtained from the singular value
+decomposition of the the mean centered data set as
+$\mathbf{U} = \mathbf{\Phi}_{pca}\Sigma\mathbf{V}$. 
 
-\subsubsection{PCA and Eigenfaces}
-In 1991, Turk and Pentland \cite{eigenfaces91} pioneered a face recognition approach
-based on the mathematical
-technique called principal component analysis (PCA). Their face recognition
+Turk and Pentland's face recognition
 scheme uses a data set of images to learn what they call
-\textit{eigenfaces}. Expressed in mathematical terms - the eigenfaces are principal components of the 2D image
-space. They represent the vectors of the 2D data set that are responsible for any
-significant variation. 
-As such these vectors are the eigenvectors of the covariance matrix of the face
-images. To obtain the eigenfaces it is necessary to compute the SVD decomposition of this
+\textit{eigenfaces}. Expressed in mathematical terms -- the eigenfaces are eigenvectors of the 2D image
+space. As seen from the PCA analysis, these eigenvectors represent the axes of a
+space spanning the 2D face data set, which are responsible for any
+significant variation. To obtain the eigenfaces they compute Turk and Pentland SVD decomposition of this
 covariance matrix. Any individual face from the training data set can then be
 exactly represented as a linear combination all the eigenfaces.
 
@@ -496,15 +530,11 @@ In an image of 256 by 256 we have a 65,536 dimensional vector that
 represents the face image. This means we would require 65,536 eigenfaces to be
 able to exactly represent every face. However, images of faces are very similar
 in their configuration which means that the underlying principal subspace of
-faces has a lower dimension than 65,536. Once the eigenfaces which span this
-principal subspace are found we can
-effectively encode a 65,536 dimensional vector using a vector of much smaller
-dimensions. 
-
-The main advantage of the eigenfaces is that we can approximate a face very well
-by a linear combination of only the eigenfaces that account for the largest
-variance. The set of $M$ eigenfaces that represent the $M$ largest variances is called
-the \textit{face space}.
+faces has a lower dimension than 65,536. To reduce the dimensionality, PCA is
+performed to identify the subset of eigenfaces which span a lower dimensional principal
+subspace. Using this subset of eigenfaces, which are called the principal
+eigenfaces, we can effectively encode a 65,536 dimensional face image vector using a vector of much smaller
+dimensions.
 
 The drawback of a PCA based model is that the recognition rate drops significantly once
 independent sources of variation are introduced. Turk and
@@ -512,11 +542,10 @@ Pentland noted that the eigenfaces approach has issues with variations in lighti
 head size, head orientation or faces exhibiting expressions \cite{eigenfaces91}. Likewise, when
 faces are partially occluded in images it causes difficulties to the technique. 
 
-The eigenfaces approach is based heavily information and coding theory
-\cite{eigenfaces91}. With the PCA it is possible to encapsulate a face image
-using low dimensional vector. As such PCA and eigenfaces are often used to
+The eigenfaces approach is based heavily information and coding theory. As
+explained, the PCA makes it possible to encapsulate a face image
+using low dimensional vector. As such PCA is often used to
 reduce dimensionality in more sophisticated modeling approaches.
-
 
 \subsubsection{Morphable Model}
 Blanz et al use PCA to construct a statistical model of 3D face shape and
@@ -537,42 +566,43 @@ Similarly, the texture vectors are defined as
 \mathbf{T_i} = (R_1,G_1,B_1,R_2,...,R_n,G_n,B_n)^T
 \end{equation}
 
-The idea behind the morphable model is that any linear combination of the
-$\mathbf{S_i}$ and $\mathbf{T_i}$ constitutes a realistic face. The full
+The idea behind the morphable model is that linear combination of the
+$\mathbf{S_i}$ and $\mathbf{T_i}$, which is within $\pm 3$ standard deviations
+from the mean, constitutes a realistic face. The full
 morphable model is the linear combination of the examples given by the formula
 
 \begin{equation}
-\mathbf{S} = \sum_{i=1}^ma_i \mathbf{S_i} \indent \mathbf{T} = \sum_{i=1}^mb_i \mathbf{T_i}
+\mathbf{S} = \sum_{i=1}^Na_i \mathbf{S_i} \indent \mathbf{T} = \sum_{i=1}^Nb_i \mathbf{T_i}
 \end{equation}
 
-Principal Component Analysis (PCA) is performed on the dataset of examples
+Blanz et al also performed a Principal Component Analysis (PCA) on the dataset of examples
 to produce orthogonal basis vectors that can be used in the morphable
-model instead of the examples directly.
+model instead of the examples directly. This reduces the dimensionality of the
+model. The eigenvectors given by $\mathbf{s_i}$ and $\mathbf{t_i}$ can be used
+to generate new faces as follows
 
-\begin{equation}
+\begin{equation}\label{eq:morhpable_pca}
 \mathbf{S} = \mathbf{\bar{s}} + \sum_{i=1}^m\alpha_i.\mathbf{s_i} \indent \mathbf{T} = \mathbf{\bar{t}} + \sum_{i=1}^m\beta_i.\mathbf{t_i}
 \end{equation}
+where $\mathbf{\bar{s}}$, $\mathbf{\bar{t}}$ are the means of the shape and
+texture data and $m < N$. The parameters $\alpha_i$ and $\beta_i$ are the
+shape and texture parameters controlling the deformable model.
 
-This process identifies vectors which represent the most variance in
-the examples, and so contain the most information about
+The PCA process identifies vectors which represent the most variance in
+the examples and as such contain the most information about
 the images. This means any image can now be represented by the linear
 combination of a smaller number of these components than would be
-required of the original examples. A limit can then be set on the number
-of components used in the model, via the value of $m$. This
-is generally set to 149, as the components beyond this contain
-mostly noise.
+required of the original examples. The linear combination is controlled by the
+parameters of the deformable model. This is in essence the eigenfaces modelling approach
+only now applied to 3D shapes and textures.
 
-
-To allow the morphable model to fit well to the source image, dense
+The shape vector and texture vector encode the location and texture values at
+specific feature (landmark) points. Therefore, to allow the morphable model to fit to the source image, a
 point-to-point correspondence must be ensured on the example
 images, so that important features such as the tip of the nose are
-correctly matched up in the examples. Then the fitting process matches
-the features in the source image to those in the examples, in order to
-calculate the correct combinations of the basis vectors.
-
-
-However, to to fit the Morphable Model of 3D faces to an image, the user has to manually select
-about 7 feature points.
+correctly matched up in the examples. During the recognition process the features in the source image are matched to those in the examples, in order to
+calculate the correct combinations of the basis vectors. According to Blanz, to fit the Morphable Model of 3D faces to an image, the user has to manually select
+about 7 feature points. 
 
 \begin{comment}
 \subsubsection{3D Reconstruction algorithm}
@@ -628,35 +658,58 @@ illumination-corrected texture extraction algorithm.
 \end{comment}
 
 
-\subsubsection{Statistical Models of Appearance}
-In their paper Statistical Models of Appearance \cite{activeApp04} Cootes and Taylor
-describe modeling approaches that consider texture variance, shape variance and the
-correlations between these two variances. The models they introduce are well suited for highly
-variable structures such as faces or internal organs. Using the shape and
-texture models, Cootes and Taylor show that it is possible to construct Active
-Shape and Active Appearance models that successfully locate
-shapes and even faces in images.
+\subsubsection{Combined Models of Shape and Appearance !ALTERED}
+Texture variations and shape variations are correlated. Clearly, with any source of
+lighting it is the shape of an object which influences what parts of the object
+will appear darker or lighter. Cootes and Taylor \cite{activeApp04} describe modeling approaches
+which account for the correlations between the two sources of
+variation can be modelled. The models they introduce are well suited for highly
+variable structures such as faces or internal organs. Using PCA based shape and
+texture models, Cootes and Taylor construct Active
+Shape and Active Appearance Models which, despite the name, are model fitting algorithms that find the parameters statistical models to fit instances of objects in images.
 
-Cootes and Taylor separate the shape and the information of a target image into
-two distinct vectors - the shape parameter vector $b_s$ and the texture
-represented by the grey-level vector $b_g$ (here the image is gray-scaled). Thus
-texture can be manipulated and investigated independent of the shape. They
-then perform PCA on both vectors, which allows them to express grey-levels and
-shape as functions of a parameter vector $c$ as follows
-\begin{gather} \label{gth:shape_mod} 
-x = \bar{x} + Q_s c\\ \label{gth:texture_mod}
-g = \bar{g} + Q_g c
-\end{gather}
-Where the shape vector $x$ and the grey-level (texture) vector $g$ are functions of the
-mean shape $\bar{x}$, the mean texture $\bar{g}$ and the matrices $Q_s$ and
-$Q_g$ which describe the modes of variation learned from the training data set
-\cite{activeApp04}. To reconstruct a new face using the model we first determine the $b_s$ and
-$b_g$ parameters from the new face image. These parameters are then
-used to calculate the $c$. Finally, the reconstruction is obtained using the
-formulas \ref{gth:shape_mod} and \ref{gth:texture_mod}.
+The shape model are constructed by annotating feature points in
+images, collecting these into a data matrix and then performing PCA on the
+covariance matrix of this data to generate a lower dimensional basis
+$\mathbf{P}_s$. The shape model then makes it possible to synthesise new shapes
+as follows
+\begin{equation}\label{eq:shape}
+\mathbf{S} = \mathbf{\bar{s}} + \mathbf{P}_s\mathbf{b_s}
+\end{equation}
+To construct the texture model, the image is first warped into the mean shape
+$\bar{s}$ to obtain a ``shape-free'' image. The gray-scale values at points in
+the shape-free which correspond to feature points in the mean shape are then
+measured and combined into a texture data matrix. Then PCA is used to find
+eingenvector matrix $\mathbf{P}_t$. This matrix of eigenvectors gives the
+linear model for texture as
+\begin{equation}\label{eq:text}
+\mathbf{T} = \mathbf{\bar{t}} + \mathbf{P}_t\mathbf{b_t}
+\end{equation}
 
-\subsubsection{Active Shape Model}
-The active shape model (ASM) proposed by Cootes and Taylor \cite{activeApp04} is based
+So similarly to the approach of Blanz as seen in formula \ref{eq:morhpable_pca}, Cootes and Taylor separate the shape and the information of a target image into
+two distinct vectors -- the shape parameter vector $\mathbf{b_s}$ and the texture
+represented by the grey-level vector $\mathbf{b_t}$ (here the image is
+gray-scaled). To obtain a model which addresses both shape and texture, these
+parameter vectors are combined into one vector $\mathbf{b} = [\mathbf{b_s}\, \mathbf{b_t}]^T$. Then PCA is applied to this combined vector to get an
+eigenvector basis $\mathbf{P_c} =
+\bigl( \begin{smallmatrix}P_cs\\P_ct\end{smallmatrix} \bigr)$ for the parameters $\mathbf{b_s}$ and
+$\mathbf{b_t}$. This new basis encapsulates the correlation between shape and
+texture, thus making it possible to express the other
+parameters as functions of a parameter vector $\mathbf{c}$ as follows
+\begin{align} \label{gth:shape_mod} 
+\mathbf{S} &= \mathbf{\bar{s}} + \mathbf{P}_s \mathbf{W}_s^{-1} \mathbf{P}_{cs}c\\
+\label{gth:texture_mod}
+\mathbf{T} &= \mathbf{\bar{t}} + \mathbf{P}_t \mathbf{P}_{ct} \mathbf{c}
+\end{align}
+where $\mathbf{W}_s$ is a diagonal matrix of weights which allows the shape and
+texture models to have different units. To reconstruct a new face using the model we first determine the $\mathbf{b_s}$ and
+$\mathbf{b_g}$ parameters from the new face image. These parameters are then
+used to calculate the $c$ using by projecting them using the eigenvector basis
+as $\mathbf{c} = \mathbf{P_c}^T\mathbf{b}$.
+
+\paragraph{Active Shape Model.}
+The Active Shape model (ASM) proposed by Cootes and Taylor is model fitting
+algorithm based
 on the statistical models of shape and texture. The ASM enables us to locate a
 shape in an image using an iterative
 procedure as shown in figure \ref{gr:asm}. To search for objects in an image
@@ -670,7 +723,7 @@ profiles smaller. This process is repeated until convergence is reached.
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.5]{images/scary_face2.png}
-\caption{ Active Shape Model iterations shown on on finding the shape of a
+\caption{ Active Shape Model iterations shown on finding the shape of a
   previously unseen face. Taken from \cite{cootesOverview01} }
 \label{gr:asm}
 \end{figure}
@@ -692,8 +745,7 @@ the fact that as a local search method, the ASM cannot escape a local minimum.
 \label{gr:bad_asm}
 \end{figure}
 
-An interesting improvement of the technique is proposed by Cootes et al
-\cite{activeApp04}. To improve the efficiency and the robustness of ASM, Cootes
+To improve the efficiency and the robustness of ASM, Cootes
 suggests performing several searches at different resolution. First a coarse
 search is performed on the image with a low resolution until the search converges. The resulting configuration
 of the shape model points from this coarse search
@@ -704,27 +756,26 @@ searching at a lower resolutions it will be easier to find the outlines of the
 face. Once the search is restarted with a higher resolution, shapes like the
 mouth and the nose can be identified.
 
-\subsubsection{Active Appearance Model}
-Modeling faces using the Active Appearance Model (AAM) is a technique explored
-by Cootes and Taylor \cite{activeApp04}. AAM takes advantage of the
-Active Shape Model which allows us to locate interesting shapes in a new
-image. The set of points defining this shape are called landmark or feature
-points. The AAM enhances the AMS search by also considering the texture
-information.
+\paragraph{Active Appearance Model.}
+The Active Appearance Model (AAM) is a model fitting technique based on a
+combined shape and texture model defined by equations \ref{gth:shape_mod} and \ref{gth:texture_mod}. The AAM enhances the Active Shape model search by also considering the texture
+information in the entire object.
 
 The AAM search attempts to minimize the difference between the texture (the
 grey-levels) of the image we are searching and the grey-levels of the
-image generated with the current model parameters. The difference vector that is
-minimized is defined as:
+image generated with the current model parameters. The difference vector which
+ is minimized every iteration is defined as:
 \begin{equation}
-\delta I = I_i - I_m
+\delta \mathbf{I} = \mathbf{I}_i - \mathbf{I}_m
 \end{equation}
-where $I_m$ is the vector of the grey-levels generated with the current model
-parameters and $I_i$ is a vector containing the grey-levels of the image we are
-searching in.
+where $\mathbf{I}_m$ is the vector of the grey-levels generated with the current model
+parameters and $\mathbf{I}_i$ is a vector containing the grey-levels of the
+image. The goal of AAM is to minimize the difference $\delta \mathbf{I}$ between
+the synthesized and observed grey-levels.
 
-To simplify this optimization problem, Cootes and Taylor learn the relationship
-between the difference vector $\delta I$ and the error in the model
+To simplify this optimization problem, Cootes and Taylor propose to allow the
+computer to learn the relationship
+between the difference vector $\delta \mathbf{I}$ and the error in the model
 parameters. Learning this relationship makes it possible to correctly improve the
 model for a given measured error in an iterative procedure.
 
@@ -734,20 +785,22 @@ minimizing the differences between pixels at the landmark points.
 
 \begin{figure}[H]
 
-\includegraphics[scale=0.8]{images/amm_example.png}
+\includegraphics[scale=0.7]{images/amm_example.png}
 \caption{ Active Appearance Model iterations shown when searching for previously
  unseen faces. Taken from \cite{activeApp04} }
 \label{gr:amm}
 \end{figure}
 
-The drawback of the AAM search is that it is required of the user to specify
+The drawback of both the ASM and AAM search is that it is required of the user to specify
 landmark points on the target image. This means the technique is not well suited
 for applications where the model would have to be matched to a large number of
 faces. To combat this problem, a number of automatic 2D and 3D landmark location
 solutions can be used \cite{activeApp04}.
 
-Another problem of both the ASM and the AAM lies in the fact that it does not
-distinguish or model the different variation sources. The variation caused by
+Another problem of both the ASM and the AAM lies in the fact that they do not
+distinguish or model the individual factors responsible for shape or texture
+variation. They only acknowledge two sources of variation in the image. In the
+case of face models, this means that variation caused by
 identity and the variation caused by expression are not perceived as two
 fundamentally different sources. Thus, it is impossible to only alter one
 variational source while leaving the other source constant. This makes the
@@ -1429,14 +1482,14 @@ R = \begin{pmatrix}i_1&i_2&i_3\\j_1&j_2&j_3\\k_1&k_2&k_3\end{pmatrix}
 Since the three vectors $i$, $j$ and $k$ are all orthogonal we only need to find the
 first two and obtain the third as the cross product of the other two.
 
-The translation vector is specified as the vector $\vec{OM_0}$ between the
+The translation vector is specified as the vector $\overrightarrow{OM_0}$ between the
 origin of the camera system $O$ and the origin of the object system $M_0$. The
 point $M_0$ can be conveniently picked as one off the known feature
 points. Unfortunately, the
 camera coordinate system equivalent of this point is unknown since we do not
 know the rotation matrix. However, the translation vector can be expressed in
 terms of the 2D projection of this feature point
-as $t = \frac{Z_0}{f}\vec{Om_0}$ where $m_0$ is the known 2D projection of $M_0$
+as $t = \frac{Z_0}{f}\overrightarrow{Om_0}$ where $m_0$ is the known 2D projection of $M_0$
 and $Z_0$ is the $z$-component of the translation vector. Therefore, to estimate
 the 3D pose we need to find the values of $i$, $j$ and $Z_0$.
 
@@ -1454,40 +1507,57 @@ the object is small compared to the distance from the pinhole camera.
 
 The fundamental equations of the POSIT algorithm are
 \begin{gather}\label{eq:posit}
-\vec{M_0M_i}\cdot I  = x_i(1+\varepsilon_i) - x_0\\
+\overrightarrow{M_0M_i}\cdot I  = x_i(1+\varepsilon_i) - x_0\\
 \label{eq:posit2}
-\vec{M_0M_i}\cdot J  = y_i(1+\varepsilon_i) - y_0
+\overrightarrow{M_0M_i}\cdot J  = y_i(1+\varepsilon_i) - y_0
 \end{gather}
 with
 \begin{equation*}
 I = \frac{f}{Z_0}i \mathrm{, }\quad J = \frac{f}{Z_0}j \quad \mathrm{and} \quad
-\varepsilon_i = \frac{1}{Z_0}\vec{M_0M_i} \cdot k
+\varepsilon_i = \frac{1}{Z_0}\overrightarrow{M_0M_i} \cdot k
 \end{equation*}
-During the POSIT iterations values are given to $\varepsilon_i$ starting with
+During the POSIT iterations, values are given to $\varepsilon_i$ starting with
 0 in the first iteration and then computed from $\varepsilon_i =
-\frac{1}{Z_0}\vec{M_0M_i} \cdot k$ with the $k$ and $Z_0$ as guesses from the
+\frac{1}{Z_0}\overrightarrow{M_0M_i} \cdot k$ with the $k$ and $Z_0$ being guesses from the
 previous iteration. Then the system of equations given by \ref{eq:posit},
 \ref{eq:posit2} is solved to obtain the vectors $I$ and $J$. These vectors are
 normalized to get the two rows of the rotation matrix $i$ and $j$. The
 $z$-component of the translation vector $Z_0$ is given by the norm of either $I$
 or $J$.
 
-\section{Model-based tracking}
-
+\section{Feature Point Tracking}
+As we have seen, most model based recognition techinques rely on a number identified feature
+(landmark) points to estimate the model parameters. To be able to track a model
+between successive frames of a video recording, it is therefore necessary to
+either keep locating the points in every frame or to track the movement points
+themselves. This problem of tracking the movement points or objects between
+images has spurred the developement of many algorithms. Most of these algorithms
+fall into the \textit{optical flow} category since they determine the movement
+of points based on the intensity changes at pixels. One such algorithm is the
+Kanade-Lucas-Tomasi feature tracker.
 \subsection{Kanade-Lucas-Tomasi Feature Tracker}
-The problem of registering a displaced image can be formalized by assuming we
-are given two functions $F(x)$ and $G(x)$. These function take a vector $x$ as input
-and output the pixel intensity at $x$. Therefore, these functions can be thought
-of as representing images. 
-The goal in image registration is to find a disparity vector $h$ which minimizes
-a measure of difference between $F(x + h)$ and $G(x)$ for a given region of
-interest $R$ \cite{kanade}. This region of interest $R$ is the feature which we
-are tracking. The image registration problem is shown below:
+Kanade and Lucas first introduced an iterative feature point registration algorithm in
+\cite{kanade}. Tomasi and Kanade developed a more generalized version of
+algorithm in \cite{kanade2}, \cite{kanade3}. The derivation of the algorithm is
+given by Birchfield in \cite{kanade4}.
+
+The problem of registering a displaced image can between two images is
+formalized by assuming there are two images functions $F(\mathbf{x})$ and $G(\mathbf{x})$. The image
+functions take a vector $\mathbf{x} = (x,y)^T$ as input
+and output the pixel intensity at $\mathbf{x}$. The goal in image registration
+is to find a disparity vector $\mathbf{h} = (h_x,h_y)^T$ which minimizes
+a measure of difference between $F(\mathbf{x + h})$ and $G(\mathbf{x})$ for a given window of
+interest $\mathcal{W}$. The windows is required, since it is very difficult to
+track single pixels as they can be easily confused with other pixels unless they
+have very distinct brightness. The window of interest contains a number of
+pixels and should contain sufficient texture. The feature tracking is
+illustrated in figure \ref{fg:apple} where the apple is the window of interest.
 
 \begin{figure}[H] 
 \centering
 \setlength\fboxsep{0.5pt}
 \setlength\fboxrule{0.5pt}
+\label{fg:apple}
 \subfloat[F(x)]{
   \fbox{\includegraphics[scale=0.35]{images/fx.png}}
 }
@@ -1498,39 +1568,67 @@ are tracking. The image registration problem is shown below:
   vector $h$.}
 \end{figure}
 
-The measure of difference most often used is the $L_2$ norm, which is defined
-as follows for the registration problem:
+The optimal displacement vector $\mathbf{h}$ minimizes the error function $E$ which is
+given by
 \begin{equation}
-L_2 \mathrm{norm} = (\sum_{x \in R} [F(x + h) - G(x)]^2)^{\frac{1}{2}}
+E(\mathbf{h}) = \int_{\mathcal{W}} (F(x + h) - G(x))^2 \mathop{d}x
 \end{equation}
 
-The naive way to locate the $h$ that minimizes the $L_2$ norm would be to
-iterate through all the possible values of $h$ and measure the $L_2$ norm. A
-better approach was proposed by Kanade and Lucas \cite{kanade}. Their algorithm
-specifies the order in which possible values of $h$ will be explored. The procedure
-iteratively improves the guess for $h$ by considering the spatial intensity
-gradients at each point $x$ in the image. This means that the Kanade-Lucas-Tomas
-feature tracker locally searches for the best disparity vector $h$ by using the
-information about the gradient at all points in the image. The estimation of the
-$h$ and the convergence of the algorithm is further improved by weighing the gradients using a second derivation
-approximation of the image \cite{kanade}. The weights are thus defined as:
-\begin{equation}\label{eq:weights}
-w(x) = \frac{1}{\lvert G'(x) - F'(x) \rvert}
+The naive way to locate this $h$  would be to iterate through all the possible values of $h$ and measure the $E(\mathbf{h})$ norm. A
+better approach was proposed by Kanade and Lucas. The behavior
+of the function $F(\mathbf{x})$ is approximated using a first order taylor expansion as 
+\begin{equation}\label{eq:kanade1}
+F(\mathbf{x + h}) \approx F(\mathbf{x}) + \mathbf{g}^T\mathbf{h}
 \end{equation}
-Where the w(x) was derived from an approximation to the second derivative with
-$h$ factored out since it is a constant in all the weights.
-
- The iterative scheme for the Kanade-Lucas-Tomasi algorithm is:
-\begin{align}
-&h_0 = 0\\
-&h_{k+1} = h_k + \frac{\sum_x w(x) F'(x + h)[G(x) - F(x +h_k)]}{\sum_x
-  w(x)F'(x+h_k)^2}
+where 
+\begin{equation}
+\mathbf{g} = \bigr[ \begin{smallmatrix} \frac{\partial}{\partial x}
+    \bigr(\frac{F + G}{2}\bigl) \quad \frac{\partial}{\partial y} \bigr(\frac{F + G}{2}\bigl) \end{smallmatrix} \bigl]^T
+\end{equation} 
+This approximation is used instead of $F(\mathbf{x + h})$ in the error. Then the minimum of the error
+function is located by setting the derivative of the error function with respect
+to $\mathbf{h}$ to zero. Therefore
+\begin{align}\label{eq:kanade2}
+\frac{\partial E}{\partial \mathbf{h}} = \frac{\partial}{\partial \mathbf{h}}
+\int_{\mathcal{W}} (F(x) + \mathbf{g}^T\mathbf{h} - G(x))^2 \mathrm{d}x =
+2\int_{\mathcal{W}} \mathrm{g}(F(x) + \mathbf{g}^T\mathbf{h} - G(x))
+\mathrm{d}x
 \end{align}
-where w(x) is calculated using equation \ref{eq:weights}.
+Setting the above to zero and rearranging the terms we get the fundamental
+equation which relates the spatial intensity to the optimal displacement
+$\mathbf{h}$ as
+\begin{align}\label{eq:kanade3}
+\Bigr(\int_{\mathcal{W}} \mathbf{g}\mathbf{g}^T\mathrm{d}x\Bigl)\mathbf{h} = \int_{\mathcal{W}} \mathrm{g}(F(x) - G(x))
+\mathrm{d}x
+\end{align}
+In matrix form the equation \ref{eq:kanade3} can be expressed as
+\begin{equation}\label{eq:kanade4}
+\mathbf{Z}\mathbf{h} = \mathbf{e}
+\end{equation}
+The iterative Kanade-Lusca algorithm specifies the order in which possible values of $\mathbf{h}$ will be explored. The procedure
+iteratively improves the guess for $\mathbf{h}$ by solving the equation
+\ref{eq:kanade3} with the spatial intensity
+gradients evaluated at each point $\mathbf{x}$ in the image. Thus, the algorithm locally searches for the best disparity vector $\mathbf{h}$ by using the
+information about the gradient at all points in the image. The estimation of the
+$\mathbf{h}$ and the convergence of the algorithm is further improved by
+weighing contributions of the points $\mathbf{x}$ inside the window. The
+weighing function can be a Gaussian or just set as $w(\mathbf{x}) = 1$.
 
-To further improve the technique Kanade et al suggest to perform the algorithm
-on several resolutions, using the result from the coarser resolution as starting
-$h_0$ of the algorithm with a finer resolution. 
+The integrals simplify to sums when we are dealing with pixel values in real images.
+The iterative scheme for the Kanade-Lucas-Tomasi feature tracking algorithm is therefore:
+\begin{align}
+& \mathbf{h}_0 = 0\\
+& \mathbf{h}_{k+1} = \mathbf{h}_k + \frac{\sum_{ \mathbf{x} \in \mathcal{W}} w(\mathbf{x}) \mathbf{g}[G(x) - F(\mathbf{x} + \mathbf{h}_k)]}{\sum_{ \mathbf{x} \in \mathcal{W}} w(\mathbf{x}) \mathbf{g}\mathbf{g}^T}
+\end{align}
+
+To further improve the technique it can be performed with several resolution levels, using the result from the coarser resolution as starting
+$h_0$ of the algorithm with a finer resolution. An effective variation of the
+algorithm which utilizes this approach was developed by Bouguet
+\cite{kanade4}. Bouguet's implementation of the Kanade-Lucas-Tomasi algorithm
+uses several resolution levels from highest to lowest. These resolutions
+resemble a pyramid of images, which is why this implementation is called the
+pyramid Lucas-Kanade tracker. At every level of the pyramid the iterations are
+computed to and the guess is propagated to the lower of the pyramid.
 
 The algorithm can also successfully compute the $h$ even if the region of interest has been rotated or
 scaled. If the image has been rotated or scaled we express the matching problem
@@ -1555,6 +1653,8 @@ region of interest.
 
 
 \section{Optimization}
+
+\subsection{Non Negative Least Squares}
 
 \subsection{Nelder Mead Downhill Simplex}
 
