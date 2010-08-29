@@ -1653,8 +1653,109 @@ region of interest.
 
 
 \section{Optimization}
+The task of locating the correct model parameters which match the model to an
+object in the image is an optimization problem. It may not be possible to find
+an exact match which would explain the object in the image perfectly. Therefore,
+we are interested in finding an instance of the model which is most similar to the
+object in the image. One way to measure disimilarity is through the use of an error function. If the
+value of the error function is large it means that the two entities are
+disimilar. To find a model instance which is most similar we therefore need to
+minimize the error function. Optimization techinques make it possible to locate
+minima of functions.
 
-\subsection{Non Negative Least Squares}
+\subsection{Least Squares and Non Negative Least Squares}
+An important error function, which is often utilized in statistics and engineering, is the
+sum of squares error. This error function defines the disimilarity between input values $y_i$ and target values $t_i$ as
+\begin{equation}\label{eq:nnls}
+E(y) = \sum_i (y_i - t_i)^2
+\end{equation}
+Solving a problem in the least squares sense means minimizing this error
+function. Given is a linear system of equations defined in matrix notation by
+$\mathbf{A}\mathbf{x} = \mathbf{b}$ with $\mathbf{A} \in \mathbb{R}^{m\times
+  n}$, $\mathbf{x} \in \mathbb{R}^{n\times 1}$ and $\mathbf{b} \in
+\mathbb{R}^{m\times 1}$. This linear system may not have an exact solution if it
+is overdetermined $m > n$, underdetermined $m < n$  or more generally when
+$\mathbf{A}$ is not invertible. Solving this linear system in the least squares sense
+means finding a $\mathbf{\hat{x}}$ for which the following error function is
+minimized
+\begin{equation}\label{eq:nnls2}
+E(\mathbf{\hat{x}}) = \frac{1}{2}\lVert \mathbf{b} - \mathbf{A\hat{x}} \rVert^2
+\end{equation}
+with $\lVert . \rVert$ being the vector norm (distance).
+To find this minimum we take the derivation of \ref{eq:nnls2} with respect to
+$\mathbf{\hat{x}}$ and set it to zero. The least squares solution is therefore
+\begin{equation}\label{eq:nnls2}
+\mathbf{\hat{x}} = (\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T\mathbf{b}
+\end{equation}
+where the expression $(\mathbf{A}^T\mathbf{A})^{-1}\mathbf{A}^T$ is commonly
+known as the pseudo-inverse.
+
+It is also possible to find the least squares solution of a linear system using
+singular value decomposition \cite{Press1992} if the matrix $\mathbf{A}$ is square. Usually the linear system would
+be solved by inverting $\mathbf{A}$ and pre-multiplying the equation with this
+inverse. Given the SVD $\mathbf{A} = \mathbf{U\Sigma V}^T$ we can easily invert
+$\mathbf{A}$ by inverting the right hand side to get $\mathbf{A}^{-1} =
+\mathbf{V\Sigma}^{-1}\mathbf{U}^T$. If the square $\mathbf{A}$ is not invertible it
+means that some of the diagonal elements in $\Sigma$ are 0. However, We obtain a
+least squares solution by inverting the non-zero elements of $\Sigma$ and
+pre-multiplying with $\mathbf{V\Sigma}^{-1}\mathbf{U}^T$.
+
+In some case it may be necessary to enfore constraints on the function. This is
+particularly important when the variables represent real physical entities,
+which should not be negative. Such non negativity constraints are often
+introduced to a linear system. The goal of optimization is then to solve this
+non negativity linear system in the least squares sense. The problem is
+therefore to find the $\mathbf{x^*}$ for which holds
+\begin{equation}\label{eq:nnls3}
+\mathbf{x^*} = \underset{\mathbf{x} \ge 0}{\mathrm{argmin}} \frac{1}{2}\lVert \mathbf{b} - \mathbf{Ax} \rVert^2
+\end{equation}
+To optimize this constrained error function Franc et al reformulate the problem as an equivalent
+quadratic optimization problem \cite{nnls}, \cite{nnls2}. 
+\begin{equation}\label{eq:nnls4}
+\mathbf{x^*} =  \underset{\mathbf{x} \ge 0}{\mathrm{argmin}} \Bigr( \frac{1}{2}
+\mathbf{x}^T\mathbf{H}\mathbf{x} + \mathbf{x}^T\mathbf{f} \Bigl)
+\end{equation}
+where $\mathbf{H} = \mathbf{A}^T\mathbf{A}$ and $\mathbf{f} = -\mathbf{A}^T\mathbf{b}$.
+Franc et al solve this quadratic optimization problem by first formulating the Karush-Kuhn-Tucker (KKT) conditions
+and then applying a sequential coordinate descent algorithm. The KKT conditions for the non negative least squares solution are
+given by
+\begin{align}\label{eq:nnls5}
+\mathbf{H}\mathbf{x} + \mathbf{f} - \mathbf{\mu} &= \mathbf{0}\\
+\mathbf{x} &\ge \mathbf{0}\\
+\mathbf{\mu} &\ge \mathbf{0}\\
+\mathbf{x}^T\mathbf{\mu} &= 0
+\end{align}
+The sequential coordinate-wise algorithm (SCA) then computes this solution so that the
+KKT conditions are satisfied. The SCA non-negativity least squares algorithm is
+given in \ref{a:sca}. The input matrices are  $\mathbf{H} =
+\mathbf{A}^T\mathbf{A}$ and $\mathbf{f} = -\mathbf{A}^T\mathbf{b}$ and
+$\mathbf{h}_k$ denotes a column of the matrix $\mathbf{H}$. 
+
+\begin{algorithm}\label{a:sca}
+\caption{Sequential Coordinate-wise Non-negativity Least Squares Algorithm}
+\begin{algorithmic}[1]
+\Procedure{SCANNLS}{$\mathbf{H}$,$\mathbf{f}$}
+\State \textbf{Output} $\mathbf{x^*} \ge 0$ such that $\mathbf{x^*} =
+\mathrm{argmin} \frac{1}{2}\lVert \mathbf{Ax - b} \rVert^2$
+\State \textbf{Initialization} $\mathbf{x}^0 = \mathbf{0}$ and $\mathbf{\mu}^0 =
+\mathbf{f}$
+\State \textbf{repeat}
+\For {$k = 1 \ldots n$}
+
+\State $\mathbf{x}_k^{t+1} = \mathrm{max} \Bigr(0,\mathbf{x}_k^t -
+\frac{\mathbf{\mu}_k^t}{\mathbf{H}_{k,k}} \Bigl)$
+\State $ \mathbf{x}_i^{t+1} = \mathbf{x}_i^{t+1} \quad \forall i \ne k$
+
+\State $\mathbf{\mu}^{t+1} = \mathbf{\mu}^t + (\mathbf{x}_k^{t+1} - \mathbf{x}_k^t)\mathbf{h}_k$
+
+\EndFor
+
+\State \textbf{until} stopping criteria (KKT conditions) are met.
+\EndProcedure
+\end{algorithmic}
+\end{algorithm}
+
+
 
 \subsection{Nelder Mead Downhill Simplex}
 
@@ -2009,7 +2110,7 @@ Given a database of 3D face scans that are in correspondence, the tensor-based
 model can be constructed by first organizing this data in a tensor and
 then using multilinear algebra to find a decomposition of this tensor.
 
-\subsection{Data Tensor}
+\subsection{Data Tensor}\label{s:datatesnor}
 The tensor model should be designed to address expression and identity as sources of variation in
 the data. We assume that the points are defined by the set $I_{pts}$, the
 expressions by the set $I_{exp}$ and the identities by $I_{id}$. Then we can
@@ -2071,8 +2172,8 @@ obtain the data. The procedure for flattening a tensor along the identity mode s
 The data tensor itself will need to be loaded once and flattened three times for
 the computation of the HOSVD decomposition. 
 
-\subsection{Computing the HOSVD}
-The generative tensor model is given by 
+\subsection{Computing the HOSVD !! NEW}
+The generative tensor model for the face transfer application is given by the formula 
 \begin{equation} \label{eq:generative_model2}
 \mathbf{f} = \mathcal{M} \times_2 \mathbf{w}_i^T \times_3 \mathbf{w}_e^T
 \end{equation}
@@ -2101,13 +2202,17 @@ vectors of $\mathbf{U}_{exp}$ form the basis of the space of expressions and the
 rows are invariant representations of the various expressions. These matrices
 are obtained through singular value decomposition of the flattened
 matrices as
-\begin{align}\label{eq:svd}
+\begin{align}\label{eq:svdi}
 \mathcal{D}_{(2)} &= \mathbf{U}_{id} \mathbf{\Sigma}_{id} \mathbf{V}_{id}^T\\
+\label{eq:svde}
 \mathcal{D}_{(3)} &= \mathbf{U}_{exp} \mathbf{\Sigma}_{exp} \mathbf{V}_{exp}^T
 \end{align}
 However, computing the mode matrices using the above equations is often not
 feasible due to computer memory constraints. This can be easily seen if one considers the magnitude of the matrices
-involved in the computation. In an application with 56 identities, 7 expressions
+involved in the computation. Consider the dimensions of the flattened
+matrices seen in \ref{eq:svdi} and \ref{eq:svde}. The data tensor we described
+in section \ref{s:datatesnor} has
+dimensions $I_{pts} \times I_{id} \times I_{exp}$. The matrix !!!! TODO For instance, in an application with 56 identities, 7 expressions
 and 5090 vertices, the data tensor has three dimensions and a size $56\times
 7\times (5090*3)$. A
 matrix flattened along the expression mode space then has two dimensions and a size
@@ -2117,10 +2222,42 @@ allocation of memory for matrices of sizes
 $7\times 7$ for $\mathbf{U}_{exp}$, $7$ non-zero singular values in $\mathbf{\Sigma}_{exp}$ and a matrix of size
 $(56*5090*3)\times (56*5090*3)$ for $\mathbf{V}_{exp}$. This means that
 $\mathbf{V}_{exp}$ matrix needs to be represented using $855120*855120$ float values. The memory requirement of this is approximately $4*700*10^9$
-bytes. Clearly the $\mathbf{V}_{exp}$ matrix is too large and exceeds the memory constraints of
+bytes. Clearly the $\mathbf{V}_{exp}$ matrix is too large and exceeds the memory capacity of
 most personal computers.
 
+We are not interested in the matrix $\mathbf{V}$ so ideally we should try to
+avoid computing it and thereby avoid needing to allocate memory for it. Note
+that to compute a simplified and less memory demanding version we can
+post-multiply the matrix with its transpose. To illustrate this approach lets
+take a matrix $\mathbf{A}$ with dimension $m \times n$. The SVD of this matrix
+is $\mathbf{A} = \mathbf{U\Sigma V}^T$, where $\mathbf{U}$ is a $m \times m$
+orthonromal matrix, $\mathbf{\Sigma}$ a $m \times n$ diagonal matrix and $\mathbf{V}$ is a $n \times m$
+orthonormal matrix. If the goal is to obtain
+the left singular matrix $U$ then finding this matrix by means of SVD of
+$\mathbf{A}$ will be memory inefficient if $m \ll n$. However, note that 
+\begin{align}
+\mathbf{A}^T = (\mathbf{U\Sigma V}^T)^T = (\mathbf{V}^T)^T(\mathbf{U\Sigma})^T
+= \mathbf{V}\mathbf{\Sigma}^T\mathbf{U}^T = \mathbf{V\Sigma U}^T 
+\end{align}
+Therefore if we post-multiply $\mathbf{A}$ with $\mathbf{A}^T$ we obtain
+\begin{align}\label{eq:trick}
+\mathbf{A}\mathbf{A}^T = \mathbf{U\Sigma V}^T\mathbf{V\Sigma U}^T
+\end{align}
+Because $\mathbf{V}$ is orthonormal this means that $\mathbf{V}^T\mathbf{V} =
+\mathbf{I}$, where $\mathbf{I}$ is the identity matrix. Using this relationship
+equation \ref{eq:trick} simplifies to
+\begin{align}\label{eq:trick2}
+\mathbf{A}\mathbf{A}^T = \mathbf{U\Sigma}^2 \mathbf{U}^T
+\end{align}
+Since the square of a diagonal matrix is again a diagonal matrix. Therefore $\mathbf{\Sigma}^2$ is diagonal, which means that we can calculate the left
+singular matrix $\mathbf{U}$ in a memory efficient way by computing the SVD
+of $\mathbf{A}\mathbf{A}^T$. The approach defined by equation \ref{eq:trick2} is crucial in the face transfer
+application in the first step of the HOSVD algorithm.
 
+Given the mode matrices $\mathbf{U}_{id}$ and $\mathbf{U}_{exp}$ the next step
+of the HOSVD algorithm is to calculate the multilinear model using equation
+\ref{eq:model}. This can be done by utilizing the relationship between the
+Kronecker product and mode-$n$ multiplication.
 
 \chapter{Results and Evaluation}
 
