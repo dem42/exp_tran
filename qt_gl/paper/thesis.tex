@@ -1195,7 +1195,7 @@ the tensor. The expanded tensor model still retains the quality of independence
 along the modes of variance. However, due to the expansion the SDM can be
 applied to the tensor if we flatten the sub-tensors into matrices.
 
-\section{3D Pose Estimation}
+\section{3D Pose Estimation}\label{s:3dpose}
 The goal of 3D pose estimation is to determine the position and orientation of
 an object from a 2D image of the object. A special case of 3D pose estimation is
 the \textit{Perspective-n-Point} (PnP) problem. This class of problems is specified as follows -
@@ -1907,8 +1907,11 @@ restarts of the downhill algorithm are also sometimes utilized \cite{Press1992}.
 
 
 \chapter{Design and Implementation}\label{design}
+In this chapter we will design an application which understands the facial
+dynamics captured in a video recording of an individual. This understanding is
+accomplished by correctly modelling the individuals face.
 
-The purpose of the application is to transfer the expressions between two
+The practical purpose of the application is to transfer the expressions between two
 subjects. Given are video recordings of two persons and a database of
 faces. One recording is the source of the expressions, henceforth just source. The
 other recording is the target. The goal is to alter the target recording so that
@@ -2433,10 +2436,123 @@ The matrices computed through HOSVD thus make it possible to synthesize a novel 
 choosing the identity and expression model parameters $\mathbf{w}_{id}$ and
 $\mathbf{w}_{exp}$. This multilinear models allows the recovery of faces based
 on either of the identity and expression attributes. The expressive power of this model depends solely on the
-faces in the database from which the new faces are generated as linear
+variance of the faces in the database from which the new faces are generated as linear
 combinations. 
 
-\section{Fitting the Model}
+\section{Fitting Algorithm}
+Once the face model is constructed, the objective becomes to correctly adjust the
+parameters that control this model in order to match a face in an
+image. The fitting algorithm must also allow the face in the image to be scaled,
+rotated or moved. So in addition to estimating the model parameters it needs to
+approximate the 3D pose of the object. As discussed in section \ref{s:3dpose}
+the 3D pose is defined by a rotation matrix $\mathbf{R}$ and a translation
+vector $\mathbf{t}$. There are 3 parameters which uniquely describe a rotation
+matrix and 3 components in a translation vector. The total number of model parameters depends on
+the amount of persons in the database and on how many expressions these
+individuals perform. In the model construction section we defined these numbers
+to be $I_{id}$ and $I_{exp}$ respectively. Thus, to fit the model to an image there
+are $6+I_{id}+I_{exp}$ parameters which need to be estimated. To approximate
+these parameters the fitting algorithm will need to minimize the the difference
+between the face in the image and the model with the changed pose.
+
+However, the model is three dimensional and the images are just two dimensional. Therefore, to
+be able to estimate the parameters in an optimization algorithm, the 3D points
+of the model must be projected to a 2D space using a camera model.
+
+After the model has been projected, an error between the projection and the face
+in the image is calculated. To be able to calculate this error, it is necessary
+to know a set of 2D reference points in the image. These reference points, or feature
+points, correspond to known points on the model. The idea behind the
+fitting algorithm is to find how the model needs to be deformed and what 3D pose
+it needs to have so that these corresponding points on the 3D model are
+projected onto the feature points. The feature points are therefore  crucial to
+determining the difference between the model and the face in the image. Minimizing this
+difference is the purpose of the fitting algorithm. Finding feature points is
+not a trivial task since they need to correspond to points on the model.
+
+The goal of the face transfer application is to understand the facial
+dynamics of an individual from a video recording -- so therefore a sequence of images. Since we are dealing with a
+video it means that the fitting algorithm will need to be performed for
+each frame of the video recording and to do that it will need reference points
+in each and every frame. The application therefore needs to track the movement
+of the feature points so that the fitting algorithm can be automatically applied
+to every frame.
+
+\subsection{Locating Feature Points}
+The first problem that needs to be addressed before the fitting algorithm is
+designed, is how the application locates feature points. These feature points
+need to correspond to points in the 3D model so that they can be used as
+reference points in the parameter optimization step. The feature points
+therefore cannot be picked randomly or even independently of the model.
+
+One approach is to designate which points on
+the model will be used as correspondences to the feature points during the model construction
+step. In the case of the face transfer application these points should be chosen
+so that their positions can be used to determine expressions. These points can
+be the corners of the mouth, the tip of the nose and other easily
+distinguishable features on the face model. Given this predefined set of points
+on the model, the feature points which correspond to them are located in the
+image. This can be done either manuallly by a user who selects the locations of
+these feature points one by one. Reference points selection in the image could likewise be perfromed with an automatic
+feature detector such as the Viola-Jones object detection framework \cite{viola}.
+
+The manual approach is more flexible, simple and less error prone. The
+flexibility comes from the fact that adding a new feature point to the model
+does not necessitate the writing of a new feature detector. However, it can be
+tedious for the user to have to select a large number of points in the image and
+it is certainly not as impressive as when these points are located
+automatically. 
+
+The drawback of using automatic feature detectors is the fact that they
+introduce error. The feature locations they detect are guesses. One of the
+challenges that the expression transfer application faces is that estimating the
+correct expression requires alot of detailed information. Any amount of error is
+significantly counterproductive since it will inevitably increase during the
+feature tracking stage.
+
+For the sake of flexibility and simplicity the expression transfer application
+is designed with a fixed set of feature points on the model. The user is then
+asked to provide the corresponding feature points on the first frame of the
+video. The default feature points on the model are shown in figure
+\ref{fg:featurePoints}.
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.40]{images/featurePoints.png}
+\par\end{centering}
+
+\caption{Sample 3D face scans from the Binghamton database along with the
+  corresponding texture maps. Taken from \cite{binghamton}}
+\label{fg:featurePoints}
+\end{figure}
+
+The user selects the feature points simply by clicking on the correct pixel in
+the image. During the selection process, he is guided with a label which informs
+him which feature point he should select next. This design is shown in figure
+\ref{fg:featurePoints2}.
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.50]{images/featureSelection.png}
+\par\end{centering}
+
+\caption{Sample 3D face scans from the Binghamton database along with the
+  corresponding texture maps. Taken from \cite{binghamton}}
+\label{fg:featurePoints2}
+
+
+\end{figure}
+
+\subsection{Tracking Feature Points}
+\subsection{Camera Parameters}
+The parameters of this camera model must be obtained by calibrating the camera which
+was used to capture the image. Since calibration can only be performed if the
+application has access to the camera, it must also be possible for the user to
+input camera parameters into the application.
+\subsection{Optimizing the Parameters}
+\paragraph{Error Function.}
+If there are $N$ feature points $f_i$, which correspond to 
+
 \section{System Architecture}
 \chapter{Results and Evaluation}
 

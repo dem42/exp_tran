@@ -1,48 +1,62 @@
-\contentsline {chapter}{\numberline {1}Introduction}{4}{chapter.1}
-\contentsline {section}{\numberline {1.1}Motivation}{4}{section.1.1}
-\contentsline {section}{\numberline {1.2}Contributions}{5}{section.1.2}
-\contentsline {chapter}{\numberline {2}Background}{6}{chapter.2}
-\contentsline {section}{\numberline {2.1}Deformable Models}{6}{section.2.1}
-\contentsline {subsection}{\numberline {2.1.1}Physics Based Models}{7}{subsection.2.1.1}
-\contentsline {subsubsection}{Finite Element Method (FEM)}{8}{section*.2}
-\contentsline {subsubsection}{Modal Analysis}{9}{section*.3}
-\contentsline {subsubsection}{Recovering shape with FEM}{10}{section*.4}
-\contentsline {subsubsection}{Combining Statistical and FEM modes}{10}{section*.5}
-\contentsline {subsection}{\numberline {2.1.2}Statistical Models}{10}{subsection.2.1.2}
-\contentsline {subsubsection}{PCA and Eigenfaces}{11}{section*.6}
-\contentsline {subsection}{\numberline {2.1.3}Morphable Model}{12}{subsection.2.1.3}
-\contentsline {subsection}{\numberline {2.1.4}Statistical Models of Appearance}{13}{subsection.2.1.4}
-\contentsline {subsubsection}{Active Shape Model}{13}{section*.7}
-\contentsline {subsubsection}{Active Appearance Model}{14}{section*.8}
-\contentsline {subsection}{\numberline {2.1.5}Tensor Models >>>>> NEW <<<<<<<}{16}{subsection.2.1.5}
-\contentsline {subsubsection}{Multilinear Algebra}{16}{section*.9}
-\contentsline {paragraph}{Tensors.}{16}{section*.10}
-\contentsline {paragraph}{Tensor Flattening.}{16}{section*.11}
-\contentsline {paragraph}{Frobenius Norm.}{17}{section*.12}
-\contentsline {paragraph}{Mode-$n$ product.}{17}{section*.13}
-\contentsline {paragraph}{High Order Singular Value Decomposition (HOSVD).}{17}{section*.14}
-\contentsline {paragraph}{HOSVD Algorithm.}{18}{section*.15}
-\contentsline {subsubsection}{Tensor-Based Model >>>>> ALTERED <<<<<<<}{19}{section*.16}
-\contentsline {subsubsection}{Tensor-based Statistical Discriminant Method}{20}{section*.17}
-\contentsline {section}{\numberline {2.2}3D Pose Estimation}{21}{section.2.2}
-\contentsline {subsection}{\numberline {2.2.1}Camera Model}{21}{subsection.2.2.1}
-\contentsline {subsubsection}{Perspective Camera Model}{21}{section*.18}
-\contentsline {subsubsection}{Orthogonal Camera Model}{22}{section*.19}
-\contentsline {subsubsection}{Weak Perspective Camera Model}{23}{section*.20}
-\contentsline {subsection}{\numberline {2.2.2}Rotation and Translation}{24}{subsection.2.2.2}
-\contentsline {subsection}{\numberline {2.2.3}Pose estimation with the POSIT algorithm}{27}{subsection.2.2.3}
-\contentsline {section}{\numberline {2.3}Model-based tracking}{27}{section.2.3}
-\contentsline {subsection}{\numberline {2.3.1}Kanade-Lucas-Tomasi Feature Tracker}{27}{subsection.2.3.1}
-\contentsline {section}{\numberline {2.4}Optimization}{29}{section.2.4}
-\contentsline {subsection}{\numberline {2.4.1}Nelder Mead Downhill Simplex}{29}{subsection.2.4.1}
-\contentsline {subsubsection}{The Downhill Simplex Algorithm}{29}{section*.21}
-\contentsline {chapter}{\numberline {3}Design and Implementation >>>>> NEW <<<<<}{32}{chapter.3}
-\contentsline {section}{\numberline {3.1}Design Challenges}{33}{section.3.1}
-\contentsline {section}{\numberline {3.2}Pre-processing}{34}{section.3.2}
-\contentsline {subsection}{\numberline {3.2.1}Correspondence}{34}{subsection.3.2.1}
-\contentsline {subsection}{\numberline {3.2.2}Database}{34}{subsection.3.2.2}
-\contentsline {section}{\numberline {3.3}Model Construction}{36}{section.3.3}
-\contentsline {subsection}{\numberline {3.3.1}Data Tensor}{36}{subsection.3.3.1}
-\contentsline {subsection}{\numberline {3.3.2}Computing the HOSVD}{37}{subsection.3.3.2}
-\contentsline {chapter}{\numberline {4}Results and Evaluation}{39}{chapter.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{40}{chapter.5}
+\contentsline {chapter}{\numberline {1}Introduction}{5}{chapter.1}
+\contentsline {section}{\numberline {1.1}Motivation}{5}{section.1.1}
+\contentsline {section}{\numberline {1.2}Contributions}{6}{section.1.2}
+\contentsline {chapter}{\numberline {2}Background}{7}{chapter.2}
+\contentsline {section}{\numberline {2.1}Deformable Models}{7}{section.2.1}
+\contentsline {subsection}{\numberline {2.1.1}Physics Based Models}{8}{subsection.2.1.1}
+\contentsline {subsubsection}{\numberline {2.1.1.1}Finite Element Method (FEM)}{9}{subsubsection.2.1.1.1}
+\contentsline {subsubsection}{\numberline {2.1.1.2}Modal Analysis}{10}{subsubsection.2.1.1.2}
+\contentsline {subsubsection}{\numberline {2.1.1.3}Recovering shape with FEM}{11}{subsubsection.2.1.1.3}
+\contentsline {subsubsection}{\numberline {2.1.1.4}Combining Statistical and FEM modes}{11}{subsubsection.2.1.1.4}
+\contentsline {subsection}{\numberline {2.1.2}Statistical Models !ALTERED}{11}{subsection.2.1.2}
+\contentsline {subsubsection}{\numberline {2.1.2.1}PCA and Eigenfaces !ALTERED}{12}{subsubsection.2.1.2.1}
+\contentsline {subsubsection}{\numberline {2.1.2.2}Morphable Model}{13}{subsubsection.2.1.2.2}
+\contentsline {subsubsection}{\numberline {2.1.2.3}Combined Models of Shape and Appearance !ALTERED}{14}{subsubsection.2.1.2.3}
+\contentsline {paragraph}{Active Shape Model.}{15}{section*.2}
+\contentsline {paragraph}{Active Appearance Model.}{17}{section*.3}
+\contentsline {subsection}{\numberline {2.1.3}Tensor Models}{18}{subsection.2.1.3}
+\contentsline {subsubsection}{\numberline {2.1.3.1}Multilinear Algebra}{18}{subsubsection.2.1.3.1}
+\contentsline {paragraph}{Tensors.}{18}{section*.4}
+\contentsline {paragraph}{Tensor Flattening.}{18}{section*.5}
+\contentsline {paragraph}{Kronecker product.}{19}{section*.6}
+\contentsline {subparagraph}{Properties.}{20}{section*.7}
+\contentsline {subparagraph}{Proof.}{20}{section*.8}
+\contentsline {subparagraph}{Proof.}{20}{section*.9}
+\contentsline {subparagraph}{Proof.}{20}{section*.10}
+\contentsline {paragraph}{Frobenius Norm.}{21}{section*.11}
+\contentsline {paragraph}{Mode-$n$ product.}{21}{section*.12}
+\contentsline {paragraph}{High Order Singular Value Decomposition (HOSVD).}{21}{section*.13}
+\contentsline {paragraph}{HOSVD Algorithm.}{22}{section*.14}
+\contentsline {subsubsection}{\numberline {2.1.3.2}Tensor-Based Model}{22}{subsubsection.2.1.3.2}
+\contentsline {subsubsection}{\numberline {2.1.3.3}Tensor-based Statistical Discriminant Method}{24}{subsubsection.2.1.3.3}
+\contentsline {section}{\numberline {2.2}3D Pose Estimation}{25}{section.2.2}
+\contentsline {subsection}{\numberline {2.2.1}Camera Model}{25}{subsection.2.2.1}
+\contentsline {subsubsection}{\numberline {2.2.1.1}Perspective Camera Model}{25}{subsubsection.2.2.1.1}
+\contentsline {subsubsection}{\numberline {2.2.1.2}Orthogonal Camera Model}{26}{subsubsection.2.2.1.2}
+\contentsline {subsubsection}{\numberline {2.2.1.3}Weak Perspective Camera Model}{27}{subsubsection.2.2.1.3}
+\contentsline {subsection}{\numberline {2.2.2}Rotation and Translation}{28}{subsection.2.2.2}
+\contentsline {subsection}{\numberline {2.2.3}Pose estimation with the POSIT algorithm !NEW}{31}{subsection.2.2.3}
+\contentsline {section}{\numberline {2.3}Feature Point Tracking}{32}{section.2.3}
+\contentsline {subsection}{\numberline {2.3.1}Kanade-Lucas-Tomasi Feature Tracker}{32}{subsection.2.3.1}
+\contentsline {section}{\numberline {2.4}Optimization}{34}{section.2.4}
+\contentsline {subsection}{\numberline {2.4.1}Least Squares and Non Negative Least Squares}{35}{subsection.2.4.1}
+\contentsline {subsection}{\numberline {2.4.2}Nelder Mead Downhill Simplex}{36}{subsection.2.4.2}
+\contentsline {subsubsection}{\numberline {2.4.2.1}The Downhill Simplex Algorithm}{37}{subsubsection.2.4.2.1}
+\contentsline {chapter}{\numberline {3}Design and Implementation}{40}{chapter.3}
+\contentsline {section}{\numberline {3.1}Design Challenges}{41}{section.3.1}
+\contentsline {section}{\numberline {3.2}Pre-processing}{42}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}Correspondence}{42}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}Database}{42}{subsection.3.2.2}
+\contentsline {section}{\numberline {3.3}Model Construction}{44}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Data Tensor}{44}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}Computing the HOSVD !! NEW}{45}{subsection.3.3.2}
+\contentsline {subsection}{\numberline {3.3.3}Generating new faces}{47}{subsection.3.3.3}
+\contentsline {section}{\numberline {3.4}Fitting Algorithm}{49}{section.3.4}
+\contentsline {subsection}{\numberline {3.4.1}Locating Feature Points}{50}{subsection.3.4.1}
+\contentsline {subsection}{\numberline {3.4.2}Tracking Feature Points}{51}{subsection.3.4.2}
+\contentsline {subsection}{\numberline {3.4.3}Camera Parameters}{51}{subsection.3.4.3}
+\contentsline {subsection}{\numberline {3.4.4}Optimizing the Parameters}{52}{subsection.3.4.4}
+\contentsline {paragraph}{Error Function.}{52}{section*.15}
+\contentsline {section}{\numberline {3.5}System Architecture}{52}{section.3.5}
+\contentsline {chapter}{\numberline {4}Results and Evaluation}{53}{chapter.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{54}{chapter.5}

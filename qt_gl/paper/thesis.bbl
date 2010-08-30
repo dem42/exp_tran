@@ -5,6 +5,16 @@ Klaus-Juergen Bathe.
 \newblock {\em Finite Element Procedures}.
 \newblock Prentice Hall, 1996.
 
+\bibitem{kanade3}
+Stan Birchfield.
+\newblock Derivation of kanade-lucas-tomas tracking equation.
+\newblock [http://www.ces.clemson.edu/~stb], January 1997.
+
+\bibitem{bishop}
+Christopher~M. Bishop.
+\newblock {\em Patter Recognition and Machine Learning}.
+\newblock Springer Science + Business Media, LLC, 2006.
+
 \bibitem{blanz1}
 V.~Blanz, C.~Basso, T.~Poggio, and T.~Vetter.
 \newblock Reanimating faces in images and video.
@@ -14,6 +24,22 @@ V.~Blanz, C.~Basso, T.~Poggio, and T.~Vetter.
 V.~Blanz, K.~Scherbaum, T.~Vetter, and H.P Seidel.
 \newblock Exchanging faces in images.
 \newblock {\em EUROGRAPHICS}, 23(3), 2004.
+
+\bibitem{kanade4}
+Jean-Yves Bouguet.
+\newblock Pyramidal implementation of the lucas kanade feature tracker.
+\newblock The paper is included into OpenCV distribution.
+
+\bibitem{opencv}
+Gary Bradski and Adrian Kaehler.
+\newblock {\em Learning OpenCV}.
+\newblock O'Reilly Media, Inc., 2008.
+
+\bibitem{nnls2}
+Donghui Chen and Rober~J. Plemmons.
+\newblock Nonnegativity constraints in numerical analysis.
+\newblock {\em Conference Proceedings of the Symposium on the Birth of
+  Numerical Analysis}, October 2007.
 
 \bibitem{cootesOverview01}
 T.F. Cootes and C.J. Taylor.
@@ -26,10 +52,37 @@ T.F. Cootes and C.J. Taylor.
 \newblock Statistical {M}odels of {A}ppearance for {C}omputer {V}ision.
 \newblock mar 2004.
 
+\bibitem{POSIT}
+Daniel~F. DeMenthon and Larry~S. Davis.
+\newblock Model-based object pose in 25 lines of code.
+\newblock {\em Proceedings of the European Conference on Computer Vision},
+  pages 335--343, 1992.
+
+\bibitem{matcalc}
+Paul~L. Fackler.
+\newblock Notes on matrix calculus.
+\newblock North Carolina State University, September 2005.
+
+\bibitem{nnls}
+Vojtech Franc, Vaclav Hlavac, and Mirko Navara.
+\newblock Sequential coordinate-wise algorithm for non-negative least squares
+  problem.
+\newblock {\em Research Report CTU-CMP-2005-06}, February 2005.
+
 \bibitem{lda}
 D.F. Gillies.
 \newblock Intelligent data and probabalistic inference lecture notes.
 \newblock {\em Imperial College London}, 2009.
+
+\bibitem{graphics}
+Duncan~F. Gillies.
+\newblock Graphics lecture notes 1.
+\newblock Imperial College London, 2010.
+
+\bibitem{matrix}
+Gene~H. Golub and Charles F.~Van Loan.
+\newblock {\em Matrix Computations: Third Edition}.
+\newblock The Johns Hopkins University Press, 1996.
 
 \bibitem{multilinear}
 L.~De Lathauwer.
@@ -91,10 +144,22 @@ J.~Nelder S.~Singer.
 \newblock
   [http://www.scholar-\linebreak[1]pedia.org/article/Nelder-Mead\_algorithm].
 
+\bibitem{kronecker}
+W.-H. Steeb.
+\newblock {\em Matrix Calculus and Kronecker Product with Applications and C++
+  Programs}.
+\newblock World Scientific Publishing Co. Pte. Ltd., 1997.
+
 \bibitem{deformTri}
 Robert~W. Sumner and Jovan Popovic.
 \newblock Deformation {T}ransfer for {T}riangle {M}eshes.
 \newblock {\em SIGGRAPH}, 2004.
+
+\bibitem{kanade2}
+Carlo Tomasi and Takeo Kanade.
+\newblock Detection and tracking of point features.
+\newblock {\em Carnegie Mellon University Technical Report CMU-CS-91-131},
+  April 1991.
 
 \bibitem{eigenfaces91}
 M.~Turk and A.~Pentland.
@@ -118,6 +183,12 @@ M.~Alex~O. Vasilescu and Demetri Terzopoulos.
 \newblock Multilinear projection for appearance-based recognition in the tensor
   framework.
 \newblock pages 1--8, October 2007.
+
+\bibitem{viola}
+Paul Viola and Michael Jones.
+\newblock Robust real-time object detection.
+\newblock {\em Second International Workshop on Satistical and Computational
+  Theories of Vision -- Modeling, Learning, Computing and Sampling}, July 2001.
 
 \bibitem{faceTransfer05}
 D.~Vlasic, M.~Brand, H.~Pfister, and J.~Popovic.
