@@ -976,7 +976,7 @@ invertible as well. The inverse of the Kronecker product is given by
 thus $(A^{-1} \otimes B^{-1})$ is the inverse of the Kronecker product.
 
 From \ref{eq:kron_mult} and \ref{eq:krontran} we can see that the Kronecker product of two orthogonal matrices is again orthogonal.
-\begin{align*}
+\begin{align*}\label{eq:kron_ortho}
 (A \otimes B)^T(A \otimes B) = (A^T \otimes B^T)(A \otimes B) = (A^TA \otimes
   B^TB) = (I \otimes I) = I
 \end{align*}
@@ -1728,7 +1728,7 @@ given by
 The sequential coordinate-wise algorithm (SCA) then computes this solution so that the
 KKT conditions are satisfied. The SCA non-negativity least squares algorithm is
 given in \ref{a:sca}. The input matrices are  $\mathbf{H} =
-\mathbf{A}^T\mathbf{A}$ and $\mathbf{f} = -\mathbf{A}^T\mathbf{b}$ and
+\mathbf{A}^T\mathbf{A}$, $\mathbf{f} = -\mathbf{A}^T\mathbf{b}$ and
 $\mathbf{h}_k$ denotes a column of the matrix $\mathbf{H}$. 
 
 \begin{algorithm}\label{a:sca}
@@ -2153,12 +2153,12 @@ obtain the data. The procedure for flattening a tensor along the identity mode s
 \begin{algorithmic}[1]
 \Procedure{Flatten}{$\mathcal{D}$, $\mathbf{D_{(2)}}$} \Comment{The input
   tensor, the output matrix}
-\For {$i \in I_{id}$}
+\For {$i = 1 \ldots I_{id}$}
 
-\For {$j \in I_{exp}$}
-\For {$k \in I_{pts}$}
+\For {$j 1 \ldots I_{exp}$}
+\For {$k 1 \ldots I_{pts}$}
 
-\State index $\gets j*\lvert I_{pts} \rvert + k$
+\State index $\gets j*I_{pts} + k$
 \State $\mathbf{D_{(2)}}$($i$,index) $\gets \mathcal{D}(i,j,k)$
 
 \EndFor
@@ -2203,16 +2203,29 @@ rows are invariant representations of the various expressions. These matrices
 are obtained through singular value decomposition of the flattened
 matrices as
 \begin{align}\label{eq:svdi}
-\mathcal{D}_{(2)} &= \mathbf{U}_{id} \mathbf{\Sigma}_{id} \mathbf{V}_{id}^T\\
+\mathbf{D}_{(2)} &= \mathbf{U}_{id} \mathbf{\Sigma}_{id} \mathbf{V}_{id}^T\\
 \label{eq:svde}
-\mathcal{D}_{(3)} &= \mathbf{U}_{exp} \mathbf{\Sigma}_{exp} \mathbf{V}_{exp}^T
+\mathbf{D}_{(3)} &= \mathbf{U}_{exp} \mathbf{\Sigma}_{exp} \mathbf{V}_{exp}^T
 \end{align}
 However, computing the mode matrices using the above equations is often not
-feasible due to computer memory constraints. This can be easily seen if one considers the magnitude of the matrices
+feasible due to computer memory constraints. This can be easily seen from the magnitude of the matrices
 involved in the computation. Consider the dimensions of the flattened
 matrices seen in \ref{eq:svdi} and \ref{eq:svde}. The data tensor we described
 in section \ref{s:datatesnor} has
-dimensions $I_{pts} \times I_{id} \times I_{exp}$. The matrix !!!! TODO For instance, in an application with 56 identities, 7 expressions
+dimensions $I_{pts} \times I_{id} \times I_{exp}$. The flattened matrix
+$\mathbf{D}_{(2)}$ is flattened along the identity mode and has dimensions
+$I_{id} \times I_{exp}I_{pts}$. For the SVD of this matrix we therefore need
+three matrices $\mathbf{U}_{id}$, $\mathbf{\Sigma}_{id}$ and $\mathbf{V}_{id}$
+of dimensions $I_{id} \times I_{id}$, $I_{id} \times I_{exp}I_{pts}$ and
+$I_{exp}I_{pts} \times I_{exp}I_{pts}$ respectively. Flattening along the expression mode produces
+the $\mathbf{D}_{(3)}$ matrix with dimensions $I_{exp} \times
+I_{pts}I_{id}$. The matrices obtained from the decomposition of this matrix are
+$\mathbf{U}_{exp}$, $\mathbf{\Sigma}_{exp}$ and $\mathbf{V}_{exp}$ with
+dimensions $I_{exp} \times I_{exp}$, $I_{exp} \times I_{pts}I_{id}$ and
+$I_{pts}I_{id} \times I_{pts}I_{id}$.
+
+The memory requirements are best illustrated on an actual application. For
+instance, consider an application with 56 identities, 7 expressions
 and 5090 vertices, the data tensor has three dimensions and a size $56\times
 7\times (5090*3)$. A
 matrix flattened along the expression mode space then has two dimensions and a size
@@ -2231,7 +2244,7 @@ that to compute a simplified and less memory demanding version we can
 post-multiply the matrix with its transpose. To illustrate this approach lets
 take a matrix $\mathbf{A}$ with dimension $m \times n$. The SVD of this matrix
 is $\mathbf{A} = \mathbf{U\Sigma V}^T$, where $\mathbf{U}$ is a $m \times m$
-orthonromal matrix, $\mathbf{\Sigma}$ a $m \times n$ diagonal matrix and $\mathbf{V}$ is a $n \times m$
+orthonromal matrix, $\mathbf{\Sigma}$ a $m \times n$ diagonal matrix and $\mathbf{V}$ is a $n \times n$
 orthonormal matrix. If the goal is to obtain
 the left singular matrix $U$ then finding this matrix by means of SVD of
 $\mathbf{A}$ will be memory inefficient if $m \ll n$. However, note that 
@@ -2251,14 +2264,180 @@ equation \ref{eq:trick} simplifies to
 \end{align}
 Since the square of a diagonal matrix is again a diagonal matrix. Therefore $\mathbf{\Sigma}^2$ is diagonal, which means that we can calculate the left
 singular matrix $\mathbf{U}$ in a memory efficient way by computing the SVD
-of $\mathbf{A}\mathbf{A}^T$. The approach defined by equation \ref{eq:trick2} is crucial in the face transfer
+of $\mathbf{A}\mathbf{A}^T$. The approach defined by equation \ref{eq:trick2} is crucial for the face transfer
 application in the first step of the HOSVD algorithm.
 
-Given the mode matrices $\mathbf{U}_{id}$ and $\mathbf{U}_{exp}$ the next step
-of the HOSVD algorithm is to calculate the multilinear model using equation
+Once the mode matrices $\mathbf{U}_{id}$ and $\mathbf{U}_{exp}$ have been
+computed, the next step of the HOSVD algorithm is to calculate the multilinear model using equation
 \ref{eq:model}. This can be done by utilizing the relationship between the
-Kronecker product and mode-$n$ multiplication.
+Kronecker product and mode-$n$ multiplication. Starting from the HOSVD
+decomposition of the data tensor which is given by
+\begin{equation}
+\mathcal{D} = \underbrace{\mathcal{S} \times_1 \mathbf{U}_{pts}}_{\mathcal{M}} \times_2 \mathbf{U}_{id} \times_3 \mathbf{U}_{exp}
+\end{equation}
+where $\mathcal{S}$ is the core tensor and $\mathcal{M}$ is the multilinear
+model we are interested in computing. The HOSVD decomposition can then be
+rewritten using Kronecker products by flattening the core tensor and the data
+tensor along the first mode. The 
+\begin{equation}\label{eq:hosvd2}
+\mathbf{D}_{(1)} = \underbrace{\mathbf{U}_{pts}\mathbf{S}_{(1)}}_{\mathbf{M}_{(1)}} (\mathbf{U}_{id} \otimes \mathbf{U}_{exp})^T
+\end{equation}
+As seen in \ref{eq:kron_ortho}, the Kronecker product of orthogonal matricies is
+again orthogonal. Therefore equation \ref{eq:hosvd2} can be post-multiplied with
+with $\mathbf{U}_{id} \otimes \mathbf{U}_{exp}$ to give
+\begin{align}\label{eq:hosvd3}
+\mathbf{D}_{(1)} (\mathbf{U}_{id} \otimes \mathbf{U}_{exp}) &= \mathbf{M}_{(1)}
+(\mathbf{U}_{id} \otimes \mathbf{U}_{exp})^T (\mathbf{U}_{id} \otimes
+\mathbf{U}_{exp})\\
+\mathbf{D}_{(1)} (\mathbf{U}_{id} \otimes \mathbf{U}_{exp}) &=
+\mathbf{M}_{(1)}\\
+\label{eq:hosvd4}
+\mathbf{M}_{(1)} &= \mathbf{D}_{(1)} (\mathbf{U}_{id} \otimes \mathbf{U}_{exp})
+\end{align}
+Equation \ref{eq:hosvd4} is essentially equation \ref{eq:model} rewritten using Kronecker
+products. It is not necessary to compute the
+multilinear model tensor $\mathcal{M}$ from the flattened multilinear
+model matrix $\mathbf{M}_{(1)}$. This is due to the fact that the flattened multilinear
+model is obtained from the decomposition of the flattened data tensor
+$\mathbf{D}_{(1)}$ as seen in equation \ref{eq:hosvd2}. This flattened data
+tensor is composed of the 3D face scans arranged as the columns of the
+matrix. The goal of the model is to be able to synthesize face. These new faces
+should be generated as linear combinations of the
+original faces. This implies that generating new faces can be done by linear
+combination of columns of the flattened matrix $\mathbf{D}_{(1)}$. Since the
+flattened multilinear model $\mathbf{M}_{(1)}$ is part of the decomposition of
+$\mathbf{D}_{(1)}$, it can therefore be used to perform this
+linear combination.\\
 
+The two steps described can now be combined into the HOSVD algorithm for the
+face transfer application. The steps of the algorithm are as follows:
+\begin{itemize}
+\item \textbf{Step 1.} Flatten the data tensor along all modes to obtain the
+  matrices $\mathbf{D}_{(1)}$, $\mathbf{D}_{(2)}$ and $\mathbf{D}_{(3)}$.
+\item \textbf{Step 2.} Compute the identity mode matrix $\mathbf{U}_{id}$ using
+  SVD as
+\begin{align}\label{eq:hosvdsvdi}
+\mathbf{D}_{(2)}\mathbf{D}_{(2)}^T &= \mathbf{U}_{id} \mathbf{\Sigma}_{id}^2 \mathbf{U}_{id}^T
+\end{align}
+\item \textbf{Step 3.} Compute the expression mode matrix $\mathbf{U}_{exp}$ using
+  SVD as
+\begin{align}\label{eq:hosvdsvde}
+\mathbf{D}_{(3)}\mathbf{D}_{(3)}^T &= \mathbf{U}_{exp} \mathbf{\Sigma}_{exp}^2 \mathbf{U}_{exp}^T
+\end{align}
+\item \textbf{Step 4.} Finally, calculate the multilinear model flattened along
+  the first mode using the Kronecker product as
+\begin{equation}
+\mathbf{M}_{(1)} = \mathbf{D}_{(1)} (\mathbf{U}_{id} \otimes \mathbf{U}_{exp})
+\end{equation}
+\end{itemize}
+
+\subsection{Generating new faces}
+As previously mentioned, the general idea that motivates the use of statistical
+analysis techniques when building models, is that
+novel faces can be obtained from linear combinations of the faces in the 3D
+face scan database. This new face will look realistic given that the new face is close in terms of standard
+deviation to the mean. Therefore, one approach to generating new faces from the
+data tensor would be to flatten the tensor along the points mode to obtain
+$\mathbf{D}_{(1)}$ and synthesize new faces using a linear combination of the
+columns of this matrix. A face model would therefore be by choosing a set of
+parameters $\mathbf{w}$ and generating a new face $\mathbf{f}$ as 
+\begin{equation}\label{eq:gen}
+\mathbf{f} = \mathbf{D}_{(1)}\mathbf{w}
+\end{equation}
+The HOSVD algorithm calculates the multilinear model $\mathbf{M}_{(1)}$ along with the mode
+matrices $\mathbf{U}_{id}$ and $\mathbf{U}_{exp}$. These matrices form the
+decomposition of the data matrix $\mathbf{D}_{(1)}$ as per equation
+\ref{eq:hosvd2}. Thus, the generative model becomes
+\begin{equation}
+\mathbf{f} = \mathbf{M}_{(1)}(\mathbf{U}_{id} \otimes \mathbf{U}_{exp})^T\mathbf{w}
+\end{equation}
+Since we are free to choose the coefficients $\mathbf{w}$, they can be
+thought of as composed through a Kronecker product as $\mathbf{w} =
+\mathbf{w}_{id} \otimes \mathbf{w}_{exp}$. The transpose of a Kronecker product
+is equal to transposing the operands of the product. Therefore
+\begin{align}\label{eq:gen1}
+\mathbf{f} &= \mathbf{M}_{(1)}(\mathbf{U}_{id} \otimes
+\mathbf{U}_{exp})^T(\mathbf{w}_{id} \otimes \mathbf{w}_{exp})\\
+&=\mathbf{M}_{(1)}(\mathbf{U}_{id}^T \otimes
+\mathbf{U}_{exp}^T)(\mathbf{w}_{id} \otimes \mathbf{w}_{exp})\\
+\label{eq:gen2}
+&= \mathbf{M}_{(1)}(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
+\mathbf{U}_{exp}^T\mathbf{w}_{exp})
+\end{align}
+where we have used the relationship between multiplication and the Kronecker
+product shown in \ref{eq:kron_mult}. So to recover the $i$-th of the original faces
+from the multilinear model, the parameter vector $\mathbf{w}$ will have a 1 at
+the $i$-th position. When this parameter vector is multiplied with the flattened
+data tensor, the $i$-th column will be recovered. This $i$-th column is the
+$i$-th face scan in the database. 
+
+Use of the multilinear model allows more powerful recovery. For
+example to obtain the face which corresponds to the $j$-th identity
+and $k$-th expression. The parameter vector is constructed from the identity and
+expression vectors. The identity parameter vector will have a 1 at the $j$-th
+position and the expression parameter vector will have a 1 at the
+$k$-position. Taking the Kronecker product of these two will produce the
+parameter vector $\mathbf{w}$ with a 1 at the $(j*I_{exp} + k)$-th position which
+reconstructs the face with the $j$-th identity and the $k$-th expression when
+the parameter vector is multiplied with the flattened data tensor as per
+equation \ref{eq:gen}.
+
+Furhermore, any arbitrary interpolation, or indeed extrapolation of the faces in
+the database can be obtained from the multilinear model based on the choice of
+the attribute parameters. This is because any parameter vector can
+be written as a sum of vectors which all have zeros at all positions except
+one. If we define $\mathbf{e}_i$ to be a vector which has a 1 at the $i$-th position and
+a zero everywhere else then $\mathbf{w} = a_1\mathbf{e}_1 + a_2\mathbf{e}_2 +
+\ldots + a_n\mathbf{e}_n$ where the $a_i$ are arbitrary coefficients. Therefore to show that the model produces any
+arbitrary linear combination of the original faces we proceed as
+\begin{align} 
+\mathbf{M}_{(1)}(\mathbf{U}_{id} \otimes \mathbf{U}_{exp})^T\mathbf{w} &=
+\mathbf{M}_{(1)}(\mathbf{U}_{id} \otimes \mathbf{U}_{exp})^T(a_1\mathbf{e}_1 +
+a_2\mathbf{e}_2 + \ldots + a_n\mathbf{e}_n)\\
+&=a_1\mathbf{D}_{(1)}\mathbf{e}_1 +
+a_2\mathbf{D}_{(1)}\mathbf{e}_2 + \ldots + a_n\mathbf{D}_{(1)}\mathbf{e}_n
+\end{align}
+This is due to the fact that the multiplication of $\mathbf{D}_{(1)}\mathbf{e}_i$ recovers the
+$i$-th face. Therefore any linear combination can be generated using the
+multilinear model. 
+
+If the goal is to interpolate a face from the original faces, then the
+coefficients $a_i$ must all be greater or equal to 0 and they must all sum to
+1. This interpolation can equivalently be done by choosing the $\mathbf{w}_{id}$
+and $\mathbf{w}_{exp}$ to have all components greater or equal to 0 and both
+weight vectors summing to 1. The Kronecker product of two such vectors again has
+components all greater or equal to 0 and summing to 1. If the Kronecker product
+is the vector $\mathbf{w} = \mathbf{w}_{id} \otimes \mathbf{w}_{exp}$, then the
+elements of this vector are all possible combinations of
+$\mathbf{w}_{id_i}\mathbf{w}_{exp_j}$ which are the $i$-th and $j$-th components
+of the identity and expression vectors. The sum of the elements of $\mathbf{w}$ is therefore
+\begin{equation*}
+\sum_i \Bigr(\mathbf{w}_{id_i} \sum_j \mathbf{w}_{exp_i} \Bigl) = \sum_i
+\mathbf{w}_{id_i} = 1
+\end{equation*}
+All the elements of the vector $\mathbf{w}$ are also trivially greater or equal to 0
+as well.
+
+If we are not interested in interpolating between the original faces, then it is
+not necessary to store the mode matrices $\mathbf{U}_{id}$ and
+$\mathbf{U}_{exp}$. These mode matrices are invertible and thus form a
+basis for the subspaces $\mathbb{R}^{I_{id}}$ and $\mathbb{R}^{I_{exp}}$
+respectively. Thus, the operands $\mathbf{U}_{id}^T\mathbf{w}_{id}$ and 
+$\mathbf{U}_{exp}^T\mathbf{w}_{exp}$ of the Kronecker in equation \ref{eq:gen2}
+can generated any vector from these subspaces. Since any vector from these
+subspaces can be obtained inside the Kronecker product, we can safely drop the mode matrices to obtain the generative model.
+\begin{equation}\label{eq:gen4}
+\mathbf{f} = \mathbf{M}_{(1)}(\mathbf{w}_{id} \otimes \mathbf{w}_{exp})
+\end{equation}
+The matrices computed through HOSVD thus make it possible to synthesize a novel face by
+choosing the identity and expression model parameters $\mathbf{w}_{id}$ and
+$\mathbf{w}_{exp}$. This multilinear models allows the recovery of faces based
+on either of the identity and expression attributes. The expressive power of this model depends solely on the
+faces in the database from which the new faces are generated as linear
+combinations. 
+
+\section{Fitting the Model}
+\section{System Architecture}
 \chapter{Results and Evaluation}
 
 \chapter{Conclusion}
