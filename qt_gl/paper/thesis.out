@@ -48,5 +48,8 @@
 \BOOKMARK [2][-]{subsection.3.5.3}{Camera Parameters}{section.3.5}
 \BOOKMARK [2][-]{subsection.3.5.4}{Optimizing the Parameters}{section.3.5}
 \BOOKMARK [1][-]{section.3.6}{System Architecture}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.6.1}{Model Layer}{section.3.6}
+\BOOKMARK [2][-]{subsection.3.6.2}{Controller Layer}{section.3.6}
+\BOOKMARK [2][-]{subsection.3.6.3}{View Layer}{section.3.6}
 \BOOKMARK [0][-]{chapter.4}{Results and Evaluation}{}
 \BOOKMARK [0][-]{chapter.5}{Conclusion}{}

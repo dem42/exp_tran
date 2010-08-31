@@ -12,45 +12,45 @@ Warning--empty year in opengl
 Warning--empty journal in Ter2
 Warning--empty journal in binghamton
 Warning--empty year in binghamton
-You've used 37 entries,
+You've used 38 entries,
             2118 wiz_defined-function locations,
-            681 strings with 8765 characters,
-and the built_in function-call counts, 10050 in all, are:
-= -- 954
-> -- 479
+            685 strings with 8829 characters,
+and the built_in function-call counts, 10258 in all, are:
+= -- 974
+> -- 486
 < -- 4
-+ -- 191
-- -- 152
-* -- 583
-:= -- 1748
-add.period$ -- 110
-call.type$ -- 37
-change.case$ -- 180
++ -- 195
+- -- 154
+* -- 593
+:= -- 1787
+add.period$ -- 113
+call.type$ -- 38
+change.case$ -- 184
 chr.to.int$ -- 0
-cite$ -- 47
-duplicate$ -- 420
-empty$ -- 793
-format.name$ -- 152
-if$ -- 2072
+cite$ -- 48
+duplicate$ -- 430
+empty$ -- 810
+format.name$ -- 154
+if$ -- 2113
 int.to.chr$ -- 0
-int.to.str$ -- 37
-missing$ -- 38
-newline$ -- 187
-num.names$ -- 74
-pop$ -- 247
+int.to.str$ -- 38
+missing$ -- 39
+newline$ -- 192
+num.names$ -- 76
+pop$ -- 251
 preamble$ -- 1
-purify$ -- 150
+purify$ -- 153
 quote$ -- 0
-skip$ -- 306
+skip$ -- 313
 stack$ -- 0
-substring$ -- 368
-swap$ -- 66
+substring$ -- 374
+swap$ -- 67
 text.length$ -- 4
 text.prefix$ -- 0
 top$ -- 0
-type$ -- 134
+type$ -- 138
 warning$ -- 10
-while$ -- 92
-width$ -- 39
-write$ -- 375
+while$ -- 94
+width$ -- 40
+write$ -- 385
 (There were 10 warnings)

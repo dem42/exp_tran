@@ -62,5 +62,8 @@
 \contentsline {subsection}{\numberline {3.5.4}Optimizing the Parameters}{54}{subsection.3.5.4}
 \contentsline {paragraph}{Error Function.}{54}{section*.15}
 \contentsline {section}{\numberline {3.6}System Architecture}{54}{section.3.6}
-\contentsline {chapter}{\numberline {4}Results and Evaluation}{55}{chapter.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{56}{chapter.5}
+\contentsline {subsection}{\numberline {3.6.1}Model Layer}{55}{subsection.3.6.1}
+\contentsline {subsection}{\numberline {3.6.2}Controller Layer}{55}{subsection.3.6.2}
+\contentsline {subsection}{\numberline {3.6.3}View Layer}{55}{subsection.3.6.3}
+\contentsline {chapter}{\numberline {4}Results and Evaluation}{56}{chapter.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{57}{chapter.5}

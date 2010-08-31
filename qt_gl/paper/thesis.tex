@@ -2629,38 +2629,92 @@ the expression transfer application is
 \end{equation}
 The process of computing camera parameters is called camera calibration. There
 are numerous algorithms for camera calibration. Most of them are based on first
-using the camera to produce images of a planar pattern with a known 3D geometry. The calibration algorithm is then
+using the camera to produce images of a pattern with a known 3D geometry. The calibration algorithm is then
 provided with a set of marked points on the images which correspond to points in
 the 3D geometry. A commonly used planar pattern for camera calibration is
 the chessboard pattern. The feature points in the chessboard pattern image are
 often chosen to be the inside corners of the chessboard squares. These can
 be located automatically since they are easily distinguishable using edge and
 corner detection algorithms. OpenCV provides the
-\texttt{cvFindChessboardCorners()} function for this purpose.
+\texttt{cvFindChessboardCorners(.)} function for this purpose.
 
 \begin{figure}[H]
 \begin{centering}
 \includegraphics[scale=0.48]{images/chessboard_pattern.png}
 \par\end{centering}
 
-\caption{Sample 3D face scans from the Binghamton database along with }
+\caption{Locating feature points in a chessboard pattern.}
 \label{fg:chessboard}
 
 \end{figure}
 
 The expression transfer application uses Zhang's camera calibration algorithm
-\cite{zhang}. This algorithm only requires 
+\cite{zhang}. Computing the camera parameters with Zhang's algorithm requires
+only a few images of a planer pattern (such as the chessboard) at different
+orientations. An implementation of this algorithm is provided in OpenCV in the
+function \texttt{cvCalibrateCamera(.)}. 
+
+Utilizing OpenCV, we can thus implement camera calibration in a few steps as
+\begin{itemize}
+\item \textbf{Step 1.} The user inputs two or more images of a chessboard
+  pattern.
+\item \textbf{Step 2.} The images are processed with
+  \texttt{cvFindChessboardCorners(.)} to find all the inner corners inside the
+  chessboard.
+\item \textbf{Step 3.} The function \texttt{cvCalibrateCamera(.)} is called with
+  the found corners and with the 3D geometry of the board. This geometry need
+  only be defined once when writing the algorithm.
+\end{itemize}
 
 
-Since calibration can only be performed if the
-application has access to the camera, it must also be possible for the user to
-input camera parameters into the application.
+Camera calibration can only be performed if the
+user has access to the camera and can take images of a chessboard pattern. To
+allow for more flexibility, it must also be possible for the user to
+input camera parameters into the application manually. The GUI of the expression
+transfer application therefore includes the possibilty of either specifying the
+parameters manually or calling the automatic calibration process. The GUI of
+application provides a dialog for camera calibration. This dialog is shown in
+figure \ref{fg:camdialog}
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.60]{images/cameraDialog.png}
+\par\end{centering}
+
+\caption{The dialog element of the expression transfer user interface, which
+  allows the the user to choose between manually or automatically calibrating
+  the camera.}
+\label{fg:camdialog}
+
+\end{figure}
 
 \subsection{Optimizing the Parameters}
 \paragraph{Error Function.}
 If there are $N$ feature points $f_i$, which correspond to 
 
 \section{System Architecture}
+The system architecture of the expression transfer application follows a
+model-view-controller (MVC) design. There are three conceputal layers -- the
+view layer which is responsible for interacting with the user, the controller
+layer which processes the commands comming from the view and the model or data
+layer. The MVC architecture is depicted in figure \ref{fg:mvc} 
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.75]{images/mvc.png}
+\par\end{centering}
+
+\caption{System architecture of the expression transfer application.}
+\label{fg:mvc}
+\end{figure}
+
+Each layer contains a number of classes and interfaces, chosen so that the coupling
+between layers is decreased and the cohesion inside the layer is increased. 
+
+\subsection{Model Layer}
+\subsection{Controller Layer}
+\subsection{View Layer}
+
 \chapter{Results and Evaluation}
 
 \chapter{Conclusion}

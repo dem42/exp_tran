@@ -205,4 +205,10 @@ D.~Vlasic, M.~Brand, H.~Pfister, and J.~Popovic.
 Lijun Yin, Xiaozhou Wei, Yi~Sun, Jun Wang, and Matthew~J. Rosato.
 \newblock A 3d facial expression database for facial behavior research.
 
+\bibitem{zhang}
+Z.~Zhang.
+\newblock A flexible new technique for camera calibration.
+\newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  November 2000.
+
 \end{thebibliography}
