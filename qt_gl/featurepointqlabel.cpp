@@ -13,7 +13,7 @@ using namespace cv;
 //const QString FeaturePointQLabel::label_msgs[5] = {"tip of the nose","forehead","chin","left ear","right ear"};
 //const int FeaturePointQLabel::msgs_size = 5;
 
-const QString FeaturePointQLabel::label_msgs[20] = {"tip of the nose","left nostril",
+const QString FeaturePointQLabel::label_msgs[20] = {"Tip of the Nose","Left Nostril",
                             "right nostril","left mouth corner","right mouth corner",
                             "center of upper lip","center of bottom lip","left eye left corner","left eye",
                             "left eye right corner","right eye left corner","right eye","right eye right corner",
@@ -51,7 +51,8 @@ void FeaturePointQLabel::paintEvent ( QPaintEvent * e)
 
     paint.drawPixmap(0,0,pmap,x_shift,y_shift,600,650);
 
-    paint.drawText(QRectF(0,0,100,30),label_msgs[marked.size()%msgs_size]);
+    paint.drawText(QRectF(20,0,400,100), "SELECT FEATURE: ");
+    paint.drawText(QRectF(150,0,400,100),label_msgs[marked.size()%msgs_size]);
 
     QPointF *points = new QPointF[marked.size()];
     for(int i=0; i < marked.size(); i++)

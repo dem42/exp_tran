@@ -48,6 +48,9 @@ class Face
   static const int fPolygons[20];
   static const int fPoints_size;
 
+  static const int mouth[43];
+  static const int mouth_size;
+
 private:
   void loadPolygonDataFromModel();
   //Vector3 *surface_normals;

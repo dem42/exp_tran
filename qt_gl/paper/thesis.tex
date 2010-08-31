@@ -1206,7 +1206,7 @@ is to find how the object must be moved, rotated, scaled so that when the
 3D feature points are projected using a camera model the result will approximate
 the input set of corresponding 2D points.  
 
-\subsection{Camera Model}
+\subsection{Camera Model}\label{s:camera}
 The camera model describes a \textit{projective transformation}. This transformation maps a 3D
 point $\mathbf{X} = (X,Y,Z)^T$ to a 2D image point $\mathbf{x} = (x,y)^T$. The
 three most important camera models are the perspective model, the orthogonal
@@ -1535,7 +1535,7 @@ images has spurred the developement of many algorithms. Most of these algorithms
 fall into the \textit{optical flow} category since they determine the movement
 of points based on the intensity changes at pixels. One such algorithm is the
 Kanade-Lucas-Tomasi feature tracker.
-\subsection{Kanade-Lucas-Tomasi Feature Tracker}
+\subsection{Kanade-Lucas-Tomasi Feature Tracker}\label{s:kanade}
 Kanade and Lucas first introduced an iterative feature point registration algorithm in
 \cite{kanade}. Tomasi and Kanade developed a more generalized version of
 algorithm in \cite{kanade2}, \cite{kanade3}. The derivation of the algorithm is
@@ -2014,6 +2014,55 @@ fitting. A robust application must therefore attempt to enforce constraint to li
 accumulation. The fitting algorithm and the model therefore need to be design
 with these considerations in mind.
 
+\section{Frameworks and APIs}
+An important design and implementation question when constructing a large
+application, is deciding which software application programming interfaces
+(APIs) and software frameworks the application should be build with. The
+great advantages of utilizing on APIs and frameworks is that they implement solutions
+and algorithms very efficiently. The disadvantage is that some frameworks may
+require the user to install this framework on his machine to be able to use the
+application. Quite important is also the quality of cross-platfrom
+compatibility, which should motivate the design to choose cross-platform
+frameworks and APIs.
+
+\subsection{OpenCV}
+The expression transfer application processes images and utilizes many computer
+vision algorithms. An excellent library of computer vision algorithms and
+functions is the OpenCV library. The OpenCV is a multi-platfrom library
+written in C and C++ \cite{opencv}. It was designed to provide a simple-to-use
+computer vision infrastructure for the building vision application. A large part
+of OpenCV was developed by Intel, specifically Intel's Russian branch. The application is build with OpenCV version 2.1.0.
+
+Among the algorithms include in the OpenCV library are efficient implementations the Kanade-Lucas feature tracker
+and the POSIT algorithm for 3D pose estimation. The OpenCV library also provides
+an matrix implementation.
+
+\subsection{OpenGL}
+Since it deals with a 3D model of the human face, the expression transfer
+application should be able to graphical represent this model to the user. To
+this end we can use the popular graphics interface OpenGL. The Open Graphics Library (OpenGL) is a software interface to the graphics
+hardware \cite{opengl}. It is currently being furhter developed and maintained
+by the Khronos Group. The OpenGL API provides a large
+number of commands to render 3D objects. With OpenGL these objects are build
+from graphics primitives like points, lines and polygons. Objects rendering in OpenGL
+implemented using series of processing stages called the rendering pipeline. The
+OpenGL pipeline implements standard graphics operations such transformations
+between camera and object coordinate systems, texture mapping and lighting. \begin{comment}The
+OpenGL code is streamlined, hardware-independent and highly portable, which in
+addition to its availability has contributed to OpenGL's popularity.\end{comment}
+\subsection{Qt}
+The OpenGL graphical representation needs to be encapsulated in a user-friendly graphical user
+interface (GUI) to allow the user to load and process the video recordings. The GUI
+of choice for this application is Trolltech's Qt, because it integrates well
+with the OpenGL framework. The user interface (UI) framework Qt (pronounced as cute) was developed by Trolltech in 1991. The
+software has since been aquired by Nokia. \begin{comment}The Qt UI frameworks is a
+cross-platformand application, which simple to use especially when used together
+with the QtCreator IDE. This IDE has a built in graphical editor to create user
+interfaces. Of special importance to the expression transfer application is the
+possibility to easily integrate a Qt GUI with opengl. \end{comment} 
+The Qt framework also includes a build system called qmake, which is
+likewise cross-platform.
+
 \section{Pre-processing}
 The primary drawback of the tensor-based model is that it requires the faces in
 the database to be in \textit{correspondence}. To put faces in the database into correspondence
@@ -2088,6 +2137,7 @@ shown in figure \ref{fg:binghamton}
 \label{fg:binghamton}
 
 \end{figure}
+\clearpage
 
 The Binghamton database consists of faces stored as polygon mesh data in VMRL
 format and texture information in bit map format. For the project the pre-processed Binghamton
@@ -2099,6 +2149,7 @@ pre-processed database are in correspondence, meaning that the order of the
 vertices in every face scan is the same. Conveniently, having the face scans in
 correspondence also means that the topology data stays constant.
 
+
 The final pre-processing step before building a model is to move the center the
 face scans to the origin of the object coordinate system. This step is not always required. However, the vertices in the
 pre-processed Binghamton database have a $z$-component with an average value of
@@ -2107,6 +2158,7 @@ can even cause problems to some algorithms like the POSIT algorithm discussed in
 \ref{posit}. Centering the face scans at the origin of the object coordinate
 system can be done by merely calculating the average $x$, $y$ and $z$ of the
 entire dataset and then subtracting this average from every vertex.
+
 
 \section{Model Construction}
 Given a database of 3D face scans that are in correspondence, the tensor-based
@@ -2521,34 +2573,89 @@ video. The default feature points on the model are shown in figure
 \includegraphics[scale=0.40]{images/featurePoints.png}
 \par\end{centering}
 
-\caption{Sample 3D face scans from the Binghamton database along with the
-  corresponding texture maps. Taken from \cite{binghamton}}
+\caption{Three newly generated faces with twenty feature points (denoted by the
+  red spheres). These feature points define the correspondence between the model
+  and the image.}
 \label{fg:featurePoints}
 \end{figure}
 
 The user selects the feature points simply by clicking on the correct pixel in
-the image. During the selection process, he is guided with a label which informs
+the image. During the selection process, a label guides the user and informs
 him which feature point he should select next. This design is shown in figure
 \ref{fg:featurePoints2}.
 
 \begin{figure}[H]
 \begin{centering}
-\includegraphics[scale=0.50]{images/featureSelection.png}
+\includegraphics[scale=0.60]{images/featureSelection.png}
 \par\end{centering}
 
-\caption{Sample 3D face scans from the Binghamton database along with the
-  corresponding texture maps. Taken from \cite{binghamton}}
+\caption{The user selects points in the image which correspond to the feature
+  points on the model (see figure \ref{fg:featurePoints} ).}
 \label{fg:featurePoints2}
-
 
 \end{figure}
 
+The selection of corresponding image feature points plays a very important role
+in the optimization process of the fitting algorithm. This again is due to the
+sensitivity of expression estimation to detail.
+
 \subsection{Tracking Feature Points}
+After the user (or an automatic algorithm) has identified the position of the projections of model
+feature points in the first frame of the recording, it is necessary to find
+the positions of these points in all the successive frames. This is done
+automatically using an optical flow algorithm. This algorithm attempts to
+estimate the movement of the points.
+
+The Kanade-Lucas feature tracker, which was discussed in \ref{s:kanade}, is an
+optical flow algorithm well suited for tracking small number of points. A
+pyramidal implementation of the Kanade-Lucas feature tracker is available in the OpenCV
+
+
+During this process of approximating the
+movement of the points, error is introduced. 
 \subsection{Camera Parameters}
-The parameters of this camera model must be obtained by calibrating the camera which
-was used to capture the image. Since calibration can only be performed if the
+The feature points on the 3D model need to be projected into 2D so that a
+difference between these points can be calculated. The points are projected
+using a camera model. The parameters of this camera model must be obtained by calibrating the camera which
+was used to capture the image. There are usually three camera parameters, or intrinsic
+parameters. As seen in section \ref{s:camera}, often it is preferrable to use
+four parameters. These are the two components of the principal point $c_x$,
+$c_y$ and two parameters $f_x$ and $f_y$ which are computed from the focal
+length $f$ and pixel to real world conversion values. The camera model used in
+the expression transfer application is
+\begin{equation}\label{eq:projective}
+\gamma\begin{pmatrix}x\\y\\1\end{pmatrix}
+= \begin{pmatrix}f_x&0&c_x&0\\0&f_y&c_y&0\\0&0&1&0\end{pmatrix} \begin{pmatrix}X\\Y\\Z\\1\end{pmatrix}
+\end{equation}
+The process of computing camera parameters is called camera calibration. There
+are numerous algorithms for camera calibration. Most of them are based on first
+using the camera to produce images of a planar pattern with a known 3D geometry. The calibration algorithm is then
+provided with a set of marked points on the images which correspond to points in
+the 3D geometry. A commonly used planar pattern for camera calibration is
+the chessboard pattern. The feature points in the chessboard pattern image are
+often chosen to be the inside corners of the chessboard squares. These can
+be located automatically since they are easily distinguishable using edge and
+corner detection algorithms. OpenCV provides the
+\texttt{cvFindChessboardCorners()} function for this purpose.
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.48]{images/chessboard_pattern.png}
+\par\end{centering}
+
+\caption{Sample 3D face scans from the Binghamton database along with }
+\label{fg:chessboard}
+
+\end{figure}
+
+The expression transfer application uses Zhang's camera calibration algorithm
+\cite{zhang}. This algorithm only requires 
+
+
+Since calibration can only be performed if the
 application has access to the camera, it must also be possible for the user to
 input camera parameters into the application.
+
 \subsection{Optimizing the Parameters}
 \paragraph{Error Function.}
 If there are $N$ feature points $f_i$, which correspond to 

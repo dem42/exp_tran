@@ -87,6 +87,7 @@ void FaceWidget::setFace(Face* face_ptr, Point2 *texture_coord)
 void FaceWidget::render()
 {  
   int v1,v2,v3;
+  GLUquadric *quad = gluNewQuadric();
 
   Point3 *vertexes = face_ptr->vertexes;
   Vector3 *vertex_normals = face_ptr->vertex_normals;
@@ -94,7 +95,12 @@ void FaceWidget::render()
 
   vector<int>::iterator result;
   vector<int> fPoly;
+  vector<int> mouthPoly;
   fPoly.assign(Face::fPolygons,Face::fPolygons+Face::fPoints_size);
+  mouthPoly.assign(Face::mouth,Face::mouth+Face::mouth_size);
+
+  vector<int>fP;
+  fP.assign(Face::fPoints,Face::fPoints+Face::fPoints_size);
 
   //nothing to render
   if(face_ptr == NULL)
@@ -106,9 +112,17 @@ void FaceWidget::render()
       glBindTexture(GL_TEXTURE_2D, texture_id);
   }
 
+  glEnable(GL_COLOR_MATERIAL);
+  glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
   for(int i=0; i<polygonNumber; i++)
     {
+
+      result = std::find(mouthPoly.begin(),mouthPoly.end(),i);
+      //this is a mouth polygon so dont render it
+      if(result != mouthPoly.end())
+          continue;
+
       v1 = triangles[i][0];
       v2 = triangles[i][1];
       v3 = triangles[i][2];
@@ -116,26 +130,42 @@ void FaceWidget::render()
       //try to find if polygon i is a feature point
       result = std::find(fPoly.begin(),fPoly.end(),i);
 
-      //if the polygon i was double clicked or is a feature point .. highlight it
-      if(i == face_index || result != fPoly.end())
-      {
-          // enable color tracking
-          glEnable(GL_COLOR_MATERIAL);
-          // set material properties which will be assigned by glColor
-          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
-          glColor3f(1.0f, 0.0f, 0.0f); // red reflective properties
-      }
-      else
+      result = std::find(fP.begin(),fP.end(),v1);
+      if(result != fP.end())
       {
-          glEnable(GL_COLOR_MATERIAL);
-          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-          glColor3f(0.0f, 0.2f, 0.4f);
-      }      
+            glPushMatrix();
+            glTranslatef(vertexes[v1].x,vertexes[v1].y,vertexes[v1].z);
+
+            glColor3f(0.5f, 0.0f, 0.0f); // red reflective properties            
+            //adjust to the correct diameter
+            gluSphere(quad,diameter*(3./144.32) ,10,10);
+
+            glPopMatrix();
+      }
+
+
+      //if the polygon i was double clicked or is a feature point .. highlight it
+//      if(i == face_index || result != fPoly.end())
+//      {
+//          // enable color tracking
+//          glEnable(GL_COLOR_MATERIAL);
+//          // set material properties which will be assigned by glColor
+//          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+//
+//          glColor3f(1.0f, 0.0f, 0.0f); // red reflective properties
+//      }
+//      else
+//      {
+//          glEnable(GL_COLOR_MATERIAL);
+//          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
+//          glColor3f(0.0f, 0.2f, 0.4f);
+//      }
 
       //calls to glLoadName are ignored if we arent in GL_SELECT render mode
       //its used to tell us what the user clicked on
       glLoadName(i);
+      glColor3f(0.6f, 0.6f, 0.6f); // grey material properties
       glBegin(gl_display_style);
 
       glTexCoord2f(texture_coord[v1].x,texture_coord[v1].y);
@@ -155,6 +185,7 @@ void FaceWidget::render()
 
   if(texture_id != -1)
       glDisable(GL_TEXTURE_2D);
+  glDisable(GL_COLOR_MATERIAL);
 }
 
 void FaceWidget::setTransParams(double r_x, double r_y, double r_z, double t_x, double t_y, double t_z)
@@ -193,17 +224,19 @@ void FaceWidget::mouseMoveEvent(QMouseEvent *event)
 void FaceWidget::initializeGL(void)
 {
 
-  qglClearColor(Qt::black);
+  //background color
+  qglClearColor(Qt::white);
 
   //scary lighting
   //GLfloat LightPosition[] =  { 2.8741, -19.915, 1.0, 0.0 };
-  //GLfloat LightPosition[] =  { 0.0, 0.0, cameraZPosition, 0.0 };
+  GLfloat LightPosition[] =  { 0.0, 0.0, cameraZPosition, 0.0 };
   GLfloat LightSpecular[] = { 1.0, 1.0, 1.0 };
   GLfloat LightAmbient[] = { 0.0, 0.0, 0.0 };
   GLfloat LightDiffuse[] = { 1.0, 1.0, 1.0 };
 
   //white material specular
-  GLfloat MaterialSpecular[] = { 0.0, 0.0, 1.0 };
+//  GLfloat MaterialSpecular[] = { 0.0, 0.0, 1.0 };
+  GLfloat MaterialSpecular[] = { 1.0, 1.0, 1.0 };
   //128 being not that shiny
   GLfloat MaterialShininess[] = {128};
 
@@ -211,7 +244,7 @@ void FaceWidget::initializeGL(void)
 
   // Enable lighting
   glEnable (GL_LIGHTING);
-  glEnable (GL_LIGHT0);  
+  glEnable (GL_LIGHT0);
   //light position is transformed by model view matrix
   //glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
   glLightfv(GL_LIGHT0, GL_AMBIENT,  LightAmbient);
@@ -429,9 +462,10 @@ void FaceWidget::setTexture(uchar *img_data, int img_height, int img_width)
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     /* glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); */
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE);
+    //glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); //blends
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL); //covers
     //glTexImage2D (GL_TEXTURE_2D, 0, texFormat, imageWidth, imageHeight, 0, texFormat, GL_UNSIGNED_BYTE, imageData);
-    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB8, img_width, img_height, 0, GL_BGR_EXT, GL_UNSIGNED_BYTE, img_data);
+    glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB8, img_width, img_height, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
 
     delete[] img_data;
 

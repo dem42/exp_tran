@@ -144,6 +144,12 @@ J.~Nelder S.~Singer.
 \newblock
   [http://www.scholar-\linebreak[1]pedia.org/article/Nelder-Mead\_algorithm].
 
+\bibitem{opengl}
+Dave Shreiner, Mason Woo, Jackie Neider, and Tom Davis.
+\newblock {\em OpenGL Programming Guide: The Official Guide to Learning
+  OpenGL}.
+\newblock http://www.glprogramming.com/red/.
+
 \bibitem{kronecker}
 W.-H. Steeb.
 \newblock {\em Matrix Calculus and Kronecker Product with Applications and C++

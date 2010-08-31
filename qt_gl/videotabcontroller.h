@@ -48,6 +48,7 @@ public slots:
 
     void replayFrame();
     void calibrate();
+    void setCameraParameters();
 private:
     void calcIntrinsicParams();
     //video fileName

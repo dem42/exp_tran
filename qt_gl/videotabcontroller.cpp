@@ -37,6 +37,7 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
 
     cameraDialog = new QDialog();
     cameraUi.setupUi(cameraDialog);
+    connect(cameraUi.buttonBox,SIGNAL(accepted()),this,SLOT(setCameraParameters()));
 
     //initialize the optical flow engine
     flowEngine = new OpticalFlowEngine();
@@ -120,8 +121,9 @@ void VideoTabController::calcIntrinsicParams()
 {
     vector<Mat> imgs;
 
-    imgs.push_back(imread("../../camera1.jpg"));
     imgs.push_back(imread("../../camera2.jpg"));
+    imgs.push_back(imread("../../camera1.jpg"));
+
 
     //the size here is very important .. it cannot be a subset
     //of the inner corners in the image but the max number in there
@@ -249,7 +251,7 @@ void VideoTabController::replayFrame()
     }
     cout << endl;
 
-    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->interpolate(w_id,w_exp,true,true);
     face_widget->setFace(face_ptr);
 
 
@@ -662,6 +664,41 @@ void VideoTabController::video_file_changed(const QString str)
     fileName = str;
 
     restartCapturing();
+}
+
+void VideoTabController::setCameraParameters()
+{
+    QString fxs = cameraUi.fx->selectedText();
+    QString fys = cameraUi.fy->selectedText();
+    QString cxs = cameraUi.cx->selectedText();
+    QString cys = cameraUi.cy->selectedText();
+    bool ok = true;
+
+    double fxd = fxs.toDouble(&ok);
+    if(ok == false)
+    {
+        cerr << "not a double" << endl;
+        cameraMatrix.at<double>(0,0) = fxd;
+    }
+    double fyd = fys.toDouble(&ok);
+    if(ok == false)
+    {
+        cerr << "not a double" << endl;
+        cameraMatrix.at<double>(1,1) = fyd;
+    }
+    double cxd = cxs.toDouble(&ok);
+    if(ok == false)
+    {
+        cerr << "not a double" << endl;
+        cameraMatrix.at<double>(0,2) = cxd;
+    }
+    double cyd = cys.toDouble(&ok);
+    if(ok == false)
+    {
+        cerr << "not a double" << endl;
+        cameraMatrix.at<double>(1,2) = cyd;
+    }
+    calcIntrinsicParams();
 }
 
 void VideoTabController::toggleDrawable(bool drawable)

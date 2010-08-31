@@ -1,7 +1,7 @@
 #include "closedformoptimizer.h"
 #include "FaceModel.h"
 
-ClosedFormOptimizer::ClosedFormOptimizer() : max_iterations(1)
+ClosedFormOptimizer::ClosedFormOptimizer() : max_iterations(4)
 {    
 }
 
@@ -56,6 +56,28 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
     Matrix lin_comb_x(exr_size,1);
     Matrix lin_comb_y(id_size,1);
 
+
+    double Z_avg;
+    double average_depth;
+    Point3f p;
+    Mat_<double> proP;
+    Mat_<double> pM(3,1);
+
+    cout << "huh" << endl;
+    Rodrigues(rotation,rmatrix);
+
+    //get weights from the current face instance
+    face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
+    p = face_ptr->getPointFromPolygon(7403);
+    average_depth = face_ptr->getAverageDepth();
+    cout << "huh2 avg depth : " << face_ptr->getAverageDepth() << endl;
+    pM(0,0) = p.x;
+    pM(1,0) = p.y;
+    pM(2,0) = face_ptr->getAverageDepth();
+    cout << "face is at a distance " << p.z << endl;
+    proP = cameraMatrix*rmatrix*pM;
+    proP = proP + cameraMatrix*translation;
+    Z_avg = proP(0,2);
 
 
     regTerm_id = regparam * Mat_<double>::eye(Size(id_size,id_size));
@@ -112,7 +134,7 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
 
     //initialize variables which dont need to be computed at every step
     Rodrigues(rotation,rmatrix);
-    pr = weakCamera*rmatrix;
+    pr = (1.0/Z_avg)*weakCamera*rmatrix;
     PR = Mat_<double>::zeros(2*featurePoints.size(),3*featurePoints.size());
     PRT = Mat_<double>(3*featurePoints.size(),2*featurePoints.size());
     for(unsigned int i=0;i<featurePoints.size();i++)
@@ -134,11 +156,12 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
     {        
         //put the guesses into matrix y and x
         y.transpose(y_t);
-        Matrix::matrix_mult(y_t,u_id).transpose(lin_comb_y);
+        //Matrix::matrix_mult(y_t,u_id).transpose(lin_comb_y);
         x_t.transpose(x);
 
-        Z_ex = Matrix::kron(lin_comb_y,Matrix::eye(exr_size));
-        ZU = Z_ex*(u_ex.t());
+        //Z_ex = Matrix::kron(lin_comb_y,Matrix::eye(exr_size));        
+        //ZU = Z_ex*(u_ex.t());
+        ZU = Matrix::kron(y,Matrix::eye(exr_size));
 
         /* compute the formula :
          * compute by stacking rather then summing since with summing its possible to lose the solution
@@ -170,11 +193,12 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
 //        }
         //put the guesses into matrix y and x
         x.transpose(x_t);
-        Matrix::matrix_mult(x_t,u_ex).transpose(lin_comb_x);
+        //Matrix::matrix_mult(x_t,u_ex).transpose(lin_comb_x);
         y_t.transpose(y);
 
-        Z_id = Matrix::kron(Matrix::eye(id_size),lin_comb_x);
-        ZU = Z_id*(u_id.t());
+//        Z_id = Matrix::kron(Matrix::eye(id_size),lin_comb_x);        
+        //ZU = Z_id*(u_id.t());
+        ZU = Matrix::kron(Matrix::eye(id_size),x);
 
         /* compute the formula :
          * Sum( U*Z'*Mi'*R'*PW'*PW*R*Mi*Z*U' )*y = Sum( U*Z'*Mi'*R'*PW'*fi - (1/tz)*U*Z'*Mi'*R'*PW'*PW'*t )
@@ -220,17 +244,19 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
 
     for(int i=0;i<exr_size;i++){        
         weights_ex.push_back(w_exp[i]);
-        cout << w_exp[i] << " == " << weights_ex[i] << " ";
+        //cout << w_exp[i] << " == " << weights_ex[i] << " ";
     }
     cout << endl;
 
     for(int i=0;i<id_size;i++){        
         weights_id.push_back(w_id[i]);
-        cout << w_id[i] << " ";
+        //cout << w_id[i] << " ";
     }
     cout << endl;
 
-    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->interpolate(w_id,w_exp,true,true);
+    cout << " avg depth after : " << face_ptr->getAverageDepth() << "avg depth before : " << average_depth << endl;
+    face_ptr->setAverageDepth(average_depth);
 
     delete[] w_id;
     delete[] w_exp;

@@ -153,7 +153,7 @@ void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bo
         for(int i=0;i<n_e;i++)
             cout << row_ex[0][i] << " ";
         cout << endl;
-        Vector3::normalize(row_ex.mat[0],n_e);
+        //Vector3::normalize(row_ex.mat[0],n_e);
 
         for(int i=0;i<n_e;i++)
             cout << row_ex[0][i] << " ";
@@ -166,16 +166,19 @@ void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bo
         //brute means we are turning the dials that correspond to the basis vectors
         for(i=0;i<n_e;i++)
             row_ex[0][i] = w_ex[i];
+        //Vector3::normalize(row_ex.mat[0],n_e);
     }
     if(brute_id == false)
     {
         //multiply with u2 and u3
         row_id = Matrix::matrix_mult(m_wid,U_id);        
+        //Vector3::normalize(row_id.mat[0],n_f);
     }
     else
     {        
         for(i=0;i<n_f;i++)
-            row_id[0][i] = w_id[i];        
+            row_id[0][i] = w_id[i];
+        //Vector3::normalize(row_id.mat[0],n_f);
     }
 
 

@@ -81,6 +81,12 @@ const int Face::fPolygons[20] = {9521,8899,310,7455,1386,8934,8945,6284,7140,819
 const int Face::fPoints_size = 20;
 
 
+const int Face::mouth[43] = {975,769,768,561,352,558,349,141,142,9569,9572,9361,9360,9149,9152,8940,
+                             8939,8726,8729,8514,8302,8515,8301,8087,8090,7877,7878,7669,7458,
+                             7668,8088,8299,8517,8728,8942,9363,9151,9571,144,351,560,
+                             8941,8731};
+const int Face::mouth_size = 43;
+
 double Face::getAverageDepth() const
 {
     double zavg = 0;
@@ -203,6 +209,8 @@ int Face::getPointNum() const
 
 int Face::getPointIndexFromPolygon(int index)
 {
+    cout << "points in polygon are" << triangles[index][0] << " "
+         << triangles[index][1] << " " << triangles[index][2] << endl;
     return triangles[index][0];
 }
 

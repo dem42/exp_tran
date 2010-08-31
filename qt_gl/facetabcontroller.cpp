@@ -104,8 +104,6 @@ void FaceTabController::expression_activated(const QString str)
 void FaceTabController::identity_activated(int ident)
 {
     std::cout << "identity activated " << ident << std::endl;    
-    w_id[current_ident] = 0;
-    w_id[ident-1] = 1;
     current_ident = ident-1;
     ident_slider->setSliderPosition(w_id[current_ident]*100);
 }

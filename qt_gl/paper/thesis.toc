@@ -44,19 +44,23 @@
 \contentsline {subsubsection}{\numberline {2.4.2.1}The Downhill Simplex Algorithm}{37}{subsubsection.2.4.2.1}
 \contentsline {chapter}{\numberline {3}Design and Implementation}{40}{chapter.3}
 \contentsline {section}{\numberline {3.1}Design Challenges}{41}{section.3.1}
-\contentsline {section}{\numberline {3.2}Pre-processing}{42}{section.3.2}
-\contentsline {subsection}{\numberline {3.2.1}Correspondence}{42}{subsection.3.2.1}
-\contentsline {subsection}{\numberline {3.2.2}Database}{42}{subsection.3.2.2}
-\contentsline {section}{\numberline {3.3}Model Construction}{44}{section.3.3}
-\contentsline {subsection}{\numberline {3.3.1}Data Tensor}{44}{subsection.3.3.1}
-\contentsline {subsection}{\numberline {3.3.2}Computing the HOSVD !! NEW}{45}{subsection.3.3.2}
-\contentsline {subsection}{\numberline {3.3.3}Generating new faces}{47}{subsection.3.3.3}
-\contentsline {section}{\numberline {3.4}Fitting Algorithm}{49}{section.3.4}
-\contentsline {subsection}{\numberline {3.4.1}Locating Feature Points}{50}{subsection.3.4.1}
-\contentsline {subsection}{\numberline {3.4.2}Tracking Feature Points}{51}{subsection.3.4.2}
-\contentsline {subsection}{\numberline {3.4.3}Camera Parameters}{51}{subsection.3.4.3}
-\contentsline {subsection}{\numberline {3.4.4}Optimizing the Parameters}{52}{subsection.3.4.4}
-\contentsline {paragraph}{Error Function.}{52}{section*.15}
-\contentsline {section}{\numberline {3.5}System Architecture}{52}{section.3.5}
-\contentsline {chapter}{\numberline {4}Results and Evaluation}{53}{chapter.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{54}{chapter.5}
+\contentsline {section}{\numberline {3.2}Frameworks and APIs}{42}{section.3.2}
+\contentsline {subsection}{\numberline {3.2.1}OpenCV}{42}{subsection.3.2.1}
+\contentsline {subsection}{\numberline {3.2.2}OpenGL}{42}{subsection.3.2.2}
+\contentsline {subsection}{\numberline {3.2.3}Qt}{43}{subsection.3.2.3}
+\contentsline {section}{\numberline {3.3}Pre-processing}{43}{section.3.3}
+\contentsline {subsection}{\numberline {3.3.1}Correspondence}{43}{subsection.3.3.1}
+\contentsline {subsection}{\numberline {3.3.2}Database}{43}{subsection.3.3.2}
+\contentsline {section}{\numberline {3.4}Model Construction}{45}{section.3.4}
+\contentsline {subsection}{\numberline {3.4.1}Data Tensor}{45}{subsection.3.4.1}
+\contentsline {subsection}{\numberline {3.4.2}Computing the HOSVD !! NEW}{46}{subsection.3.4.2}
+\contentsline {subsection}{\numberline {3.4.3}Generating new faces}{49}{subsection.3.4.3}
+\contentsline {section}{\numberline {3.5}Fitting Algorithm}{50}{section.3.5}
+\contentsline {subsection}{\numberline {3.5.1}Locating Feature Points}{51}{subsection.3.5.1}
+\contentsline {subsection}{\numberline {3.5.2}Tracking Feature Points}{52}{subsection.3.5.2}
+\contentsline {subsection}{\numberline {3.5.3}Camera Parameters}{53}{subsection.3.5.3}
+\contentsline {subsection}{\numberline {3.5.4}Optimizing the Parameters}{54}{subsection.3.5.4}
+\contentsline {paragraph}{Error Function.}{54}{section*.15}
+\contentsline {section}{\numberline {3.6}System Architecture}{54}{section.3.6}
+\contentsline {chapter}{\numberline {4}Results and Evaluation}{55}{chapter.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{56}{chapter.5}

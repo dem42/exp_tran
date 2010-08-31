@@ -31,18 +31,22 @@
 \BOOKMARK [3][-]{subsubsection.2.4.2.1}{The Downhill Simplex Algorithm}{subsection.2.4.2}
 \BOOKMARK [0][-]{chapter.3}{Design and Implementation}{}
 \BOOKMARK [1][-]{section.3.1}{Design Challenges}{chapter.3}
-\BOOKMARK [1][-]{section.3.2}{Pre-processing}{chapter.3}
-\BOOKMARK [2][-]{subsection.3.2.1}{Correspondence}{section.3.2}
-\BOOKMARK [2][-]{subsection.3.2.2}{Database}{section.3.2}
-\BOOKMARK [1][-]{section.3.3}{Model Construction}{chapter.3}
-\BOOKMARK [2][-]{subsection.3.3.1}{Data Tensor}{section.3.3}
-\BOOKMARK [2][-]{subsection.3.3.2}{Computing the HOSVD !! NEW}{section.3.3}
-\BOOKMARK [2][-]{subsection.3.3.3}{Generating new faces}{section.3.3}
-\BOOKMARK [1][-]{section.3.4}{Fitting Algorithm}{chapter.3}
-\BOOKMARK [2][-]{subsection.3.4.1}{Locating Feature Points}{section.3.4}
-\BOOKMARK [2][-]{subsection.3.4.2}{Tracking Feature Points}{section.3.4}
-\BOOKMARK [2][-]{subsection.3.4.3}{Camera Parameters}{section.3.4}
-\BOOKMARK [2][-]{subsection.3.4.4}{Optimizing the Parameters}{section.3.4}
-\BOOKMARK [1][-]{section.3.5}{System Architecture}{chapter.3}
+\BOOKMARK [1][-]{section.3.2}{Frameworks and APIs}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.2.1}{OpenCV}{section.3.2}
+\BOOKMARK [2][-]{subsection.3.2.2}{OpenGL}{section.3.2}
+\BOOKMARK [2][-]{subsection.3.2.3}{Qt}{section.3.2}
+\BOOKMARK [1][-]{section.3.3}{Pre-processing}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.3.1}{Correspondence}{section.3.3}
+\BOOKMARK [2][-]{subsection.3.3.2}{Database}{section.3.3}
+\BOOKMARK [1][-]{section.3.4}{Model Construction}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.4.1}{Data Tensor}{section.3.4}
+\BOOKMARK [2][-]{subsection.3.4.2}{Computing the HOSVD !! NEW}{section.3.4}
+\BOOKMARK [2][-]{subsection.3.4.3}{Generating new faces}{section.3.4}
+\BOOKMARK [1][-]{section.3.5}{Fitting Algorithm}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.5.1}{Locating Feature Points}{section.3.5}
+\BOOKMARK [2][-]{subsection.3.5.2}{Tracking Feature Points}{section.3.5}
+\BOOKMARK [2][-]{subsection.3.5.3}{Camera Parameters}{section.3.5}
+\BOOKMARK [2][-]{subsection.3.5.4}{Optimizing the Parameters}{section.3.5}
+\BOOKMARK [1][-]{section.3.6}{System Architecture}{chapter.3}
 \BOOKMARK [0][-]{chapter.4}{Results and Evaluation}{}
 \BOOKMARK [0][-]{chapter.5}{Conclusion}{}
