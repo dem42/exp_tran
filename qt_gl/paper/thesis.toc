@@ -62,8 +62,12 @@
 \contentsline {subsection}{\numberline {3.5.4}Optimizing the Parameters}{54}{subsection.3.5.4}
 \contentsline {paragraph}{Error Function.}{54}{section*.15}
 \contentsline {section}{\numberline {3.6}System Architecture}{54}{section.3.6}
-\contentsline {subsection}{\numberline {3.6.1}Model Layer}{55}{subsection.3.6.1}
-\contentsline {subsection}{\numberline {3.6.2}Controller Layer}{55}{subsection.3.6.2}
-\contentsline {subsection}{\numberline {3.6.3}View Layer}{55}{subsection.3.6.3}
-\contentsline {chapter}{\numberline {4}Results and Evaluation}{56}{chapter.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{57}{chapter.5}
+\contentsline {subsection}{\numberline {3.6.1}View Layer}{55}{subsection.3.6.1}
+\contentsline {paragraph}{OpenGL widget}{55}{section*.16}
+\contentsline {paragraph}{Interactive Image Hierarchy}{55}{section*.17}
+\contentsline {paragraph}{Main Window}{55}{section*.18}
+\contentsline {paragraph}{GUI}{55}{section*.19}
+\contentsline {subsection}{\numberline {3.6.2}Model Layer}{56}{subsection.3.6.2}
+\contentsline {subsection}{\numberline {3.6.3}Controller Layer}{56}{subsection.3.6.3}
+\contentsline {chapter}{\numberline {4}Results and Evaluation}{57}{chapter.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{58}{chapter.5}

@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  31 AUG 2010 21:40
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  1 SEP 2010 04:58
 entering extended mode
  %&-line parsing enabled.
 **thesis.tex
@@ -731,13 +731,13 @@ File: images/cameraDialog.png Graphic file (type png)
 <images/mvc.png, id=890, 442.65375pt x 125.71968pt>
 File: images/mvc.png Graphic file (type png)
  <use images/mvc.png>
-[54 <./images/cameraDialog.png>] [55 <./images/mvc.png (PNG copy)>]
+[54 <./images/cameraDialog.png>] [55 <./images/mvc.png (PNG copy)>] [56]
 Chapter 4.
-[56
+[57
 
 ]
 Chapter 5.
-(./thesis.bbl [57
+(./thesis.bbl [58
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 9--12
@@ -745,7 +745,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 9--12
 -ing equa-tion.
  []
 
-[58
+[59
 
 ]
 Underfull \hbox (badness 2617) in paragraph at lines 148--152
@@ -759,7 +759,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 148--152
 GL\OT1/cmr/m/n/10.95 .
  []
 
-[59]) [60] (./thesis.aux)
+[60]) [61] (./thesis.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -768,8 +768,8 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 7530 strings out of 95086
- 108642 string characters out of 1183256
+ 7535 strings out of 95086
+ 108693 string characters out of 1183256
  174473 words of memory out of 1500000
  10247 multiletter control sequences out of 10000+50000
  19746 words of font info for 73 fonts, out of 1200000 for 2000
@@ -792,9 +792,9 @@ hare/texmf-texlive/fonts/type1/bluesky/cm/cmsy8.pfb></usr/share/texmf-texlive/f
 onts/type1/bluesky/cm/cmti10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/
 cm/cmti12.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmtt10.pfb></usr
 /share/texmf-texlive/fonts/type1/bluesky/ams/msbm10.pfb>
-Output written on thesis.pdf (61 pages, 3015703 bytes).
+Output written on thesis.pdf (62 pages, 3021207 bytes).
 PDF statistics:
- 1062 PDF objects out of 1200 (max. 8388607)
- 296 named destinations out of 1000 (max. 131072)
+ 1071 PDF objects out of 1200 (max. 8388607)
+ 301 named destinations out of 1000 (max. 131072)
  557 words of extra memory for PDF output out of 10000 (max. 10000000)
 

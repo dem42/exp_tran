@@ -2711,9 +2711,50 @@ layer. The MVC architecture is depicted in figure \ref{fg:mvc}
 Each layer contains a number of classes and interfaces, chosen so that the coupling
 between layers is decreased and the cohesion inside the layer is increased. 
 
+\subsection{View Layer}
+The view layer of the expression transfer application contains the classes which
+are responsible for user interface related tasks such as displaying the 3D model
+and providing interactive images for feature point selection. There are four
+crucial components in the expression transfer view layer. The
+OpenGL widget class, a class hierarchy of interactive images, the main
+window and the GUI.
+
+\paragraph{OpenGL widget}
+The expression transfer application needs to allow the user to view the
+estimated 3D model or view faces from the database. The GUI is build with Qt
+which supports OpenGL and provides a widget class \texttt{QGLWidget}. This
+widget class integrates with the OpenGL graphics interface and includes a canvas
+onto which objects can be rendered. This class implements three functions with
+protected visibility which
+can be overwritten in any class inheriting from \texttt{QGLWidget}. These
+functions are \texttt{initializeGL()}, \texttt{resizeGL()} and
+\texttt{paintGL()}. The first of these functions, \texttt{initializeGL()}, is
+called when the widget class is constructed. The function \texttt{resizeGL()} is
+called when the window which holds the widget is resized and should be
+overwritten so that it correctly sets the projection parameters. The most important of
+these three function is \texttt{paintGL()} which controls the rendering itself.
+
+In addition to the rendering functions, there are also useful public functions
+such as \texttt{bindTexture(.)} and \texttt{grabFrameBuffer(.)} to support
+adding texture or grabbing the frame buffer and returning it in form of an
+image.
+
+The expression transfer application's view layer includes the class
+\texttt{FaceWidget} which extends the \texttt{QGLWidget}. The \texttt{FaceWidget
+} class overwrites the rendering functions of \texttt{QGLWidget} to allow for a
+3d face scan to be displayed.
+
+The \texttt{FaceWidget} also provides methods to set a face and to set the 3D
+pose parameters of a face. It also supports loading a face object from a file.
+\paragraph{Interactive Image Hierarchy}
+
+\paragraph{Main Window}
+
+\paragraph{GUI}
+
 \subsection{Model Layer}
 \subsection{Controller Layer}
-\subsection{View Layer}
+
 
 \chapter{Results and Evaluation}
 
