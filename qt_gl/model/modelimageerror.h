@@ -4,7 +4,7 @@
 #include "errorfunction.h"
 #include <vector>
 #include <cv.h>
-#include "FaceModel.h"
+#include "model/FaceModel.h"
 
 using namespace std;
 using namespace cv;

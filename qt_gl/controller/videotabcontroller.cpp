@@ -1,5 +1,5 @@
 #include "videotabcontroller.h"
-#include "opticalflowfarneback.h"
+#include "model/opticalflowfarneback.h"
 #include "utility.h"
 
 #include <iostream>
@@ -11,13 +11,12 @@
 #include <cmath>
 #include <ctime>
 
-#include "errorfunction.h"
-#include "modelimageerror.h"
-#include "rosenerror.h"
+#include "model/errorfunction.h"
+#include "model/modelimageerror.h"
 
-#include "neldermeadoptimizer.h"
-#include "closedformoptimizer.h"
-#include "nnlsoptimizer.h"
+#include "model/neldermeadoptimizer.h"
+#include "model/closedformoptimizer.h"
+#include "model/nnlsoptimizer.h"
 
 using namespace cv;
 using namespace std;
@@ -56,8 +55,8 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
      capture = new VideoCapture(fileName.toStdString());
      frameCount = capture->get(CV_CAP_PROP_FRAME_COUNT); //SEEMS TO BE UNSUPPORTED AND RETURNS 0
 
-     //setup video
     Mat m;
+
     Utility::grabThumbnailForVideo(fileName.toStdString(),m);
 
     double c_x = m.size().width / 2.;
@@ -251,7 +250,9 @@ void VideoTabController::replayFrame()
     }
     cout << endl;
 
-    face_ptr->interpolate(w_id,w_exp,true,true);
+    double avg = face_ptr->getAverageDepth();
+    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setAverageDepth(avg);
     face_widget->setFace(face_ptr);
 
 

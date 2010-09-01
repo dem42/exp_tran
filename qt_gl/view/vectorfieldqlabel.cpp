@@ -40,6 +40,7 @@ void VectorFieldQLabel::paintEvent( QPaintEvent * )
     }
     QPixmap pmap = *(this->pixmap());
     int x,y,w,h;
+
     //make the points smaller if we are drawing vs larger when we are just clicking
      w = h = 4;
 

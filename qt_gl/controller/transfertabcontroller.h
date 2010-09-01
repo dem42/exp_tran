@@ -2,15 +2,15 @@
 #define TRANSFERTABCONTROLLER_H
 
 #include <cv.h>
-#include "clickableqlabel.h"
-#include "videoprocessor.h"
+#include "view/clickableqlabel.h"
+#include "model/videoprocessor.h"
 #include <QString>
 #include <QTimer>
 #include <QLineEdit>
 #include <QFileDialog>
 
-#include "Face.h"
-#include "face_widget.h"
+#include "model/Face.h"
+#include "view/facewidget.h"
 
 class TransferTabController : public QObject
 {

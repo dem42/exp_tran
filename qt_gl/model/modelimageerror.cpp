@@ -61,13 +61,14 @@ double ModelImageError::operator()(vector<double>& x)
     Mat_<double> projectedT;
 
     double sum = 0;
+
     double x_error_sqrt;
     double y_error_sqrt;
 
     Matrix w(x);
 
     //implement non-negativity constraints
-    for(int i=0;i<x.size();i++)
+    for(unsigned int i=0;i<x.size();i++)
     {
         if(x[i] < 0) return numeric_limits<double>::max();    
     }

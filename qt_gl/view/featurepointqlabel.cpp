@@ -41,6 +41,7 @@ void FeaturePointQLabel::paintEvent ( QPaintEvent * e)
     }
     QPixmap pmap = *(this->pixmap());
     int x,y,w,h;
+
     //make the points smaller if we are drawing vs larger when we are just clicking
     w = h = 4;
 
@@ -55,7 +56,7 @@ void FeaturePointQLabel::paintEvent ( QPaintEvent * e)
     paint.drawText(QRectF(150,0,400,100),label_msgs[marked.size()%msgs_size]);
 
     QPointF *points = new QPointF[marked.size()];
-    for(int i=0; i < marked.size(); i++)
+    for(unsigned int i=0; i < marked.size(); i++)
     {
         x = marked[i].x;
         y = marked[i].y;

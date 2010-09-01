@@ -29,7 +29,7 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QGroupBox" name="groupBox">
+  <widget class="QGroupBox" name="paramBox">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -46,6 +46,12 @@
    </property>
    <property name="title">
     <string notr="true">Camera Parameters</string>
+   </property>
+   <property name="flat">
+    <bool>false</bool>
+   </property>
+   <property name="checkable">
+    <bool>true</bool>
    </property>
    <widget class="QLineEdit" name="fx">
     <property name="geometry">
@@ -140,7 +146,7 @@
     </property>
    </widget>
   </widget>
-  <widget class="QGroupBox" name="groupBox_2">
+  <widget class="QGroupBox" name="cameraBox">
    <property name="geometry">
     <rect>
      <x>10</x>
@@ -156,6 +162,9 @@
     <bool>false</bool>
    </property>
    <property name="checkable">
+    <bool>true</bool>
+   </property>
+   <property name="checked">
     <bool>false</bool>
    </property>
    <widget class="QLabel" name="label_5">

@@ -100,7 +100,7 @@ void TransferTabController::beginTransfer()
 
     timerReplay = new QTimer(this);
     connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
-    timerReplay->start(3000);
+    timerReplay->start(1000);
 }
 
 void TransferTabController::replayFrame()
@@ -149,8 +149,11 @@ void TransferTabController::replayFrame()
     cout << endl;
 
     //converts and loads the texture into opengl
-    convertFrameIntoTexture(frameData[i]);
+    face_widget->bindTexture(Utility::mat2QImage(frameData[i]));
+    //convertFrameIntoTexture(frameData[i]);
+    double zavg = face_ptr->getAverageDepth();
     face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setAverageDepth(zavg);
 
     for(int j=0;j<face_ptr->getPointNum();j++)
         objectPoints.push_back(face_ptr->vertexes[j]);
@@ -158,21 +161,90 @@ void TransferTabController::replayFrame()
     cv::projectPoints(Mat(objectPoints),frameRotation[i],frameTranslation[i],cameraSrc,lensDist,imagePoints);
     textureData = new Point2[imagePoints.size()];
 
-    img_width = Utility::closestLargetPowerOf2(frameData[i].size().width);
-    img_height = Utility::closestLargetPowerOf2(frameData[i].size().height);
+    sourceLabel->clearMarked();
+    sourceLabel->setMarked(imagePoints);
 
-    for(int j=0;j<imagePoints.size();j++)
+    img_width = frameData[i].size().width;
+    img_height = frameData[i].size().height;
+//    img_width = Utility::closestLargetPowerOf2(frameData[i].size().width);
+//    img_height = Utility::closestLargetPowerOf2(frameData[i].size().height);
+
+    for(unsigned int j=0;j<imagePoints.size();j++)
     {
         textureData[j].x = imagePoints[j].x / img_width;
-        textureData[j].y = imagePoints[j].y / img_height;
+        //our texture coordinate sysem is 0,0 top left corner ..
+        //bingTexture doesnt do this
+        textureData[j].y = -imagePoints[j].y / img_height;
         if(j%1000==0)
             cout << "texture for j " << j << " is " << textureData[j].x << " " << textureData[j].y
                  <<  "from points " << imagePoints[j].x << " " << imagePoints[j].y << endl;
     }
 
+    //create the 4x4 proj matrix for the face widget
+    Mat_<double> projM = Mat_<double>::zeros(Size(4,4));
+    for(int j=0;j<3;j++)
+        for(int k=0;k<3;k++)
+            projM(j,k) = cameraSrc.at<double>(j,k);
+
+    projM(0,2) = 0;
+    projM(1,2) = 0;
+    projM(0,0) = (1./360.)*projM(0,0);
+    projM(1,1) = -(1./288.)*projM(1,1);
+    projM(3,2) = 1.0;
+    projM(2,2) = 1;
+    projM(2,3) = 0;
+    //coz of a stupid zero division when normalizing homogenous .. yay for opengl
+    projM(3,3) = 0.001;
+    face_widget->setProjectionMatrix(projM);
+
+    //creat the 4x4 (homogen) trans matrix for face widget
+    Mat_<double> tranM = Mat_<double>::zeros(Size(4,4));
+    for(int j=0;j<3;j++)
+        for(int k=0;k<3;k++)
+            tranM(j,k) = rmatrix(j,k);
+    tranM(0,3) = tx;
+    tranM(1,3) = ty;
+    tranM(2,3) = tz;
+    tranM(3,3) = 1.0;
+    cout << "tranM " << Matrix(tranM);
+    //face_widget->setTransformationMatrix(tranM);
+
+    Mat_<double> comp = projM*tranM;
+    Mat_<double> p3a(4,1);
+    Mat_<double> p3b(4,1);
+    Mat_<double> p3c(3,1);
+    Mat_<double> p3d(3,1);
+    Mat_<double> tM(3,1);
+    tM(0,0) = tx;
+    tM(1,0) = ty;
+    tM(2,0) = tz;
+
+    Point3f p3f = face_ptr->getPointFromPolygon(10);
+    p3a(0,0) = p3f.x;
+    p3a(1,0) = p3f.y;
+    p3a(2,0) = p3f.z;
+    p3a(3,0) = 1.0;
+
+    p3c(0,0) = p3f.x;
+    p3c(1,0) = p3f.y;
+    p3c(2,0) = p3f.z;
+
+    p3b = comp*p3a;
+    cout << "p3a " << Matrix(p3a);
+    cout << "p3b " << Matrix(p3b);
+
+    p3d = cameraSrc*(rmatrix*p3c + tM);
+    p3d = (1./p3d(2,0)) * p3d;
+    cout << "p3c " << Matrix(p3c);
+    cout << "p3d " << Matrix(p3d);
+
+    //face_widget->setWireFrame(true);
     face_widget->setFace(face_ptr,textureData);
     delete[] textureData;
 
+    QImage qimg = face_widget->grabFrameBuffer(false);
+
+    //sourceLabel->setPixmap(QPixmap::fromImage(qimg));
 
     i++;
     if(i == generatedPoints.size())
@@ -190,8 +262,7 @@ void TransferTabController::replayFrame()
 void TransferTabController::convertFrameIntoTexture(Mat &imgO)
 {
     int img_width = Utility::closestLargetPowerOf2(imgO.size().width);
-    int img_height = Utility::closestLargetPowerOf2(imgO.size().height);
-    cout << "huh" << img_height << " " <<  img_width << endl;
+    int img_height = Utility::closestLargetPowerOf2(imgO.size().height);    
     Mat img = Mat::ones(img_height,img_width,CV_8UC3);
 
     int height,width,step,channels;
@@ -199,11 +270,17 @@ void TransferTabController::convertFrameIntoTexture(Mat &imgO)
 
     int count = 0;
 
+
     for(int i=0;i<imgO.rows;i++)
+    {
         for(int j=0;j<imgO.cols;j++)
-            img.at<char>(i,j) = imgO.at<char>(i,j);
-    //imgO.copyTo(img,Mat::ones(imgO.rows,imgO.cols,CV_8UC3));
-    //cv::resize(imgO,img,Size(512,512));
+        {
+            for(int k=0;k<imgO.channels();k++)
+            {
+                img.data[i*img.step+j*imgO.channels()+k] = imgO.data[i*imgO.step+j*imgO.channels()+k];
+            }
+        }
+    }
 
     // get the image data
     height = img.rows;
@@ -214,7 +291,6 @@ void TransferTabController::convertFrameIntoTexture(Mat &imgO)
     cout << "in convert frame into texture " << endl;
     cout << height << " " << width << " " << channels << " " << step << endl;;
     img_data = new uchar[width*height*3];
-
 
     for(int i=0;i<height;i++)
     {

@@ -4,10 +4,10 @@
 #include "closedformoptimizer.h"
 #include "nnlsoptimizer.h"
 
-VideoProcessor::VideoProcessor() : FRAME_MAX(10)
+VideoProcessor::VideoProcessor() : FRAME_MAX(5)
 {
     flowEngine = new OpticalFlowEngine();
-    paramOptimizer = new ClosedFormOptimizer();
+    paramOptimizer = new NNLSOptimizer();
 }
 
 VideoProcessor::VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine) : FRAME_MAX(4)
@@ -99,7 +99,7 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
 
     newPoints.clear();
     cout << "now new points " << endl;
-    paramOptimizer->generatePoints(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,700,face_ptr,newPoints,indices);
+    paramOptimizer->generatePoints(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,420,face_ptr,newPoints,indices);
     //add new points so that we start tracking them
     //we arent actually altering the first featurePoints[0] just the rest throught compute flow
     cout << "cur points b4 " << currentPoints.size() << endl;

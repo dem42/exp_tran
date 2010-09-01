@@ -1,5 +1,5 @@
 #include "closedformoptimizer.h"
-#include "FaceModel.h"
+#include "model/FaceModel.h"
 
 ClosedFormOptimizer::ClosedFormOptimizer() : max_iterations(4)
 {    
@@ -130,7 +130,6 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
     for(int i=0;i<id_size;i++)
         y_t[0][i] = y[i][0] = w_id[i];
 
-    cout << "im gonna throw up" << endl;
 
     //initialize variables which dont need to be computed at every step
     Rodrigues(rotation,rmatrix);

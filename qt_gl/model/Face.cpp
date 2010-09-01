@@ -3,8 +3,8 @@
 #include <string>
 #include <cmath>
 #include <new>
-#include "Face.h"
-#include "FaceModel.h"
+#include "model/Face.h"
+#include "model/FaceModel.h"
 #include <QColor>
 
 using namespace std;
@@ -107,7 +107,7 @@ void Face::setAverageDepth(double d)
 {
     double avg = getAverageDepth();
     for(int i=0;i<point_num;i++)
-        vertexes[i].z = vertexes[i].z - avg + d;
+        vertexes[i].z = vertexes[i].z - avg + d;    
 }
 
 int Face::getPolyNum() const

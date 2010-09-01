@@ -4,7 +4,7 @@
 #include <QWidget>
 #include <QMouseEvent>
 #include <QGLWidget>
-#include "Face.h"
+#include "model/Face.h"
 
 #include <QWheelEvent>
 
@@ -35,6 +35,8 @@ public:
    void setCameraParameters(double cameraZPosition, double upVector, double cameraDistance);
 
    void setTexture(uchar *img_data, int img_height, int img_width);
+   void setProjectionMatrix(Matrix projM);
+   void setTransformationMatrix(Matrix tranM);
 
    void refreshGL();
 
@@ -69,6 +71,15 @@ private:
   int gl_display_style;
 
   QPoint lastPos;
+
+  //booleans to tell if a projection or trans matrix has been set
+  //or if the default one should be used
+  bool customProj;
+  bool customTrans;
+
+  //4x4 column major matrices
+  GLfloat projM[16];
+  GLfloat tranM[16];
 
   //extrinsic scene parameters
   //rotation

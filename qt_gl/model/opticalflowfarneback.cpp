@@ -18,7 +18,8 @@ OpticalFlowFarneback::OpticalFlowFarneback() : OpticalFlowEngine()
 }
 
 void OpticalFlowFarneback::computeFlow(const Mat& prevImg, const Mat& nextImg,
-                                    const vector<Point2f>& prevPoints, vector<Point2f>& nextPoints)
+                                    const vector<Point2f>& prevPoints, vector<Point2f>& nextPoints,
+                                    const std::vector<int> &curIndices, std::vector<int> &nextIndices)
 {
     Mat flowOutput;
     int sizeX,sizeY;

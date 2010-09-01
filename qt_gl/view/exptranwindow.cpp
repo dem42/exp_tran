@@ -1,11 +1,11 @@
-#include "my_main_window.h"
+#include "exptranwindow.h"
 
 #include <qimage.h>
 #include <cv.h>
 #include <highgui.h>
 
 
-MyMainWindow::MyMainWindow(QMainWindow *window)
+ExpTranWindow::ExpTranWindow(QMainWindow *window)
 {    
     ui.setupUi(this);
 
@@ -90,7 +90,7 @@ MyMainWindow::MyMainWindow(QMainWindow *window)
 }
 
 
-MyMainWindow::~MyMainWindow()
+ExpTranWindow::~ExpTranWindow()
 {    
     delete face_widget1;
     delete f_dialog;

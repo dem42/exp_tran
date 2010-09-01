@@ -4,22 +4,22 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include "ui_applform.h"
-#include "face_widget.h"
+#include "facewidget.h"
 
-#include "videotabcontroller.h"
-#include "facetabcontroller.h"
-#include "transfertabcontroller.h"
+#include "controller/videotabcontroller.h"
+#include "controller/facetabcontroller.h"
+#include "controller/transfertabcontroller.h"
 
-#include "clickableqlabel.h"
-#include "vectorfieldqlabel.h"
-#include "featurepointqlabel.h"
+#include "view/clickableqlabel.h"
+#include "view/vectorfieldqlabel.h"
+#include "view/featurepointqlabel.h"
 
-class MyMainWindow : public QMainWindow
+class ExpTranWindow : public QMainWindow
 {
     Q_OBJECT
 public:
-    MyMainWindow(QMainWindow *window = 0);
-    ~MyMainWindow();    
+    ExpTranWindow(QMainWindow *window = 0);
+    ~ExpTranWindow();
 
 private:
     Ui::ApplForm ui;

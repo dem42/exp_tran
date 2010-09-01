@@ -6,14 +6,14 @@
 #include <QString>
 #include <QTimer>
 #include <QLabel>
-#include "clickableqlabel.h"
-#include "vectorfieldqlabel.h"
-#include "opticalflowengine.h"
+#include "view/clickableqlabel.h"
+#include "view/vectorfieldqlabel.h"
+#include "model/opticalflowengine.h"
 
-#include "Face.h"
-#include "face_widget.h"
-#include "optimizer.h"
-#include "videoprocessor.h"
+#include "model/Face.h"
+#include "view/facewidget.h"
+#include "model/optimizer.h"
+#include "model/videoprocessor.h"
 
 #include "ui_cameraDialog.h"
 

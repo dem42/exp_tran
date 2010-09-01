@@ -1,5 +1,5 @@
 #include "facetabcontroller.h"
-#include "Vector3.h"
+#include "model/Vector3.h"
 
 FaceTabController::FaceTabController(QSlider *exp_slider, QSlider *ident_slider, FaceWidget *face_widget)
 {

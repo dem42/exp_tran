@@ -38,7 +38,7 @@
        <rect>
         <x>10</x>
         <y>10</y>
-        <width>771</width>
+        <width>811</width>
         <height>661</height>
        </rect>
       </property>
@@ -47,7 +47,7 @@
      <widget class="QWidget" name="verticalLayoutWidget_2">
       <property name="geometry">
        <rect>
-        <x>810</x>
+        <x>860</x>
         <y>10</y>
         <width>209</width>
         <height>381</height>
@@ -149,10 +149,10 @@
        <item>
         <widget class="QSlider" name="expSlider">
          <property name="minimum">
-          <number>-50</number>
+          <number>-100</number>
          </property>
          <property name="maximum">
-          <number>50</number>
+          <number>100</number>
          </property>
          <property name="singleStep">
           <number>1</number>
@@ -200,6 +200,9 @@
         <widget class="QRadioButton" name="bruteIdRadio">
          <property name="text">
           <string>identity interpolation off</string>
+         </property>
+         <property name="checked">
+          <bool>true</bool>
          </property>
         </widget>
        </item>

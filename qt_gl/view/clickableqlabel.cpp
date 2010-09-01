@@ -89,6 +89,7 @@ void ClickableQLabel::paintEvent ( QPaintEvent * e)
     }
     QPixmap pmap = *(this->pixmap());
     int x,y,w,h;
+
     //make the points smaller if we are drawing vs larger when we are just clicking
      w = h = 4;
 
@@ -96,7 +97,7 @@ void ClickableQLabel::paintEvent ( QPaintEvent * e)
      paint.drawPixmap(0,0,pmap,x_shift,y_shift,600,650);
 
      QPointF *points = new QPointF[marked.size()];
-     for(int i=0; i < marked.size(); i++)
+     for(unsigned int i=0; i < marked.size(); i++)
      {
          x = marked[i].x;
          y = marked[i].y;

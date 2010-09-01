@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <cv.h>
-#include "Face.h"
+#include "model/Face.h"
 
 using namespace std;
 using namespace cv;

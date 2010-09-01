@@ -15,7 +15,7 @@ FaceModel * FaceModel::getInstance()
     //lazy initialization
     if(instance == NULL)
     {
-        instance = new FaceModel("svd_result_object_3",
+        instance = new FaceModel("svd_result_object_5",
                                  "/home/martin/project/JaceyBinghamtonVTKFiles",
                                  "out_here.txt",
                                   56,7,5090);

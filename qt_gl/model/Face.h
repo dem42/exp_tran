@@ -3,7 +3,7 @@
 
 #include "Vector3.h"
 #include <string>
-#include "FaceModel.h"
+#include "model/FaceModel.h"
 #include "svd.h"
 
 class Face 

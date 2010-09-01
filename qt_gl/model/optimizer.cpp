@@ -1,7 +1,7 @@
 #include "optimizer.h"
 #include <cstdio>
 #include <cstdlib>
-#include "FaceModel.h"
+#include "model/FaceModel.h"
 
 void Optimizer::generatePoints(const Mat &rotation, const Mat &translation,
                                const Mat& cameraMatrix, const Mat& lensDist,

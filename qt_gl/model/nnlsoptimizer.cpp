@@ -1,5 +1,5 @@
 #include "nnlsoptimizer.h"
-#include "FaceModel.h"
+#include "model/FaceModel.h"
 
 NNLSOptimizer::NNLSOptimizer() : NNLS_MAX_ITER(1000), max_iterations(3)
 {
