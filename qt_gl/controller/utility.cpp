@@ -1,8 +1,22 @@
 #include "utility.h"
 #include <cmath>
 #include <iostream>
-
+#include <QPainter>
 using namespace std;
+
+
+QPixmap Utility::composePixmaps(const QPixmap &src, const QPixmap &dest)
+{
+    QPixmap result;
+    result = src.copy();
+    QPainter painter(&result);
+    painter.setCompositionMode(QPainter::CompositionMode_Source);
+    painter.drawPixmap(0,0,src);
+    painter.setCompositionMode(QPainter::CompositionMode_DestinationOver);
+    painter.drawPixmap(0,0,dest);
+    painter.end();
+    return result;
+}
 
 int Utility::closestLargetPowerOf2(int x)
 {

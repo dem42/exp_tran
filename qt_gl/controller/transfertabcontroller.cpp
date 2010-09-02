@@ -1,8 +1,9 @@
 #include "transfertabcontroller.h"
 #include "utility.h"
+#include <QBitmap>
 
 TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, ClickableQLabel *targetLabel,
-                                             QLineEdit *srcText, QLineEdit *targetText,FaceWidget *face_widget)
+                                             QLineEdit *srcText, QLineEdit *targetText,CustomizableFaceWidget *face_widget)
 {
     this->targetLabel = targetLabel;
     this->sourceLabel = sourceLabel;
@@ -85,18 +86,34 @@ void TransferTabController::beginTransfer()
     /**********************/
     /*first collect frames*/
     /**********************/    
-    frameData.push_back(srcFrames[srcFrames.size()-1]);
-    sourceLabel->setPixmap(Utility::mat2QPixmap(srcFrames[0]));
+    s_frameData.push_back(srcFrames[srcFrames.size()-1]);
+    sourceLabel->setPixmap(Utility::mat2QPixmap(s_frameData[0]));
     while( capSrc->grab() == true)
     {
         capSrc->retrieve(frame);
         cvtColor(frame, rgb_frame, CV_BGR2RGB);
         copyFrame = rgb_frame.clone();
-        frameData.push_back(copyFrame);
+        s_frameData.push_back(copyFrame);
     }
 
-    videoProcessor->processVideo(sourceLabel->getMarked(),frameData, cameraSrc, lensDist,
-                                 frameTranslation,frameRotation, generatedPoints,vector_weights_exp,vector_weights_id);
+    videoProcessor->processVideo(sourceLabel->getMarked(),s_frameData, cameraSrc, lensDist,
+                                 s_frameTranslation,s_frameRotation, s_generatedPoints,s_vector_weights_exp,s_vector_weights_id);
+
+
+    /**** now repeat the process for the other face ***/    
+    t_frameData.push_back(targetFrames[targetFrames.size()-1]);
+    targetLabel->setPixmap(Utility::mat2QPixmap(t_frameData[0]));
+    while( capSrc->grab() == true)
+    {
+        capSrc->retrieve(frame);
+        cvtColor(frame, rgb_frame, CV_BGR2RGB);
+        copyFrame = rgb_frame.clone();
+        t_frameData.push_back(copyFrame);
+    }
+
+    videoProcessor->processVideo(targetLabel->getMarked(),t_frameData, cameraTarget, lensDist,
+                                 t_frameTranslation,t_frameRotation, t_generatedPoints,t_vector_weights_exp,t_vector_weights_id);
+
 
     timerReplay = new QTimer(this);
     connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
@@ -111,21 +128,21 @@ void TransferTabController::replayFrame()
     vector<Point2f> imagePoints;
     vector<Point3f> objectPoints;
     Point2 *textureData;
-    double tx = frameTranslation[i].at<double>(0,0);
-    double ty = frameTranslation[i].at<double>(0,1);
-    double tz = frameTranslation[i].at<double>(0,2);
+    double tx = s_frameTranslation[i].at<double>(0,0);
+    double ty = s_frameTranslation[i].at<double>(0,1);
+    double tz = s_frameTranslation[i].at<double>(0,2);
 
     double *w_id = new double[56];
     double *w_exp = new double[7];
 
     int img_width, img_height;
 
-    sourceLabel->setPixmap(Utility::mat2QPixmap(frameData[i]));
+    sourceLabel->setPixmap(Utility::mat2QPixmap(s_frameData[i]));
 
-    sourceLabel->setMarked(generatedPoints[i]);
+    sourceLabel->setMarked(s_generatedPoints[i]);
 
     //compute and set the pose parameters
-    Rodrigues(frameRotation[i],rmatrix);
+    Rodrigues(s_frameRotation[i],rmatrix);
     Utility::computeEulerAnglesFromRmatrix(rmatrix,euler_x,euler_y,euler_z);
     //only y needs to be negative so that it agrees with the transposes
     cout << "setting trans param " << euler_x << " " << euler_y << " "
@@ -137,20 +154,20 @@ void TransferTabController::replayFrame()
     cout << "begin w_id and w_exp in frame : " << i << endl;
     for(int j=0;j<56;j++)
     {
-        w_id[j] = vector_weights_id[i][j];
+        w_id[j] = s_vector_weights_id[i][j];
         cout << w_id[j] << " ";
     }
     cout << endl;
     for(int j=0;j<7;j++)
     {
-        w_exp[j] = vector_weights_exp[i][j];
+        w_exp[j] = s_vector_weights_exp[i][j];
         cout << w_exp[j] << " ";
     }
     cout << endl;
 
     //converts and loads the texture into opengl
-    face_widget->bindTexture(Utility::mat2QImage(frameData[i]));
-    //convertFrameIntoTexture(frameData[i]);
+    //face_widget->bindTexture(Utility::mat2QImage(frameData[i]));
+    convertFrameIntoTexture(s_frameData[i]);
     double zavg = face_ptr->getAverageDepth();
     face_ptr->interpolate(w_id,w_exp);
     face_ptr->setAverageDepth(zavg);
@@ -158,23 +175,23 @@ void TransferTabController::replayFrame()
     for(int j=0;j<face_ptr->getPointNum();j++)
         objectPoints.push_back(face_ptr->vertexes[j]);
 
-    cv::projectPoints(Mat(objectPoints),frameRotation[i],frameTranslation[i],cameraSrc,lensDist,imagePoints);
+    cv::projectPoints(Mat(objectPoints),s_frameRotation[i],s_frameTranslation[i],cameraSrc,lensDist,imagePoints);
     textureData = new Point2[imagePoints.size()];
 
     sourceLabel->clearMarked();
-    sourceLabel->setMarked(imagePoints);
-
-    img_width = frameData[i].size().width;
-    img_height = frameData[i].size().height;
-//    img_width = Utility::closestLargetPowerOf2(frameData[i].size().width);
-//    img_height = Utility::closestLargetPowerOf2(frameData[i].size().height);
+    //sourceLabel->setMarked(imagePoints);
+//
+//    img_width = srcFrames[i].size().width;
+//    img_height = srcFrames[i].size().height;
+    img_width = Utility::closestLargetPowerOf2(s_frameData[i].size().width);
+    img_height = Utility::closestLargetPowerOf2(s_frameData[i].size().height);
 
     for(unsigned int j=0;j<imagePoints.size();j++)
     {
         textureData[j].x = imagePoints[j].x / img_width;
         //our texture coordinate sysem is 0,0 top left corner ..
         //bingTexture doesnt do this
-        textureData[j].y = -imagePoints[j].y / img_height;
+        textureData[j].y = imagePoints[j].y / img_height;
         if(j%1000==0)
             cout << "texture for j " << j << " is " << textureData[j].x << " " << textureData[j].y
                  <<  "from points " << imagePoints[j].x << " " << imagePoints[j].y << endl;
@@ -186,15 +203,7 @@ void TransferTabController::replayFrame()
         for(int k=0;k<3;k++)
             projM(j,k) = cameraSrc.at<double>(j,k);
 
-    projM(0,2) = 0;
-    projM(1,2) = 0;
-    projM(0,0) = (1./360.)*projM(0,0);
-    projM(1,1) = -(1./288.)*projM(1,1);
-    projM(3,2) = 1.0;
-    projM(2,2) = 1;
-    projM(2,3) = 0;
-    //coz of a stupid zero division when normalizing homogenous .. yay for opengl
-    projM(3,3) = 0.001;
+
     face_widget->setProjectionMatrix(projM);
 
     //creat the 4x4 (homogen) trans matrix for face widget
@@ -238,20 +247,24 @@ void TransferTabController::replayFrame()
     cout << "p3c " << Matrix(p3c);
     cout << "p3d " << Matrix(p3d);
 
-    //face_widget->setWireFrame(true);
     face_widget->setFace(face_ptr,textureData);
     delete[] textureData;
 
     QImage qimg = face_widget->grabFrameBuffer(false);
+    QPixmap pimg = QPixmap::fromImage(qimg);
+    pimg.setMask(pimg.createMaskFromColor(Qt::white,Qt::MaskInColor));
 
-    //sourceLabel->setPixmap(QPixmap::fromImage(qimg));
+
+
+    QPixmap result = Utility::composePixmaps(Utility::mat2QPixmap(s_frameData[i]),pimg);
+    sourceLabel->setPixmap(result);
 
     i++;
-    if(i == generatedPoints.size())
+    if(i == s_generatedPoints.size())
     {
         timerReplay->stop();
         i = 0;
-        frameData.clear();
+        s_frameData.clear();
         featurePoints.clear();
     }
     delete[] w_id;

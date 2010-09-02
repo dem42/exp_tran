@@ -5,6 +5,7 @@
 #include <QFileDialog>
 #include "ui_applform.h"
 #include "facewidget.h"
+#include "customizablefacewidget.h"
 
 #include "controller/videotabcontroller.h"
 #include "controller/facetabcontroller.h"
@@ -30,7 +31,7 @@ private:
     //custom widgets
     FaceWidget *face_widget1;
     FaceWidget *face_widget2;
-    FaceWidget *face_widget3;
+    CustomizableFaceWidget *face_widget3;
     //labels
     VectorFieldQLabel *flowLabelV;
     ClickableQLabel *picLabelV;

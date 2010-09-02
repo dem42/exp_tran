@@ -35,8 +35,6 @@ public:
    void setCameraParameters(double cameraZPosition, double upVector, double cameraDistance);
 
    void setTexture(uchar *img_data, int img_height, int img_width);
-   void setProjectionMatrix(Matrix projM);
-   void setTransformationMatrix(Matrix tranM);
 
    void refreshGL();
 
@@ -51,6 +49,24 @@ protected:
 
   void wheelEvent(QWheelEvent *event);
 
+  //extrinsic scene parameters
+  //rotation
+  float rot_x;
+  float rot_y;
+  float rot_z;
+  //translation
+  float trans_x;
+  float trans_y;
+  float trans_z;
+  //center
+  float center_x;
+  float center_y;
+  float center_z;
+  float diameter;
+  //camera
+  double cameraZPosition;
+  double cameraDistance;
+  double upVector;
 
 public slots:
    void wireFrameChecked(bool);
@@ -71,34 +87,6 @@ private:
   int gl_display_style;
 
   QPoint lastPos;
-
-  //booleans to tell if a projection or trans matrix has been set
-  //or if the default one should be used
-  bool customProj;
-  bool customTrans;
-
-  //4x4 column major matrices
-  GLfloat projM[16];
-  GLfloat tranM[16];
-
-  //extrinsic scene parameters
-  //rotation
-  float rot_x;
-  float rot_y;
-  float rot_z;
-  //translation
-  float trans_x;
-  float trans_y;
-  float trans_z;
-  //center
-  float center_x;
-  float center_y;
-  float center_z;
-  float diameter;
-  //camera
-  double cameraZPosition;
-  double cameraDistance;
-  double upVector;
 
   //texture id
   GLuint texture_id;

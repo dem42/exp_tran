@@ -11,7 +11,7 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
 
     face_widget1 = new FaceWidget();
     face_widget2 = new FaceWidget();
-    face_widget3 = new FaceWidget();
+    face_widget3 = new CustomizableFaceWidget();
     ui.verticalLayout->addWidget(face_widget1);
     f_dialog = new QFileDialog();
     v_dialog = new QFileDialog();    

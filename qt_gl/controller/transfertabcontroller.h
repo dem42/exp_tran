@@ -10,14 +10,14 @@
 #include <QFileDialog>
 
 #include "model/Face.h"
-#include "view/facewidget.h"
+#include "view/customizablefacewidget.h"
 
 class TransferTabController : public QObject
 {
     Q_OBJECT
 public:
     TransferTabController(ClickableQLabel *sourceLabel,ClickableQLabel *targetLabel,
-                          QLineEdit *srcText, QLineEdit *targetText, FaceWidget *face_widget);
+                          QLineEdit *srcText, QLineEdit *targetText, CustomizableFaceWidget *face_widget);
 
 public slots:
     void targetFileSelected(const QString str);
@@ -54,23 +54,23 @@ private:
     vector<Mat> targetFrames;
     vector<Mat> srcFrames;
 
-    FaceWidget *face_widget;
+    CustomizableFaceWidget *face_widget;
     Face *face_ptr;
 
 
     //TEMPORARY to test texture
     //for now so that we can use them in a timer
-    vector<cv::Mat> frameData;
+    vector<cv::Mat> s_frameData, t_frameData;
     //points we use for optical flow .. more points will be used for model estimation
     vector<vector<cv::Point2f> > featurePoints;
     //pose data for every frame
-    vector<cv::Mat> frameTranslation;
-    vector<cv::Mat> frameRotation;
+    vector<cv::Mat> s_frameTranslation, t_frameTranslation;
+    vector<cv::Mat> s_frameRotation, t_frameRotation;
     //points used to calculate model parameters
-    vector<vector<cv::Point2f> > generatedPoints;
+    vector<vector<cv::Point2f> > s_generatedPoints, t_generatedPoints;
     //recalculated weights
-    vector<vector<double> >vector_weights_exp;
-    vector<vector<double> >vector_weights_id;
+    vector<vector<double> >s_vector_weights_exp, t_vector_weights_exp;
+    vector<vector<double> >s_vector_weights_id, t_vector_weights_id;
     QTimer *timerReplay;
 };
 

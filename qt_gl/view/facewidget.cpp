@@ -28,9 +28,6 @@ FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
   texture_coord = new Point2[face_ptr->getPointNum()];
   texture_id = -1;
 
-  customProj = false;
-  customTrans = false;
-
   //initialize camera parameters
   rot_x = 0;
   rot_y = 0;
@@ -383,33 +380,19 @@ void FaceWidget::resizeGL(int width, int height)
   cout << "in resize" << endl;
   GLdouble left,right,bottom,top,near,far;
 
-  if(customProj == false)
-  {
-      //coordinates of 2D plane (the one we're projecting to)
-      glViewport(0, 0, (GLsizei)width, (GLsizei)height);
-      //switch to projection matrix
-      glMatrixMode(GL_PROJECTION);
-      //reset to identity matrix
-      glLoadIdentity();
+  //coordinates of 2D plane (the one we're projecting to)
+  glViewport(0, 0, (GLsizei)width, (GLsizei)height);
+  //switch to projection matrix
+  glMatrixMode(GL_PROJECTION);
+  //reset to identity matrix
+  glLoadIdentity();
 
-      //use frustum instead of gluPerspective .. frustum more flexible
-      //frustum specifies viewing volume
-      //perspective just does frustum with focal = trigonometry(fov)
-      setupFrustumParameters(left,right,bottom,top,near,far);
-      glFrustum(left,right,bottom,top,near,far);
+  //use frustum instead of gluPerspective .. frustum more flexible
+  //frustum specifies viewing volume
+  //perspective just does frustum with focal = trigonometry(fov)
+  setupFrustumParameters(left,right,bottom,top,near,far);
+  glFrustum(left,right,bottom,top,near,far);
 
-  }
-  else
-  {
-      //switch to projection matrix
-      glMatrixMode(GL_PROJECTION);
-      glViewport(0, 0, 2*projM[8], 2*projM[9]);
-
-      //load the custom projection matrix (obtained from opt)
-      for(int i=0;i<16;i++)
-          cout << " i : " << projM[i] << endl;
-      glLoadMatrixf(projM);
-  }
   //switch back to transformation matrix
   glMatrixMode(GL_MODELVIEW);
 }
@@ -426,48 +409,33 @@ void FaceWidget::paintGL(void)
   //reload so that transformations dont stack
   glLoadIdentity();
 
-  if(customTrans == false)
-  {
-      //gluLookAt is a viewing not a modelling transformation!!
-      //gluLookAt(0.0, 0.0, upVector*2*diameter, center_x, center_y, center_z, 0.0, upVector, 0.0);
+  //gluLookAt is a viewing not a modelling transformation!!
+  gluLookAt(0.0, 0.0, upVector*2*diameter, center_x, center_y, center_z, 0.0, upVector, 0.0);
 
-      //gluLookAt(0.0, 0.0, cameraZPosition, 0, 0, 0, 0.0, upVector, 0.0);
-
-
-      //keep the viewing trans with gluLookAt on the stack
-      //here we are trying to keep light movements independent of the
-      //viewing transformation of the scene objects
-      glPushMatrix();
-      GLfloat LightPosition[] =  { 0.0, 0.0, cameraZPosition, 0.0 };
-      glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
-      glPopMatrix();
+  //keep the viewing trans with gluLookAt on the stack
+  //here we are trying to keep light movements independent of the
+  //viewing transformation of the scene objects
+  glPushMatrix();
+  GLfloat LightPosition[] =  { 0.0, 0.0, cameraZPosition, 0.0 };
+  glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
+  glPopMatrix();
 
 
-      //move the objects by: we dont really need to display this
-      //since the objects may get smaller after param optimization
-      //we would have to consider them getting smaller and move camera
-      //by this too or something .. its just very messy
-      glTranslatef(trans_x,trans_y,trans_z);
+  //move the objects by: we dont really need to display this
+  //since the objects may get smaller after param optimization
+  //we would have to consider them getting smaller and move camera
+  //by this too or something .. its just very messy
+  //glTranslatef(trans_x,trans_y,trans_z);
 
-      //rotations which will be updated anytime the values of rot_x, rot_y change
-      //to get the rotations around the object (which isnt at 0,0,0) we need to
-      //not turn just around 1,0,0 and 0,1,0 as usual
-      glRotatef(rot_z, 0.0, 0.0, 1.0);
-      glRotatef(rot_y, 0.0, 1.0, 0.0);
-      glRotatef(rot_x, 1.0, 0.0, 0.0);
+  //rotations which will be updated anytime the values of rot_x, rot_y change
+  //to get the rotations around the object (which isnt at 0,0,0) we need to
+  //not turn just around 1,0,0 and 0,1,0 as usual
+  glRotatef(rot_z, 0.0, 0.0, 1.0);
+  glRotatef(rot_y, 0.0, 1.0, 0.0);
+  glRotatef(rot_x, 1.0, 0.0, 0.0);
 
-      //glTranslatef(-center_x,-center_y,-center_z);
+  glTranslatef(-center_x,-center_y,-center_z);
 
-  }
-  else
-  {
-      //gluLookAt(0.0, 0.0, upVector*2*diameter, center_x, center_y, center_z, 0.0, upVector, 0.0);      
-      GLfloat LightPosition[] =  { 0.0, 0.0, cameraZPosition, 0.0 };
-      glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
-      for(int i=0;i<16;i++)
-          cout << " i : " << tranM[i] << endl;
-      glLoadMatrixf(tranM);      
-  }
   //does the open gl glBegin(GL_POLYGON) glEnd() stuff
   render();
 }
@@ -491,62 +459,12 @@ void FaceWidget::setTexture(uchar *img_data, int img_height, int img_width)
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
     /* glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST); */
     glTexParameteri (GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); //blends
-    //glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL); //covers
+    //glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE); //blends
+    glTexEnvf (GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL); //covers
     //glTexImage2D (GL_TEXTURE_2D, 0, texFormat, imageWidth, imageHeight, 0, texFormat, GL_UNSIGNED_BYTE, imageData);
     glTexImage2D (GL_TEXTURE_2D, 0, GL_RGB8, img_width, img_height, 0, GL_RGB, GL_UNSIGNED_BYTE, img_data);
 
     delete[] img_data;
 
     texture_id = texture;
-}
-
-void FaceWidget::setProjectionMatrix(Matrix projM)
-{
-    customProj = true;
-    if(projM.getM() != 4 && projM.getN() != 4)
-    {
-        cerr << "proj matrix size is incorrect" << endl;
-        return;
-    }
-    int count = 0;
-    for(int i=0;i<projM.getN();i++)
-        for(int j=0;j<projM.getM();j++)
-        {
-            this->projM[count] = (float)projM[j][i];
-            count++;
-        }
-
-//    this->projM[0] = 1.2;
-//    this->projM[1] = 0.0;
-//    this->projM[2] = 0.0;
-//    this->projM[3] = 0.0;
-//    this->projM[4] = 0.0;
-//    this->projM[5] = 2.0;
-//    this->projM[6] = 0.0;
-//    this->projM[7] = 0.0;
-//    this->projM[8] = 0.0043;
-//    this->projM[9] = 0.007;
-//    this->projM[10] = -1.5;
-//    this->projM[11] = -1.0;
-//    this->projM[12] = 0.0;
-//    this->projM[13] = 0.0;
-//    this->projM[14] = -360.0;
-//    this->projM[15] = 0.0;
-}
-void FaceWidget::setTransformationMatrix(Matrix tranM)
-{
-    customTrans = true;
-    if(tranM.getM() != 4 && tranM.getN() != 4)
-    {
-        cerr << "trans matrix size is incorrect" << endl;
-        return;
-    }
-    int count = 0;
-    for(int i=0;i<tranM.getN();i++)
-        for(int j=0;j<tranM.getM();j++)
-        {
-            this->tranM[count] = (float)tranM[j][i];
-            count++;
-        }
 }

@@ -23,6 +23,7 @@ public:
     static void grabThumbnailForVideo(string videoName, Mat& thumbnail);
     static QPixmap mat2QPixmap(const Mat &m);
     static int closestLargetPowerOf2(int x);
+    static QPixmap composePixmaps(const QPixmap &src, const QPixmap &dest);
 };
 
 #endif // UTILITY_H
