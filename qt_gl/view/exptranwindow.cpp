@@ -68,7 +68,9 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(v_dialog,SIGNAL(fileSelected(const QString)),v_controller,SLOT(video_file_changed(const QString)));
 
     //face widget connects    
-    connect(ui.wireCheckBox,SIGNAL(toggled(bool)),face_widget1,SLOT(wireFrameChecked(bool)));
+    connect(ui.wireRadioButton,SIGNAL(toggled(bool)),face_widget1,SLOT(wireFrameChecked(bool)));    
+    connect(ui.featureRadio,SIGNAL(toggled(bool)),face_widget1,SLOT(featureToggled(bool)));
+    connect(ui.mouthRadio,SIGNAL(toggled(bool)),face_widget1,SLOT(mouthToggled(bool)));
 
     //video controller connects
     connect(ui.restartButton,SIGNAL(clicked()),v_controller,SLOT(restartCapturing()));

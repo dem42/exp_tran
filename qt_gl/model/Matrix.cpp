@@ -119,12 +119,12 @@ void Matrix::setElem(int i,int j,double elem)
     mat[i][j] = elem;
 }
 
-inline int Matrix::getM() const
+int Matrix::getM() const
 {
     return m;
 }
 
-inline int Matrix::getN() const
+int Matrix::getN() const
 {
     return n;
 }

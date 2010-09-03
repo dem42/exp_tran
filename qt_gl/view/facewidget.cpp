@@ -21,6 +21,8 @@ FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
   polygonNumber = 0;
 
   gl_display_style = GL_POLYGON;
+  displayFeature = false;
+  displayMouth = true;
 
   face_index = -1;
 
@@ -118,30 +120,38 @@ void FaceWidget::render()
   for(int i=0; i<polygonNumber; i++)
     {
 
-      result = std::find(mouthPoly.begin(),mouthPoly.end(),i);
-      //this is a mouth polygon so dont render it
-      if(result != mouthPoly.end())
-          continue;
+      //displayMouth logic
+      if(displayMouth)
+      {
+          result = std::find(mouthPoly.begin(),mouthPoly.end(),i);
+          //this is a mouth polygon so dont render it
+          if(result != mouthPoly.end())
+              continue;
+      }
 
       v1 = triangles[i][0];
       v2 = triangles[i][1];
       v3 = triangles[i][2];
 
-      //try to find if polygon i is a feature point
-      result = std::find(fPoly.begin(),fPoly.end(),i);
-
-
-      result = std::find(fP.begin(),fP.end(),v1);
-      if(result != fP.end())
+      //whether to render feature points using spheres
+      if(displayFeature)
       {
-            glPushMatrix();
-            glTranslatef(vertexes[v1].x,vertexes[v1].y,vertexes[v1].z);
+          //try to find if polygon i is a feature point
+          result = std::find(fPoly.begin(),fPoly.end(),i);
 
-            glColor3f(0.5f, 0.0f, 0.0f); // red reflective properties            
-            //adjust to the correct diameter
-            gluSphere(quad,diameter*(3./144.32) ,10,10);
 
-            glPopMatrix();
+          result = std::find(fP.begin(),fP.end(),v1);
+          if(result != fP.end())
+          {
+              glPushMatrix();
+              glTranslatef(vertexes[v1].x,vertexes[v1].y,vertexes[v1].z);
+
+              glColor3f(0.5f, 0.0f, 0.0f); // red reflective properties
+              //adjust to the correct diameter
+              gluSphere(quad,diameter*(3./144.32) ,10,10);
+
+              glPopMatrix();
+          }
       }
 
 
@@ -365,6 +375,15 @@ int FaceWidget::selectPoint(const QPoint &pos)
 void FaceWidget::wireFrameChecked(bool checked)
 {
     setWireFrame(checked);
+}
+
+void FaceWidget::mouthToggled(bool tog)
+{
+    displayMouth = tog;
+}
+void FaceWidget::featureToggled(bool tog)
+{
+    displayFeature = tog;
 }
 
 void FaceWidget::setWireFrame(bool on)

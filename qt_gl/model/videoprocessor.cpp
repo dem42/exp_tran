@@ -3,17 +3,20 @@
 #include "neldermeadoptimizer.h"
 #include "closedformoptimizer.h"
 #include "nnlsoptimizer.h"
+#include "controller/utility.h"
 
-VideoProcessor::VideoProcessor() : FRAME_MAX(5)
+VideoProcessor::VideoProcessor() : FRAME_MAX(20)
 {
     flowEngine = new OpticalFlowEngine();
     paramOptimizer = new NNLSOptimizer();
+    poseEstimator = new PoseEstimator();
 }
 
 VideoProcessor::VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine) : FRAME_MAX(4)
 {
     this->flowEngine = flowEngine;
     this->paramOptimizer = paramOptimizer;
+    this->poseEstimator = new PoseEstimator();
 }
 
 void VideoProcessor::setFlowEngine(OpticalFlowEngine *flowEngine)
@@ -92,17 +95,24 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
 
     cout << "now first frame pose " << endl;
     //calculate the rot,trans of the intial frame
-    paramOptimizer->calculateTransformation(featurePoints[0],face_ptr,cameraMatrix,lensDist,indices,rvec,tvec,useExt);
+    poseEstimator->calculateTransformation(featurePoints[0],face_ptr,cameraMatrix,lensDist,indices,rvec,tvec,useExt);
     frameRotation.push_back(rvec.clone());
     frameTranslation.push_back(tvec.clone());
     useExt |= true;
 
     newPoints.clear();
-    cout << "now new points " << endl;
-    paramOptimizer->generatePoints(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,420,face_ptr,newPoints,indices);
+
     //add new points so that we start tracking them
     //we arent actually altering the first featurePoints[0] just the rest throught compute flow
-    cout << "cur points b4 " << currentPoints.size() << endl;
+//    poseEstimator->generatePoints(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,420,face_ptr,newPoints,indices);
+//    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+
+
+    Utility::sampleGoodPoints(currentPoints,newPoints);
+    currentPoints.clear();
+    indices.clear();
+    poseEstimator->reprojectInto3DUsingWeak(newPoints,frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,face_ptr,indices);
+
     currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
     cout << " after " << currentPoints.size() << endl;
 
@@ -130,7 +140,7 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
 
         //estimate the pose parameters and place estimations into vectors rotations and translations
         //the rotations vector holds the rodrigues rotation vectors which can be converted to a rotation matrix
-        paramOptimizer->calculateTransformation(featurePoints[i],face_ptr,cameraMatrix,lensDist,point_indices[i],rvec,tvec,useExt);
+        poseEstimator->calculateTransformation(featurePoints[i],face_ptr,cameraMatrix,lensDist,point_indices[i],rvec,tvec,useExt);
         frameRotation.push_back(rvec.clone());
         frameTranslation.push_back(tvec.clone());
         useExt |= true;
@@ -156,7 +166,7 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
         //could overload generatePoints in closedform optim to do weak perspective
         cout << "frame : " << i << endl;
         newPoints.clear();
-        paramOptimizer->weakPerspectiveProjectPoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,point_indices[i],face_ptr,newPoints);
+        poseEstimator->weakPerspectiveProjectPoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,point_indices[i],face_ptr,newPoints);
         generatedPoints.push_back(newPoints);
     }
 

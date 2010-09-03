@@ -3,6 +3,7 @@
 
 #include "opticalflowengine.h"
 #include "optimizer.h"
+#include "poseestimator.h"
 #include <cv.h>
 #include <vector>
 
@@ -24,7 +25,8 @@ public:
 private:    
     const unsigned int FRAME_MAX;
     Optimizer *paramOptimizer;
-    OpticalFlowEngine *flowEngine;    
+    OpticalFlowEngine *flowEngine;
+    PoseEstimator *poseEstimator;
 };
 
 #endif // VIDEOPROCESSOR_H

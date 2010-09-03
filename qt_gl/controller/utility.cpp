@@ -2,8 +2,53 @@
 #include <cmath>
 #include <iostream>
 #include <QPainter>
+#include <cstdio>
+#include <cstdlib>
 using namespace std;
 
+
+void Utility::sampleGoodPoints(const vector<Point2f> &points, vector<Point2f> &sampledPoints)
+{
+    Utility::pointSampling(points[3],points[5],10,sampledPoints);
+    Utility::pointSampling(points[3],points[6],10,sampledPoints);
+    Utility::pointSampling(points[5],points[4],10,sampledPoints);
+    Utility::pointSampling(points[6],points[4],10,sampledPoints);
+
+    Utility::pointSampling(points[13],points[14],10,sampledPoints);
+    Utility::pointSampling(points[15],points[16],10,sampledPoints);
+
+    Utility::pointSampling(points[17],points[18],10,sampledPoints);
+    Utility::pointSampling(points[17],points[19],10,sampledPoints);
+}
+
+void Utility::pointSampling(const Point2f& a, const Point2f& b, const int num,
+                                   vector<Point2f> &points)
+{
+    double random;
+    double low = 0;
+    double high = 100;
+
+    srand( (unsigned int)time(0) );
+
+    //now generate random numbers from range based on unifrom sampling dist formula
+    //we look at it as a parametrization of the interval a,b
+    //with a param based on rand() from interval 0 to 1
+    //with the +1 coz it will never go to 1 .. coz it will never be rand_max
+    //U = a + (b-a+1)*rand()/(1+RAND_MAX);
+
+    Point2f newPoint;
+    for(int i=0;i<num;i++)
+    {
+        random = low + (high - low + 1.0)*rand()/(1.0 + RAND_MAX);
+        random /= 100;
+        newPoint.x = (1-random)*a.x + random*b.x;
+        newPoint.y = (1-random)*a.y + random*b.y;
+        points.push_back(newPoint);
+    }
+    cout << "testing sampling" << endl;
+    for(int i=0;i<points.size();i++)
+        cout << points[i].x << " " << points[i].y << endl;
+}
 
 QPixmap Utility::composePixmaps(const QPixmap &src, const QPixmap &dest)
 {

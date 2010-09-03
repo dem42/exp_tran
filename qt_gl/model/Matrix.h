@@ -51,8 +51,8 @@ public:
     /*****************/
     double getElem(int i,int j) const;
     void setElem(int i,int j,double elem);
-    inline int getM() const;
-    inline int getN() const;
+    int getM() const;
+    int getN() const;
 
 
     void transpose(Matrix &mt);

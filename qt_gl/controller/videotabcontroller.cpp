@@ -14,9 +14,7 @@
 #include "model/errorfunction.h"
 #include "model/modelimageerror.h"
 
-#include "model/neldermeadoptimizer.h"
-#include "model/closedformoptimizer.h"
-#include "model/nnlsoptimizer.h"
+#include "model/poseestimator.h"
 
 using namespace cv;
 using namespace std;
@@ -41,7 +39,7 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
     //initialize the optical flow engine
     flowEngine = new OpticalFlowEngine();
     //init the optimizer
-    paramOptimizer = new NelderMeadOptimizer();
+    poseEstimator = new PoseEstimator();
 
     //init the video processor with default optimizer and optical flow engine
     videoProcessor = new VideoProcessor();
@@ -75,10 +73,6 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
     flowLabel->show();
     picLabel->show();
     //ui.picLabel->showFullScreen();
-
-
-    NNLSOptimizer *nnls = new NNLSOptimizer();
-    nnls->test();
 
 
     //initalize the camera based on precalculated intrinsic parameters
@@ -336,9 +330,29 @@ void VideoTabController::startFaceTransfer()
     //setup the result vectors for the extrinsic parameters
     Mat_<double> rvec, tvec;
 
+    Face *face_guess = new Face();
+    double *w_id = new double[56];
+    double *w_exp = new double[7];
 
+    for(int i=0;i<56;i++)
+    {
+        if(i==33)w_id[i] = 0.2;
+        else if(i==10)w_id[i] = 0.2;
+        else if(i==20)w_id[i] = 0.2;
+        else if(i==1)w_id[i] = 0.2;
+        else if(i==50)w_id[i] = 0.2;
+        else w_id[i] = 0;
+    }
+    w_exp[0] = 0.0;
+    w_exp[1] = 0.0;
+    w_exp[2] = 0.0;
+    w_exp[3] = 0.0;
+    w_exp[4] = 1.0;
+    w_exp[5] = 0.0;
+    w_exp[6] = 0.0;
+    face_guess->interpolate(w_id,w_exp);
     vector<int> indices(Face::fPoints,Face::fPoints+Face::fPoints_size);
-    paramOptimizer->calculateTransformation(marked,face_ptr,cameraMatrix,lensDist,indices,rvec,tvec,false);
+    poseEstimator->calculateTransformation(marked,face_guess,cameraMatrix,lensDist,indices,rvec,tvec,false);
 
     Mat_<double> rmatrix;
     //convert the rotation vector to a rotation matrix
@@ -406,19 +420,13 @@ void VideoTabController::startFaceTransfer()
 
     cout << "TRANS : " << tvec.at<double>(0,0) << " " << tvec.at<double>(1,0)  << " " << tvec.at<double>(2,0) << endl;
 
-    double fovy, fovx, fl, aratio;
     Point2d pp;
-    cv::calibrationMatrixValues(cameraMatrix,frames[frames.size()-1].size(),200,200,fovx,fovy,fl,pp,aratio);
-
-    cout << "fovx " << fovx << " fovy " << fovy << " focal length " << fl
-         << " pp.x " << pp.x << " pp.y " << pp.y << " aratio " << aratio << endl;
-
 
     double scale = 1;
 
     for(int i=0; i<Face::fPoints_size; i++)
     {
-        p = face_ptr->getPoint(Face::fPoints[i]);
+        p = face_guess->getPoint(Face::fPoints[i]);
         point3dMat(0,0) = p.x;
         point3dMat(1,0) = p.y;
         point3dMat(2,0) = p.z;
@@ -444,8 +452,22 @@ void VideoTabController::startFaceTransfer()
         points.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));
     }
 
-    picLabel->setMarked(points);
+    //picLabel->setMarked(points);
 
+    vector<Point2f> sampledPoints;
+    Utility::sampleGoodPoints(points,sampledPoints);
+    picLabel->setMarked(sampledPoints);
+
+
+    vector<int> correspondences;
+    vector<int>::iterator cit, cit_end;
+    poseEstimator->reprojectInto3DUsingWeak(points,rvec,tvec,cameraMatrix,lensDist,face_guess,correspondences);
+    cit = correspondences.begin();
+    cit_end = correspondences.end();
+    cout << "correspondences are : " << endl;
+    for(;cit!=cit_end;cit++)
+        cout << *cit << " ";
+    cout << endl;
     double euler_x = rot_x * 180./PI;
     double euler_y = rot_y * 180./PI;
     double euler_z = rot_z * 180./PI;
@@ -461,8 +483,11 @@ void VideoTabController::startFaceTransfer()
     //that the pose estimation returns .. (solvePnP return R = rzTryTrxT but a different upvector
     face_widget->setTransParams(euler[0],-euler[1],euler[2],tx,ty,tz);
     //face_widget->setTransParams(euler[0],euler[1],euler[2],tx,ty,tz);
-    face_widget->setFace(face_ptr);
+    face_widget->setFace(face_guess);
     face_widget->refreshGL();
+
+    delete[] w_id;
+    delete[] w_exp;
 }
 
 void VideoTabController::dropFrame()
@@ -716,6 +741,8 @@ VideoTabController::~VideoTabController()
     delete capture;
 
     delete flowEngine;
+    delete poseEstimator;
+    delete videoProcessor;
 
     delete picLabel;
     delete flowLabel;

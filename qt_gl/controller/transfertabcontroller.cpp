@@ -25,27 +25,30 @@ TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, Click
     connect(srcDia,SIGNAL(fileSelected(QString)),this,SLOT(srcFileSelected(QString)));
     connect(targetDia,SIGNAL(fileSelected(QString)),this,SLOT(targetFileSelected(QString)));
 
+    initSrcSide();
+    initTargetSide();
+
+    lensDist = Mat_<double>(1,5);
+    lensDist(0,0) = 0;
+    lensDist(0,1) = 0;
+    lensDist(0,2) = 0;
+    lensDist(0,3) = 0;
+    lensDist(0,4) = 0;
+}
+
+void TransferTabController::initSrcSide()
+{
     Mat m;
     double c_x, c_y;
 
     Utility::grabThumbnailForVideo(srcFile.toStdString(),m);
-    srcFrames.push_back(m.clone());    
+    srcFrames.push_back(m.clone());
     sourceLabel->setPixmap(Utility::mat2QPixmap(m));
     c_x = m.size().width / 2.;
     c_y = m.size().height / 2.;
 
-    Utility::grabThumbnailForVideo(targetFile.toStdString(),m);
-    targetFrames.push_back(m.clone());
-    targetLabel->setPixmap(Utility::mat2QPixmap(m));
-    c_x = m.size().width / 2.;
-    c_y = m.size().height / 2.;
-
     sourceLabel->show();
-    targetLabel->show();
-
     capSrc = new VideoCapture(srcFile.toStdString());
-    capTarget = new VideoCapture(targetFile.toStdString());
-
 
     cameraSrc = Mat_<double>(3,3);
     cameraSrc(0,0) = 900;
@@ -57,12 +60,32 @@ TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, Click
     cameraSrc(2,0) = 0;
     cameraSrc(2,1) = 0;
     cameraSrc(2,2) = 1;
-    lensDist = Mat_<double>(1,5);
-    lensDist(0,0) = 0;
-    lensDist(0,1) = 0;
-    lensDist(0,2) = 0;
-    lensDist(0,3) = 0;
-    lensDist(0,4) = 0;
+}
+
+void TransferTabController::initTargetSide()
+{
+    Mat m;
+    double c_x, c_y;
+    Utility::grabThumbnailForVideo(targetFile.toStdString(),m);
+    targetFrames.push_back(m.clone());
+    targetLabel->setPixmap(Utility::mat2QPixmap(m));
+    c_x = m.size().width / 2.;
+    c_y = m.size().height / 2.;
+
+    targetLabel->show();
+
+    capTarget = new VideoCapture(targetFile.toStdString());
+
+    cameraTarget = Mat_<double>(3,3);
+    cameraTarget(0,0) = 900;
+    cameraTarget(0,1) = 0;
+    cameraTarget(0,2) = c_x;
+    cameraTarget(1,0) = 0;
+    cameraTarget(1,1) = 900;
+    cameraTarget(1,2) = c_y;
+    cameraTarget(2,0) = 0;
+    cameraTarget(2,1) = 0;
+    cameraTarget(2,2) = 1;
 }
 
 /*************************************************/
@@ -70,11 +93,29 @@ TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, Click
 /*************************************************/
 void TransferTabController::dropSrc()
 {
+    Mat frame, rgb_frame;
+    if( capSrc->grab() == true)
+        capSrc->retrieve(frame);
+    else    
+        return;
 
+    cvtColor(frame, rgb_frame, CV_BGR2RGB);
+
+    srcFrames.push_back(rgb_frame);
+    sourceLabel->setPixmap(Utility::mat2QPixmap(rgb_frame));
 }
 void TransferTabController::dropTarget()
 {
+    Mat frame, rgb_frame;
+    if( capTarget->grab() == true)
+        capTarget->retrieve(frame);
+    else
+        return;
 
+    cvtColor(frame, rgb_frame, CV_BGR2RGB);
+
+    targetFrames.push_back(rgb_frame);
+    targetLabel->setPixmap(Utility::mat2QPixmap(rgb_frame));
 }
 void TransferTabController::beginTransfer()
 {
@@ -103,9 +144,9 @@ void TransferTabController::beginTransfer()
     /**** now repeat the process for the other face ***/    
     t_frameData.push_back(targetFrames[targetFrames.size()-1]);
     targetLabel->setPixmap(Utility::mat2QPixmap(t_frameData[0]));
-    while( capSrc->grab() == true)
+    while( capTarget->grab() == true)
     {
-        capSrc->retrieve(frame);
+        capTarget->retrieve(frame);
         cvtColor(frame, rgb_frame, CV_BGR2RGB);
         copyFrame = rgb_frame.clone();
         t_frameData.push_back(copyFrame);
@@ -324,12 +365,14 @@ void TransferTabController::targetFileSelected(const QString str)
 {
     targetFile = str;
     targetText->setText(str);
+    initTargetSide();
 }
 
 void TransferTabController::srcFileSelected(const QString str)
 {
     srcFile = str;
     srcText->setText(str);
+    initSrcSide();
 }
 
 void TransferTabController::targetBrowse()

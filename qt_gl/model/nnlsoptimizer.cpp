@@ -378,7 +378,7 @@ void NNLSOptimizer::scannls(const Mat& A, const Mat& b,Mat &x)
 bool NNLSOptimizer::eKKT(const Mat& H,const Mat& f,const Mat& x,double e)
 {
     int n = H.size().width;
-    bool result = true;
+
     Mat_<double> hx_f = H*x + f;
 
     for(int i=0;i<n;++i)

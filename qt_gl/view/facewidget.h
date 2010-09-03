@@ -70,6 +70,8 @@ protected:
 
 public slots:
    void wireFrameChecked(bool);
+   void mouthToggled(bool);
+   void featureToggled(bool);
 
 private:
   int selectPoint(const QPoint &pos);
@@ -85,6 +87,9 @@ private:
   int face_index;
   //whether we display using (line loop)wireframe or polygon (default)
   int gl_display_style;
+  //display option bools
+  bool displayMouth;
+  bool displayFeature;
 
   QPoint lastPos;
 

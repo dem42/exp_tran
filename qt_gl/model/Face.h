@@ -24,6 +24,7 @@ class Face
   Point3 getPointFromPolygon(int);
   Point3 getPoint(int index) const;
   int getPointIndexFromPolygon(int);
+  int closestPointIndexForPoint(Point3 p);
 
   //the following functions allow us to use weak perspective projection
   //in conjunction with parameter estimation

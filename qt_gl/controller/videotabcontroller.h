@@ -12,7 +12,7 @@
 
 #include "model/Face.h"
 #include "view/facewidget.h"
-#include "model/optimizer.h"
+#include "model/poseestimator.h"
 #include "model/videoprocessor.h"
 
 #include "ui_cameraDialog.h"
@@ -73,8 +73,8 @@ private:
     //object responsible for computing
     //optical flow
     OpticalFlowEngine *flowEngine;
-    //model parameters optimization
-    Optimizer *paramOptimizer;
+    //3D pose parameters optimization
+    PoseEstimator *poseEstimator;
     //model fitting engine
     VideoProcessor *videoProcessor;
 

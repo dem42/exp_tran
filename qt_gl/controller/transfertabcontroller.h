@@ -31,6 +31,8 @@ public slots:
     void replayFrame();
 private:
     void convertFrameIntoTexture(Mat &frame);
+    void initSrcSide();
+    void initTargetSide();
 
     ClickableQLabel *sourceLabel;
     ClickableQLabel *targetLabel;

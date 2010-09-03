@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <limits>
 #include <cmath>
 #include <new>
 #include "model/Face.h"
@@ -212,6 +213,25 @@ int Face::getPointIndexFromPolygon(int index)
     cout << "points in polygon are" << triangles[index][0] << " "
          << triangles[index][1] << " " << triangles[index][2] << endl;
     return triangles[index][0];
+}
+
+int Face::closestPointIndexForPoint(Point3 p)
+{    
+    int min_index = -1;
+    double min = numeric_limits<double>::max();
+    double dist = 0.0;
+    for(int i=0;i<point_num;i++)
+    {
+        Vector3 v(vertexes[i],p);
+        dist = v.length();
+
+        if(dist < min)
+        {
+            min = dist;
+            min_index = i;
+        }
+    }
+    return min_index;
 }
 
 void Face::calculateBoundingSphere(float &cx,float &cy,float &cz, float &diameter) const
