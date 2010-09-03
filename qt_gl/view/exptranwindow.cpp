@@ -99,3 +99,11 @@ ExpTranWindow::~ExpTranWindow()
     delete f_controller;
 }
 
+void ExpTranWindow::displayException(const std::exception &e)
+{
+    QDialog d;
+    QString str = e.what();
+    cout << str.toStdString() << endl;
+    d.setWindowTitle(str);
+    d.exec();
+}

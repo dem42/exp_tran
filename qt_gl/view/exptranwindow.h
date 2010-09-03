@@ -21,6 +21,7 @@ class ExpTranWindow : public QMainWindow
 public:
     ExpTranWindow(QMainWindow *window = 0);
     ~ExpTranWindow();
+    void displayException(const std::exception &e);
 
 private:
     Ui::ApplForm ui;

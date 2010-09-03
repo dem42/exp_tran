@@ -12,11 +12,31 @@ VideoProcessor::VideoProcessor() : FRAME_MAX(10)
     poseEstimator = new PoseEstimator();
 }
 
+VideoProcessor::VideoProcessor(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
+                               const cv::Mat &cameraMatrix, const cv::Mat &lensDist) : FRAME_MAX(10)
+{
+    fPoints = featurePoints;
+    fData = frameData;
+    this->cameraMatrix = cameraMatrix;
+    this->lensDist = lensDist;
+
+    flowEngine = new OpticalFlowEngine();
+    paramOptimizer = new ClosedFormOptimizer();
+    poseEstimator = new PoseEstimator();
+}
+
 VideoProcessor::VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine) : FRAME_MAX(4)
 {
     this->flowEngine = flowEngine;
     this->paramOptimizer = paramOptimizer;
     this->poseEstimator = new PoseEstimator();
+}
+
+
+void VideoProcessor::run()
+{
+    this->processVideo(fPoints,fData,cameraMatrix,lensDist,frameTranslation,frameRotation,generatedPoints,
+                       vector_weights_exp,vector_weights_id);
 }
 
 void VideoProcessor::setFlowEngine(OpticalFlowEngine *flowEngine)
