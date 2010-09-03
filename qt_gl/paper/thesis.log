@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  1 SEP 2010 04:58
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  3 SEP 2010 12:30
 entering extended mode
  %&-line parsing enabled.
 **thesis.tex
@@ -648,24 +648,24 @@ File: images/fx.png Graphic file (type png)
 File: images/gx.png Graphic file (type png)
  <use images/gx.png> [33 <./images/fx.png> <./images/gx.png>] [34] [35]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 1735.
+put line 1736.
  [36]
-Underfull \hbox (badness 10000) in paragraph at lines 1839--1841
+Underfull \hbox (badness 10000) in paragraph at lines 1840--1842
 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1842--1844
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1844--1852
+Underfull \hbox (badness 10000) in paragraph at lines 1843--1845
 
  []
 
 [37]
-Underfull \hbox (badness 10000) in paragraph at lines 1866--1870
+Underfull \hbox (badness 10000) in paragraph at lines 1845--1853
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 1867--1871
 
  []
 
@@ -684,10 +684,10 @@ ning (ext4): destination with the same identifier (name{algorithm.\\theHalgorit
 hm\040}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.2197 \end{algorithm}
+l.2198 \end{algorithm}
                       
 
-LaTeX Warning: Reference `a:flat' on page 45 undefined on input line 2204.
+LaTeX Warning: Reference `a:flat' on page 45 undefined on input line 2205.
 
 [45
 
@@ -695,14 +695,14 @@ LaTeX Warning: Reference `a:flat' on page 45 undefined on input line 2204.
 theHalgorithm\040}) has been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.2225 \end{algorithm}
+l.2226 \end{algorithm}
                        [46] [47]
 
 LaTeX Warning: Reference `eq:kron_ortho' on page 48 undefined on input line 234
-0.
+1.
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 2351--2366
+Underfull \hbox (badness 10000) in paragraph at lines 2352--2367
 
  []
 
@@ -719,7 +719,7 @@ File: images/featureSelection.png Graphic file (type png)
 File: images/chessboard_pattern.png Graphic file (type png)
 
 <use images/chessboard_pattern.png>
-Overfull \hbox (3.26901pt too wide) in paragraph at lines 2643--2644
+Overfull \hbox (3.26901pt too wide) in paragraph at lines 2644--2645
  [][] 
  []
 
@@ -792,7 +792,7 @@ hare/texmf-texlive/fonts/type1/bluesky/cm/cmsy8.pfb></usr/share/texmf-texlive/f
 onts/type1/bluesky/cm/cmti10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/
 cm/cmti12.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmtt10.pfb></usr
 /share/texmf-texlive/fonts/type1/bluesky/ams/msbm10.pfb>
-Output written on thesis.pdf (62 pages, 3021207 bytes).
+Output written on thesis.pdf (62 pages, 3021483 bytes).
 PDF statistics:
  1071 PDF objects out of 1200 (max. 8388607)
  301 named destinations out of 1000 (max. 131072)

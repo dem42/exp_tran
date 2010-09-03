@@ -105,8 +105,9 @@ void CustomizableFaceWidget::setProjectionMatrix(Matrix projM)
     viewport_width = this->projM[8];
 
     this->projM[8] = 0.0;
-    //small shif not sure why its necessary
+    //small shift not sure why its necessary
     this->projM[9] = -0.2;
+    //this->projM[9] = 0.0;
     this->projM[0] *= (1./viewport_width);
     this->projM[5] *= -(1./viewport_height);
     //coz of a stupid zero division when normalizing homogenous .. yay for opengl

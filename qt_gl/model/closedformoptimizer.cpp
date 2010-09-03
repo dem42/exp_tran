@@ -21,9 +21,6 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
     Mat_<double> PR, PRT, pr, Pt, PRM;
     Mat_<double> W, WT;
 
-    //regularization term
-    Mat_<double> regTerm_id, regTerm_exp;
-    const double regparam = 10.8;
     //core tensor rows
     Mat_<double> Mi;
     Mat_<double> M;
@@ -56,6 +53,28 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
     Matrix lin_comb_x(exr_size,1);
     Matrix lin_comb_y(id_size,1);
 
+    //regularization term
+    Mat_<double> regTerm_id, regTerm_exp, leftTerm_id, leftTerm_exp;
+    const double regParam = 2000.8;
+
+    //size is Size(width,height)
+    regTerm_exp = Mat_<double>::eye(Size(exr_size,exr_size));
+    regTerm_id = Mat_<double>::eye(Size(id_size,id_size));
+    leftTerm_exp = Mat_<double>::eye(Size(1,exr_size));
+    leftTerm_id = Mat_<double>::eye(Size(1,id_size));
+
+    //init the left terms which are made up of regParam*mean
+    //mean is 1./size for both since theres exactly same amount of
+    //faces with 1s at those spots and mean is in between all of them (? not sure)
+    for(int i=0;i<exr_size;i++)
+        leftTerm_exp(0,i) = 1./exr_size;
+    for(int i=0;i<id_size;i++)
+        leftTerm_id(0,i) = 1./id_size;
+    leftTerm_exp = regParam*leftTerm_exp;
+    leftTerm_id = regParam*leftTerm_id;
+
+    regTerm_exp = regParam*regTerm_exp;
+    regTerm_id = regParam*regTerm_id;
 
     double Z_avg;
     double average_depth;
@@ -79,9 +98,6 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
     proP = proP + cameraMatrix*translation;
     Z_avg = proP(0,2);
 
-
-    regTerm_id = regparam * Mat_<double>::eye(Size(id_size,id_size));
-    regTerm_exp = regparam * Mat_<double>::eye(Size(exr_size,exr_size));
 
     //get weights from the current face instance
     face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
@@ -144,6 +160,7 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
 
     PRM = PR*M;
 
+    //size is Size(width,height)
     A_ex = Mat_<double>::zeros(Size(exr_size,exr_size));
     B_ex = Mat_<double>::zeros(Size(1,exr_size));
 
@@ -172,7 +189,13 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
         A_ex = WT*W;
         B_ex = WT*f;
 
-        //A_ex = A_ex + regTerm_exp;
+        cout << "sizes " << A_ex.size().width << " " << A_ex.size().height << " "
+                << regTerm_exp.size().width << " " << regTerm_exp.size().height << " "
+                << B_ex.size().width << " " << B_ex.size().height << " "
+                << leftTerm_exp.size().width << " " << leftTerm_exp.size().height << endl;
+        cout << "types " << A_ex.type() << " " << regTerm_exp.type() << " " << B_ex.type() << " " << leftTerm_exp.type() << endl;
+        A_ex = A_ex + regTerm_exp;
+        B_ex = B_ex + leftTerm_exp;
         x = Matrix::solveLinSysSvd(A_ex,B_ex);
         cout << "in EX optim" << endl;
         Mat_<double> xM = x;
@@ -209,7 +232,8 @@ void ClosedFormOptimizer::estimateModelParameters(const Mat &frame, const vector
         A_id = WT*W;        
         B_id = WT*f;
 
-        //A_id = A_id + regTerm_id;
+        A_id = A_id + regTerm_id;
+        B_id = B_id + leftTerm_id;
         y = Matrix::solveLinSysSvd(A_id,B_id);
 
         cout << "this should work ... O_O : " << endl << x;

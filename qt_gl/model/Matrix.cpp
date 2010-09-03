@@ -386,13 +386,14 @@ Matrix Matrix::kron(const Matrix &a,const Matrix &b)
 //mult c (mxr) = a (mxn) * b (nxr)
 Matrix Matrix::matrix_mult(const Matrix &a,const Matrix &b)
 {
-        Matrix c(a.getM(),b.getN());
-        int i,j,k;        
-        for(i=0;i<a.getM();i++)
-                for(k=0;k<b.getM();k++)
-                        for(j=0;j<b.getN();j++)
-                                c.mat[i][j] += a.mat[i][k]*b.mat[k][j];
-        return c;
+    assert(a.getN() == b.getM());
+    Matrix c(a.getM(),b.getN());
+    int i,j,k;
+    for(i=0;i<a.getM();i++)
+        for(k=0;k<b.getM();k++)
+            for(j=0;j<b.getN();j++)
+                c.mat[i][j] += a.mat[i][k]*b.mat[k][j];
+    return c;
  }
 
 Matrix Matrix::eye(int n)
@@ -413,6 +414,7 @@ Matrix Matrix::solveLinSysSvd(const Matrix &A, const Matrix &b)
     int n = A.getN();
     int p = b.getM();
     int q = b.getN();
+    std::cout << "sizes in solve lin sys " << m << " " << n << " " << p << " " << q << std::endl;
     Matrix U(m,m), UT(m,m), V(n,n), invD(m,n), result(m,q);
 
     assert(m == p);

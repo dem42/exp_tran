@@ -245,7 +245,7 @@ void VideoTabController::replayFrame()
     cout << endl;
 
     double avg = face_ptr->getAverageDepth();
-    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->interpolate(w_id,w_exp,true,true);
     face_ptr->setAverageDepth(avg);
     face_widget->setFace(face_ptr);
 

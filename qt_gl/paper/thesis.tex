@@ -1665,7 +1665,8 @@ minima of functions.
 
 \subsection{Least Squares and Non Negative Least Squares}
 An important error function, which is often utilized in statistics and engineering, is the
-sum of squares error. This error function defines the disimilarity between input values $y_i$ and target values $t_i$ as
+sum of squares error. This error function defines the disimilarity between input
+values $y_i$ and target values $t_i$ using a numeric value given by
 \begin{equation}\label{eq:nnls}
 E(y) = \sum_i (y_i - t_i)^2
 \end{equation}
@@ -2729,10 +2730,11 @@ protected visibility which
 can be overwritten in any class inheriting from \texttt{QGLWidget}. These
 functions are \texttt{initializeGL()}, \texttt{resizeGL()} and
 \texttt{paintGL()}. The first of these functions, \texttt{initializeGL()}, is
-called when the widget class is constructed. The function \texttt{resizeGL()} is
+called when the widget class is constructed to set up the rendering context. The function \texttt{resizeGL()} is
 called when the window which holds the widget is resized and should be
-overwritten so that it correctly sets the projection parameters. The most important of
-these three function is \texttt{paintGL()} which controls the rendering itself.
+overwritten so that it correctly sets the viewport and the projection parameters. The most important of
+these three function is \texttt{paintGL()} which controls the drawing of the
+scene.
 
 In addition to the rendering functions, there are also useful public functions
 such as \texttt{bindTexture(.)} and \texttt{grabFrameBuffer(.)} to support

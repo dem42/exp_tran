@@ -12,6 +12,12 @@ class VideoProcessor
 public:
     VideoProcessor();
     VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine);
+    void processVideo2(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
+                      const Mat &cameraMatrix, const Mat &lensDist,
+                      vector<cv::Mat> &frameTranslation, vector<cv::Mat> &frameRotation,
+                      vector<vector<cv::Point2f> > &generatedPoints,
+                      vector<vector<double> >&vector_weights_exp,
+                      vector<vector<double> >&vector_weights_id );
     void processVideo(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
                       const Mat &cameraMatrix, const Mat &lensDist,
                       vector<cv::Mat> &frameTranslation, vector<cv::Mat> &frameRotation,
