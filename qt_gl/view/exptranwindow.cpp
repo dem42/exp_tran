@@ -3,7 +3,7 @@
 #include <qimage.h>
 #include <cv.h>
 #include <highgui.h>
-
+#include <QTextBrowser>
 
 ExpTranWindow::ExpTranWindow(QMainWindow *window)
 {    
@@ -102,8 +102,13 @@ ExpTranWindow::~ExpTranWindow()
 void ExpTranWindow::displayException(const std::exception &e)
 {
     QDialog d;
+    QVBoxLayout *layout = new QVBoxLayout();
+    QTextBrowser *browser = new QTextBrowser;
     QString str = e.what();
-    cout << str.toStdString() << endl;
-    d.setWindowTitle(str);
+    browser->setText(str);
+    layout->addWidget(browser);
+    d.setLayout(layout);
+
+    d.setWindowTitle("Error");
     d.exec();
 }

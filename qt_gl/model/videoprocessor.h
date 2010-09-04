@@ -3,6 +3,7 @@
 
 #include "opticalflowengine.h"
 #include "optimizer.h"
+#include "nnlsoptimizer.h"
 #include "poseestimator.h"
 #include <cv.h>
 #include <vector>
@@ -14,8 +15,14 @@ public:
     VideoProcessor();
     VideoProcessor(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
                    const cv::Mat &cameraMatrix, const cv::Mat &lensDist);
-    VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine);
+    VideoProcessor(NNLSOptimizer *paramOptimizer, OpticalFlowEngine *flowEngine);
     void processVideo2(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
+                      const Mat &cameraMatrix, const Mat &lensDist,
+                      vector<cv::Mat> &frameTranslation, vector<cv::Mat> &frameRotation,
+                      vector<vector<cv::Point2f> > &generatedPoints,
+                      vector<vector<double> >&vector_weights_exp,
+                      vector<vector<double> >&vector_weights_id );
+    void processVideo3(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
                       const Mat &cameraMatrix, const Mat &lensDist,
                       vector<cv::Mat> &frameTranslation, vector<cv::Mat> &frameRotation,
                       vector<vector<cv::Point2f> > &generatedPoints,
@@ -29,13 +36,13 @@ public:
                       vector<vector<double> >&vector_weights_id );
 
     void setFlowEngine(OpticalFlowEngine *flowEngine);
-    void setOptimizer(Optimizer *paramOptimizer);
+    void setOptimizer(NNLSOptimizer *paramOptimizer);
 
     void run();
 
 private:    
     const unsigned int FRAME_MAX;
-    Optimizer *paramOptimizer;
+    NNLSOptimizer *paramOptimizer;
     OpticalFlowEngine *flowEngine;
     PoseEstimator *poseEstimator;
 

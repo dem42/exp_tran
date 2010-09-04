@@ -4,7 +4,6 @@
 NNLSOptimizer::NNLSOptimizer() : NNLS_MAX_ITER(1000), max_iterations(3)
 {
 
-
 }
 
 void NNLSOptimizer::test()
@@ -58,6 +57,304 @@ void NNLSOptimizer::test()
     cout << "RESULT OF SCA NNLS " << endl << X;
 }
 
+void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featurePoints,
+                                 const Mat &cameraMatrix, const Mat& lensDist,
+                                 Face* face_ptr,const vector<int> &point_indices,
+                                 const Mat &rotation, const Mat &translation,
+                                 vector<double> &weights_ex)
+{
+    Mat_<double> weakCamera(2,3);
+    //matrices for A_ex * w_ex = f and A_id * w_id = f
+    Mat_<double> A_ex, seg_A_ex;
+    //matrix Z = kron(weights, Identity_matrix)
+    Mat_<double> Z_ex;
+    Mat_<double> ZU;
+    Mat_<double> pr, Pt;
+
+    //core tensor rows
+    Mat_<double> Mi;
+
+    //featurePoints converted to 2x1 matrices
+    Mat_<double> fi;
+    Mat_<double> f;
+
+    //initialize model-morph bases
+    FaceModel *model = FaceModel::getInstance();
+    Matrix core = model->getCoreTensor();
+    Mat_<double> u_id = model->getUIdentity();
+    Mat_<double> u_ex = model->getUExpression();
+
+    int index = 0;
+
+    const int exr_size = 7;
+    const int id_size = 56;
+
+    double *w_id = new double[id_size];
+    double *w_exp = new double[exr_size];
+
+    Mat_<double> rmatrix;
+    Mat_<double> x_t(1,exr_size);
+    Mat_<double> y_t(1,id_size);
+    Mat_<double> x(exr_size,1);
+    Mat_<double> y(id_size,1);
+    //used for x_t*U_ex and y_t*U_id
+    Matrix lin_comb_x(exr_size,1);
+    Matrix lin_comb_y(id_size,1);
+
+    double Z_avg;
+    double average_depth;
+    Point3f p;
+    Mat_<double> proP;
+    Mat_<double> pM(3,1);
+
+    Rodrigues(rotation,rmatrix);
+
+    //get weights from the current face instance
+    face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
+    average_depth = face_ptr->getAverageDepth();    
+    pM(0,0) = 1;
+    pM(1,0) = 1;
+    pM(2,0) = average_depth;
+    proP = cameraMatrix*rmatrix*pM;
+    proP = proP + cameraMatrix*translation;
+    Z_avg = proP(0,2);
+    cout << " with a z_avg after projecting " << Z_avg << endl;
+
+    /***************************************************************/
+    /*create weak-perspecitve camera matrix from camera matrix*/
+    /***************************************************************/
+    for(int i=0;i<2;i++)
+        for(int j=0;j<3;j++)
+            weakCamera(i,j) = cameraMatrix.at<double>(i,j);
+
+    f = Mat_<double>(featurePoints.size()*2,1);
+    fi = Mat_<double>(2,1);
+
+    //precompute translation
+    Pt = (1./translation.at<double>(2,0)) * (weakCamera*translation);
+
+    cout << "here " << featurePoints.size() << " &  " << point_indices.size() << endl;
+    //preprocess points and core tensor rows
+    //for points subtract translation too
+    for(unsigned int i=0;i<featurePoints.size();i++)
+    {
+        fi = Mat_<double>(2,1);
+        fi(0,0) = featurePoints[i].x;
+        fi(1,0) = featurePoints[i].y;
+
+        fi = fi - Pt;
+        f.row(2*i) = fi.row(0) + 0;
+        f.row(2*i+1) = fi.row(1) + 0;
+    }
+
+    pr = (1.0/Z_avg)*weakCamera*rmatrix;
+    A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);
+    seg_A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);
+    Mi = Mat_<double>(3,exr_size*id_size);
+
+    for(int i=0;i<id_size;i++)
+        y_t(0,i) = w_id[i];
+    Matrix::matrix_mult(y_t,u_id).transpose(lin_comb_y);
+    Z_ex = Matrix::kron(lin_comb_y,Matrix::eye(exr_size));
+    ZU = Z_ex*(u_ex.t());
+
+    for(unsigned int i=0;i<point_indices.size();++i)
+    {
+        index = point_indices[i];
+        cout << "hey : " << index << endl;
+        Mi = core.submatrix( index*3 , index*3 + 2 );
+
+        seg_A_ex = pr*Mi*ZU;
+        A_ex.row(2*i) = seg_A_ex.row(0) + 0;
+        A_ex.row(2*i+1) = seg_A_ex.row(1) + 0;
+    }
+
+
+    //do not use the guess in the first frame but do for every following frame
+    for(int i=0;i<exr_size;i++)
+        x_t(0,i) = x(i,0) = w_exp[i];
+
+    //op .. lets see if we get here
+    this->scannls(A_ex,f,x);
+    cout << " OPT EXP " << Matrix(x);
+
+    for(int i=0;i<exr_size;i++){
+        w_exp[i] = x(i,0);
+    }
+
+    for(int i=0;i<exr_size;i++){
+        weights_ex.push_back(w_exp[i]);
+    }
+
+    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setAverageDepth(average_depth);
+
+    delete[] w_id;
+    delete[] w_exp;
+}
+
+
+void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&featurePointsVector,
+                                 const Mat &cameraMatrix, const Mat& lensDist,
+                                 Face* face_ptr,const vector<vector<int> >&point_indices_vector,
+                                 const vector<Mat> &rotation, const vector<Mat> &translation,
+                                 const vector<vector<double> > &weights_ex,
+                                 vector<double> &weights_id)
+{
+    Mat_<double> weakCamera(2,3);
+    //matrices for A_id * w_id = f
+    Mat_<double> A_id, seg_A_id;
+    //matrix Z = kron(weights, Identity_matrix)
+    Mat_<double> Z_id;
+    Mat_<double> ZU;
+    Mat_<double> pr, Pt;
+
+    //core tensor rows
+    Mat_<double> Mi;
+
+    //featurePoints converted to 2x1 matrices
+    Mat_<double> fi;
+    Mat_<double> f;
+
+    //initialize model-morph bases
+    FaceModel *model = FaceModel::getInstance();
+    Matrix core = model->getCoreTensor();
+    Mat_<double> u_id = model->getUIdentity();
+    Mat_<double> u_ex = model->getUExpression();
+
+    int index = 0;
+    //total number of feature points
+    int featurePointNum = 0;
+
+    const int exr_size = 7;
+    const int id_size = 56;
+
+    double *w_id = new double[id_size];
+    double *w_exp = new double[exr_size];
+
+    Mat_<double> rmatrix;
+    Mat_<double> x_t(1,exr_size);
+    Mat_<double> y_t(1,id_size);
+    Mat_<double> x(exr_size,1);
+    Mat_<double> y(id_size,1);
+    //used for x_t*U_ex and y_t*U_id
+    Matrix lin_comb_x(exr_size,1);
+
+    double Z_avg;
+    double average_depth;    
+    Mat_<double> proP;
+    Mat_<double> pM(3,1);
+
+
+    //get weights from the current face instance
+    face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
+
+
+    /***************************************************************/
+    /*create weak-perspecitve camera matrix from camera matrix*/
+    /***************************************************************/
+    for(int i=0;i<2;i++)
+        for(int j=0;j<3;j++)
+            weakCamera(i,j) = cameraMatrix.at<double>(i,j);
+
+    for(unsigned int i=0;i<featurePointsVector.size();i++)
+        featurePointNum += featurePointsVector[i].size();
+    cout << "total number of points " << featurePointNum << endl;
+
+    f = Mat_<double>(featurePointNum*2,1);
+    fi = Mat_<double>(2,1);
+
+
+    //preprocess points and core tensor rows
+    //for points subtract translation too
+    for(unsigned int i=0, count=0;i<featurePointsVector.size();i++)
+    {
+        //precompute translation
+        Pt = (1./translation[i].at<double>(2,0)) * (weakCamera*translation[i]);
+
+        for(unsigned int j=0;j<featurePointsVector[i].size();j++)
+        {
+            fi = Mat_<double>(2,1);
+            fi(0,0) = featurePointsVector[i][j].x;
+            fi(1,0) = featurePointsVector[i][j].y;
+
+            fi = fi - Pt;
+            f.row(count + 2*j) = fi.row(0) + 0;
+            f.row(count + 2*j+1) = fi.row(1) + 0;
+        }
+        count += featurePointsVector[i].size();
+    }
+
+
+    A_id = Mat_<double>(2*featurePointNum,id_size);
+    seg_A_id = Mat_<double>(2,id_size);
+    Mi = Mat_<double>(3,exr_size*id_size);
+
+    average_depth = face_ptr->getAverageDepth();
+
+    pM(0,0) = 1;
+    pM(1,0) = 1;
+    pM(2,0) = average_depth;
+
+    cout << "featurePointsVector size : " << featurePointsVector.size() << endl;
+    cout << "point indices vector size : " << point_indices_vector.size() << endl;
+
+    for(unsigned int i=0, count = 0;i<point_indices_vector.size();++i)
+    {
+        Rodrigues(rotation[i],rmatrix);
+        proP = cameraMatrix*rmatrix*pM;
+        proP = proP + cameraMatrix*translation[i];
+        Z_avg = proP(0,2);
+        cout << " with a z_avg after projecting in frame : " << i << " " << Z_avg << endl;
+
+        pr = (1.0/Z_avg)*weakCamera*rmatrix;
+
+
+        //load the appropriate weights for the i-th frame
+        for(unsigned int k=0;k<weights_ex[i].size();k++)
+            x_t(0,k) = weights_ex[i][k];
+        Matrix::matrix_mult(x_t,u_ex).transpose(lin_comb_x);
+        Z_id = Matrix::kron(Matrix::eye(id_size),lin_comb_x);
+        ZU = Z_id*(u_id.t());
+
+        for(unsigned int j=0;j<point_indices_vector[i].size();++j)
+        {
+            index = point_indices_vector[i][j];
+            Mi = core.submatrix( index*3 , index*3 + 2 );
+
+            seg_A_id = pr*Mi*ZU;
+            A_id.row(count + 2*j) = seg_A_id.row(0) + 0;
+            A_id.row(count + 2*j+1) = seg_A_id.row(1) + 0;
+        }
+        count += point_indices_vector[i].size();
+    }
+
+
+    //do not use the guess in the first frame but do for every following frame
+    for(int i=0;i<id_size;i++)
+        y_t(0,i) = y(i,0) = w_id[i];
+
+    //optimize using sequential coordinate descent
+    this->scannls(A_id,f,y);
+
+    cout << "OPT id .. not that well ever get here .. " << Matrix(y);
+
+
+    for(int i=0;i<id_size;i++){
+        w_id[i] = y(i,0);
+    }
+
+    for(int i=0;i<id_size;i++){
+        weights_id.push_back(w_id[i]);
+
+    }
+
+    delete[] w_id;
+    delete[] w_exp;
+}
+
+
+
 void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point2f> &featurePoints,
                                  const Mat &cameraMatrix, const Mat& lensDist,
                                  Face* face_ptr,const vector<int> &point_indices,
@@ -70,7 +367,7 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
     //matrix Z = kron(weights, Identity_matrix)
     Mat_<double> Z_ex, Z_id;
     Mat_<double> ZU;
-    Mat_<double> PR, PRT, pr, Pt, PRM;
+    Mat_<double> pr, Pt, PRM, prm;
 
     //core tensor rows
     Mat_<double> Mi;
@@ -115,12 +412,11 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
 
     //get weights from the current face instance
     face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
-    p = face_ptr->getPointFromPolygon(7403);
-    average_depth = face_ptr->getAverageDepth();
-    cout << "huh2 avg depth : " << face_ptr->getAverageDepth() << endl;
-    pM(0,0) = p.x;
-    pM(1,0) = p.y;
-    pM(2,0) = face_ptr->getAverageDepth();
+
+    average_depth = face_ptr->getAverageDepth();    
+    pM(0,0) = 1;
+    pM(1,0) = 1;
+    pM(2,0) = average_depth;
     cout << "face is at a distance " << p.z << endl;
     proP = cameraMatrix*rmatrix*pM;
     proP = proP + cameraMatrix*translation;
@@ -138,7 +434,7 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
     fi = Mat_<double>(2,1);
 
     //precompute translation
-    Pt = (1/translation.at<double>(2,0)) * (weakCamera*translation);
+    Pt = (1./translation.at<double>(2,0)) * (weakCamera*translation);
 
     cout << "here " << featurePoints.size() << " &  " << point_indices.size() << endl;
     //preprocess points and core tensor rows
@@ -154,17 +450,19 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
         f.row(2*i+1) = fi.row(1) + 0;        
     }
 
-    M = Mat_<double>(3*featurePoints.size(),exr_size*id_size);
-    Mi = Mat_<double>(3,exr_size,id_size);
+    pr = (1.0/Z_avg)*weakCamera*rmatrix;
+    PRM = Mat_<double>(2*featurePoints.size(),exr_size*id_size);
+    prm = Mat_<double>(2,exr_size*id_size);
+    Mi = Mat_<double>(3,exr_size*id_size);
 
     for(unsigned int i=0;i<point_indices.size();++i)
     {
         index = point_indices[i];
         cout << "hey : " << index << endl;
         Mi = core.submatrix( index*3 , index*3 + 2 );
-        M.row(3*i) = Mi.row(0) + 0;
-        M.row(3*i+1) = Mi.row(1) + 0;
-        M.row(3*i+2) = Mi.row(2) + 0;
+        prm = pr*Mi;
+        PRM.row(2*i) = prm.row(0) + 0;
+        PRM.row(2*i+1) = prm.row(1) + 0;
     }
 
 
@@ -176,21 +474,9 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
 
     cout << "and here! " << endl;
 
-    //initialize variables which dont need to be computed at every step    
-    pr = (1.0/Z_avg)*weakCamera*rmatrix;
-    PR = Mat_<double>::zeros(2*featurePoints.size(),3*featurePoints.size());
-    PRT = Mat_<double>(3*featurePoints.size(),2*featurePoints.size());
-    for(unsigned int i=0;i<featurePoints.size();i++)
-    {
-        PR(Range(2*i,2*i+2),Range(3*i,3*i+3)) = pr + 0;
-    }
-    PRT = PR.t();
 
-    PRM = PR*M;
-
-    A_ex = Mat_<double>::zeros(Size(2*featurePoints.size(),exr_size));
-
-    A_id = Mat_<double>::zeros(Size(2*featurePoints.size(),id_size));
+    A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);
+    A_id = Mat_<double>::zeros(2*featurePoints.size(),id_size);
 
     for(int count = 0;count < max_iterations; count++)
     {

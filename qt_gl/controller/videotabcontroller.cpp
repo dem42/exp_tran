@@ -233,7 +233,7 @@ void VideoTabController::replayFrame()
     cout << "begin w_id and w_exp in frame : " << i << endl;
     for(int j=0;j<56;j++)
     {
-        w_id[j] = vector_weights_id[i][j];
+        w_id[j] = vector_weights_id[0][j];
         cout << w_id[j] << " ";
     }
     cout << endl;
@@ -245,7 +245,7 @@ void VideoTabController::replayFrame()
     cout << endl;
 
     double avg = face_ptr->getAverageDepth();
-    face_ptr->interpolate(w_id,w_exp,true,true);
+    face_ptr->interpolate(w_id,w_exp);
     face_ptr->setAverageDepth(avg);
     face_widget->setFace(face_ptr);
 
