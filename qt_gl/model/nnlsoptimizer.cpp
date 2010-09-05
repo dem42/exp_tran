@@ -111,7 +111,10 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
 
     //get weights from the current face instance
     face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
-    average_depth = face_ptr->getAverageDepth();    
+
+    //find average depth
+    average_depth = face_ptr->getAverageDepth();
+    cout << "is the average depth 0 .. i think it is always the same" << average_depth << endl;
     pM(0,0) = 1;
     pM(1,0) = 1;
     pM(2,0) = average_depth;
@@ -160,8 +163,7 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
 
     for(unsigned int i=0;i<point_indices.size();++i)
     {
-        index = point_indices[i];
-        cout << "hey : " << index << endl;
+        index = point_indices[i];        
         Mi = core.submatrix( index*3 , index*3 + 2 );
 
         seg_A_ex = pr*Mi*ZU;
@@ -346,7 +348,6 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
 
     for(int i=0;i<id_size;i++){
         weights_id.push_back(w_id[i]);
-
     }
 
     delete[] w_id;
@@ -413,7 +414,7 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
     //get weights from the current face instance
     face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
 
-    average_depth = face_ptr->getAverageDepth();    
+    average_depth = face_ptr->getAverageDepth();
     pM(0,0) = 1;
     pM(1,0) = 1;
     pM(2,0) = average_depth;

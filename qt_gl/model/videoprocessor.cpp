@@ -5,7 +5,9 @@
 #include "nnlsoptimizer.h"
 #include "controller/utility.h"
 
-VideoProcessor::VideoProcessor() : FRAME_MAX(5)
+#include "model/exptranexception.h"
+
+VideoProcessor::VideoProcessor(const unsigned int fmax, const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax)
 {
     flowEngine = new OpticalFlowEngine();
     paramOptimizer = new NNLSOptimizer();
@@ -13,10 +15,11 @@ VideoProcessor::VideoProcessor() : FRAME_MAX(5)
 }
 
 VideoProcessor::VideoProcessor(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
-                               const cv::Mat &cameraMatrix, const cv::Mat &lensDist) : FRAME_MAX(10)
+                               const cv::Mat &cameraMatrix, const cv::Mat &lensDist, const unsigned int fmax,
+                               const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax)
 {
-    fPoints = featurePoints;
-    fData = frameData;
+    fPoints.assign(featurePoints.begin(),featurePoints.end());
+    fData.assign(frameData.begin(),frameData.end());
     this->cameraMatrix = cameraMatrix;
     this->lensDist = lensDist;
 
@@ -25,7 +28,8 @@ VideoProcessor::VideoProcessor(const vector<cv::Point2f> &featurePoints, const v
     poseEstimator = new PoseEstimator();
 }
 
-VideoProcessor::VideoProcessor(NNLSOptimizer *paramOptimizer, OpticalFlowEngine *flowEngine) : FRAME_MAX(4)
+VideoProcessor::VideoProcessor(NNLSOptimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
+                               const unsigned int fmax, const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax)
 {
     this->flowEngine = flowEngine;
     this->paramOptimizer = paramOptimizer;
@@ -36,7 +40,7 @@ VideoProcessor::VideoProcessor(NNLSOptimizer *paramOptimizer, OpticalFlowEngine 
 void VideoProcessor::run()
 {
     this->processVideo(fPoints,fData,cameraMatrix,lensDist,frameTranslation,frameRotation,generatedPoints,
-                       vector_weights_exp,vector_weights_id);
+                       vector_weights_exp,vector_weights_id);    
 }
 
 void VideoProcessor::setFlowEngine(OpticalFlowEngine *flowEngine)
@@ -47,6 +51,55 @@ void VideoProcessor::setFlowEngine(OpticalFlowEngine *flowEngine)
 void VideoProcessor::setOptimizer(NNLSOptimizer *paramOptimizer)
 {
     this->paramOptimizer = paramOptimizer;
+}
+
+unsigned int VideoProcessor::getFrameNum() const
+{
+    return FRAME_MAX;
+}
+
+void VideoProcessor::getFaceForFrame(unsigned int frameIndex, Face *face_ptr) const
+{
+    int ID = face_ptr->getIdNum();
+    int EXP = face_ptr->getExpNum();
+
+    double w_id[ID];
+    double w_exp[EXP];
+    double avg = face_ptr->getAverageDepth();
+
+    if(frameIndex > vector_weights_exp.size())
+    {
+        ostringstream os;
+        os << "frame index " << frameIndex << " < than number of frames computed " << vector_weights_exp.size();
+        throw ExpTranException(os.str());
+    }
+
+    for(int i=0;i<ID;i++)
+    {
+        cout << vector_weights_id[0][i] << endl;
+        w_id[i] = vector_weights_id[0][i];
+    }
+    cout << " xx " << endl;
+    for(int i=0;i<EXP;i++)
+    {
+        cout << vector_weights_exp[frameIndex][i] << endl;
+        w_exp[i] = vector_weights_exp[frameIndex][i];
+    }
+
+    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setAverageDepth(avg);
+}
+
+void VideoProcessor::getFaceAndPoseForFrame(unsigned int frameIndex, Face *face_ptr, Mat &rot, Mat &tran) const
+{
+    getFaceForFrame(frameIndex,face_ptr);
+    rot = frameRotation[frameIndex].clone();
+    tran = frameTranslation[frameIndex].clone();
+}
+
+void VideoProcessor::getGeneratedPointsForFrame(unsigned int frameIndex, vector<Point2f> &points) const
+{
+    points.assign(generatedPoints[frameIndex].begin(),generatedPoints[frameIndex].end());
 }
 
 void VideoProcessor::processVideo2(const vector<cv::Point2f> &inputPoints, const vector<cv::Mat> &frameData,
@@ -465,11 +518,11 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
     indices.clear();
     indices.insert(indices.begin(),Face::fPoints,Face::fPoints+Face::fPoints_size);
     //now sample new points and add them to the feature points
-    Utility::sampleGoodPoints(currentPoints,newPoints);
-    poseEstimator->reprojectInto3DUsingWeak(newPoints,frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,face_ptr,indices);
-
-    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
-    cout << " after " << currentPoints.size() << endl;
+//    Utility::sampleGoodPoints(currentPoints,newPoints);
+//    poseEstimator->reprojectInto3DUsingWeak(newPoints,frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,face_ptr,indices);
+//
+//    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+//    cout << " after " << currentPoints.size() << endl;
 
     estimationPoints.push_back(currentPoints);
     estimation_point_indices.push_back(indices);
@@ -491,8 +544,10 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
         nextIndices.clear();
     }
 
-    for(int j=0;j<3;j++)
+    for(unsigned int j=0;j<ITER_MAX;j++)
     {
+        //clear before putting new set of params in
+        vector_weights_exp.clear();
         for(unsigned int i=0;i<FRAME_MAX;++i)
         {
             /**********************/
@@ -526,6 +581,7 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
         poseEstimator->weakPerspectiveProjectPoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,estimation_point_indices[i],face_ptr,newPoints);
         generatedPoints.push_back(newPoints);
     }
+
 
     delete[] w_id;
     delete[] w_exp;

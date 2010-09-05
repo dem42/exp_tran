@@ -12,10 +12,15 @@
 class VideoProcessor : public QThread
 {
 public:
-    VideoProcessor();
+    //constructors with default frame max and iteration max values
+    VideoProcessor(const unsigned int fmax=5, const unsigned int imax=3);
     VideoProcessor(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
-                   const cv::Mat &cameraMatrix, const cv::Mat &lensDist);
-    VideoProcessor(NNLSOptimizer *paramOptimizer, OpticalFlowEngine *flowEngine);
+                   const cv::Mat &cameraMatrix, const cv::Mat &lensDist,
+                   const unsigned int fmax=5, const unsigned int imax=3);
+    VideoProcessor(NNLSOptimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
+                   const unsigned int fmax=5, const unsigned int imax=3);
+
+    //process video
     void processVideo2(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
                       const Mat &cameraMatrix, const Mat &lensDist,
                       vector<cv::Mat> &frameTranslation, vector<cv::Mat> &frameRotation,
@@ -38,10 +43,18 @@ public:
     void setFlowEngine(OpticalFlowEngine *flowEngine);
     void setOptimizer(NNLSOptimizer *paramOptimizer);
 
+    //interpolates face with the parameters and returns the 3d pose parameters
+    void getFaceForFrame(unsigned int frameIndex, Face *face_ptr) const;
+    void getFaceAndPoseForFrame(unsigned int frameIndex, Face *face_ptr, Mat &rot, Mat &tran) const;
+    void getGeneratedPointsForFrame(unsigned int frameIndex, vector<Point2f> &points) const;
+    unsigned int getFrameNum() const;
+
     void run();
 
 private:    
     const unsigned int FRAME_MAX;
+    const unsigned int ITER_MAX;
+
     NNLSOptimizer *paramOptimizer;
     OpticalFlowEngine *flowEngine;
     PoseEstimator *poseEstimator;

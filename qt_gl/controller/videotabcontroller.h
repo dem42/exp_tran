@@ -21,12 +21,14 @@
 #include <vector>
 #include <string>
 
+
 //really should be called transfer controller
 class VideoTabController : public QWidget
 {
     Q_OBJECT
 public:
-    VideoTabController(QString fileName, ClickableQLabel *picLabel, VectorFieldQLabel *flowLabel, FaceWidget *face_widget);
+    VideoTabController(QString fileName, ClickableQLabel *picLabel, VectorFieldQLabel *flowLabel,
+                       QPushButton *executeButton, FaceWidget *face_widget);
     ~VideoTabController();
 
     void selectGoodFeaturePoints(const cv::Mat& m);
@@ -49,6 +51,8 @@ public slots:
     void replayFrame();
     void calibrate();
     void setCameraParameters();
+
+    void processingFinished();
 private:
     void calcIntrinsicParams();
     //video fileName
@@ -62,6 +66,7 @@ private:
 
     ClickableQLabel *picLabel;
     VectorFieldQLabel *flowLabel;
+    QPushButton *executeButton;
 
     //camera parameters
     Mat_<double> cameraMatrix;
@@ -80,22 +85,12 @@ private:
 
     Face *face_ptr;
     FaceWidget *face_widget;
-    //static here could be read from an xml config
-//    static const int fPoints[20];
-//    static const int fPoints_size;
 
     //for now so that we can use them in a timer
     vector<cv::Mat> frameData;
     //points we use for optical flow .. more points will be used for model estimation
     vector<vector<cv::Point2f> > featurePoints;
-    //pose data for every frame
-    vector<cv::Mat> frameTranslation;
-    vector<cv::Mat> frameRotation;
-    //points used to calculate model parameters
-    vector<vector<cv::Point2f> > generatedPoints;
-    //recalculated weights
-    vector<vector<double> >vector_weights_exp;
-    vector<vector<double> >vector_weights_id;
+
     QTimer *timerReplay;
 
     //camera dialog ui

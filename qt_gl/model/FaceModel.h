@@ -31,6 +31,9 @@ class FaceModel
     int getPolyNum() const;
     int getPointNum() const;
 
+    int getIdSize() const;
+    int getExpSize() const;
+
  protected:
     FaceModel(std::string filename,std::string dir,std::string db_list,int f,int e,int v);
     ~FaceModel();

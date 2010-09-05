@@ -72,6 +72,16 @@ Matrix FaceModel::getCoreTensor() const
     return core;
 }
 
+int FaceModel::getIdSize() const
+{
+    return n_f;
+}
+
+int FaceModel::getExpSize() const
+{
+    return n_e;
+}
+
 Matrix FaceModel::getUIdentity() const
 {
     cout << "u id" << endl;

@@ -13,14 +13,19 @@ using namespace std;
 //possibly add an xml config file for the stuff like exp and database dir
 Face::Face()
 {
-    ID = 56, EXP = 7, VER = 5090;
-
     //model = new SVD("svd_result_object_2",expr,id,ver);
     model = FaceModel::getInstance();
 
     //we always need to load at least the topology data (which triangles are joined up)
     //this happens in the load method which also allocates the vertexes array
     loadPolygonDataFromModel();
+
+    ID = model->getIdSize();
+    EXP = model->getExpSize();
+    VER = model->getPointNum();
+
+    cout << "params sizes " << ID << " " << EXP << " " << VER << endl;
+
     cout << " point num " << point_num << endl;
     cout << " poly num " << poly_num << endl;
 
@@ -114,6 +119,17 @@ void Face::setAverageDepth(double d)
 int Face::getPolyNum() const
 {
     return poly_num;
+}
+
+
+int Face::getIdNum() const
+{
+    return ID;
+}
+
+int Face::getExpNum() const
+{
+    return EXP;
 }
 
 /**** this is how we interpolate
@@ -482,89 +498,18 @@ void Face::load(string filename, const char *tex_map_filename)
 	}
       file_op >> triangles[i][0] >> triangles[i][1] >> triangles[i][2];
     }
-    
-  /**************************************************/
-  /** load TEXTURE_COORD ***/
-  /**************************************************/
-  
-  // fstream tex_map_op(tex_map_filename,ios::in);
-  // int w,h,maxval;
-  
-  // tex_map_op.getline(line,256);
-  // //tex_map_op.getline(line,256);
-  // tex_map_op >> w >> h;
-  // cout << w << " " << h << endl;
-  // //c++ as java has row major ordering (rows in memory)
-  // Color3 texture_map[h][w];
-  // Color3 col;
-  
-  // tex_map_op >> maxval;
-  // cout << maxval << endl;
-  // for(int i=0; i<h; i++)
-  //   {
-  //     for(int j=0; j<w; j++)
-  // 	{	  
-  // 	  tex_map_op >> col.r >> col.g >> col.b;
-  // 	  col.r = col.r/maxval;
-  // 	  col.g = col.g/maxval;
-  // 	  col.b = col.b/maxval;	  
-  // 	  //does this copy or overwrite ??? POSSIBLE ERROR
-  // 	  texture_map[h][w] = col;
-  // 	}
-  //   }
-  
-  // file_op.getline(line,256);
-  // file_op.getline(line,256);
-  // file_op.getline(line,256);
-  // file_op >> str >> texture_num;  
-  // //error if wrong label
-  // if(str.compare("POINT_DATA") != 0) 
-  //   {
-  //     cerr << "did not match the label POINT_DATA" << endl;
-  //     return;
-  //   }
-  // /*a line with 4 things we dont need */
-  // file_op >> str;
-  // file_op >> str;
-  // file_op >> dont_need_int;
-  // file_op >> str;
-  // cerr << str << endl;
-  
-  // texture_2d_coord = new (nothrow) float[texture_num][2];
-  // vertex_texture = new (nothrow) Color3[texture_num];
-  
-  // if(vertex_texture == NULL)
-  //   {
-  //     cerr << "error allocating memory for texture" << endl;
-  //     return;
-  //   }
-
-  // float texture_2d_coord_x, texture_2d_coord_y;
-  // float rest_a, rest_b;
-  // Color3 a,b,c,d;
-  
-  // //bilinear interpolation of texture values .. why not
-  // for(int i=0; i<texture_num; i++)
-  //   {
-  //     file_op >> texture_2d_coord_x >> texture_2d_coord_y;
-  //     a = texture_map[(int)floor(texture_2d_coord_y*h)][(int)floor(texture_2d_coord_x*w)];
-  //     b = texture_map[(int)floor(texture_2d_coord_y*h)][(int)ceil(texture_2d_coord_x*w)];
-  //     c = texture_map[(int)ceil(texture_2d_coord_y*h)][(int)floor(texture_2d_coord_x*w)];
-  //     d = texture_map[(int)ceil(texture_2d_coord_y*h)][(int)ceil(texture_2d_coord_x*w)];
-      
-  //     rest_a = texture_2d_coord_x*w - floor(texture_2d_coord_x*w);
-  //     rest_b = texture_2d_coord_y*h - floor(texture_2d_coord_y*h);
-      
-  //     vertex_texture[i] = interpolate_color(a,b,c,d,rest_a,rest_b);
-  //   }
-        
-  
-  // // for(int i=0; i<texture_num; i++)
-  // //   file_op >> texture_2d_coord[i][0] >> texture_2d_coord[i][1];
-
-
 
   /***** generate vertex normals ******/
   generate_vertex_normals();  
   file_op.close();
+}
+
+void Face::transferExpressionFromFace(Face *src_face)
+{
+    double w_id_src[ID];
+    double w_exp_src[EXP];
+
+    src_face->getWeights(w_id_src,ID,w_exp_src,EXP);
+
+    interpolate(w_id,w_exp_src);
 }

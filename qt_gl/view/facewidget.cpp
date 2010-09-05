@@ -22,7 +22,7 @@ FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
 
   gl_display_style = GL_POLYGON;
   displayFeature = false;
-  displayMouth = true;
+  displayMouth = false;
 
   face_index = -1;
 

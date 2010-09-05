@@ -17,10 +17,16 @@ class Face
   Color3 interpolate_color(Color3 a,Color3 b,Color3 c,Color3 d,float r,float s);
 
   void interpolate(double *w_id,double *w_exp,bool brute_exp=false, bool brute_id=false);
+
+  void transferExpressionFromFace(Face *src_face);
+
   void getWeights(double *w_id, int w_id_size, double *w_exp, int w_exp_size);
 
   int getPolyNum() const;
   int getPointNum() const;
+  int getIdNum() const;
+  int getExpNum() const;
+
   Point3 getPointFromPolygon(int);
   Point3 getPoint(int index) const;
   int getPointIndexFromPolygon(int);

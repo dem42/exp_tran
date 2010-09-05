@@ -6,6 +6,7 @@
 #include "model/videoprocessor.h"
 #include <QString>
 #include <QTimer>
+#include <QMutex>
 #include <QLineEdit>
 #include <QFileDialog>
 
@@ -29,14 +30,17 @@ public slots:
     void beginTransfer();
 
     void replayFrame();
+    void processingFinished();
+
 private:
-    void convertFrameIntoTexture(Mat &frame);
+    void convertFrameIntoTexture(Mat &frame);    
     void initSrcSide();
     void initTargetSide();
 
     ClickableQLabel *sourceLabel;
     ClickableQLabel *targetLabel;
-    VideoProcessor *videoProcessor;
+    VideoProcessor *src_videoProcessor;
+    VideoProcessor *target_videoProcessor;
 
     VideoCapture *capSrc;
     VideoCapture *capTarget;
@@ -57,22 +61,19 @@ private:
     vector<Mat> srcFrames;
 
     CustomizableFaceWidget *face_widget;
-    Face *face_ptr;
-
+    Face *src_face_ptr;
+    Face *target_face_ptr;
 
     //TEMPORARY to test texture
     //for now so that we can use them in a timer
     vector<cv::Mat> s_frameData, t_frameData;
     //points we use for optical flow .. more points will be used for model estimation
     vector<vector<cv::Point2f> > featurePoints;
-    //pose data for every frame
-    vector<cv::Mat> s_frameTranslation, t_frameTranslation;
-    vector<cv::Mat> s_frameRotation, t_frameRotation;
-    //points used to calculate model parameters
-    vector<vector<cv::Point2f> > s_generatedPoints, t_generatedPoints;
-    //recalculated weights
-    vector<vector<double> >s_vector_weights_exp, t_vector_weights_exp;
-    vector<vector<double> >s_vector_weights_id, t_vector_weights_id;
+
+    bool srcFinished;
+    bool targetFinished;
+    QMutex mutex;
+
     QTimer *timerReplay;
 };
 

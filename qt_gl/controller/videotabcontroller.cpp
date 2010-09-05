@@ -15,6 +15,7 @@
 #include "model/modelimageerror.h"
 
 #include "model/poseestimator.h"
+#include "model/exptranexception.h"
 
 using namespace cv;
 using namespace std;
@@ -22,11 +23,12 @@ using namespace std;
 
 
 VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLabel,
-                                       VectorFieldQLabel *flowLabel,
+                                       VectorFieldQLabel *flowLabel, QPushButton *executeButton,
                                        FaceWidget *face_widget) : fileName(fileName)
 {
     this->picLabel = picLabel;
     this->flowLabel = flowLabel;
+    this->executeButton = executeButton;
     this->face_widget = face_widget;
     this->face_widget->setCameraParameters(-200,-1,-200);
     face_ptr  = new Face();
@@ -40,9 +42,6 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
     flowEngine = new OpticalFlowEngine();
     //init the optimizer
     poseEstimator = new PoseEstimator();
-
-    //init the video processor with default optimizer and optical flow engine
-    videoProcessor = new VideoProcessor();
 
     //setup the timer
     timer = new QTimer(this);
@@ -111,7 +110,7 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
 }
 
 void VideoTabController::calcIntrinsicParams()
-{
+{    
     vector<Mat> imgs;
 
     imgs.push_back(imread("../../camera2.jpg"));
@@ -208,58 +207,51 @@ void VideoTabController::replayFrame()
     static unsigned int i;
     double euler_x, euler_y, euler_z;
     Mat_<double> rmatrix;
+    Mat_<double> rot;
+    Mat_<double> tran;
+    vector<Point2f> points;
 
-    double tx = frameTranslation[i].at<double>(0,0);
-    double ty = frameTranslation[i].at<double>(0,1);
-    double tz = frameTranslation[i].at<double>(0,2);
+    videoProcessor->getFaceAndPoseForFrame(i,face_ptr,rot,tran);
 
-    double *w_id = new double[56];
-    double *w_exp = new double[7];
-
-    picLabel->setPixmap(Utility::mat2QPixmap(frameData[i]));
-
-    picLabel->setMarked(generatedPoints[i]);
-
+    double tx = tran(0,0);
+    double ty = tran(0,1);
+    double tz = tran(0,2);
     //compute and set the pose parameters
-    Rodrigues(frameRotation[i],rmatrix);
+    Rodrigues(rot,rmatrix);
     Utility::computeEulerAnglesFromRmatrix(rmatrix,euler_x,euler_y,euler_z);
     //only y needs to be negative so that it agrees with the transposes
     cout << "setting trans param " << euler_x << " " << euler_y << " "
-         << euler_z  << " " << tx << " " << ty << " " << tz  << endl;
+            << euler_z  << " " << tx << " " << ty << " " << tz  << endl;
 
+    //set the parameters in face widget
     face_widget->setTransParams(euler_x,-euler_y,euler_z,tx,ty,tz);
-
-    //generate the corresponding face    
-    cout << "begin w_id and w_exp in frame : " << i << endl;
-    for(int j=0;j<56;j++)
-    {
-        w_id[j] = vector_weights_id[0][j];
-        cout << w_id[j] << " ";
-    }
-    cout << endl;
-    for(int j=0;j<7;j++)
-    {
-        w_exp[j] = vector_weights_exp[i][j];
-        cout << w_exp[j] << " ";
-    }
-    cout << endl;
-
-    double avg = face_ptr->getAverageDepth();
-    face_ptr->interpolate(w_id,w_exp);
-    face_ptr->setAverageDepth(avg);
     face_widget->setFace(face_ptr);
 
+    videoProcessor->getGeneratedPointsForFrame(i,points);
+    picLabel->setPixmap(Utility::mat2QPixmap(frameData[i]));
+    picLabel->setMarked(points);
 
     i++;
-    if(i == generatedPoints.size())
+    if(i == videoProcessor->getFrameNum())
     {
         timerReplay->stop();
         i = 0;
         frameData.clear();
         featurePoints.clear();
-    }
-    delete[] w_id;
-    delete[] w_exp;
+
+        executeButton->setDisabled(false);
+        delete videoProcessor;
+    }    
+}
+
+void VideoTabController::processingFinished()
+{
+    cout << "PROCESSING OVER" << endl;        
+
+    //after processing is complete start the timer
+    timerReplay = new QTimer(this);
+    connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
+    timerReplay->start(500);
 }
 
 void VideoTabController::playBack()
@@ -268,6 +260,7 @@ void VideoTabController::playBack()
 
     flowLabel->setVisible(false);
     face_widget->setVisible(true);
+    executeButton->setDisabled(true);
 
     /**********************/
     /*first collect frames*/
@@ -284,13 +277,13 @@ void VideoTabController::playBack()
         frameData.push_back(copyFrame);
     }
 
-    videoProcessor->processVideo(picLabel->getMarked(),frameData, cameraMatrix, lensDist,
-                                 frameTranslation,frameRotation, generatedPoints,vector_weights_exp,vector_weights_id);
+    videoProcessor = new VideoProcessor(picLabel->getMarked(),frameData,cameraMatrix,lensDist);
+    connect(videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
 
-    //after processing is complete start the timer
-    timerReplay = new QTimer(this);
-    connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
-    timerReplay->start(500);
+    videoProcessor->start();    
+
+//    videoProcessor->processVideo(picLabel->getMarked(),frameData, cameraMatrix, lensDist,
+//                                 frameTranslation,frameRotation, generatedPoints,vector_weights_exp,vector_weights_id);
 
 }
 
@@ -545,11 +538,8 @@ void VideoTabController::restartCapturing()
     delete capture;
     frames.clear();
 
-    generatedPoints.clear();\
     featurePoints.clear();
     frameData.clear();
-    frameRotation.clear();
-    frameTranslation.clear();
 
     //get rid of the old face
     delete face_ptr;

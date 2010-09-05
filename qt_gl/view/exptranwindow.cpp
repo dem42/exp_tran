@@ -26,7 +26,7 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
 
     //intialize transfer widget    
     v_controller = new VideoTabController("/home/martin/project/TrackedSmiles/S003-024.avi",
-                                          picLabelV, flowLabelV, face_widget2);
+                                          picLabelV, flowLabelV, ui.modelButton, face_widget2);
 
     ui.verticalLayoutWidget->setGeometry(10,10,650,650);
 
