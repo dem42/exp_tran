@@ -15,6 +15,7 @@
 #include "model/poseestimator.h"
 #include "model/videoprocessor.h"
 
+#include "view/exptranabstractview.h"
 #include "ui_cameraDialog.h"
 
 #include <cv.h>
@@ -28,7 +29,7 @@ class VideoTabController : public QWidget
     Q_OBJECT
 public:
     VideoTabController(QString fileName, ClickableQLabel *picLabel, VectorFieldQLabel *flowLabel,
-                       QPushButton *executeButton, FaceWidget *face_widget);
+                       ExpTranAbstractView *view, FaceWidget *face_widget);
     ~VideoTabController();
 
     void selectGoodFeaturePoints(const cv::Mat& m);
@@ -66,7 +67,7 @@ private:
 
     ClickableQLabel *picLabel;
     VectorFieldQLabel *flowLabel;
-    QPushButton *executeButton;
+    ExpTranAbstractView *view;
 
     //camera parameters
     Mat_<double> cameraMatrix;

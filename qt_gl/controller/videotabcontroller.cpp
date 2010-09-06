@@ -17,18 +17,19 @@
 #include "model/poseestimator.h"
 #include "model/exptranexception.h"
 
+
 using namespace cv;
 using namespace std;
 
 
 
 VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLabel,
-                                       VectorFieldQLabel *flowLabel, QPushButton *executeButton,
+                                       VectorFieldQLabel *flowLabel, ExpTranAbstractView *view,
                                        FaceWidget *face_widget) : fileName(fileName)
 {
     this->picLabel = picLabel;
     this->flowLabel = flowLabel;
-    this->executeButton = executeButton;
+    this->view = view;
     this->face_widget = face_widget;
     this->face_widget->setCameraParameters(-200,-1,-200);
     face_ptr  = new Face();
@@ -239,7 +240,7 @@ void VideoTabController::replayFrame()
         frameData.clear();
         featurePoints.clear();
 
-        executeButton->setDisabled(false);
+        view->setAllVideoTabButtonsDisabled(false);
         delete videoProcessor;
     }    
 }
@@ -260,7 +261,7 @@ void VideoTabController::playBack()
 
     flowLabel->setVisible(false);
     face_widget->setVisible(true);
-    executeButton->setDisabled(true);
+    view->setAllVideoTabButtonsDisabled(true);
 
     /**********************/
     /*first collect frames*/
@@ -478,6 +479,12 @@ void VideoTabController::startFaceTransfer()
     //face_widget->setTransParams(euler[0],euler[1],euler[2],tx,ty,tz);
     face_widget->setFace(face_guess);
     face_widget->refreshGL();
+
+
+    Mat gradImg(frames[frames.size()-1].size().height,frames[frames.size()-1].size().width, CV_8UC1);
+    Utility::filterForGradient(frames[frames.size()-1],gradImg);
+
+    picLabel->setPixmap(Utility::mat2QPixmap(gradImg));
 
     delete[] w_id;
     delete[] w_exp;

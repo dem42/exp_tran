@@ -17,7 +17,7 @@ public:
     VideoProcessor(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
                    const cv::Mat &cameraMatrix, const cv::Mat &lensDist,
                    const unsigned int fmax=5, const unsigned int imax=3);
-    VideoProcessor(NNLSOptimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
+    VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
                    const unsigned int fmax=5, const unsigned int imax=3);
 
     //process video
@@ -41,7 +41,7 @@ public:
                       vector<vector<double> >&vector_weights_id );
 
     void setFlowEngine(OpticalFlowEngine *flowEngine);
-    void setOptimizer(NNLSOptimizer *paramOptimizer);
+    void setOptimizer(Optimizer *paramOptimizer);
 
     //interpolates face with the parameters and returns the 3d pose parameters
     void getFaceForFrame(unsigned int frameIndex, Face *face_ptr) const;
@@ -55,7 +55,7 @@ private:
     const unsigned int FRAME_MAX;
     const unsigned int ITER_MAX;
 
-    NNLSOptimizer *paramOptimizer;
+    Optimizer *paramOptimizer;
     OpticalFlowEngine *flowEngine;
     PoseEstimator *poseEstimator;
 

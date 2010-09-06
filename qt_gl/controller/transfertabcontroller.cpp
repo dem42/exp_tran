@@ -97,16 +97,28 @@ void TransferTabController::initTargetSide()
 /*************************************************/
 void TransferTabController::dropSrc()
 {
-    Mat frame, rgb_frame;
-    if( capSrc->grab() == true)
-        capSrc->retrieve(frame);
-    else    
-        return;
+    Mat img_src = *(srcFrames.end()-1);
+    Mat img_dest = *(targetFrames.end()-1);
 
-    cvtColor(frame, rgb_frame, CV_BGR2RGB);
+    Mat_<double> mask = Mat_<double>::zeros(img_src.rows,img_src.cols);
+    for(int i=385;i<420;i++)
+        for(int j=157;j<185;j++)
+            mask(i,j) = 1.0;
 
-    srcFrames.push_back(rgb_frame);
-    sourceLabel->setPixmap(Utility::mat2QPixmap(rgb_frame));
+    Utility::poissonClone(img_src,mask,img_dest);
+
+    targetLabel->setPixmap(Utility::mat2QPixmap(img_dest));
+
+//    Mat frame, rgb_frame;
+//    if( capSrc->grab() == true)
+//        capSrc->retrieve(frame);
+//    else
+//        return;
+//
+//    cvtColor(frame, rgb_frame, CV_BGR2RGB);
+//
+//    srcFrames.push_back(rgb_frame);
+//    sourceLabel->setPixmap(Utility::mat2QPixmap(rgb_frame));
 }
 void TransferTabController::dropTarget()
 {

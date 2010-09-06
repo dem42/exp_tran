@@ -15,13 +15,16 @@
 #include "view/vectorfieldqlabel.h"
 #include "view/featurepointqlabel.h"
 
-class ExpTranWindow : public QMainWindow
+#include "view/exptranabstractview.h"
+
+class ExpTranWindow : public QMainWindow, public ExpTranAbstractView
 {
     Q_OBJECT
 public:
     ExpTranWindow(QMainWindow *window = 0);
     ~ExpTranWindow();
     void displayException(const std::exception &e);
+    void setAllVideoTabButtonsDisabled(bool);
 
 private:
     Ui::ApplForm ui;

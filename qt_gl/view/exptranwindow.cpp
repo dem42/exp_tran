@@ -24,9 +24,10 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     ui.verticalLayout_4->addWidget(face_widget2);
 
 
+    ui.videoTabProgressBar->setVisible(false);
     //intialize transfer widget    
     v_controller = new VideoTabController("/home/martin/project/TrackedSmiles/S003-024.avi",
-                                          picLabelV, flowLabelV, ui.modelButton, face_widget2);
+                                          picLabelV, flowLabelV, this, face_widget2);
 
     ui.verticalLayoutWidget->setGeometry(10,10,650,650);
 
@@ -37,6 +38,7 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     face_widget3->setVisible(false);
     ui.targetLayout->addWidget(face_widget3);
 
+    ui.transferTabProgressBar->setVisible(false);
     t_controller = new TransferTabController(sourceLabel,targetLabel,ui.srcText,ui.targetTxt, face_widget3);
 
     //tracking determines when value change signal is emitted
@@ -97,6 +99,11 @@ ExpTranWindow::~ExpTranWindow()
     delete face_widget1;
     delete f_dialog;
     delete f_controller;
+}
+
+void ExpTranWindow::setAllVideoTabButtonsDisabled(bool disabled)
+{
+    ui.modelButton->setDisabled(disabled);
 }
 
 void ExpTranWindow::displayException(const std::exception &e)

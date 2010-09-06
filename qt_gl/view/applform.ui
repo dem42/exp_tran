@@ -27,7 +27,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>1</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="faceTab">
      <attribute name="title">
@@ -446,6 +446,19 @@
        </item>
       </layout>
      </widget>
+     <widget class="QProgressBar" name="videoTabProgressBar">
+      <property name="geometry">
+       <rect>
+        <x>320</x>
+        <y>520</y>
+        <width>571</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>24</number>
+      </property>
+     </widget>
     </widget>
     <widget class="QWidget" name="transferTab">
      <attribute name="title">
@@ -556,6 +569,19 @@
       </property>
       <property name="text">
        <string>drop src</string>
+      </property>
+     </widget>
+     <widget class="QProgressBar" name="transferTabProgressBar">
+      <property name="geometry">
+       <rect>
+        <x>490</x>
+        <y>520</y>
+        <width>501</width>
+        <height>23</height>
+       </rect>
+      </property>
+      <property name="value">
+       <number>24</number>
       </property>
      </widget>
     </widget>

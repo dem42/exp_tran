@@ -24,11 +24,11 @@ VideoProcessor::VideoProcessor(const vector<cv::Point2f> &featurePoints, const v
     this->lensDist = lensDist;
 
     flowEngine = new OpticalFlowEngine();
-    paramOptimizer = new NNLSOptimizer();
+    paramOptimizer = new ClosedFormOptimizer();
     poseEstimator = new PoseEstimator();
 }
 
-VideoProcessor::VideoProcessor(NNLSOptimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
+VideoProcessor::VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
                                const unsigned int fmax, const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax)
 {
     this->flowEngine = flowEngine;
@@ -48,7 +48,7 @@ void VideoProcessor::setFlowEngine(OpticalFlowEngine *flowEngine)
     this->flowEngine = flowEngine;
 }
 
-void VideoProcessor::setOptimizer(NNLSOptimizer *paramOptimizer)
+void VideoProcessor::setOptimizer(Optimizer *paramOptimizer)
 {
     this->paramOptimizer = paramOptimizer;
 }
