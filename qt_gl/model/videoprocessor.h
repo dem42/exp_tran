@@ -12,10 +12,13 @@
 class VideoProcessor : public QThread
 {
 public:
+    enum OptType { OptType_INTERPOLATE, OptType_LIN_COMB, OptType_NELDER_INT, OptType_NELDER_LIN };
+
     //constructors with default frame max and iteration max values
     VideoProcessor(const unsigned int fmax=5, const unsigned int imax=3);
     VideoProcessor(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
                    const cv::Mat &cameraMatrix, const cv::Mat &lensDist,
+                   VideoProcessor::OptType type = OptType_INTERPOLATE, double regParam = 2000.0,
                    const unsigned int fmax=5, const unsigned int imax=3);
     VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
                    const unsigned int fmax=5, const unsigned int imax=3);

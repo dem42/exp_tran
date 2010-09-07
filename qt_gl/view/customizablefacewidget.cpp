@@ -12,14 +12,12 @@ CustomizableFaceWidget::CustomizableFaceWidget(QGLWidget *parent) : FaceWidget(p
 
 void CustomizableFaceWidget::resizeGL(int width, int height)
 {
-  cout << "in resize" << endl;
+  cout << "in resize custom" << endl;
   //switch to projection matrix
-  glMatrixMode(GL_PROJECTION);
+  glMatrixMode(GL_PROJECTION);  
   glViewport(0, 0, 2*viewport_width, 2*viewport_height);
 
-  //load the custom projection matrix (obtained from opt)
-  for(int i=0;i<16;i++)
-      cout << " i : " << projM[i] << endl;
+  //load the custom projection matrix (obtained from opt)  
   glLoadMatrixf(projM);
 
   //switch back to transformation matrix
@@ -75,9 +73,7 @@ void CustomizableFaceWidget::paintGL(void)
   {
       //gluLookAt(0.0, 0.0, upVector*2*diameter, center_x, center_y, center_z, 0.0, upVector, 0.0);
       GLfloat LightPosition[] =  { 0.0, 0.0, cameraZPosition, 0.0 };
-      glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);
-      for(int i=0;i<16;i++)
-          cout << " i : " << tranM[i] << endl;
+      glLightfv(GL_LIGHT0, GL_POSITION, LightPosition);      
       glLoadMatrixf(tranM);
   }
   //does the open gl glBegin(GL_POLYGON) glEnd() stuff
@@ -105,9 +101,12 @@ void CustomizableFaceWidget::setProjectionMatrix(Matrix projM)
     viewport_width = this->projM[8];
 
     this->projM[8] = 0.0;
-    //small shift not sure why its necessary
-    this->projM[9] = -0.2;
-    //this->projM[9] = 0.0;
+    int h = this->height();
+    //since the rendering starts at 0,0 bottom left corner and the widget is larger (or smaller than the image
+    //so we need to adjust for this difference in y by setting c_y appropriately from the viewport equation
+    //(yn + 1)(viewport_height/2) + y0
+    //solving for y0 to put 0,0 at 0,0
+    this->projM[9] = (double)(h - 2*viewport_height)/(double)(viewport_height);
     this->projM[0] *= (1./viewport_width);
     this->projM[5] *= -(1./viewport_height);
     //coz of a stupid zero division when normalizing homogenous .. yay for opengl

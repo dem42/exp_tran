@@ -40,9 +40,8 @@ void Utility::filterForGradient(const Mat &img, Mat &dest)
             src_copy.at<double[3]>(i,j)[2] = (double)img.at<uchar[3]>(i,j)[2] / 255.0;
         }
 
-    cv::Laplacian(img,dest,-1);
-    IplImage ipl = dest;
-    cvShowImage("ugh",&ipl);
+//    cv::Laplacian(img,dest,-1);
+
 //    cv::Laplacian(img,dest,CV_8UC1);
 //
 //    cout << " XXX " << dest.channels() << endl;
@@ -70,7 +69,7 @@ double static inline clamp(double f) {
         else return f;
 }
 
-void Utility::poissonClone(const Mat &src, const Mat &mask, Mat &target)
+void Utility::poissonClone(const Mat &src, const Mat &mask, Mat &target, int o_x, int o_y)
 {
     Mat laplacian;
     //mapping of variables
@@ -97,15 +96,38 @@ void Utility::poissonClone(const Mat &src, const Mat &mask, Mat &target)
     Mat_<double> b1(N,1),b2(N,1),b3(N,1);
     Mat_<double> u1(N,1), u2(N,1), u3(N,1);
 
+    bool o_x_is_neg = o_x < 0;
+    bool o_y_is_neg = o_y < 0;
+    o_x = ::abs(o_x);
+    o_y = ::abs(o_y);
 
     Mat src_copy = Mat::zeros(src.rows,src.cols,CV_64FC3);
-    for(int i=0;i<src_copy.rows-25;i++)
-        for(int j=0;j<src_copy.cols-31;j++)
+    for(int i=0;i<src_copy.rows-o_y;i++)
+    {
+        for(int j=0;j<src_copy.cols-o_x;j++)
         {
-            src_copy.at<double[3]>(i,j)[0] = (double)src.at<uchar[3]>(i+25,j+31)[0] / 255.0;
-            src_copy.at<double[3]>(i,j)[1] = (double)src.at<uchar[3]>(i+25,j+31)[1] / 255.0;
-            src_copy.at<double[3]>(i,j)[2] = (double)src.at<uchar[3]>(i+25,j+31)[2] / 255.0;
+            if(!o_x_is_neg && !o_y_is_neg)
+            {
+                src_copy.at<double[3]>(i,j)[0] = (double)src.at<uchar[3]>(i+o_y,j+o_x)[0] / 255.0;
+                src_copy.at<double[3]>(i,j)[1] = (double)src.at<uchar[3]>(i+o_y,j+o_x)[1] / 255.0;
+                src_copy.at<double[3]>(i,j)[2] = (double)src.at<uchar[3]>(i+o_y,j+o_x)[2] / 255.0;
+            } else if(o_y_is_neg && !o_x_is_neg)
+            {
+                src_copy.at<double[3]>(i+o_y,j)[0] = (double)src.at<uchar[3]>(i,j+o_x)[0] / 255.0;
+                src_copy.at<double[3]>(i+o_y,j)[1] = (double)src.at<uchar[3]>(i,j+o_x)[1] / 255.0;
+                src_copy.at<double[3]>(i+o_y,j)[2] = (double)src.at<uchar[3]>(i,j+o_x)[2] / 255.0;
+            }else if(!o_y_is_neg && o_x_is_neg)
+            {
+                src_copy.at<double[3]>(i,j+o_x)[0] = (double)src.at<uchar[3]>(i+o_y,j)[0] / 255.0;
+                src_copy.at<double[3]>(i,j+o_x)[1] = (double)src.at<uchar[3]>(i+o_y,j)[1] / 255.0;
+                src_copy.at<double[3]>(i,j+o_x)[2] = (double)src.at<uchar[3]>(i+o_y,j)[2] / 255.0;
+            } else {
+                src_copy.at<double[3]>(i+o_y,j+o_x)[0] = (double)src.at<uchar[3]>(i,j)[0] / 255.0;
+                src_copy.at<double[3]>(i+o_y,j+o_x)[1] = (double)src.at<uchar[3]>(i,j)[1] / 255.0;
+                src_copy.at<double[3]>(i+o_y,j+o_x)[2] = (double)src.at<uchar[3]>(i,j)[2] / 255.0;
+            }
         }
+    }
 
     cv::Laplacian(src_copy,laplacian,-1);
 //    IplImage ipl = laplacian;
@@ -181,13 +203,9 @@ void Utility::poissonClone(const Mat &src, const Mat &mask, Mat &target)
         }
     }
 
-
-
     solve(A,b1,u1);    
     solve(A,b2,u2);
     solve(A,b3,u3);
-
-    cout << "ugh agh " << Matrix(b1);
 
     count=0;
     for(int y=1;y<h-1;y++)

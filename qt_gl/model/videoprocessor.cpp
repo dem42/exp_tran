@@ -15,16 +15,23 @@ VideoProcessor::VideoProcessor(const unsigned int fmax, const unsigned int imax)
 }
 
 VideoProcessor::VideoProcessor(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
-                               const cv::Mat &cameraMatrix, const cv::Mat &lensDist, const unsigned int fmax,
-                               const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax)
+                               const cv::Mat &cameraMatrix, const cv::Mat &lensDist,
+                               VideoProcessor::OptType type, double regParam,
+                               const unsigned int fmax,const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax)
 {
     fPoints.assign(featurePoints.begin(),featurePoints.end());
     fData.assign(frameData.begin(),frameData.end());
     this->cameraMatrix = cameraMatrix;
     this->lensDist = lensDist;
 
+    if(type == OptType_INTERPOLATE)
+        paramOptimizer = new NNLSOptimizer();
+    else if(type == OptType_LIN_COMB)
+        paramOptimizer = new ClosedFormOptimizer(regParam);
+    else
+        paramOptimizer = new NNLSOptimizer();
+
     flowEngine = new OpticalFlowEngine();
-    paramOptimizer = new ClosedFormOptimizer();
     poseEstimator = new PoseEstimator();
 }
 
@@ -396,7 +403,7 @@ void VideoProcessor::processVideo3(const vector<cv::Point2f> &inputPoints, const
         /**********************/
         weights_exp.clear();
         weights_id.clear();
-        paramOptimizer->estimateModelParameters(frameData[i],estimationPoints[i],cameraMatrix,lensDist,face_ptr,
+        paramOptimizer->estimateModelParameters(estimationPoints[i],cameraMatrix,lensDist,face_ptr,
                                                 estimation_point_indices[i], frameRotation[i],frameTranslation[i],
                                                 weights_id,weights_exp);
         vector_weights_exp.push_back(weights_exp);
@@ -505,6 +512,17 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
         useExt |= true;
     }
 
+    //reset current points to hold the first frame feature points
+    currentPoints.clear();
+    currentPoints.insert(currentPoints.begin(),inputPoints.begin(),inputPoints.end());
+    indices.clear();
+    indices.insert(indices.begin(),Face::fPoints,Face::fPoints+Face::fPoints_size);
+
+    //first frame alignment computes the first face in face_ptr
+//    paramOptimizer->estimateModelParameters(currentPoints,cameraMatrix,lensDist,face_ptr,indices,
+//                                            frameRotation[0],frameTranslation[0],weights_id,weights_exp);
+
+
 
     //add new points so that we start tracking them
     //we arent actually altering the first featurePoints[0] just the rest throught compute flow
@@ -512,17 +530,12 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
 //    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
 
 
-    //reset current points to hold the first frame feature points
-    currentPoints.clear();
-    currentPoints.insert(currentPoints.begin(),inputPoints.begin(),inputPoints.end());
-    indices.clear();
-    indices.insert(indices.begin(),Face::fPoints,Face::fPoints+Face::fPoints_size);
-    //now sample new points and add them to the feature points
-//    Utility::sampleGoodPoints(currentPoints,newPoints);
-//    poseEstimator->reprojectInto3DUsingWeak(newPoints,frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,face_ptr,indices);
-//
-//    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
-//    cout << " after " << currentPoints.size() << endl;
+    //now sample new points using the first frame alignment and add them to the feature points
+    Utility::sampleGoodPoints(currentPoints,newPoints);
+    poseEstimator->reprojectInto3DUsingWeak(newPoints,frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,face_ptr,indices);
+
+    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+    cout << " after " << currentPoints.size() << endl;
 
     estimationPoints.push_back(currentPoints);
     estimation_point_indices.push_back(indices);

@@ -11,7 +11,7 @@ using namespace cv;
 class Optimizer
 {
 public:
-    virtual void estimateModelParameters(const Mat &frame, const vector<Point2f> &featurePoints,
+    virtual void estimateModelParameters(const vector<Point2f> &featurePoints,
                                          const Mat &cameraMatrix, const Mat& lensDist,
                                          Face* face_ptr,const vector<int> &point_indices,
                                          const Mat &rotation, const Mat &translation,

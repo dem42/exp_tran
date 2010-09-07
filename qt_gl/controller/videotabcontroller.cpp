@@ -232,7 +232,9 @@ void VideoTabController::replayFrame()
     picLabel->setPixmap(Utility::mat2QPixmap(frameData[i]));
     picLabel->setMarked(points);
 
+    cout << "FRAAME " << i << endl;
     i++;
+
     if(i == videoProcessor->getFrameNum())
     {
         timerReplay->stop();
@@ -278,7 +280,9 @@ void VideoTabController::playBack()
         frameData.push_back(copyFrame);
     }
 
-    videoProcessor = new VideoProcessor(picLabel->getMarked(),frameData,cameraMatrix,lensDist);
+    videoProcessor = new VideoProcessor(picLabel->getMarked(),frameData,cameraMatrix,lensDist,
+                                        VideoProcessor::OptType_INTERPOLATE,2500.,15,2);
+
     connect(videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
 
     videoProcessor->start();    

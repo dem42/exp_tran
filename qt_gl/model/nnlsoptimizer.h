@@ -14,7 +14,7 @@ class NNLSOptimizer : public Optimizer
 {
 public:
     NNLSOptimizer();
-    void estimateModelParameters(const Mat &frame, const vector<Point2f> &featurePoints,
+    void estimateModelParameters(const vector<Point2f> &featurePoints,
                                  const Mat &cameraMatrix, const Mat& lensDist,
                                  Face* face_ptr,const vector<int> &point_indices,
                                  const Mat &rotation, const Mat &translation,

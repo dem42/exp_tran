@@ -98,7 +98,7 @@ void FaceWidget::render()
   vector<int>::iterator result;
   vector<int> fPoly;
   vector<int> mouthPoly;
-  fPoly.assign(Face::fPolygons,Face::fPolygons+Face::fPoints_size);
+  //fPoly.assign(Face::fPolygons,Face::fPolygons+Face::fPoints_size);
   mouthPoly.assign(Face::mouth,Face::mouth+Face::mouth_size);
 
   vector<int>fP;
@@ -108,12 +108,9 @@ void FaceWidget::render()
   if(face_ptr == NULL)
       return;
 
-  //if(texture_id != 0)
-  //{
-      glEnable(GL_TEXTURE_2D);
-      //glBindTexture(GL_TEXTURE_2D, texture_id);
-  //}
 
+
+  glEnable(GL_TEXTURE_2D);
   glEnable(GL_COLOR_MATERIAL);
   glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
@@ -136,10 +133,6 @@ void FaceWidget::render()
       //whether to render feature points using spheres
       if(displayFeature)
       {
-          //try to find if polygon i is a feature point
-          result = std::find(fPoly.begin(),fPoly.end(),i);
-
-
           result = std::find(fP.begin(),fP.end(),v1);
           if(result != fP.end())
           {
@@ -153,24 +146,6 @@ void FaceWidget::render()
               glPopMatrix();
           }
       }
-
-
-      //if the polygon i was double clicked or is a feature point .. highlight it
-//      if(i == face_index || result != fPoly.end())
-//      {
-//          // enable color tracking
-//          glEnable(GL_COLOR_MATERIAL);
-//          // set material properties which will be assigned by glColor
-//          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-//
-//          glColor3f(1.0f, 0.0f, 0.0f); // red reflective properties
-//      }
-//      else
-//      {
-//          glEnable(GL_COLOR_MATERIAL);
-//          glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
-//          glColor3f(0.0f, 0.2f, 0.4f);
-//      }
 
       //calls to glLoadName are ignored if we arent in GL_SELECT render mode
       //its used to tell us what the user clicked on
@@ -193,8 +168,7 @@ void FaceWidget::render()
 
     }
 
-  //if(texture_id != 0)
-      glDisable(GL_TEXTURE_2D);
+  glDisable(GL_TEXTURE_2D);
   glDisable(GL_COLOR_MATERIAL);
 }
 

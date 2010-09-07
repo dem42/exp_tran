@@ -12,8 +12,8 @@ using namespace cv;
 class ClosedFormOptimizer : public Optimizer
 {
 public:
-    ClosedFormOptimizer();
-    void estimateModelParameters(const Mat &frame, const vector<Point2f> &featurePoints,
+    ClosedFormOptimizer(double regParam);
+    void estimateModelParameters(const vector<Point2f> &featurePoints,
                                  const Mat &cameraMatrix, const Mat& lensDist,
                                  Face* face_ptr,const vector<int> &point_indices,
                                  const Mat &rotation, const Mat &translation,
@@ -33,6 +33,7 @@ public:
                                     vector<double> &weights_id);
 private:
     const int max_iterations;
+    double regParam;
 };
 
 #endif // CLOSEDFORMOPTIMIZER_H

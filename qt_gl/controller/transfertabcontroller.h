@@ -37,10 +37,16 @@ private:
     void initSrcSide();
     void initTargetSide();
 
+    void getClonedMouth(const Mat& img, unsigned int frame_index, Mat &target);
+    Mat getMaskForLeftEyebrow();
+    Mat getMaskForRightEyebrow();
+
     ClickableQLabel *sourceLabel;
     ClickableQLabel *targetLabel;
     VideoProcessor *src_videoProcessor;
     VideoProcessor *target_videoProcessor;
+
+    bool textureInterpolate;
 
     VideoCapture *capSrc;
     VideoCapture *capTarget;

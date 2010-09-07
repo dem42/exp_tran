@@ -9,6 +9,10 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
 {    
     ui.setupUi(this);
 
+    settings = new QDialog();
+    sUi.setupUi(settings);
+    connect(sUi.buttonBox,SIGNAL(accepted()),this,SLOT(changeSettings()));
+
     face_widget1 = new FaceWidget();
     face_widget2 = new FaceWidget();
     face_widget3 = new CustomizableFaceWidget();
@@ -57,6 +61,7 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     //connect(ui.action_Open,SIGNAL(triggered()),my_widget,SLOT(face_file_changed()));
     connect(ui.action_Open,SIGNAL(triggered()),f_dialog,SLOT(show()));
     connect(ui.actionVideo_File,SIGNAL(triggered()),v_dialog,SLOT(show()));
+    connect(ui.actionPreferences,SIGNAL(triggered()),settings,SLOT(show()));
 
 
     connect(ui.expComboBox,SIGNAL(activated(QString)),f_controller,SLOT(expression_activated(QString)));    
@@ -118,4 +123,9 @@ void ExpTranWindow::displayException(const std::exception &e)
 
     d.setWindowTitle("Error");
     d.exec();
+}
+
+void ExpTranWindow::changeSettings()
+{
+    cout << "changing settings" << endl;
 }

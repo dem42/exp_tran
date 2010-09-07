@@ -27,7 +27,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>2</number>
+     <number>0</number>
     </property>
     <widget class="QWidget" name="faceTab">
      <attribute name="title">
@@ -56,6 +56,12 @@
       <layout class="QVBoxLayout" name="verticalLayout_2">
        <item>
         <widget class="QLabel" name="label">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string>Identity:</string>
          </property>
@@ -99,6 +105,12 @@
        </item>
        <item>
         <widget class="QLabel" name="label_2">
+         <property name="font">
+          <font>
+           <weight>75</weight>
+           <bold>true</bold>
+          </font>
+         </property>
          <property name="text">
           <string>Expression:</string>
          </property>
@@ -194,7 +206,7 @@
        </rect>
       </property>
       <property name="title">
-       <string>Options</string>
+       <string>Display Options</string>
       </property>
       <widget class="QRadioButton" name="wireRadioButton">
        <property name="geometry">
@@ -242,6 +254,9 @@
        </property>
        <property name="text">
         <string>expression interpolation</string>
+       </property>
+       <property name="checked">
+        <bool>true</bool>
        </property>
        <property name="autoExclusive">
         <bool>false</bool>
@@ -603,7 +618,14 @@
     <addaction name="action_Open"/>
     <addaction name="actionVideo_File"/>
    </widget>
+   <widget class="QMenu" name="menuOptions">
+    <property name="title">
+     <string>Options</string>
+    </property>
+    <addaction name="actionPreferences"/>
+   </widget>
    <addaction name="menu_File"/>
+   <addaction name="menuOptions"/>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
   <action name="action_Open">
@@ -614,6 +636,11 @@
   <action name="actionVideo_File">
    <property name="text">
     <string>Video File</string>
+   </property>
+  </action>
+  <action name="actionPreferences">
+   <property name="text">
+    <string>Preferences</string>
    </property>
   </action>
  </widget>

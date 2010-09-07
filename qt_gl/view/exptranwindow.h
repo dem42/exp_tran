@@ -4,6 +4,8 @@
 #include <QMainWindow>
 #include <QFileDialog>
 #include "ui_applform.h"
+#include "ui_settingsDialog.h"
+
 #include "facewidget.h"
 #include "customizablefacewidget.h"
 
@@ -26,8 +28,12 @@ public:
     void displayException(const std::exception &e);
     void setAllVideoTabButtonsDisabled(bool);
 
+public slots:
+    void changeSettings();
+
 private:
     Ui::ApplForm ui;
+    Ui::settingsDialog sUi;
     //controllers
     FaceTabController *f_controller;
     VideoTabController *v_controller;
@@ -44,6 +50,7 @@ private:
     //menu dialogs
     QFileDialog *f_dialog;
     QFileDialog *v_dialog;    
+    QDialog *settings;
 };
 
 #endif // MY_MAIN_WINDOW_H

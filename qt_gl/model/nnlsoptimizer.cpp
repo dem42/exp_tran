@@ -86,8 +86,8 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
 
     int index = 0;
 
-    const int exr_size = 7;
-    const int id_size = 56;
+    const int exr_size = model->getExpSize();
+    const int id_size = model->getIdSize();
 
     double *w_id = new double[id_size];
     double *w_exp = new double[exr_size];
@@ -228,8 +228,8 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
     //total number of feature points
     int featurePointNum = 0;
 
-    const int exr_size = 7;
-    const int id_size = 56;
+    const int exr_size = model->getExpSize();
+    const int id_size = model->getIdSize();
 
     double *w_id = new double[id_size];
     double *w_exp = new double[exr_size];
@@ -356,7 +356,7 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
 
 
 
-void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point2f> &featurePoints,
+void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints,
                                  const Mat &cameraMatrix, const Mat& lensDist,
                                  Face* face_ptr,const vector<int> &point_indices,
                                  const Mat &rotation, const Mat &translation,
@@ -386,9 +386,8 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
     Mat_<double> u_ex = model->getUExpression();
 
     int index = 0;
-
-    const int exr_size = 7;
-    const int id_size = 56;
+    const int exr_size = model->getExpSize();
+    const int id_size = model->getIdSize();
 
     double *w_id = new double[id_size];
     double *w_exp = new double[exr_size];
@@ -488,51 +487,12 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
         Z_ex = Matrix::kron(lin_comb_y,Matrix::eye(exr_size));
         ZU = Z_ex*(u_ex.t());
 
-        /* compute the formula :
-         * compute by stacking rather then summing since with summing its possible to lose the solution
-         * despite the fact that here we have a square matrix
-         * Pw*R*M*Z*U*x = f - (1/tz)*Pw*t
-         */
+
         A_ex = PRM*ZU;
-        // Mat_<double> p = (f - A_ex*x);
-        //Mat_<double> err = p.t()*p;
-        //cout << "the error before is : " << err(0,0) << endl;
-//        for(unsigned int j=0;j<point_indices.size();j++)
-//        {
-//            O = PRM*ZU*x;
-//            Mat_<double> pp =  M*ZU*x;
-//            cout << pp(0,0) << " " << pp(1,0) << " " << pp(2,0) << endl;
-//            Mi = O.rowRange(Range(2*j,2*j+2));
-//            fi = f.rowRange(Range(2*j,2*j+2));
-//            cout << "o.rowrange size : " << Mi.size().height << " " << Mi.size().width << endl;
-//            Mi(0,0) = Mi(0,0);
-//            Mi(1,0) = Mi(1,0);
-//            cout << Mi(0,0) << " " << Mi(1,0) << " vs "
-//                 << fi(0,0) << " " << fi(1,0) << endl;
-//        }
 
 
         this->scannls(A_ex,f,x);
-        //p = (f - A_ex*x);
-//        err = p.t()*p;
-//        cout << "the error after is : " << err(0,0) << endl;
-//
-//        cout << "in EX optim" << endl;
-//
-//        for(unsigned int j=0;j<point_indices.size();j++)
-//        {
-//            O = PRM*ZU*x;
-//            Mat_<double> pp =  M*ZU*x;
-//            cout << pp(0,0) << " " << pp(1,0) << " " << pp(2,0) << endl;
-//            Mi = O.rowRange(Range(2*j,2*j+2));
-//            fi = f.rowRange(Range(2*j,2*j+2));
-//            cout << "o.rowrange size : " << Mi.size().height << " " << Mi.size().width << endl;
-//            Mi(0,0) = Mi(0,0);
-//            Mi(1,0) = Mi(1,0);
-//            cout << Mi(0,0) << " " << Mi(1,0) << " vs "
-//                 << fi(0,0) << " " << fi(1,0) << endl;
-//        }
-        //put the guesses into matrix y and x
+
         x_t = x.t();
         Matrix::matrix_mult(x_t,u_ex).transpose(lin_comb_x);
 
@@ -542,47 +502,12 @@ void NNLSOptimizer::estimateModelParameters(const Mat &frame, const vector<Point
         /* compute the formula :
          * Sum( U*Z'*Mi'*R'*PW'*PW*R*Mi*Z*U' )*y = Sum( U*Z'*Mi'*R'*PW'*fi - (1/tz)*U*Z'*Mi'*R'*PW'*PW'*t )
          */
-//        cout << "here " << point_indices.size() << endl;
+
 
         A_id = PRM*ZU;
-//        p = (f - A_id*y);
-//        err = p.t()*p;
-//        cout << "the error before is : " << err(0,0) << endl;
-//                for(unsigned int j=0;j<point_indices.size();j++)
-//        {
-//            O = PRM*ZU*y;
-//            Mat_<double> pp =  M*ZU*y;
-//            cout << pp(0,0) << " " << pp(1,0) << " " << pp(2,0) << endl;
-//            Mi = O.rowRange(Range(2*j,2*j+2));
-//            fi = f.rowRange(Range(2*j,2*j+2));
-//            Mi(0,0) = Mi(0,0);
-//            Mi(1,0) = Mi(1,0);
-//            cout << Mi(0,0) << " " << Mi(1,0) << " vs "
-//                 << fi(0,0) << " " << fi(1,0) << endl;
-//        }
-
 
         this->scannls(A_id,f,y);
-//        p = (f - A_id*y);
-//        err = p.t()*p;
-//        cout << "the error after is : " << err(0,0) << endl;
-//
-//        cout << "this should work ... O_O : " << endl << Matrix(x);
-//        cout << "in ID optim" << endl;
-//
-//
-//        for(unsigned int j=0;j<point_indices.size();j++)
-//        {
-//            O = PRM*ZU*y;
-//            Mat_<double> pp =  M*ZU*y;
-//            cout << pp(0,0) << " " << pp(1,0) << " " << pp(2,0) << endl;
-//            Mi = O.rowRange(Range(2*j,2*j+2));
-//            fi = f.rowRange(Range(2*j,2*j+2));
-//            Mi(0,0) = Mi(0,0);
-//            Mi(1,0) = Mi(1,0);
-//            cout << Mi(0,0) << " " << Mi(1,0) << " vs "
-//                 << fi(0,0) << " " << fi(1,0) << endl;
-//        }
+
     }
 
 

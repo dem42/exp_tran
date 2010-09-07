@@ -28,7 +28,7 @@ public:
     static void sampleGoodPoints(const vector<Point2f> &points, vector<Point2f> &sampledPoints);
 
     static void filterForGradient(const Mat &img, Mat &dest);
-    static void poissonClone(const Mat &src, const Mat &mask, Mat &target);
+    static void poissonClone(const Mat &src, const Mat &mask, Mat &target,int o_x=0, int o_y=0);
 };
 
 #endif // UTILITY_H
