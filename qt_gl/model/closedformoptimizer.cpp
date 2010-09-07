@@ -1,60 +1,12 @@
 #include "closedformoptimizer.h"
 #include "model/FaceModel.h"
 
-ClosedFormOptimizer::ClosedFormOptimizer(double regParam) : max_iterations(4)
+ClosedFormOptimizer::ClosedFormOptimizer(double regParam) : Optimizer(), max_iterations(4)
 {    
     this->regParam = regParam;
-}
-
-void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints,
-                                                  const Mat &cameraMatrix, const Mat& lensDist,
-                                                  Face* face_ptr,const vector<int> &point_indices,
-                                                  const Mat &rotation, const Mat &translation,
-                                                  vector<double> &weights_id, vector<double> &weights_ex)
-{
-    Mat_<double> weakCamera(2,3);
-    //matrices for A_ex * w_ex = B_ex and A_id * w_id = B_id
-    Mat_<double> A_ex , A_id, A_ext , A_idt;
-    Mat_<double> B_ex, B_id;
-    //matrix Z = kron(weights, Identity_matrix)
-    Mat_<double> Z_ex, Z_id;
-    Mat_<double> ZU;
-    Mat_<double> PR, prm, pr, Pt, PRM;
-    Mat_<double> W;
-
-    //core tensor rows
-    Mat_<double> Mi;
-
-    //featurePoints converted to 2x1 matrices    
-    Mat_<double> fi;
-    Mat_<double> f;
-
-    //initialize model-morph bases
-    FaceModel *model = FaceModel::getInstance();
-    Matrix core = model->getCoreTensor();
-    Mat_<double> u_id = model->getUIdentity();
-    Mat_<double> u_ex = model->getUExpression();
-
-    int index = 0;
 
     const int exr_size = model->getExpSize();
     const int id_size = model->getIdSize();
-
-    double *w_id = new double[id_size];
-    double *w_exp = new double[exr_size];
-
-    Mat_<double> rmatrix;
-
-    Mat_<double> x_t(1,exr_size);
-    Mat_<double> y_t(1,id_size);
-    Mat_<double> x(exr_size,1);
-    Mat_<double> y(id_size,1);
-    //used for x_t*U_ex and y_t*U_id
-    Matrix lin_comb_x(exr_size,1);
-    Matrix lin_comb_y(id_size,1);
-
-    //regularization term
-    Mat_<double> regTerm_id, regTerm_exp, leftTerm_id, leftTerm_exp;
 
     //size is Size(width,height)
     regTerm_exp = Mat_<double>::eye(exr_size,exr_size);
@@ -74,6 +26,49 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
 
     regTerm_exp = regParam*regTerm_exp;
     regTerm_id = regParam*regTerm_id;
+
+}
+
+void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints,
+                                                  const Mat &cameraMatrix, const Mat& lensDist,
+                                                  Face* face_ptr,const vector<int> &point_indices,
+                                                  const Mat &rotation, const Mat &translation,
+                                                  vector<double> &weights_id, vector<double> &weights_ex)
+{
+    Mat_<double> weakCamera(2,3);
+    //matrices for A_ex * w_ex = B_ex and A_id * w_id = B_id
+    Mat_<double> A_ex , A_id, A_ext , A_idt;
+    Mat_<double> B_ex, B_id;
+    //matrix Z = kron(weights, Identity_matrix)
+    Mat_<double> Z_ex, Z_id;
+    Mat_<double> ZU;
+    Mat_<double> PR, prm, pr, Pt, PRM;
+    Mat_<double> W;
+
+    Mat_<double> Mi;
+
+    //featurePoints converted to 2x1 matrices
+    Mat_<double> fi;
+    Mat_<double> f;
+
+    int index = 0;
+
+    const int exr_size = model->getExpSize();
+    const int id_size = model->getIdSize();
+
+    double *w_id = new double[id_size];
+    double *w_exp = new double[exr_size];
+
+    Mat_<double> rmatrix;
+
+    Mat_<double> x_t(1,exr_size);
+    Mat_<double> y_t(1,id_size);
+    Mat_<double> x(exr_size,1);
+    Mat_<double> y(id_size,1);
+    //used for x_t*U_ex and y_t*U_id
+    Matrix lin_comb_x(exr_size,1);
+    Matrix lin_comb_y(id_size,1);
+
 
     double Z_avg;
     double average_depth;
@@ -235,18 +230,10 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
     Mat_<double> pr, Pt;
     Mat_<double> W, B;
 
-    //core tensor rows
-    Mat_<double> Mi;
 
     //featurePoints converted to 2x1 matrices
     Mat_<double> fi;
     Mat_<double> f;
-
-    //initialize model-morph bases
-    FaceModel *model = FaceModel::getInstance();
-    Matrix core = model->getCoreTensor();
-    Mat_<double> u_id = model->getUIdentity();
-    Mat_<double> u_ex = model->getUExpression();
 
     int index = 0;
 
@@ -269,25 +256,7 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
     double average_depth;
     Point3f p;
     Mat_<double> proP;
-    Mat_<double> pM(3,1);    
-
-        //regularization term
-    Mat_<double> regTerm_exp, leftTerm_exp;
-
-    //size is Size(width,height)
-    regTerm_exp = Mat_<double>::eye(Size(exr_size,exr_size));
-    leftTerm_exp = Mat_<double>::eye(Size(1,exr_size));
-
-    //init the left terms which are made up of regParam*mean
-    //mean is 1./size for both since theres exactly same amount of
-    //faces with 1s at those spots and mean is in between all of them (? not sure)
-    for(int i=0;i<exr_size;i++)
-        leftTerm_exp(0,i) = 1./exr_size;
-
-    leftTerm_exp = regParam*leftTerm_exp;
-
-    regTerm_exp = regParam*regTerm_exp;
-
+    Mat_<double> pM(3,1);
 
     Rodrigues(rotation,rmatrix);
 
@@ -335,7 +304,6 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
     pr = (1.0/Z_avg)*weakCamera*rmatrix;
     A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);
     seg_A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);
-    Mi = Mat_<double>(3,exr_size*id_size);
 
     for(int i=0;i<id_size;i++)
         y_t(0,i) = w_id[i];
@@ -352,9 +320,8 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
     for(unsigned int i=0;i<point_indices.size();++i)
     {
         index = point_indices[i];
-        Mi = core.submatrix( index*3 , index*3 + 2 );
 
-        seg_A_ex = pr*Mi*ZU;
+        seg_A_ex = pr*M[index]*ZU;
         A_ex.row(2*i) = seg_A_ex.row(0) + 0;
         A_ex.row(2*i+1) = seg_A_ex.row(1) + 0;
     }
@@ -409,18 +376,10 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
     Mat_<double> pr, Pt;
     Mat_<double> W, B;
 
-    //core tensor rows
-    Mat_<double> Mi;
-
     //featurePoints converted to 2x1 matrices
     Mat_<double> fi;
     Mat_<double> f;
 
-    //initialize model-morph bases
-    FaceModel *model = FaceModel::getInstance();
-    Matrix core = model->getCoreTensor();
-    Mat_<double> u_id = model->getUIdentity();
-    Mat_<double> u_ex = model->getUExpression();
 
     int index = 0;
     //total number of feature points
@@ -443,25 +402,7 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
     double Z_avg;
     double average_depth;
     Mat_<double> proP;
-    Mat_<double> pM(3,1);
-
-        //regularization term
-    Mat_<double> regTerm_id, leftTerm_id;
-
-    //size is Size(width,height)
-    regTerm_id = Mat_<double>::eye(Size(id_size,id_size));
-
-    leftTerm_id = Mat_<double>::eye(Size(1,id_size));
-
-    //init the left terms which are made up of regParam*mean
-    //mean is 1./size for both since theres exactly same amount of
-    //faces with 1s at those spots and mean is in between all of them (? not sure)
-    for(int i=0;i<id_size;i++)
-        leftTerm_id(0,i) = 1./id_size;
-    leftTerm_id = regParam*leftTerm_id;
-
-    regTerm_id = regParam*regTerm_id;
-
+    Mat_<double> pM(3,1);    
 
     //get weights from the current face instance
     face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
@@ -505,7 +446,6 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
 
     A_id = Mat_<double>(2*featurePointNum,id_size);
     seg_A_id = Mat_<double>(2,id_size);
-    Mi = Mat_<double>(3,exr_size*id_size);
 
     average_depth = face_ptr->getAverageDepth();
 
@@ -544,9 +484,8 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
         for(unsigned int j=0;j<point_indices_vector[i].size();++j)
         {
             index = point_indices_vector[i][j];
-            Mi = core.submatrix( index*3 , index*3 + 2 );
 
-            seg_A_id = pr*Mi*ZU;
+            seg_A_id = pr*M[index]*ZU;
             A_id.row(count + 2*j) = seg_A_id.row(0) + 0;
             A_id.row(count + 2*j+1) = seg_A_id.row(1) + 0;
         }

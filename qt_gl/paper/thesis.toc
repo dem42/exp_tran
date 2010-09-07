@@ -60,14 +60,13 @@
 \contentsline {subsection}{\numberline {3.5.2}Tracking Feature Points}{52}{subsection.3.5.2}
 \contentsline {subsection}{\numberline {3.5.3}Camera Parameters}{53}{subsection.3.5.3}
 \contentsline {subsection}{\numberline {3.5.4}Optimizing the Parameters}{54}{subsection.3.5.4}
-\contentsline {paragraph}{Error Function.}{54}{section*.15}
-\contentsline {section}{\numberline {3.6}System Architecture}{54}{section.3.6}
-\contentsline {subsection}{\numberline {3.6.1}View Layer}{55}{subsection.3.6.1}
-\contentsline {paragraph}{OpenGL widget}{55}{section*.16}
-\contentsline {paragraph}{Interactive Image Hierarchy}{55}{section*.17}
-\contentsline {paragraph}{Main Window}{55}{section*.18}
-\contentsline {paragraph}{GUI}{55}{section*.19}
-\contentsline {subsection}{\numberline {3.6.2}Model Layer}{56}{subsection.3.6.2}
-\contentsline {subsection}{\numberline {3.6.3}Controller Layer}{56}{subsection.3.6.3}
-\contentsline {chapter}{\numberline {4}Results and Evaluation}{57}{chapter.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{58}{chapter.5}
+\contentsline {section}{\numberline {3.6}System Architecture}{56}{section.3.6}
+\contentsline {subsection}{\numberline {3.6.1}View Layer}{56}{subsection.3.6.1}
+\contentsline {paragraph}{OpenGL widget}{57}{section*.15}
+\contentsline {paragraph}{Interactive Image Hierarchy}{57}{section*.16}
+\contentsline {paragraph}{Main Window}{57}{section*.17}
+\contentsline {paragraph}{GUI}{57}{section*.18}
+\contentsline {subsection}{\numberline {3.6.2}Model Layer}{57}{subsection.3.6.2}
+\contentsline {subsection}{\numberline {3.6.3}Controller Layer}{57}{subsection.3.6.3}
+\contentsline {chapter}{\numberline {4}Results and Evaluation}{58}{chapter.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{59}{chapter.5}

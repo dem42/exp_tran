@@ -34,6 +34,8 @@ public:
 private:
     const int max_iterations;
     double regParam;
+    //regularization terms
+    Mat_<double> regTerm_id, regTerm_exp, leftTerm_id, leftTerm_exp;
 };
 
 #endif // CLOSEDFORMOPTIMIZER_H

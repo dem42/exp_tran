@@ -1,7 +1,7 @@
 #include "nnlsoptimizer.h"
 #include "model/FaceModel.h"
 
-NNLSOptimizer::NNLSOptimizer() : NNLS_MAX_ITER(1000), max_iterations(3)
+NNLSOptimizer::NNLSOptimizer() : Optimizer(), NNLS_MAX_ITER(1000), max_iterations(3)
 {
 
 }
@@ -78,11 +78,6 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
     Mat_<double> fi;
     Mat_<double> f;
 
-    //initialize model-morph bases
-    FaceModel *model = FaceModel::getInstance();
-    Matrix core = model->getCoreTensor();
-    Mat_<double> u_id = model->getUIdentity();
-    Mat_<double> u_ex = model->getUExpression();
 
     int index = 0;
 
@@ -152,8 +147,7 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
 
     pr = (1.0/Z_avg)*weakCamera*rmatrix;
     A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);
-    seg_A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);
-    Mi = Mat_<double>(3,exr_size*id_size);
+    seg_A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);    
 
     for(int i=0;i<id_size;i++)
         y_t(0,i) = w_id[i];
@@ -163,10 +157,8 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
 
     for(unsigned int i=0;i<point_indices.size();++i)
     {
-        index = point_indices[i];        
-        Mi = core.submatrix( index*3 , index*3 + 2 );
-
-        seg_A_ex = pr*Mi*ZU;
+        index = point_indices[i];
+        seg_A_ex = pr*M[index]*ZU;
         A_ex.row(2*i) = seg_A_ex.row(0) + 0;
         A_ex.row(2*i+1) = seg_A_ex.row(1) + 0;
     }
@@ -211,18 +203,9 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
     Mat_<double> ZU;
     Mat_<double> pr, Pt;
 
-    //core tensor rows
-    Mat_<double> Mi;
-
     //featurePoints converted to 2x1 matrices
     Mat_<double> fi;
     Mat_<double> f;
-
-    //initialize model-morph bases
-    FaceModel *model = FaceModel::getInstance();
-    Matrix core = model->getCoreTensor();
-    Mat_<double> u_id = model->getUIdentity();
-    Mat_<double> u_ex = model->getUExpression();
 
     int index = 0;
     //total number of feature points
@@ -290,7 +273,6 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
 
     A_id = Mat_<double>(2*featurePointNum,id_size);
     seg_A_id = Mat_<double>(2,id_size);
-    Mi = Mat_<double>(3,exr_size*id_size);
 
     average_depth = face_ptr->getAverageDepth();
 
@@ -322,9 +304,8 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
         for(unsigned int j=0;j<point_indices_vector[i].size();++j)
         {
             index = point_indices_vector[i][j];
-            Mi = core.submatrix( index*3 , index*3 + 2 );
 
-            seg_A_id = pr*Mi*ZU;
+            seg_A_id = pr*M[index]*ZU;
             A_id.row(count + 2*j) = seg_A_id.row(0) + 0;
             A_id.row(count + 2*j+1) = seg_A_id.row(1) + 0;
         }

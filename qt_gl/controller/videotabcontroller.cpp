@@ -281,7 +281,7 @@ void VideoTabController::playBack()
     }
 
     videoProcessor = new VideoProcessor(picLabel->getMarked(),frameData,cameraMatrix,lensDist,
-                                        VideoProcessor::OptType_INTERPOLATE,2500.,15,2);
+                                        VideoProcessor::OptType_LIN_COMB,2500.,20,3);
 
     connect(videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
 

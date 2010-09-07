@@ -540,6 +540,9 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
     estimationPoints.push_back(currentPoints);
     estimation_point_indices.push_back(indices);
 
+    //initialize the param optimizer with the indices (to make it faster)
+    paramOptimizer->setPointIndices(indices);
+
     //repeat tracking of new points
     //we start with frames 0 and 1
     for(unsigned int i=1;i<FRAME_MAX;++i)

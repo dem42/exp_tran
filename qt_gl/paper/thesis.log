@@ -1,7 +1,7 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  3 SEP 2010 12:30
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  7 SEP 2010 20:30
 entering extended mode
  %&-line parsing enabled.
-**thesis.tex
+**thesis.tex fg
 (./thesis.tex
 LaTeX2e <2005/12/01>
 Babel <v3.8h> and hyphenation patterns for english, usenglishmax, dumylang, noh
@@ -727,17 +727,17 @@ Overfull \hbox (3.26901pt too wide) in paragraph at lines 2644--2645
 <images/cameraDialog.png, id=888, 386.44376pt x 261.97874pt>
 File: images/cameraDialog.png Graphic file (type png)
 
-<use images/cameraDialog.png>
-<images/mvc.png, id=890, 442.65375pt x 125.71968pt>
+<use images/cameraDialog.png> [54 <./images/cameraDialog.png>] [55]
+<images/mvc.png, id=913, 442.65375pt x 125.71968pt>
 File: images/mvc.png Graphic file (type png)
  <use images/mvc.png>
-[54 <./images/cameraDialog.png>] [55 <./images/mvc.png (PNG copy)>] [56]
+[56 <./images/mvc.png (PNG copy)>] [57]
 Chapter 4.
-[57
+[58
 
 ]
 Chapter 5.
-(./thesis.bbl [58
+(./thesis.bbl [59
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 9--12
@@ -745,7 +745,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 9--12
 -ing equa-tion.
  []
 
-[59
+[60
 
 ]
 Underfull \hbox (badness 2617) in paragraph at lines 148--152
@@ -759,7 +759,7 @@ Underfull \hbox (badness 10000) in paragraph at lines 148--152
 GL\OT1/cmr/m/n/10.95 .
  []
 
-[60]) [61] (./thesis.aux)
+[61]) [62] (./thesis.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -768,13 +768,13 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 7535 strings out of 95086
- 108693 string characters out of 1183256
- 174473 words of memory out of 1500000
- 10247 multiletter control sequences out of 10000+50000
+ 7552 strings out of 95086
+ 108876 string characters out of 1183256
+ 174981 words of memory out of 1500000
+ 10256 multiletter control sequences out of 10000+50000
  19746 words of font info for 73 fonts, out of 1200000 for 2000
  28 hyphenation exceptions out of 8191
- 43i,20n,43p,543b,423s stack positions out of 5000i,500n,6000p,200000b,5000s
+ 43i,20n,43p,546b,423s stack positions out of 5000i,500n,6000p,200000b,5000s
  </home/martin/.texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.600pk></usr/sh
 are/texmf-texlive/fonts/type1/bluesky/cm/cmbx10.pfb></usr/share/texmf-texlive/f
 onts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/
@@ -792,9 +792,9 @@ hare/texmf-texlive/fonts/type1/bluesky/cm/cmsy8.pfb></usr/share/texmf-texlive/f
 onts/type1/bluesky/cm/cmti10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/
 cm/cmti12.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmtt10.pfb></usr
 /share/texmf-texlive/fonts/type1/bluesky/ams/msbm10.pfb>
-Output written on thesis.pdf (62 pages, 3021483 bytes).
+Output written on thesis.pdf (63 pages, 3031486 bytes).
 PDF statistics:
- 1071 PDF objects out of 1200 (max. 8388607)
- 301 named destinations out of 1000 (max. 131072)
+ 1088 PDF objects out of 1200 (max. 8388607)
+ 309 named destinations out of 1000 (max. 131072)
  557 words of extra memory for PDF output out of 10000 (max. 10000000)
 

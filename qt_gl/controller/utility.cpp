@@ -227,11 +227,11 @@ void Utility::sampleGoodPoints(const vector<Point2f> &points, vector<Point2f> &s
     Utility::pointSampling(points[5],points[4],10,sampledPoints);
     Utility::pointSampling(points[6],points[4],10,sampledPoints);
 
+    Utility::pointSampling(points[11],points[12],10,sampledPoints);
     Utility::pointSampling(points[13],points[14],10,sampledPoints);
-    Utility::pointSampling(points[15],points[16],10,sampledPoints);
 
-    Utility::pointSampling(points[17],points[18],10,sampledPoints);
-    Utility::pointSampling(points[17],points[19],10,sampledPoints);
+    //Utility::pointSampling(points[17],points[18],10,sampledPoints);
+    //Utility::pointSampling(points[17],points[19],10,sampledPoints);
 }
 
 void Utility::pointSampling(const Point2f& a, const Point2f& b, const int num,

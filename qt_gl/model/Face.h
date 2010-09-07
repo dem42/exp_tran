@@ -51,8 +51,8 @@ class Face
   Point3 *vertexes;
   Vector3 *vertex_normals;
   float (*triangles)[3];
-  static const int fPoints[20];
-  static const int fPolygons[20];
+  static const int fPoints[18];
+  static const int fPolygons[18];
   static const int fPoints_size;
 
   static const int mouth[43];

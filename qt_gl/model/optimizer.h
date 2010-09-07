@@ -2,8 +2,10 @@
 #define OPTIMIZER_H
 
 #include <vector>
+#include <map>
 #include <cv.h>
 #include "model/Face.h"
+#include "model/FaceModel.h"
 
 using namespace std;
 using namespace cv;
@@ -11,6 +13,7 @@ using namespace cv;
 class Optimizer
 {
 public:
+    Optimizer();
     virtual void estimateModelParameters(const vector<Point2f> &featurePoints,
                                          const Mat &cameraMatrix, const Mat& lensDist,
                                          Face* face_ptr,const vector<int> &point_indices,
@@ -29,6 +32,15 @@ public:
                                     const vector<Mat> &rotation, const vector<Mat> &translation,
                                     const vector<vector<double> > &weights_ex,
                                     vector<double> &weights_id) = 0;
+
+    void setPointIndices(const vector<int>&point_indices_vector);
+
+protected:
+    map<int,Mat> M;
+    FaceModel *model;
+    Matrix core;
+    Mat_<double> u_ex;
+    Mat_<double> u_id;
 
 };
 
