@@ -1279,7 +1279,7 @@ of the orthogonal projection is shown in figure \ref{fg:weakOrtho}. Orthographic
 projection is sometimes called parallel projection, since unlike in perspective
 projection, parallel lines remain after being projected into the image plane.
 
-\subsubsection{Weak Perspective Camera Model}
+\subsubsection{Weak Perspective Camera Model}\label{s:weak}
 The weak perspective camera model is in essence just a scaled orthographic
 projection. With this camera model it is possible to approximate a perspective
 transformation under the following conditions.
@@ -2689,7 +2689,7 @@ figure \ref{fg:camdialog}
 
 \end{figure}
 
-\subsection{Optimizing the Parameters}
+\subsection{Minimizing the Error Function}\label{s:minerror}
 The goal of the the fitting algorithm is to estimate the model and 3D pose
 parameters given a set of $N$ feature points $f_1, \ldots , f_N$ in every frame of the recording. The in
 order to find the parameters that are closest to the true parameters we need error
@@ -2784,10 +2784,346 @@ solving the resulting equation.
 
 However, the problem with the perspective projection is that to obtain the feature point
 we need to dehomogenize the result of the projection by dividing with
-$\gamma$. The perspective projection is therefore ill-suited for optimization, since the $\gamma$ will be equal to the unknown value of $z$-component
-of $\mathbf{p}_i$. The derivative of the error function will therefore be
-a non-linear function because the error depends on the $\gamma$. 
+$\gamma$. This $\gamma$ to the unknown value of the $z$-component of the point
+whcih is being projected using the camera matrix. In equation \ref{eq:fit8}, $\mu$ is therefore a function of the model parameters and the rotation
+matrix given by $\mu(\mathbf{w}_{id},\mathbf{w}_{exp},\mathbf{R})$. The
+  perspective projection is therefore ill-suited for optimization, because the derivative of the error function will be
+a nonlinear function depending on the partial derivatives of the function
+$\mu(\mathbf{w}_{id},\mathbf{w}_{exp},\mathbf{R})$. Setting the derivative to
+  zero would then result in a nonlinear equation which are difficult to solve.
 
+The perspective projection is not a linear transformation since $\gamma$ is a
+function of the point $p_i$. The weak-perspective projection however is a linear
+transformation and it approximates the perspective projection. The idea
+behind the weak-perspective projection is that when the distance of the object
+from the camera is large enough then the points can be thought to have effectively same
+$z$-component. The points on a face are very close to each other in depth, which justifies using the weak-perspective camera model as an approximation
+of the perspective camera model in the fitting algorithm. 
+
+The weak-perspective projection uses the same parameters $f_x$, $f_y$, $c_x$ and
+$c_y$ as the perspective camera model. Unlike the perspective model however, the
+result is divided by the average depth $z_{avg}$ of the model instead of
+$\gamma$. The average depth is essentially the average of $\gamma$ of all points
+in the object. The weak-perspective camera model is defined by the camera matrix
+$\mathbf{P}_w$ as 
+
+\begin{equation}\label{eq:fig9}
+ \mathbf{f}_i = \frac{1}{z_{avg}}\begin{pmatrix}f_x&0&c_x\\0&f_y&c_y\end{pmatrix}\mathbf{p}_i
+    = \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{p}_i
+\end{equation}\\
+For the weak-perspective projection to provide a reasonable approximation of the
+perspective projection, the points must be far enough from the origin so that
+the differences in their depth are small in comparision to this distance. If this condition is not fulfilled, it is
+possible to still make the approximation good by increasing the distance of the
+image plane (defined by the focal length $f$) before the optimization. Increasing the focal length
+is essentially equivalent to moving the object in the $z$ direction.
+
+
+\paragraph{Error function.} With the weak-perspective camera model we can now define the error function for
+the tensor-based model fitting algorithm as
+\begin{equation}\label{eq:fig10}
+E(\mathbf{w}_{id}, \mathbf{w}_{exp}, \mathbf{R}, \mathbf{t}) = \sum_{i=1}^N \Bigl[\mathbf{f}_i - \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
+\mathbf{U}_{exp}^T\mathbf{w}_{exp}) - \frac{1}{t_z}\mathbf{P}\mathbf{t}\Bigr]^2
+\end{equation}
+which uses the weak-perspective camera matrix $\mathbf{P}_w$ to project the
+rotated model point and the perspective camera matrix $\mathbf{P}$ to project
+the translation vector $t$. 
+
+Given the error defining function $E(\mathbf{w}_{id}, \mathbf{w}_{exp}, \mathbf{R},
+\mathbf{t})$, the goal is to find the optimal parameters $\mathbf{w}_{id}^*$,
+$\mathbf{w}_{exp}^*$, $\mathbf{R}^*$ and
+$\mathbf{t}^*$ which minimize this
+error. The minimium can be found by setting the partial derivatives to zero as
+
+\begin{align}\label{eq:fig11}
+\frac{\partial E}{\partial \mathbf{w}_{id}} &= \mathbf{0} & \frac{\partial
+  E}{\partial \mathbf{w}_{exp}} &= \mathbf{0} & \frac{\partial E}{\partial
+  \mathbf{R}} &= \mathbf{0} & \frac{\partial E}{\partial \mathbf{t}} &= \mathbf{0}
+\end{align}
+
+The resulting equation are however nonlinear due to the square in the error
+function. Consider the derivative with respect to the identity parameters given by 
+\begin{align*}\label{eq:fig12}
+\frac{\partial E}{\partial \mathbf{w}_{id}} &= \frac{\partial}{\partial \mathbf{w}_{id}}\sum_{i=1}^N \Bigl[\mathbf{f}_i - \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}\overbrace{(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
+\mathbf{U}_{exp}^T\mathbf{w}_{exp})}^{\mathbf{Z}} - \frac{1}{t_z}\mathbf{P}\mathbf{t}\Bigr]^2\\
+&=\sum_{i=1}^N \frac{\partial}{\partial \mathbf{w}_{id}}\Bigl[\mathbf{f}_i - \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}\mathbf{Z} -
+\frac{1}{t_z}\mathbf{P}\mathbf{t}\Bigr]^2\\
+&=\sum_{i=1}^N -\frac{2}{z_{avg}}\Bigl(\frac{\partial \mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}\mathbf{Z}}{\partial
+  \mathbf{w}_{id}}\Bigr)\Bigl(\mathbf{f}_i -
+\frac{1}{z_{avg}}\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}\mathbf{Z} -
+\frac{1}{t_z}\mathbf{P}\mathbf{t}\Bigr)
+\end{align*}
+where the chain rule of matrix calculus was used. 
+
+The order of the derivations in the chain rule for vectors depends on whether the gradient is a row or column
+vector. Here we will adopt the notation that the gradient is a row vector. The
+chain rule is therefore ``build toward the left''. For example, if $\mathbf{w}$
+is a function of $\mathbf{z}$, which is a function of $\mathbf{y}$, which is a
+function of $\mathbf{x}$ then the derivative of $\mathbf{w}$ with respect to
+$\mathbf{x}$ is computed using the chain rule as
+\begin{equation*}
+\frac{\partial \mathbf{w}}{\partial \mathbf{x}} = \frac{\partial
+  \mathbf{y}}{\partial \mathbf{x}}\frac{\partial \mathbf{z}}{\partial
+  \mathbf{y}}\frac{\partial \mathbf{w}}{\partial \mathbf{z}} 
+\end{equation*}
+which is reverse order of the scalar chain rule where multiplication is
+comutitative.
+
+The derivative of a vector function $\mathbf{A}\mathbf{x}$ with respect to a
+vector $\mathbf{x}$ is defined as
+\begin{equation*}
+\frac{\partial \mathbf{A}\mathbf{x}}{\partial \mathbf{x}} = \mathbf{A}^T
+\end{equation*}\\
+Using the chain rule and then expanding $\mathbf{Z}$ we obtain
+\begin{align}
+\frac
+{\partial 
+\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}\mathbf{Z}
+}
+{\partial
+\mathbf{w}_{id}
+}
+&= 
+\frac
+{\partial
+\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}(\mathbf{U}_{id}^T\mathbf{w}_{id}
+\otimes \mathbf{U}_{exp}^T\mathbf{w}_{exp})
+}
+{
+\partial
+\mathbf{w}_{id}
+}\nonumber\\
+&=
+\frac
+{\partial
+\mathbf{U}_{id}^T\mathbf{w}_{id}
+}
+{\partial
+\mathbf{w}_{id}
+}
+\frac
+{\partial
+(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes \mathbf{U}_{exp}^T\mathbf{w}_{exp})
+}
+{\partial
+\mathbf{U}_{id}^T\mathbf{w}_{id}
+}
+\frac
+{\partial
+\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes \mathbf{U}_{exp}^T\mathbf{w}_{exp})
+}
+{\partial
+(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes \mathbf{U}_{exp}^T\mathbf{w}_{exp})
+}\nonumber\\\label{eq:opt0}
+&=\mathbf{U}_{id}
+\underbrace{
+\frac
+{\partial
+(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes \mathbf{U}_{exp}^T\mathbf{w}_{exp})
+}
+{\partial
+\mathbf{U}_{id}^T\mathbf{w}_{id}
+}
+}_{\mathbf{W}}
+(\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i})^T
+\end{align}
+Computing the $\mathbf{W}$ requires us to take the derivative of a Kronecker
+product. In \cite{matcalc} the derivative of the Kronecker of a $m \times n$
+matrix $\mathbf{A}$ and a $p \times q$
+matrix $\mathbf{B}$ with respect to the
+matrix $\mathbf{A}$ is defined as  
+\begin{equation}
+\frac{\partial \mathbf{A} \otimes \mathbf{B}}{\partial \mathbf{A}} = 
+\bigr(\mathbf{I}_{n} \otimes \mathop{vec}(\mathbf{B}) \otimes
+\mathbf{I}_{m}\bigl)\bigr(\mathbf{I}_{nq} \otimes \mathbf{T}_{pm}\bigl)
+\end{equation}
+where $\mathbf{I}_{n}$ is the $n \times n$ identity matrix, $\mathop{vec}$ a
+vectorization operator which stacks the columns of the operand into a vector and $\mathbf{T}_{pm}$
+a $p \times m$ permutation matrix called the transpose matrix. This permutation matrix $\mathbf{T}_{pm}$ has
+the special property that it reverses the Kronecker product.
+\begin{equation}
+\mathbf{B} \otimes \mathbf{A} = \mathbf{T}_{pm}(\mathbf{A} \otimes
+\mathbf{B})\mathbf{T}_{nq}
+\end{equation}\\
+However, since we are taking the derivation of the Kronecker product with
+respect to a vector we can utilize and one of the operands is a vector we can
+therefore make us of a small trick to simplify $\mathbf{Z} =
+\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
+\mathbf{U}_{exp}^T\mathbf{w}_{exp}$. We can make use of the relationship between
+multiplication and the Kronecker product \ref{eq:kron_mult} given by 
+\begin{equation*}
+(A \otimes B)(C \otimes D) = (AC \otimes BD)
+\end{equation*}
+The expression $\mathbf{U}_{exp}^T\mathbf{w}_{exp}$ is a $I_{exp} \times
+1$ matrix, therefore a vector, which is a constant when
+taking the derivation with respect to $\mathbf{w}_{id}$. We can therefore
+substitute the vector $\mathbf{a} = \mathbf{U}_{exp}^T\mathbf{w}_{exp}$ into $\mathbf{Z}$
+to get 
+\begin{align}
+\mathbf{Z} &= \mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
+\mathbf{U}_{exp}^T\mathbf{w}_{exp}\nonumber\\
+& = \mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
+\mathbf{a}\nonumber\\
+&= \mathbf{I}_{I_{id}}\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
+\mathbf{a}\mathbf{I}_1 \nonumber\\
+&= (\mathbf{I}_{I_{id}} \otimes \mathbf{a})(\mathbf{U}_{id}^T\mathbf{w}_{id}
+\otimes \mathbf{I}_1)\nonumber\\
+\label{eq:opt1}
+&=(\mathbf{I}_{I_{id}} \otimes \mathbf{U}_{exp}^T\mathbf{w}_{exp})\mathbf{U}_{id}^T\mathbf{w}_{id}
+\end{align}
+since $\mathbf{I}_1 = 1$. Using a similar approach it is also possible to extract
+$\mathbf{w}_{exp}$ out of $\mathbf{Z}$ to obtain
+\begin{equation}\label{eq:opt2}
+\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
+\mathbf{U}_{exp}^T\mathbf{w}_{exp} = (\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
+\mathbf{I}_{I_{exp}})\mathbf{U}_{exp}^T\mathbf{w}_{exp} 
+\end{equation}
+With this result we can now evaluate $\mathbf{W}$ to obtain
+\begin{align*}
+\mathbf{W} &= 
+\frac
+{\partial
+(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes \mathbf{U}_{exp}^T\mathbf{w}_{exp})
+}
+{\partial
+\mathbf{U}_{id}^T\mathbf{w}_{id}
+}= 
+\frac
+{\partial
+(\mathbf{I}_{I_{id}} \otimes \mathbf{U}_{exp}^T\mathbf{w}_{exp})\mathbf{U}_{id}^T\mathbf{w}_{id}
+}
+{\partial
+\mathbf{U}_{id}^T\mathbf{w}_{id}
+}\\
+&=(\mathbf{I}_{I_{id}} \otimes
+\mathbf{U}_{exp}^T\mathbf{w}_{exp})^T =(\mathbf{I}_{I_{id}} \otimes
+\mathbf{w}_{exp}^T\mathbf{U}_{exp})
+\end{align*}
+This result, obtained using \ref{eq:opt1}, adheres with the derivation of
+the Kronecker product, since for all transpose matrices it holds that $\mathbf{T}_{n1} =
+\mathbf{T}_{1n} = \mathbf{I}_n$ for any $n$.\\
+\\
+With the known $\mathbf{W}$ we can complete the derivation in \ref{eq:opt0} to get
+\begin{align}
+\frac
+{\partial 
+\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}\mathbf{Z}
+}
+{\partial
+\mathbf{w}_{id}
+}
+&=\mathbf{U}_{id}
+\frac
+{\partial
+(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes \mathbf{U}_{exp}^T\mathbf{w}_{exp})
+}
+{\partial
+\mathbf{U}_{id}^T\mathbf{w}_{id}
+}
+(\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i})^T\nonumber\\
+&=
+\mathbf{U}_{id}
+(\mathbf{I}_{I_{id}} \otimes
+\mathbf{w}_{exp}^T\mathbf{U}_{exp})
+[\mathbf{M}_{(1)}]_{i}^T\mathbf{R}^T\mathbf{P}_w^T
+\end{align}
+The results from equations \ref{eq:opt1} and \ref{eq:opt2} also allow us to decompose the Kronecker product
+in the error function as well. Thus we obtain the derivation of the error function with respect to
+$\mathbf{w}_{id}$ to be
+\begin{align*}\label{eq:opt4}
+\frac{\partial E}{\partial \mathbf{w}_{id}} &= \sum_{i=1}^N -\frac{2}{z_{avg}}\Bigl(
+\frac{\partial \mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}\mathbf{Z}}
+{\partial \mathbf{w}_{id}}\Bigr)\Bigl(\mathbf{f}_i - \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}\mathbf{Z} - \frac{1}{t_z}\mathbf{P}\mathbf{t}\Bigr)\\
+&=\sum_{i=1}^N -\frac{2}{z_{avg}}\underbrace{\Bigl(\mathbf{U}_{id} (\mathbf{I}_{I_{id}} \otimes \mathbf{w}_{exp}^T\mathbf{U}_{exp}) [\mathbf{M}_{(1)}]_{i}^T\mathbf{R}^T\mathbf{P}_w^T\Bigr)}_{\mathbf{H}_i^T}\Bigl(\mathbf{f}_i - \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}\mathbf{Z} - \frac{1}{t_z}\mathbf{P}\mathbf{t}
+\Bigr)\\
+&= \frac{2}{z_{avg}}\sum_{i=1}^N\bigl(
+\mathbf{H}_i^T\frac{1}{z_{avg}}\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}\mathbf{Z}\bigr)
+-
+\frac{2}{z_{avg}}\sum_{i=1}^N \mathbf{H}_i^T\bigl(\mathbf{f}_i - \frac{1}{t_z}\mathbf{P}\mathbf{t}
+\bigr)\\
+&=
+\frac{2}{z_{avg}^2}\sum_{i=1}^N\bigl(
+\mathbf{H}_i^T\underbrace{\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}(\mathbf{I}_{I_{id}} \otimes \mathbf{U}_{exp}^T\mathbf{w}_{exp})\mathbf{U}_{id}^T}_{\mathbf{H}_i}\mathbf{w}_{id}\bigr)
+-
+\frac{2}{z_{avg}}\sum_{i=1}^N \mathbf{H}_i^T\bigl(\mathbf{f}_i -
+\frac{1}{t_z}\mathbf{P}\mathbf{t}\bigr)\\
+&=\frac{2}{z_{avg}^2}\sum_{i=1}^N\bigl(
+\mathbf{H}_i^T\mathbf{H}_i\mathbf{w}_{id}\bigr)
+-
+\frac{2}{z_{avg}}\sum_{i=1}^N \mathbf{H}_i^T\bigl(\mathbf{f}_i -
+\frac{1}{t_z}\mathbf{P}\mathbf{t}\bigr)
+\end{align*}
+To find the optimal identity parameters $\mathbf{w}_{id}^*$ which minimize the error function we set
+this derivative to zero to obtain the system of equations 
+\begin{align*}
+&\frac{2}{z_{avg}^2}\sum_{i=1}^N\bigl(
+\mathbf{H}_i^T\mathbf{H}_i\mathbf{w}^*_{id}\bigr)
+-
+\frac{2}{z_{avg}}\sum_{i=1}^N \mathbf{H}_i^T\bigl(\mathbf{f}_i -
+\frac{1}{t_z}\mathbf{P}\mathbf{t}^*\bigr) = 0\\
+&\frac{2}{z_{avg}^2}\sum_{i=1}^N\bigl(
+\mathbf{H}_i^T\mathbf{H}_i\mathbf{w}^*_{id}\bigr)
+=
+\frac{2}{z_{avg}}\sum_{i=1}^N \mathbf{H}_i^T\bigl(\mathbf{f}_i -
+\frac{1}{t_z}\mathbf{P}\mathbf{t}^*\bigr)\\
+&\frac{1}{z_{avg}}\sum_{i=1}^N\bigl(
+\mathbf{H}_i^T\mathbf{H}_i\mathbf{w}^*_{id}\bigr)
+=
+\sum_{i=1}^N \mathbf{H}_i^T\bigl(\mathbf{f}_i -
+\frac{1}{t_z}\mathbf{P}\mathbf{t}^*\bigr)\\
+\end{align*}
+This system of equations can be written in matrix form as
+\begin{equation}
+\frac{1}{z_{avg}}\mathbf{H}^T\mathbf{H}\mathbf{w}^*_{id} =
+\mathbf{H}^T\bigl(\mathbf{f} - \frac{1}{t_z}\mathbf{P}\mathbf{t}^*\bigr)
+\end{equation}
+with
+\begin{equation}
+\mathbf{H} = 
+\begin{pmatrix}
+\mathbf{H}_1\\
+\mathbf{H}_2\\
+\vdots\\
+\mathbf{H}_N
+\end{pmatrix}
+\quad \mathrm{and} \quad 
+\mathbf{f} = 
+\begin{pmatrix}
+\mathbf{f}_1\\
+\mathbf{f}_2\\
+\vdots\\
+\mathbf{f}_N
+\end{pmatrix}
+\end{equation}
+The solution of this system of equations in matrix form is the optimal identity parameter
+vector $\mathbf{w}^*_{id}$ which is given by
+\begin{equation}
+\mathbf{w}^*_{id} = \frac{1}{z_{avg}}(\mathbf{H}^T\mathbf{H})^{-1}\mathbf{H}^T\bigl(\mathbf{f} - \frac{1}{t_z}\mathbf{P}\mathbf{t}^*\bigr)
+\end{equation}
+with
+\begin{equation*}
+\mathbf{H}_i = \mathbf{P}_w\mathbf{R}^*[\mathbf{M}_{(1)}]_{i}(\mathbf{I}_{I_{id}}
+\otimes \mathbf{U}_{exp}^T\mathbf{w}^*_{exp})\mathbf{U}_{id}
+\end{equation*}
+The optimal expression parameter vector $\mathbf{w}^*_{exp}$ is obtained in the
+same manner by setting the derivative of the error function with respect to
+$\mathbf{w}^*_{exp}$ to zero. The result is 
+\begin{equation}
+\mathbf{w}^*_{exp} = \frac{1}{z_{avg}}(\mathbf{G}^T\mathbf{G})^{-1}\mathbf{G}^T\bigl(\mathbf{f} - \frac{1}{t_z}\mathbf{P}\mathbf{t}^*\bigr)
+\end{equation}
+with 
+\begin{equation*}
+\mathbf{G}_i =
+\mathbf{P}_w\mathbf{R}^*[\mathbf{M}_{(1)}]_{i}(\mathbf{U}_{id}^T\mathbf{w}^*_{id}
+\otimes \mathbf{I}_{I_{exp}})\mathbf{U}_{exp}
+\end{equation*}
+Both of the equations are they depend on the other optimal parameter vector as
+well as the optimal rotation matrix $\mathbf{R}^*$ and the optimal translation
+vector $\mathbf{t}^*$. Finding the optimal parameters therefore reduces to a
+system of nonlinear equations. 
+
+However, we can still approximate the optimal solution using a coordinate
+descent optimization.
 \section{System Architecture}
 The system architecture of the expression transfer application follows a
 model-view-controller (MVC) design. There are three conceputal layers -- the
