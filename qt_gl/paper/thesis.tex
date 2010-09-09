@@ -1758,7 +1758,7 @@ $\mathbf{h}_k$ denotes a column of the matrix $\mathbf{H}$.
 
 
 
-\subsection{Nelder Mead Downhill Simplex}
+\subsection{Nelder Mead Downhill Simplex}\label{s:nelder}
 
 The downhill simplex is a local optimization method that does not
 require gradients to identify local extrema. With the downhill simplex method a
@@ -2607,13 +2607,44 @@ the positions of these points in all the successive frames. This is done
 automatically using an optical flow algorithm. This algorithm attempts to
 estimate the movement of the points.
 
+The movement of points is what allows the fitting algorithm to recognize an
+expression. Clearly there are points which provide more information about the
+expression than
+other. Points around the mouth for example are especially important for the
+algorithm since most expressions are characterized by unique mouth
+movements. Points on the eyebrows are also a good source of information about
+the expression. Conveniently, these points are also very good for tracking since
+the mouth and the eyebrows are easily distiguishable in terms of texture from
+other points on the face. 
+
+On the other hand, the features which are imperative to the recognition of a
+person's identity are more static. These features include the distance between the
+corners of the mouth, the distances between the chin, the displacements between
+the mouth and the nose and even the size of the eyes. The problem is that when feature points are selected in places where
+the texture is very constant then they will be difficult to track. For example, selecting
+feature points on the forehead or the cheeks may be cruical to determine the
+diameter of the face. However, the movement of these points will be very
+difficult to predict due to the lack of unique texture around them.
+
 The Kanade-Lucas feature tracker, which was discussed in \ref{s:kanade}, is an
 optical flow algorithm well suited for tracking small number of points. A
-pyramidal implementation of the Kanade-Lucas feature tracker is available in the OpenCV
+pyramidal implementation of the Kanade-Lucas feature tracker is available in the
+OpenCV as the function \texttt{calcOpticalFlowPyrLK()}. The OpenCV
+implementation is described in detail by Bouguet in \cite{kanade4}.  
 
-
-During this process of approximating the
-movement of the points, error is introduced. 
+Feature points may get lost during tracking process with the Kanade-Lucas
+feature tracker. This can happen if the
+texture around the point changes so drastically that it is impossible for the
+algorithm to predict its movement. This can for example happen to feature points
+on the eye when a person blinks. There are two possible approaches to dealing
+with lost points. The algorithm can either assume that the point did not move at
+all which is a reasonable assumption for feature points on the eye. The other
+possibility is to discard these points altogether. The second approach works
+better with more general disturbances. Consider a situation when a hand moving
+in front of the face. It should usually take several frames for the hand to
+pass. As the hand appears some points will get lost. If the algorithm assumed
+their position did not change they would begin moving with the hand in the
+following frames.
 \subsection{Camera Parameters}
 The feature points on the 3D model need to be projected into 2D so that a
 difference between these points can be calculated. The points are projected
@@ -3313,17 +3344,86 @@ the model parameters. For both the identity and the expression parameter vector
 it must hold that all the components are greater or equal to zero and
 that they sum to one. The constrained minimzation problem that the fitting
 algorithm must solve is therefore given by
-\begin{align}
+\begin{align}\label{eq:optprob}
 \mathrm{minimize}\quad &\sum_{i=1}^N \Big\Vert\mathbf{f}_i - \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
 \mathbf{U}_{exp}^T\mathbf{w}_{exp}) + \mathbf{t}\Big\Vert^2\\
 \mathrm{subject\; to}\quad &\sum_{i=1}^{I_{id}} w_{id_i} = 1\\
 &\sum_{i=1}^{I_{exp}} w_{exp_i} = 1\\
-&w_{id_i} \ge 0 \quad i=1,\ldots ,I_{id}\\ 
+\label{eq:nonneg1}
+&w_{id_i} \ge 0 \quad i=1,\ldots ,I_{id}\\\label{eq:nonneg2}
 &w_{exp_i} \ge 0 \quad i=1,\ldots ,I_{exp}
 \end{align}
 
-Constrained minimization of a nonlinear function is a difficult task if tackled numerically.
+Constrained minimization of a nonlinear function is a difficult task. It
+involves setting up the Karush-Kuhn-Tucker condition or the Lagrangian function
+and taking the derivatives. We can however be solve the problem using the Nelder
+Mead downhill simplex discussed in section \ref{s:nelder}. The downhill simplex
+method does not require the derivatives. It finds the minimum by evaluating the
+function at specific points in order to move towards the minimum. 
 
+To solve a constrained optimization problem the downhill simplex method needs to
+be augmented. The simplest way to do this is to make the function evaluation
+return infinity when the constraints are not satisfied. 
+
+The drawback of the downhill simplex method is that it usually performs a large
+number of function evaluations. However, every evaluation amounts to computing the
+error function for all feature points. The downhill simplex method is thus not
+very efficient.
+
+Experimentation showed that unrealistic faces are generated only when the
+non-negativity constraints \ref{eq:nonneg1} and \ref{eq:nonneg2} are
+violated. When the constraints which ensure the sum are violated then the
+resulting face is merely larger but still a realistic representation. We can therefore ensure that the fitting algorithm produces only
+realistic faces by solving the minimization problem \ref{eq:optprob} given only the non-negativity
+conditions. The simplified constrained optimization problem is therefore  
+\begin{align}
+\mathrm{minimize}\quad &\sum_{i=1}^N \Big\Vert\mathbf{f}_i - \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
+\mathbf{U}_{exp}^T\mathbf{w}_{exp}) + \mathbf{t}\Big\Vert^2\\
+\mathrm{subject\; to}\quad &w_{id_i} \ge 0 \quad i=1,\ldots ,I_{id}\\\
+&w_{exp_i} \ge 0 \quad i=1,\ldots ,I_{exp}
+\end{align}
+This makes it possible to to update the identity and
+expression model parameters at every iteration of the coordinate descent
+algorithm using the Sequential Coordinate-wise Non-negativity
+Least Squares Algorithm introduced in \ref{a:sca}. 
+
+The reason why only non-negative parameters produce unrealistic faces is most
+likely due to the fact that during the linear combination only a subtraction of
+faces can produce the zero vector. The null space of the data tensor thus spans only the negative
+parameter space. 
+
+It is entirely possible to generate some realistic
+faces even when the non-negativity conditions are violated, so by enforcing
+these constraints the model losses expressive power. However, it is
+impossible to generate an unrealistic face when they are satisfied, which
+warrants enforcing the non-negativity constraints.
+
+\subsection{Algorithm}
+Before the complete fitting algorithm can be established two things need to be
+addressed. First of all the coordinate descent algoritm discussed sofar was
+designed to optimize the parameters for just one frame. The fitting algorithm
+should however find the identity and the expressions of a person by examining a
+sequence of frames. The identity parameters should
+stay the same in all frames since the identity of the person in the video
+sequence should not change. In the multi-frame coordinate descent algorithm we therefore find the expression
+parameters for every frame using a guess for the identity parameters. Then we
+use all the feature points and the estimated expression parameter vectors from all frames
+to solve for the identity parameters. This process can then be iteratively
+repeated until convergence.
+
+For the algorithm to estimate a reasonable approximation to the face in the
+video, it is necessary to use a large number of feature points. The user cannot
+be expected to enter that many points. It is therefore necessary to generate
+a large number of new points to use in addition to the feature points specified
+by the user. These points cannot be picked just randomly, they must correspond
+to known points on the model so that they can be used in the error
+function. 
+
+For the algorithm to be able to automatically establish the correspondence to a
+model point it needs to know the camera matrix, the 3D pose as well as the model
+parameters. The feature points also pr
+The fitting algorithm for the tensor-based shape model is summarized in the
+following steps. 
 \section{Texture Transfer}
 
 \section{System Architecture}

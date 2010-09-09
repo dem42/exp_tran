@@ -59,14 +59,21 @@
 \contentsline {subsection}{\numberline {3.5.1}Locating Feature Points}{51}{subsection.3.5.1}
 \contentsline {subsection}{\numberline {3.5.2}Tracking Feature Points}{52}{subsection.3.5.2}
 \contentsline {subsection}{\numberline {3.5.3}Camera Parameters}{53}{subsection.3.5.3}
-\contentsline {subsection}{\numberline {3.5.4}Optimizing the Parameters}{54}{subsection.3.5.4}
-\contentsline {section}{\numberline {3.6}System Architecture}{56}{section.3.6}
-\contentsline {subsection}{\numberline {3.6.1}View Layer}{56}{subsection.3.6.1}
-\contentsline {paragraph}{OpenGL widget}{57}{section*.15}
-\contentsline {paragraph}{Interactive Image Hierarchy}{57}{section*.16}
-\contentsline {paragraph}{Main Window}{57}{section*.17}
-\contentsline {paragraph}{GUI}{57}{section*.18}
-\contentsline {subsection}{\numberline {3.6.2}Model Layer}{57}{subsection.3.6.2}
-\contentsline {subsection}{\numberline {3.6.3}Controller Layer}{57}{subsection.3.6.3}
-\contentsline {chapter}{\numberline {4}Results and Evaluation}{58}{chapter.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{59}{chapter.5}
+\contentsline {subsection}{\numberline {3.5.4}Minimizing the Error Function}{55}{subsection.3.5.4}
+\contentsline {paragraph}{Error function.}{57}{section*.15}
+\contentsline {paragraph}{Coordinate-Descent Method}{61}{section*.16}
+\contentsline {subsection}{\numberline {3.5.5}Overfitting}{62}{subsection.3.5.5}
+\contentsline {paragraph}{Regularization.}{63}{section*.17}
+\contentsline {paragraph}{Constrained Optimization.}{64}{section*.18}
+\contentsline {subsection}{\numberline {3.5.6}Algorithm}{65}{subsection.3.5.6}
+\contentsline {section}{\numberline {3.6}Texture Transfer}{66}{section.3.6}
+\contentsline {section}{\numberline {3.7}System Architecture}{66}{section.3.7}
+\contentsline {subsection}{\numberline {3.7.1}View Layer}{66}{subsection.3.7.1}
+\contentsline {paragraph}{OpenGL widget}{66}{section*.19}
+\contentsline {paragraph}{Interactive Image Hierarchy}{67}{section*.20}
+\contentsline {paragraph}{Main Window}{67}{section*.21}
+\contentsline {paragraph}{GUI}{67}{section*.22}
+\contentsline {subsection}{\numberline {3.7.2}Model Layer}{67}{subsection.3.7.2}
+\contentsline {subsection}{\numberline {3.7.3}Controller Layer}{67}{subsection.3.7.3}
+\contentsline {chapter}{\numberline {4}Results and Evaluation}{68}{chapter.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{69}{chapter.5}

@@ -46,10 +46,13 @@
 \BOOKMARK [2][-]{subsection.3.5.1}{Locating Feature Points}{section.3.5}
 \BOOKMARK [2][-]{subsection.3.5.2}{Tracking Feature Points}{section.3.5}
 \BOOKMARK [2][-]{subsection.3.5.3}{Camera Parameters}{section.3.5}
-\BOOKMARK [2][-]{subsection.3.5.4}{Optimizing the Parameters}{section.3.5}
-\BOOKMARK [1][-]{section.3.6}{System Architecture}{chapter.3}
-\BOOKMARK [2][-]{subsection.3.6.1}{View Layer}{section.3.6}
-\BOOKMARK [2][-]{subsection.3.6.2}{Model Layer}{section.3.6}
-\BOOKMARK [2][-]{subsection.3.6.3}{Controller Layer}{section.3.6}
+\BOOKMARK [2][-]{subsection.3.5.4}{Minimizing the Error Function}{section.3.5}
+\BOOKMARK [2][-]{subsection.3.5.5}{Overfitting}{section.3.5}
+\BOOKMARK [2][-]{subsection.3.5.6}{Algorithm}{section.3.5}
+\BOOKMARK [1][-]{section.3.6}{Texture Transfer}{chapter.3}
+\BOOKMARK [1][-]{section.3.7}{System Architecture}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.7.1}{View Layer}{section.3.7}
+\BOOKMARK [2][-]{subsection.3.7.2}{Model Layer}{section.3.7}
+\BOOKMARK [2][-]{subsection.3.7.3}{Controller Layer}{section.3.7}
 \BOOKMARK [0][-]{chapter.4}{Results and Evaluation}{}
 \BOOKMARK [0][-]{chapter.5}{Conclusion}{}

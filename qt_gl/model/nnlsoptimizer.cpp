@@ -181,6 +181,7 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
     }
 
     face_ptr->interpolate(w_id,w_exp);
+    //unecessary it seems 
     face_ptr->setAverageDepth(average_depth);
 
     delete[] w_id;

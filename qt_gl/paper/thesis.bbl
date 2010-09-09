@@ -63,6 +63,13 @@ Paul~L. Fackler.
 \newblock Notes on matrix calculus.
 \newblock North Carolina State University, September 2005.
 
+\bibitem{ifemcolorado}
+Carlos Felippa.
+\newblock Introduction to finite element methods.
+\newblock Department of Aerospace Engineering Sciences, University of Colorado
+  at Boulder, 2010.
+\newblock http://www.colorado.edu/engineering/cas/courses.d/IFEM.d/.
+
 \bibitem{nnls}
 Vojtech Franc, Vaclav Hlavac, and Mirko Navara.
 \newblock Sequential coordinate-wise algorithm for non-negative least squares

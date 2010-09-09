@@ -142,6 +142,7 @@
 \newlabel{eq:projective}{{2.40}{26}{Perspective Camera Model\relax }{equation.2.40}{}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.1.2}Orthogonal Camera Model}{26}{subsubsection.2.2.1.2}}
 \@writefile{toc}{\contentsline {subsubsection}{\numberline {2.2.1.3}Weak Perspective Camera Model}{27}{subsubsection.2.2.1.3}}
+\newlabel{s:weak}{{2.2.1.3}{27}{Weak Perspective Camera Model\relax }{subsubsection.2.2.1.3}{}}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.9}{\ignorespaces Weak perspective projection is a scaled orthographic projection. The image obtained by orthographic projection is scaled by the constant $f/Z_{avg}$.}}{27}{figure.2.9}}
 \newlabel{fg:weakOrtho}{{2.9}{27}{Weak perspective projection is a scaled orthographic projection. The image obtained by orthographic projection is scaled by the constant $f/Z_{avg}$}{figure.2.9}{}}
 \citation{graphics}
@@ -194,6 +195,7 @@
 \newlabel{a:sca}{{2.4.1}{36}{Least Squares and Non Negative Least Squares\relax }{equation.2.67}{}}
 \@writefile{loa}{\contentsline {algorithm}{\numberline {1}{\ignorespaces Sequential Coordinate-wise Non-negativity Least Squares Algorithm}}{36}{algorithm.\theHalgorithm }}
 \@writefile{toc}{\contentsline {subsection}{\numberline {2.4.2}Nelder Mead Downhill Simplex}{36}{subsection.2.4.2}}
+\newlabel{s:nelder}{{2.4.2}{36}{Nelder Mead Downhill Simplex\relax }{subsection.2.4.2}{}}
 \citation{Press1992}
 \citation{Nelder2009}
 \citation{Press1992}
@@ -265,38 +267,69 @@
 \@writefile{lof}{\contentsline {figure}{\numberline {3.3}{\ignorespaces The user selects points in the image which correspond to the feature points on the model (see figure \ref  {fg:featurePoints} ).}}{52}{figure.3.3}}
 \newlabel{fg:featurePoints2}{{3.3}{52}{The user selects points in the image which correspond to the feature points on the model (see figure \ref {fg:featurePoints} )}{figure.3.3}{}}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5.2}Tracking Feature Points}{52}{subsection.3.5.2}}
-\citation{zhang}
+\citation{kanade4}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5.3}Camera Parameters}{53}{subsection.3.5.3}}
-\newlabel{eq:projective}{{3.24}{53}{Camera Parameters\relax }{equation.3.24}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces Locating feature points in a chessboard pattern.}}{53}{figure.3.4}}
-\newlabel{fg:chessboard}{{3.4}{53}{Locating feature points in a chessboard pattern}{figure.3.4}{}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces The dialog element of the expression transfer user interface, which allows the the user to choose between manually or automatically calibrating the camera.}}{54}{figure.3.5}}
-\newlabel{fg:camdialog}{{3.5}{54}{The dialog element of the expression transfer user interface, which allows the the user to choose between manually or automatically calibrating the camera}{figure.3.5}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.4}Optimizing the Parameters}{54}{subsection.3.5.4}}
-\newlabel{eq:fit0}{{3.25}{55}{Optimizing the Parameters\relax }{equation.3.25}{}}
-\newlabel{eq:fit1}{{3.26}{55}{Optimizing the Parameters\relax }{equation.3.26}{}}
-\newlabel{eq:fit2}{{3.27}{55}{Optimizing the Parameters\relax }{equation.3.27}{}}
-\newlabel{eq:fit3}{{3.28}{55}{Optimizing the Parameters\relax }{equation.3.28}{}}
-\newlabel{eq:fit5}{{3.29}{55}{Optimizing the Parameters\relax }{equation.3.29}{}}
-\newlabel{eq:fit6}{{3.30}{55}{Optimizing the Parameters\relax }{equation.3.30}{}}
-\newlabel{eq:fit7}{{3.31}{56}{Optimizing the Parameters\relax }{equation.3.31}{}}
-\newlabel{eq:fit8}{{3.32}{56}{Optimizing the Parameters\relax }{equation.3.32}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.6}System Architecture}{56}{section.3.6}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces System architecture of the expression transfer application.}}{56}{figure.3.6}}
-\newlabel{fg:mvc}{{3.6}{56}{System architecture of the expression transfer application}{figure.3.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.1}View Layer}{56}{subsection.3.6.1}}
-\@writefile{toc}{\contentsline {paragraph}{OpenGL widget}{57}{section*.15}}
-\@writefile{toc}{\contentsline {paragraph}{Interactive Image Hierarchy}{57}{section*.16}}
-\@writefile{toc}{\contentsline {paragraph}{Main Window}{57}{section*.17}}
-\@writefile{toc}{\contentsline {paragraph}{GUI}{57}{section*.18}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.2}Model Layer}{57}{subsection.3.6.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.6.3}Controller Layer}{57}{subsection.3.6.3}}
-\@writefile{toc}{\contentsline {chapter}{\numberline {4}Results and Evaluation}{58}{chapter.4}}
+\citation{zhang}
+\newlabel{eq:projective}{{3.24}{54}{Camera Parameters\relax }{equation.3.24}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.4}{\ignorespaces Locating feature points in a chessboard pattern.}}{54}{figure.3.4}}
+\newlabel{fg:chessboard}{{3.4}{54}{Locating feature points in a chessboard pattern}{figure.3.4}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.5}{\ignorespaces The dialog element of the expression transfer user interface, which allows the the user to choose between manually or automatically calibrating the camera.}}{55}{figure.3.5}}
+\newlabel{fg:camdialog}{{3.5}{55}{The dialog element of the expression transfer user interface, which allows the the user to choose between manually or automatically calibrating the camera}{figure.3.5}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.4}Minimizing the Error Function}{55}{subsection.3.5.4}}
+\newlabel{s:minerror}{{3.5.4}{55}{Minimizing the Error Function\relax }{subsection.3.5.4}{}}
+\newlabel{eq:fit0}{{3.25}{55}{Minimizing the Error Function\relax }{equation.3.25}{}}
+\newlabel{eq:fit1}{{3.26}{55}{Minimizing the Error Function\relax }{equation.3.26}{}}
+\newlabel{eq:fit2}{{3.27}{56}{Minimizing the Error Function\relax }{equation.3.27}{}}
+\newlabel{eq:fit3}{{3.28}{56}{Minimizing the Error Function\relax }{equation.3.28}{}}
+\newlabel{eq:fit5}{{3.29}{56}{Minimizing the Error Function\relax }{equation.3.29}{}}
+\newlabel{eq:fit6}{{3.30}{56}{Minimizing the Error Function\relax }{equation.3.30}{}}
+\newlabel{eq:fit7}{{3.31}{56}{Minimizing the Error Function\relax }{equation.3.31}{}}
+\newlabel{eq:fit8}{{3.32}{56}{Minimizing the Error Function\relax }{equation.3.32}{}}
+\newlabel{eq:fit9}{{3.33}{57}{Minimizing the Error Function\relax }{equation.3.33}{}}
+\@writefile{toc}{\contentsline {paragraph}{Error function.}{57}{section*.15}}
+\newlabel{eq:fit10}{{3.34}{57}{Error function}{equation.3.34}{}}
+\newlabel{eq:fit11}{{3.35}{57}{Error function}{equation.3.35}{}}
+\citation{ifemcolorado}
+\citation{matcalc}
+\newlabel{eq:opt0}{{3.36}{58}{Error function}{equation.3.36}{}}
+\newlabel{eq:opt1}{{3.39}{59}{Error function}{equation.3.39}{}}
+\newlabel{eq:opt2}{{3.40}{59}{Error function}{equation.3.40}{}}
+\newlabel{eq:nonlin1}{{3.44}{60}{Error function}{equation.3.44}{}}
+\newlabel{eq:H}{{3.45}{60}{Error function}{equation.3.45}{}}
+\citation{Press1992}
+\citation{faceTransfer05}
+\newlabel{eq:nonlin2}{{3.46}{61}{Error function}{equation.3.46}{}}
+\newlabel{eq:G}{{3.47}{61}{Error function}{equation.3.47}{}}
+\@writefile{toc}{\contentsline {paragraph}{Coordinate-Descent Method}{61}{section*.16}}
+\citation{blanz1}
+\citation{jacey}
+\newlabel{a:coorddesc}{{3.5.4}{62}{Coordinate-Descent Method\relax }{section*.16}{}}
+\@writefile{loa}{\contentsline {algorithm}{\numberline {4}{\ignorespaces Coordinate-descent for one frame}}{62}{algorithm.\theHalgorithm }}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.5}Overfitting}{62}{subsection.3.5.5}}
+\@writefile{toc}{\contentsline {paragraph}{Regularization.}{63}{section*.17}}
+\newlabel{eq:regular}{{3.48}{63}{Regularization}{equation.3.48}{}}
+\@writefile{toc}{\contentsline {paragraph}{Constrained Optimization.}{64}{section*.18}}
+\newlabel{eq:optprob}{{3.51}{64}{Constrained Optimization}{equation.3.51}{}}
+\newlabel{eq:nonneg1}{{3.54}{64}{Constrained Optimization}{equation.3.54}{}}
+\newlabel{eq:nonneg2}{{3.55}{64}{Constrained Optimization}{equation.3.55}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.6}Algorithm}{65}{subsection.3.5.6}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.6}Texture Transfer}{66}{section.3.6}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.7}System Architecture}{66}{section.3.7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces System architecture of the expression transfer application.}}{66}{figure.3.6}}
+\newlabel{fg:mvc}{{3.6}{66}{System architecture of the expression transfer application}{figure.3.6}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.1}View Layer}{66}{subsection.3.7.1}}
+\@writefile{toc}{\contentsline {paragraph}{OpenGL widget}{66}{section*.19}}
+\@writefile{toc}{\contentsline {paragraph}{Interactive Image Hierarchy}{67}{section*.20}}
+\@writefile{toc}{\contentsline {paragraph}{Main Window}{67}{section*.21}}
+\@writefile{toc}{\contentsline {paragraph}{GUI}{67}{section*.22}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.2}Model Layer}{67}{subsection.3.7.2}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.3}Controller Layer}{67}{subsection.3.7.3}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}Results and Evaluation}{68}{chapter.4}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
 \bibstyle{plain}
 \bibdata{references}
-\@writefile{toc}{\contentsline {chapter}{\numberline {5}Conclusion}{59}{chapter.5}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}Conclusion}{69}{chapter.5}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
 \bibcite{FEMbook}{1}
@@ -311,29 +344,30 @@
 \bibcite{activeApp04}{10}
 \bibcite{POSIT}{11}
 \bibcite{matcalc}{12}
-\bibcite{nnls}{13}
-\bibcite{lda}{14}
-\bibcite{graphics}{15}
-\bibcite{matrix}{16}
-\bibcite{multilinear}{17}
-\bibcite{kanade}{18}
-\bibcite{FEM1ter}{19}
-\bibcite{jacey}{20}
-\bibcite{sdm}{21}
-\bibcite{FEM1pen}{22}
-\bibcite{Press1992}{23}
-\bibcite{vienna}{24}
-\bibcite{ICP}{25}
-\bibcite{Nelder2009}{26}
-\bibcite{opengl}{27}
-\bibcite{kronecker}{28}
-\bibcite{deformTri}{29}
-\bibcite{kanade2}{30}
-\bibcite{eigenfaces91}{31}
-\bibcite{Ter1}{32}
-\bibcite{Ter3}{33}
-\bibcite{Ter2}{34}
-\bibcite{viola}{35}
-\bibcite{faceTransfer05}{36}
-\bibcite{binghamton}{37}
-\bibcite{zhang}{38}
+\bibcite{ifemcolorado}{13}
+\bibcite{nnls}{14}
+\bibcite{lda}{15}
+\bibcite{graphics}{16}
+\bibcite{matrix}{17}
+\bibcite{multilinear}{18}
+\bibcite{kanade}{19}
+\bibcite{FEM1ter}{20}
+\bibcite{jacey}{21}
+\bibcite{sdm}{22}
+\bibcite{FEM1pen}{23}
+\bibcite{Press1992}{24}
+\bibcite{vienna}{25}
+\bibcite{ICP}{26}
+\bibcite{Nelder2009}{27}
+\bibcite{opengl}{28}
+\bibcite{kronecker}{29}
+\bibcite{deformTri}{30}
+\bibcite{kanade2}{31}
+\bibcite{eigenfaces91}{32}
+\bibcite{Ter1}{33}
+\bibcite{Ter3}{34}
+\bibcite{Ter2}{35}
+\bibcite{viola}{36}
+\bibcite{faceTransfer05}{37}
+\bibcite{binghamton}{38}
+\bibcite{zhang}{39}

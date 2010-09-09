@@ -301,7 +301,7 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
         f.row(2*i+1) = fi.row(1) + 0;
     }
 
-    pr = (1.0/Z_avg)*weakCamera*rmatrix;
+    pr = weakCamera*rmatrix;
     A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);
     seg_A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);
 
@@ -334,10 +334,11 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
 
     A_ext = A_ex.t();
     W = A_ext*A_ex;
-    W = W + regTerm_exp;
+    W = (1.0/Z_avg)*W;
+    W = W + Z_avg*regTerm_exp;
 
     B = A_ext*f;
-    B = B + leftTerm_exp;
+    B = B + Z_avg*leftTerm_exp;
 
     cv::solve(W,B,x,DECOMP_SVD);
     //x = Matrix::solveLinSysSvd(W,B);
@@ -353,6 +354,7 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
     }
 
     face_ptr->interpolate(w_id,w_exp);
+    // unecessary it seems 
     face_ptr->setAverageDepth(average_depth);
 
     delete[] w_id;
@@ -464,7 +466,7 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
         Z_avg = proP(0,2);
         cout << " with a z_avg after projecting in frame : " << i << " " << Z_avg << endl;
 
-        pr = (1.0/Z_avg)*weakCamera*rmatrix;
+        pr = weakCamera*rmatrix;
 
 
         //load the appropriate weights for the i-th frame
@@ -499,10 +501,11 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
 
     A_idt = A_id.t();
     W = A_idt*A_id;
-    W = W + regTerm_id;
+    W = (1.0/Z_avg)*W;
+    W = W + Z_avg*regTerm_id;
 
     B = A_idt*f;
-    B = B + leftTerm_id;
+    B = B + Z_avg*leftTerm_id;
 
     cv::solve(W,B,y,DECOMP_SVD);
 

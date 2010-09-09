@@ -1,7 +1,7 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  7 SEP 2010 20:30
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  9 SEP 2010 05:16
 entering extended mode
  %&-line parsing enabled.
-**thesis.tex fg
+**thesis.tex
 (./thesis.tex
 LaTeX2e <2005/12/01>
 Babel <v3.8h> and hyphenation patterns for english, usenglishmax, dumylang, noh
@@ -575,21 +575,21 @@ Chapter 2.
 [7
 
 ] [8] [9] [10] [11]
-<images/eigenfaces_comb_from_nn_vienna.png, id=390, 770.88pt x 362.85562pt>
+<images/eigenfaces_comb_from_nn_vienna.png, id=405, 770.88pt x 362.85562pt>
 File: images/eigenfaces_comb_from_nn_vienna.png Graphic file (type png)
 
 <use images/eigenfaces_comb_from_nn_vienna.png> [12] [13 <./images/eigenfaces_c
 omb_from_nn_vienna.png (PNG copy)>] [14]
-<images/scary_face2.png, id=426, 815.29594pt x 257.46187pt>
+<images/scary_face2.png, id=441, 815.29594pt x 257.46187pt>
 File: images/scary_face2.png Graphic file (type png)
 
 <use images/scary_face2.png> [15]
-<images/bad_asm.png, id=441, 576.65437pt x 213.04594pt>
+<images/bad_asm.png, id=456, 576.65437pt x 213.04594pt>
 File: images/bad_asm.png Graphic file (type png)
 
 <use images/bad_asm.png> [16 <./images/scary_face2.png (PNG copy)> <./images/ba
 d_asm.png (PNG copy)>]
-<images/amm_example.png, id=453, 602.25pt x 392.96812pt>
+<images/amm_example.png, id=468, 602.25pt x 392.96812pt>
 File: images/amm_example.png Graphic file (type png)
 
 <use images/amm_example.png>
@@ -598,19 +598,19 @@ Overfull \hbox (6.16168pt too wide) in paragraph at lines 788--790
  []
 
 [17 <./images/amm_example.png (PNG copy)>] [18]
-<images/flattening3.png, id=489, 391.4625pt x 322.95656pt>
+<images/flattening3.png, id=504, 391.4625pt x 322.95656pt>
 File: images/flattening3.png Graphic file (type png)
 
 <use images/flattening3.png> [19 <./images/flattening3.png (PNG copy)>]
-[20] [21] <images/n_mode_svd2.png, id=531, 531.48563pt x 182.18062pt>
+[20] [21] <images/n_mode_svd2.png, id=546, 531.48563pt x 182.18062pt>
 File: images/n_mode_svd2.png Graphic file (type png)
 
 <use images/n_mode_svd2.png> [22 <./images/n_mode_svd2.png (PNG copy)>]
-<images/modes_faces.png, id=547, 317.68687pt x 173.89969pt>
+<images/modes_faces.png, id=562, 317.68687pt x 173.89969pt>
 File: images/modes_faces.png Graphic file (type png)
 
 <use images/modes_faces.png> [23 <./images/modes_faces.png (PNG copy)>]
-[24] <images/pinhole.png, id=573, 563.85657pt x 220.57407pt>
+[24] <images/pinhole.png, id=588, 563.85657pt x 220.57407pt>
 File: images/pinhole.png Graphic file (type png)
 
 <use images/pinhole.png>
@@ -619,7 +619,7 @@ Overfull \hbox (7.48096pt too wide) in paragraph at lines 1235--1236
  []
 
 [25] [26 <./images/pinhole.png (PNG copy)>]
-<images/weak_persp.png, id=590, 609.02531pt x 246.1697pt>
+<images/weak_persp.png, id=605, 609.02531pt x 246.1697pt>
 File: images/weak_persp.png Graphic file (type png)
 
 <use images/weak_persp.png>
@@ -628,11 +628,11 @@ Overfull \hbox (41.35742pt too wide) in paragraph at lines 1312--1314
  []
 
 [27 <./images/weak_persp.png (PNG copy)>]
-<images/camera_object5.png, id=598, 721.69624pt x 290.08376pt>
+<images/camera_object5.png, id=613, 721.69624pt x 290.08376pt>
 File: images/camera_object5.png Graphic file (type png)
 
 <use images/camera_object5.png> [28 <./images/camera_object5.png>]
-<images/rotation.png, id=612, 565.36218pt x 326.72063pt>
+<images/rotation.png, id=627, 565.36218pt x 326.72063pt>
 File: images/rotation.png Graphic file (type png)
 
 <use images/rotation.png>
@@ -641,10 +641,10 @@ Overfull \hbox (8.61015pt too wide) in paragraph at lines 1406--1411
  []
 
 [29] [30 <./images/rotation.png (PNG copy)>] [31] [32]
-<images/fx.png, id=658, 602.25pt x 432.61626pt>
+<images/fx.png, id=673, 602.25pt x 432.61626pt>
 File: images/fx.png Graphic file (type png)
  <use images/fx.png>
-<images/gx.png, id=659, 401.5pt x 359.3425pt>
+<images/gx.png, id=674, 401.5pt x 359.3425pt>
 File: images/gx.png Graphic file (type png)
  <use images/gx.png> [33 <./images/fx.png> <./images/gx.png>] [34] [35]
 Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
@@ -669,14 +669,14 @@ Underfull \hbox (badness 10000) in paragraph at lines 1867--1871
 
  []
 
-<images/amoeba.png, id=730, 602.25pt x 602.25pt>
+<images/amoeba.png, id=745, 602.25pt x 602.25pt>
 File: images/amoeba.png Graphic file (type png)
  <use images/amoeba.png>
 [38] [39 <./images/amoeba.png>]
 Chapter 3.
 [40
 
-] [41] [42] [43] <images/binghamton.png, id=784, 414.04688pt x 345.54094pt>
+] [41] [42] [43] <images/binghamton.png, id=799, 414.04688pt x 345.54094pt>
 File: images/binghamton.png Graphic file (type png)
 
 <use images/binghamton.png> [44 <./images/binghamton.png (PNG copy)>]pdfTeX war
@@ -706,38 +706,54 @@ Underfull \hbox (badness 10000) in paragraph at lines 2352--2367
 
  []
 
-[48] [49] [50] <images/featurePoints.png, id=861, 829.0975pt x 325.215pt>
+[48] [49] [50] <images/featurePoints.png, id=876, 829.0975pt x 325.215pt>
 File: images/featurePoints.png Graphic file (type png)
 
 <use images/featurePoints.png> [51]
-<images/featureSelection.png, id=869, 361.35pt x 353.32pt>
+<images/featureSelection.png, id=884, 361.35pt x 353.32pt>
 File: images/featureSelection.png Graphic file (type png)
 
 <use images/featureSelection.png> [52 <./images/featurePoints.png (PNG copy)> <
-./images/featureSelection.png (PNG copy)>]
-<images/chessboard_pattern.png, id=879, 872.25874pt x 361.35pt>
+./images/featureSelection.png (PNG copy)>] [53]
+<images/chessboard_pattern.png, id=900, 872.25874pt x 361.35pt>
 File: images/chessboard_pattern.png Graphic file (type png)
 
 <use images/chessboard_pattern.png>
-Overfull \hbox (3.26901pt too wide) in paragraph at lines 2644--2645
+Overfull \hbox (3.26901pt too wide) in paragraph at lines 2675--2676
  [][] 
  []
 
-[53 <./images/chessboard_pattern.png (PNG copy)>]
-<images/cameraDialog.png, id=888, 386.44376pt x 261.97874pt>
+[54 <./images/chessboard_pattern.png (PNG copy)>]
+<images/cameraDialog.png, id=910, 386.44376pt x 261.97874pt>
 File: images/cameraDialog.png Graphic file (type png)
 
-<use images/cameraDialog.png> [54 <./images/cameraDialog.png>] [55]
-<images/mvc.png, id=913, 442.65375pt x 125.71968pt>
+<use images/cameraDialog.png> [55 <./images/cameraDialog.png>] [56] [57]
+[58]
+Underfull \hbox (badness 10000) in paragraph at lines 3029--3035
+
+ []
+
+
+Overfull \hbox (31.15706pt too wide) in paragraph at lines 3083--3083
+[] 
+ []
+
+[59] [60] [61]pdfTeX warning (ext4): destination with the same identifier (name
+{algorithm.\\theHalgorithm\040}) has been already used, duplicate ignored
+<to be read again> 
+                   \relax 
+l.3261 \end{algorithm}
+                       [62] [63] [64] [65]
+<images/mvc.png, id=1031, 442.65375pt x 125.71968pt>
 File: images/mvc.png Graphic file (type png)
  <use images/mvc.png>
-[56 <./images/mvc.png (PNG copy)>] [57]
+[66 <./images/mvc.png (PNG copy)>] [67]
 Chapter 4.
-[58
+[68
 
 ]
 Chapter 5.
-(./thesis.bbl [59
+(./thesis.bbl [69
 
 ]
 Underfull \hbox (badness 10000) in paragraph at lines 9--12
@@ -745,21 +761,33 @@ Underfull \hbox (badness 10000) in paragraph at lines 9--12
 -ing equa-tion.
  []
 
-[60
+
+Underfull \hbox (badness 1377) in paragraph at lines 67--72
+[]\OT1/cmr/m/n/10.95 Carlos Fe-lippa.  In-tro-duc-tion to fi-nite el-e-ment met
+h-ods.  De-part-ment of
+ []
+
+
+Underfull \hbox (badness 1715) in paragraph at lines 67--72
+\OT1/cmr/m/n/10.95 Aerospace En-gi-neer-ing Sci-ences, Uni-ver-sity of Col-orad
+o at Boul-der, 2010.
+ []
+
+[70
 
 ]
-Underfull \hbox (badness 2617) in paragraph at lines 148--152
+Underfull \hbox (badness 2617) in paragraph at lines 155--159
 []\OT1/cmr/m/n/10.95 Dave Shreiner, Ma-son Woo, Jackie Nei-der, and Tom Davis. 
  \OT1/cmr/m/it/10.95 OpenGL
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 148--152
+Underfull \hbox (badness 10000) in paragraph at lines 155--159
 \OT1/cmr/m/it/10.95 Pro-gram-ming Guide: The Of-fi-cial Guide to Learn-ing Open
 GL\OT1/cmr/m/n/10.95 .
  []
 
-[61]) [62] (./thesis.aux)
+[71]) [72] (./thesis.aux)
 
 LaTeX Warning: There were undefined references.
 
@@ -768,13 +796,13 @@ LaTeX Warning: There were multiply-defined labels.
 
  ) 
 Here is how much of TeX's memory you used:
- 7552 strings out of 95086
- 108876 string characters out of 1183256
- 174981 words of memory out of 1500000
- 10256 multiletter control sequences out of 10000+50000
+ 7623 strings out of 95086
+ 109711 string characters out of 1183256
+ 176980 words of memory out of 1500000
+ 10283 multiletter control sequences out of 10000+50000
  19746 words of font info for 73 fonts, out of 1200000 for 2000
  28 hyphenation exceptions out of 8191
- 43i,20n,43p,546b,423s stack positions out of 5000i,500n,6000p,200000b,5000s
+ 43i,20n,43p,543b,423s stack positions out of 5000i,500n,6000p,200000b,5000s
  </home/martin/.texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.600pk></usr/sh
 are/texmf-texlive/fonts/type1/bluesky/cm/cmbx10.pfb></usr/share/texmf-texlive/f
 onts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/
@@ -792,9 +820,9 @@ hare/texmf-texlive/fonts/type1/bluesky/cm/cmsy8.pfb></usr/share/texmf-texlive/f
 onts/type1/bluesky/cm/cmti10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/
 cm/cmti12.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmtt10.pfb></usr
 /share/texmf-texlive/fonts/type1/bluesky/ams/msbm10.pfb>
-Output written on thesis.pdf (63 pages, 3031486 bytes).
+Output written on thesis.pdf (73 pages, 3085398 bytes).
 PDF statistics:
- 1088 PDF objects out of 1200 (max. 8388607)
- 309 named destinations out of 1000 (max. 131072)
- 557 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 1214 PDF objects out of 1440 (max. 8388607)
+ 353 named destinations out of 1000 (max. 131072)
+ 581 words of extra memory for PDF output out of 10000 (max. 10000000)
 
