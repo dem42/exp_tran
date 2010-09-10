@@ -1907,7 +1907,7 @@ Since either of these criteria could occur in a single anomalous step,
 restarts of the downhill algorithm are also sometimes utilized \cite{Press1992}. 
 
 
-\chapter{Design and Implementation}\label{design}
+\chapter{Design}\label{design}
 In this chapter we will design an application which understands the facial
 dynamics captured in a video recording of an individual. This understanding is
 accomplished by correctly modelling the shape of an individual's face.
@@ -2492,7 +2492,7 @@ on either of the identity and expression attributes. The expressive power of thi
 variance of the faces in the database from which the new faces are generated as linear
 combinations. 
 
-\section{Fitting Algorithm}
+\section{Model Parameter Estimation}
 Once the face model is constructed, the objective becomes to correctly adjust the
 parameters that control this model in order to match a face in an
 image. The fitting algorithm must also allow the face in the image to be scaled,
@@ -3398,12 +3398,14 @@ these constraints the model losses expressive power. However, it is
 impossible to generate an unrealistic face when they are satisfied, which
 warrants enforcing the non-negativity constraints.
 
-\subsection{Algorithm}
-Before the complete fitting algorithm can be established two things need to be
-addressed. First of all the coordinate descent algoritm discussed sofar was
+\subsection{Fitting Algorithm}
+Before the complete fitting algorithm can be established two problems need to be
+addressed. 
+
+\paragraph{Multi-Frame Coordinate Descent.} First of all the coordinate descent algoritm discussed sofar was
 designed to optimize the parameters for just one frame. The fitting algorithm
 should however find the identity and the expressions of a person by examining a
-sequence of frames. The identity parameters should
+sequence of frames. As an additional constraint, the identity parameters should
 stay the same in all frames since the identity of the person in the video
 sequence should not change. In the multi-frame coordinate descent algorithm we therefore find the expression
 parameters for every frame using a guess for the identity parameters. Then we
@@ -3411,20 +3413,211 @@ use all the feature points and the estimated expression parameter vectors from a
 to solve for the identity parameters. This process can then be iteratively
 repeated until convergence.
 
-For the algorithm to estimate a reasonable approximation to the face in the
-video, it is necessary to use a large number of feature points. The user cannot
-be expected to enter that many points. It is therefore necessary to generate
-a large number of new points to use in addition to the feature points specified
+\paragraph{Feature point generation.} The second problem concerns the feature points. To estimate a reasonable approximation of the expression in the
+video sequence, it is necessary to use a large number of feature points. The user cannot
+be expected to enter that many points. The algorithm must therefore be able to generate
+a number of new points to use in addition to the feature points specified
 by the user. These points cannot be picked just randomly, they must correspond
 to known points on the model so that they can be used in the error
 function. 
 
-For the algorithm to be able to automatically establish the correspondence to a
-model point it needs to know the camera matrix, the 3D pose as well as the model
-parameters. The feature points also pr
-The fitting algorithm for the tensor-based shape model is summarized in the
-following steps. 
-\section{Texture Transfer}
+The task is thus to generate feature points which
+correspond to known points on the model. This can be done by either selecting
+new 3D points on the model and projecting them to generate the new feature
+points in the image, or
+inversly by selecting points in the 2D image and reprojecting them into 3D. When
+points are projected from the model the correspondence is already given. When
+they are reprojected from the image into 3D then the corresponding 3D point to the 2D image
+is chosen to be the 3D point on the model which is closest
+in terms of Euclidean distance to the reprojected point.
+
+To establish the correspondence in this manner the camera matrix and the 3D pose
+need to be
+known. These define the projection from object coordinate space into image
+space. This projection can be inversed to give the reprojection from image space into
+object coordinate space. Likewise, it is necessary to know the shape of the face in 3D space. This
+shape is generated using the expression and identity parameters. So to be able
+to generate new points with known correspondences we require all the unknwon parameters
+we are attempting to find. This is clearly a problem. The best approach is to find the 3D pose and model parameters of the
+first frame by means of optimization using only the small number of user provided
+feature points. These rough estimations of the parameters can then be used to
+generate more points with known correspondences which are then tracked using
+optical flow and used in the error functions of the following frames. Finding
+these parameter estimates for the first frame is known as \textit{first frame
+  alignment}.
+
+This first frame alignment approach to generating new feature points raises an important question. An estimate of the model
+parameters and 3D pose is used to generate most of the points. These are later on
+utilized to minimize the error. Thus, it is clear that with each and every newly
+generated point we are influencing our result. The error for every point that was generated
+using the estimates is of course minimized exactly when the parameters
+assume the values of the model and 3D pose parameter estimates. Fortunately,
+the fitting algorithm utilizes information obtained from the movement of these tracked
+points not from their static position. Therefore, if the reprojected point is at least
+close enough to the true model point, then this reprojected point still supports
+the correct model parameters even if though it does not correspond to the true
+3D model point. For the reprojection to be close enough it is necessary to have
+a good estimate of the rotation matrix and the translation vector. This is
+because the rotation and translation account for most of the movement of points in 3D. The variation
+due to the model parameters is small in comparison.
+
+
+\paragraph{Expression Transfer Fitting Algorithm. } \label{s:fit}Given are $N$ image feature points $f_1, \ldots ,f_N$, the
+calibrated weak perspective camera matrix $\mathbf{P}_w$ and the regularization
+parameter $\lambda$. To fit the
+tensor-based shape model to these point the paramters $\mathbf{w}_{id}$,
+$\mathbf{w}_{exp}$, $\mathbf{R}$ and $\mathbf{t}$ are located as follows
+\begin{itemize}
+\item \textbf{Step 1.} Calculate the first frame alignment using the single
+  frame coordinate descent algorithm \ref{a:coorddesc} optimizing with
+  regularization for the $N$ feature
+  points $f_1, \ldots ,f_N$ to obtain initial estimates of $\mathbf{w}_{id}$,
+$\mathbf{w}_{exp}$, $\mathbf{R}$ and $\mathbf{t}$.
+\item \textbf{Step 2.} Generate new $M$ points using the 3D pose and model
+  parameters. Do this by uniformly sampling points in the 2D image around important
+  feature like the mouth and the eyebrows to obtain new feature points $f_{N+1},
+  \ldots, f_{N+M}$. Then reproject these points into 3D to obtain 3D points $p_{N+1},
+  \ldots, p_{N+M}$ using 
+\begin{equation*}
+p_i = \mathbf{R}^T(\mathbf{P}_w^{-1}f_i - \mathbf{t})
+\end{equation*}
+utilizing the parameters obtained through first frame alignment. Finally
+establish correspondences to model points by finding the closest 3D model point
+$m_i$ to the point $p_i$ using Euclidean distance.
+\item \textbf{Step 3.} Track the $N+M$ point using the Kanade-Lucas feature
+  tracker (OpenCV function \texttt{calcOpticalFlowPyrLK()}), dropping lost points, to obtain $R_i \le N+M$ image feature
+  points in every $i$-th frame.
+\item \textbf{Step 4.} Perform the multi-frame coordinate descent algorithm by repeating
+\begin{itemize}
+\item[\textbullet] \textbf{Step 5.} Update the 3D pose estimates for every frame
+  using the POSIT algorithm (OpenCV function \texttt{solvePnP()}).
+\item[\textbullet] \textbf{Step 6.} Update the expression parameter vector
+  estimate for every frame using 
+\begin{equation*}
+\mathbf{w}_{exp} =z_{avg}(\mathbf{G}^T\mathbf{G} + \lambda\mathbf{I}_{exp})^{-1}\mathbf{G}^T\bigl(\mathbf{f} -
+\frac{1}{z_{avg}}\mathbf{P}_w\mathbf{t}\bigr) + \lambda z_{avg}\mathbf{\bar{w}}_{exp}
+\end{equation*}
+with 
+\begin{equation*}
+\mathbf{G}_i =
+\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}(\mathbf{U}_{id}^T\mathbf{w}_{id}
+\otimes \mathbf{I}_{I_{exp}})\mathbf{U}_{exp}
+\end{equation*}
+\item[\textbullet] \textbf{Step 7.} Collect the feature points from all frame
+  and update the identity parameter vector using 
+\begin{equation*}
+\mathbf{w}_{id} =z_{avg}(\mathbf{H}^T\mathbf{H} + \lambda\mathbf{I}_{id})^{-1}\mathbf{H}^T\bigl(\mathbf{f}
+- \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{t}\bigr) + \lambda z_{avg}\mathbf{\bar{w}}_{id}
+\end{equation*}
+with
+\begin{equation*}
+\mathbf{H}_i = \mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}(\mathbf{I}_{I_{id}}
+\otimes \mathbf{U}_{exp}^T\mathbf{w}_{exp})\mathbf{U}_{id}
+\end{equation*}
+\end{itemize}
+\item \textbf{Step 8.} Until convergence 
+\end{itemize}
+The above algorithm enforces realistic faces using
+regularization. To use constrained optimization instead, it is only necessary to
+change the update steps 6. and 7. so that the parameter vectors are updated using
+the the Sequential Coordinate-wise Non-negativity Least Squares Algorithm given
+in \ref{a:sca}.
+
+\section{Expression Transfer}
+Ideally, the expression transfer application should be able to seamlessly change
+the expressions of the individual in the target video with the expressions from
+the source video. This of course involves correctly generating the texture for
+the respective expressions. Since the tensor model we have constructed is a
+shape model and not an appearance model, it cannot be used to directly generate
+the correct texture. The shape model does however provide the application with an
+understanding of the source and target face. This understanding can be utilized
+to transfer the texture between the target subject in the 2D frames of the
+video.
+
+The simplest way of transfering the texture between the two
+video sequences is to create a texture map of the target face and then map
+the texture onto the estimated 3D model of this face. The application can
+construct the texture map after all the model and pose parameters have been
+estimated by projecting all the model points into the image to obtain their
+image coordiantes. The RGB values at these image coordinates make up the texture
+map's contents and the image coordinates themselves can be used as the texture
+coordiantes. Usually, this texture itself is captured from the first frame of the
+target video sequence. If the subject has a neutral expression in the first frame and a smiling expression is
+transferred onto him, then this will cause the original texture to contract and
+stretch to fit the new configuartion of model points. It is clear that this
+approach alone cannot produce very realistic results. 
+
+We can however utilize the information available about the target and source
+face shape to generate more realistic results. If the exact measurements of the
+source subject's smile and the size of the target's mouth are known then the texture
+of the source smile can be transferred into the target frame and blended with its
+surroundings. This blending has to be seamless and the result must appear believable. 
+
+\paragraph{Poisson Cloning.} Realistic blending of images can be achieved using
+poisson image editing techniques. The poisson cloning method, described by Perez
+et al in \cite{perez}, and Leyvand \cite{poisson} allows for seamless cloning of
+regions between images.
+The method is based on the two observations. Firstly, it is known to
+psychologists \cite{perez} that second-order variations, rather than
+slow gradients of intensity, are most important perceptually. Secondly, a scalar
+function is uniquely defined by its Laplacian and the values at its
+boundary. Since the Laplacian of an image filters everything but the second
+order variations in intensity, we blend a region $\Omega$ of a target image $g$ into a
+target image $f^*$ seamlessly
+by finding the Laplacian $\Delta g$ over this region and solving an optimization
+problem to obtain the seamlessly cloned interior $f$. The minimization is
+performed over the region $\Omega$ constrained so that values at the region boundary
+($\partial \Omega$) match. The optimization problem is therefore 
+\begin{equation}
+\mathop{min}_f \iint_{\Omega} \vert \nabla f  - \nabla g \vert^2 \quad \mathrm{with} \quad
+f\vert_{\partial \Omega} = f^*\vert_{\partial \Omega}
+\end{equation}
+The solution of this problem is given by the equation
+\begin{equation}
+\Delta f = \Delta g \; \mathrm{over} \; \Omega \quad \mathrm{with} \quad
+f\vert_{\partial \Omega} = f^*\vert_{\partial \Omega}
+\end{equation}
+This equation reduces to a sparse linear system of equations where the unknowns are the
+pixels values inside the region. It can be solved using a sparse linear equation
+solver.
+
+The result of cloning two regions using possion image editing is shown in figure \ref{fg:poisson}
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.55]{images/cloning.png}
+\par\end{centering}
+
+\caption{The seamless blending of regions into a target image using poisson
+  image editing.}
+\label{fg:poisson}
+
+\end{figure}
+
+Having established how faces will be reanimated using textures, we can now
+summarize the expression transfer algorithm:
+\begin{itemize}
+\item \textbf{Step 1.} Apply the fitting algortihm to the \textbf{source} video sequence
+  to obtain the identity, expression model parameters and the 3D pose parameters
+  for every frame.
+\item \textbf{Step 2.} Apply the fitting algortihm to the \textbf{target} video sequence
+  to obtain the identity, expression model parameters and the 3D pose
+  parameters for every frame.
+\item \textbf{Step 3.} Compute a sequence of 3D faces using the identity
+  parameters along with the 3D pose from the target and the expression parameter
+  from the source. Each face in the sequence will share the identity parameter
+  but will have different values for the expression and 3D pose
+  parameters. These are the faces with transferred expressions.
+\item \textbf{Step 4.} For each frame.
+\begin{itemize}
+\item[\textbullet] Use the geometry and topology of the \textbf{source face} obtained in step 1 to
+  find the mouth and the eyebrows.
+\item[\textbullet] Use the geometry and topology of the \textbf{target face} obtained in step 2 to
+  find the mouth and the eyebrows.
+\item[\textbullet] Poisson clone the mouth and the eyebrows from the source texture into
+  the target texture using the size of the target mouth and eyebrows as the
+  region size.
+\end{itemize}
+\end{itemize}
 
 \section{System Architecture}
 The system architecture of the expression transfer application follows a
@@ -3455,10 +3648,10 @@ window and the GUI.
 
 \paragraph{OpenGL widget}
 The expression transfer application needs to allow the user to view the
-estimated 3D model or view faces from the database. The GUI is build with Qt
+estimated 3D model or to view the 3D face scans from the database. The GUI is build with Qt
 which supports OpenGL and provides a widget class \texttt{QGLWidget}. This
 widget class integrates with the OpenGL graphics interface and includes a canvas
-onto which objects can be rendered. This class implements three functions with
+onto which objects can be rendered. The class implements three functions with
 protected visibility which
 can be overwritten in any class inheriting from \texttt{QGLWidget}. These
 functions are \texttt{initializeGL()}, \texttt{resizeGL()} and
@@ -3477,18 +3670,149 @@ image.
 The expression transfer application's view layer includes the class
 \texttt{FaceWidget} which extends the \texttt{QGLWidget}. The \texttt{FaceWidget
 } class overwrites the rendering functions of \texttt{QGLWidget} to allow for a
-3d face scan to be displayed.
+3D face scan to be displayed. The class also intercepts mouse events so that the
+object on the canvas can be rotated or enlarged.
 
-The \texttt{FaceWidget} also provides methods to set a face and to set the 3D
-pose parameters of a face. It also supports loading a face object from a file.
+Inheriting from \texttt{FaceWidget}, the class \texttt{CustomizableFaceWidget}
+makes it possible to load a custom projection matrix into OpenGL.
+
 \paragraph{Interactive Image Hierarchy}
+In a Qt based user interface images are displayed using the \texttt{QLabel} class. Since the
+face transfer application needs to allow the user to select points on the image
+it is necessary to extend this base class. The main subclass which stores and
+displays clicked points is \texttt{ClickableQLabel}. This class is extended by
+\texttt{FeaturePointQLabel} which maps clicked points to corresponding 3D
+feature points and \texttt{VectorFieldQLabel} which is used to display an
+optical flow vector field.
 
 \paragraph{Main Window}
-
+The GUI is itself is encapsulated in a main widnow. In the expression transfer application the
+main window's functionality is implemented in the class
+\texttt{ExpTranWindow}. This class is responsible for all the GUI objects such
+as labels, OpenGL widgets and buttons. To has a reference to the controller
+layer and connects the signals emitted by the GUI objects to the appropriate
+controller objects.
 \paragraph{GUI}
+The graphical user interface is separated into three tabs. The face tab allows
+the user to view a 3D face model and change its expression and identity using
+sliders. The design for this tab is shown in figure \ref{fg:facetab}
+
+\begin{figure}[h]
+\begin{centering}
+\includegraphics[scale=0.35]{images/facetab.png}
+\par\end{centering}
+
+\caption{The face tab part of the GUI which allows the user to view and move the
+  3D face.}
+\label{fg:facetab}
+\end{figure}
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.35]{images/videotab.png}
+\par\end{centering}
+
+\caption{The video tab which provides model fitting and feature point tracking functionality.}
+\label{fg:videotab}
+\end{figure}
+
+The face tab also includes an options group which allows the user to customize how
+the face is displayed. The menu bar of the window contains an a File and an
+Options drop down menu. Using the file menu the user can load a .vtk file
+containing a face object or a video file to use in the video tab.
+
+The video tab processes the loaded video, providing functionality related to tracking points, extracting 3D
+pose and fitting the model to the video. The design of this tab is shown in
+figure \ref{fg:videotab} 
+
+
+This tab contains an \texttt{ClickableQLabel} which represents the current frame
+of the video. Feature points can be selected on this frame. The 
+OpenGL widget is used to display the model which is extracted from the image.
+
+The expression transfer functionality is provided in the transfer tab. This tab allows the user to load a
+source and a target video files needed for the expression transfer.
 
 \subsection{Model Layer}
+The model layer contains classes that participate in constructing and fitting
+the tensor based model. A diagram of the class hierarchy in this layer is
+depicted in figure \ref{fg:modellayer}
+
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.67]{images/modellayer.png}
+\par\end{centering}
+
+\caption{UML class diagram of the model layer.}
+\label{fg:modellayer}
+\end{figure}
+
+The model layer can be divided based on responsibility into two parts. The first
+part is composed of the classes which are used to construct the tensor
+model and generate new faces. The second part of the model layer is responsible for fitting the model
+to an image.
+
+\paragraph{Model Construction}
+The model construction algorithm is encapsulated in the persistable \texttt{FaceModel}
+class. Persitence means the tensor model needs to be computed only once. After
+the initial computation the the class persists the identity mode
+matrix, the expression mode matrix and the flattened multilinear model matrix in
+a file. When the application is started it will look for this file and if found
+it will load these matrices without having to recompute them. 
+
+The \texttt{FaceModel} class follows the singleton design pattern and stores a static instance of a
+\texttt{FaceModel} object. It also provides a function to obtain a reference to
+this static instance. The class hides its constructor so the only instance of the
+class at runtime will be the one static instance. The use of the singleton
+pattern makes the code more effective since the mode and model matrices are
+quite large and it would require a considerable amount of memory to have more than just one
+instance of the \texttt{FaceModel} class at any time.
+
+The tensor model also provides a function to generate new faces given a identity
+and expression parameter vector. 
+
+The faces themselves are made up of a number of vertices and the identity and
+expression parameters. The application represents a face object using the
+\texttt{Face} class.
+\paragraph{Model Fitting}
+The model fitting algorithm discussed in paragraph \ref{s:fit} is implemented in
+the class \texttt{VideoProcessor}. To prevent blocking of the application during the
+computation of the fitting algortihm, the class extends \texttt{QThread} so that
+each processing of a video can be started in a separate thread.
+
+A \texttt{VideoProcessor} object communicates with an \texttt{Optimizer} object,
+a \texttt{PoseEstimator} object and a \texttt{OpticalFlowEngine} object. The
+\texttt{Optimizer} provides an interface for model parameter estimation. This
+interface is implemented in a number of subclasses each of which applies a
+different optimization method to find the parameters. The \texttt{PoseEstimator}
+class reprojects points into 3D and calculates the 3D using the OpenCV
+implementation of the POSIT algorithm. The \texttt{OpticalFlowEngine} is an
+interface to a feature tracker algorithm. By default, the engine uses the OpenCV
+Kanade-Lucas feature tracker.
+
+The communication between the classes during an invocation of the
+\texttt{VideoProcessor} thread is shown in figure \ref{fg:videoproc}
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.71]{images/videoproc.png}
+\par\end{centering}
+
+\caption{The sequence diagram showing an invocation of the
+  \texttt{VideoProcerssor} thread.}
+\label{fg:videoproc}
+\end{figure}
+
 \subsection{Controller Layer}
+The classes in the controller layer intercept signals and events from GUI,
+process these requests and return the result to the view layer. There are three
+controller classes -- one for each tab in the user interface. The
+\texttt{FaceTabController} reacts to movements of the sliders by calling the
+face generation functions from \texttt{FaceModel} and then updating the OpenGL
+widget. The \texttt{VideoTabController} starts \texttt{VideoProcessor} threads
+or computes the optical flow again using the appropriate classes from the model
+layer. Finally, the \texttt{TransferTabController} 
 
 
 \chapter{Results and Evaluation}
