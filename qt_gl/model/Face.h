@@ -16,7 +16,7 @@ class Face
   void load(string filename, const char *tex_map_filename);
   Color3 interpolate_color(Color3 a,Color3 b,Color3 c,Color3 d,float r,float s);
 
-  void interpolate(double *w_id,double *w_exp,bool brute_exp=false, bool brute_id=false);
+  void setNewIdentityAndExpression(double *w_id,double *w_exp);
 
   void transferExpressionFromFace(Face *src_face);
 
@@ -55,7 +55,7 @@ class Face
   static const int fPolygons[18];
   static const int fPoints_size;
 
-  static const int mouth[43];
+  static const int mouth[39];
   static const int mouth_size;
 
 private:

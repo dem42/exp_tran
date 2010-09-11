@@ -177,7 +177,9 @@ void VideoTabController::calcIntrinsicParams()
     cout << "CALIBRATED : " << endl;
     MatConstIterator_<double> it = cameraMatrix.begin<double>(), it_end = cameraMatrix.end<double>();
     for(; it != it_end; ++it)
+    {
         cout << *it << " ";
+    }
     cout << endl;
     cout << "distortions: " << endl;
     it = distCoeffs.begin<double>();
@@ -348,7 +350,7 @@ void VideoTabController::startFaceTransfer()
     w_exp[4] = 1.0;
     w_exp[5] = 0.0;
     w_exp[6] = 0.0;
-    face_guess->interpolate(w_id,w_exp);
+    face_guess->setNewIdentityAndExpression(w_id,w_exp);
     vector<int> indices(Face::fPoints,Face::fPoints+Face::fPoints_size);
     poseEstimator->calculateTransformation(marked,face_guess,cameraMatrix,lensDist,indices,rvec,tvec,false);
 

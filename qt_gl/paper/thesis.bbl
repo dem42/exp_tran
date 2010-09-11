@@ -65,7 +65,7 @@ Paul~L. Fackler.
 
 \bibitem{ifemcolorado}
 Carlos Felippa.
-\newblock Introduction to finite element methods.
+\newblock Introduction to finite element methods: Appendix d.
 \newblock Department of Aerospace Engineering Sciences, University of Colorado
   at Boulder, 2010.
 \newblock http://www.colorado.edu/engineering/cas/courses.d/IFEM.d/.
@@ -95,6 +95,12 @@ Gene~H. Golub and Charles F.~Van Loan.
 L.~De Lathauwer.
 \newblock {\em Signal Processing based on Multilinear Algebra}.
 \newblock {Phd} dissertation, Katholieke Universitiet Leuven, Belgium, 1997.
+
+\bibitem{poisson}
+Tommer Leyvand.
+\newblock Advanced topics in computer graphics: Poisson image editing.
+\newblock Blavatnik School of Computer Science, Tel Avid University.
+\newblock http://leyvand.com/research/adv-graphics/ex1.htm.
 
 \bibitem{kanade}
 Bruce~D. Lucas and Takeo Kanade.
@@ -126,6 +132,11 @@ Alex Pentland and Stan Sclaroff.
   recognition.
 \newblock {\em IEEE Transactions on Pattern Analysis and Machine Intelligence},
   13(7):715--726, 1991.
+
+\bibitem{perez}
+P.~Perez, M.~Ganget, and A.~Blake.
+\newblock Poisson image editing.
+\newblock {\em ACM Transactions on Graphics}, 22(3):313--318, July.
 
 \bibitem{Press1992}
 W.H. Press, S.A. Teukolsky, W.T. Vetterlin, and B.P. Flannery.

@@ -139,7 +139,7 @@ void FaceModel::initializeDbStrings()
 
 
 //@param brute .. whether we interpolate using U2 and U3 or just the weights right away
-void FaceModel::interpolate_expression(Point3 *face,double *w_id,double *w_ex,bool brute_exp, bool brute_id)
+void FaceModel::generateFace(Point3 *face,double *w_id,double *w_ex,bool brute_exp, bool brute_id)
 {
     Matrix m_wid(1,n_f);
     Matrix m_wex(1,n_e);

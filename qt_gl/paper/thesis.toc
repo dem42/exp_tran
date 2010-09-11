@@ -42,7 +42,7 @@
 \contentsline {subsection}{\numberline {2.4.1}Least Squares and Non Negative Least Squares}{35}{subsection.2.4.1}
 \contentsline {subsection}{\numberline {2.4.2}Nelder Mead Downhill Simplex}{36}{subsection.2.4.2}
 \contentsline {subsubsection}{\numberline {2.4.2.1}The Downhill Simplex Algorithm}{37}{subsubsection.2.4.2.1}
-\contentsline {chapter}{\numberline {3}Design and Implementation}{40}{chapter.3}
+\contentsline {chapter}{\numberline {3}Design}{40}{chapter.3}
 \contentsline {section}{\numberline {3.1}Design Challenges}{41}{section.3.1}
 \contentsline {section}{\numberline {3.2}Frameworks and APIs}{42}{section.3.2}
 \contentsline {subsection}{\numberline {3.2.1}OpenCV}{42}{subsection.3.2.1}
@@ -55,7 +55,7 @@
 \contentsline {subsection}{\numberline {3.4.1}Data Tensor}{45}{subsection.3.4.1}
 \contentsline {subsection}{\numberline {3.4.2}Computing the HOSVD !! NEW}{46}{subsection.3.4.2}
 \contentsline {subsection}{\numberline {3.4.3}Generating new faces}{49}{subsection.3.4.3}
-\contentsline {section}{\numberline {3.5}Fitting Algorithm}{50}{section.3.5}
+\contentsline {section}{\numberline {3.5}Model Parameter Estimation}{50}{section.3.5}
 \contentsline {subsection}{\numberline {3.5.1}Locating Feature Points}{51}{subsection.3.5.1}
 \contentsline {subsection}{\numberline {3.5.2}Tracking Feature Points}{52}{subsection.3.5.2}
 \contentsline {subsection}{\numberline {3.5.3}Camera Parameters}{53}{subsection.3.5.3}
@@ -65,15 +65,27 @@
 \contentsline {subsection}{\numberline {3.5.5}Overfitting}{62}{subsection.3.5.5}
 \contentsline {paragraph}{Regularization.}{63}{section*.17}
 \contentsline {paragraph}{Constrained Optimization.}{64}{section*.18}
-\contentsline {subsection}{\numberline {3.5.6}Algorithm}{65}{subsection.3.5.6}
-\contentsline {section}{\numberline {3.6}Texture Transfer}{66}{section.3.6}
-\contentsline {section}{\numberline {3.7}System Architecture}{66}{section.3.7}
-\contentsline {subsection}{\numberline {3.7.1}View Layer}{66}{subsection.3.7.1}
-\contentsline {paragraph}{OpenGL widget}{66}{section*.19}
-\contentsline {paragraph}{Interactive Image Hierarchy}{67}{section*.20}
-\contentsline {paragraph}{Main Window}{67}{section*.21}
-\contentsline {paragraph}{GUI}{67}{section*.22}
-\contentsline {subsection}{\numberline {3.7.2}Model Layer}{67}{subsection.3.7.2}
-\contentsline {subsection}{\numberline {3.7.3}Controller Layer}{67}{subsection.3.7.3}
-\contentsline {chapter}{\numberline {4}Results and Evaluation}{68}{chapter.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{69}{chapter.5}
+\contentsline {subsection}{\numberline {3.5.6}Fitting Algorithm}{65}{subsection.3.5.6}
+\contentsline {paragraph}{Multi-Frame Coordinate Descent.}{65}{section*.19}
+\contentsline {paragraph}{Feature point generation.}{65}{section*.20}
+\contentsline {paragraph}{Expression Transfer Fitting Algorithm. }{66}{section*.21}
+\contentsline {section}{\numberline {3.6}Expression Transfer}{67}{section.3.6}
+\contentsline {paragraph}{Poisson Cloning.}{68}{section*.22}
+\contentsline {paragraph}{Expression transfer algorithm.}{69}{section*.23}
+\contentsline {section}{\numberline {3.7}System Architecture}{69}{section.3.7}
+\contentsline {subsection}{\numberline {3.7.1}View Layer}{70}{subsection.3.7.1}
+\contentsline {paragraph}{OpenGL widget}{70}{section*.24}
+\contentsline {paragraph}{Interactive Image Hierarchy}{70}{section*.25}
+\contentsline {paragraph}{Main Window}{70}{section*.26}
+\contentsline {paragraph}{GUI}{70}{section*.27}
+\contentsline {subsection}{\numberline {3.7.2}Model Layer}{72}{subsection.3.7.2}
+\contentsline {paragraph}{Model Construction}{72}{section*.28}
+\contentsline {paragraph}{Model Fitting}{73}{section*.29}
+\contentsline {subsection}{\numberline {3.7.3}Controller Layer}{74}{subsection.3.7.3}
+\contentsline {chapter}{\numberline {4}Results and Evaluation}{75}{chapter.4}
+\contentsline {section}{\numberline {4.1}Face Generation}{75}{section.4.1}
+\contentsline {section}{\numberline {4.2}Optical Flow Results}{77}{section.4.2}
+\contentsline {section}{\numberline {4.3}Optimization Results}{77}{section.4.3}
+\contentsline {section}{\numberline {4.4}Expression Transfer Results}{77}{section.4.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{78}{chapter.5}
+\contentsline {section}{\numberline {5.1}Future Work}{78}{section.5.1}

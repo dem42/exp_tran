@@ -93,7 +93,7 @@ void VideoProcessor::getFaceForFrame(unsigned int frameIndex, Face *face_ptr) co
         w_exp[i] = vector_weights_exp[frameIndex][i];
     }
 
-    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
     face_ptr->setAverageDepth(avg);
 }
 
@@ -148,7 +148,7 @@ void VideoProcessor::processVideo2(const vector<cv::Point2f> &inputPoints, const
     w_exp[5] = 0.8;
     w_exp[6] = 0.0;
 
-    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
 
 
     /**********************/
@@ -309,7 +309,7 @@ void VideoProcessor::processVideo3(const vector<cv::Point2f> &inputPoints, const
     w_exp[5] = 0.8;
     w_exp[6] = 0.0;
 
-    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
 
 
     /**********************/
@@ -464,7 +464,7 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
     w_exp[5] = 0.8;
     w_exp[6] = 0.0;
 
-    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
 
 
     /**********************/

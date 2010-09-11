@@ -62,7 +62,7 @@ Face::Face()
 //    w_exp[4] = 1.0;
 //    w_exp[5] = 0.0;
 //    w_exp[6] = 0.0;
-    interpolate(w_id,w_exp);
+    setNewIdentityAndExpression(w_id,w_exp);
 }
 
 Face::~Face()
@@ -87,11 +87,16 @@ const int Face::fPolygons[18] = {9521,8899,310,7455,1386,8934,8945,6284,/*7140,*
 const int Face::fPoints_size = 18;
 
 
-const int Face::mouth[43] = {975,769,768,561,352,558,349,141,142,9569,9572,9361,9360,9149,9152,8940,
+const int Face::mouth[39] = /*{975,769,768,561,352,558,349,141,142,9569,9572,9361,9360,9149,9152,8940,
                              8939,8726,8729,8514,8302,8515,8301,8087,8090,7877,7878,7669,7458,
                              7668,8088,8299,8517,8728,8942,9363,9151,9571,144,351,560,
-                             8941,8731};
-const int Face::mouth_size = 43;
+                             8941,8731,}*/
+{
+                             9145,556,7667,8510,
+                             9148,350,764,765,137,9356,8297,7876,7875,7455,8511,8936,8935,9357,
+                         8722,9565,8727,8085,8298,8300,7456,139,557,971,
+                     9568,8725,140,7666,138,142,8088,345,349,8299,347,767,975};
+const int Face::mouth_size = 39;
 
 double Face::getAverageDepth() const
 {
@@ -152,7 +157,7 @@ Color3 Face::interpolate_color(Color3 a,Color3 b,Color3 c,Color3 d,float r,float
 
 //standard interpolate where w_id and w_exp are multiplied with
 //the singular value matricies U2 and U3
-void Face::interpolate(double *w_id,double *w_exp,bool brute_exp,bool brute_id)
+void Face::setNewIdentityAndExpression(double *w_id,double *w_exp)
 {
 //    double sum = 0;
 //    for(int i=0;i<7;i++)
@@ -188,7 +193,7 @@ void Face::interpolate(double *w_id,double *w_exp,bool brute_exp,bool brute_id)
     for(int i=0;i<EXP;i++)
         this->w_exp[i] = w_exp[i];
 
-    model->interpolate_expression(vertexes,w_id,w_exp,brute_exp,brute_id);
+    model->generateFace(vertexes,w_id,w_exp,false,false);
     //now recalculate the vertex normals for the newly interpolated face
     generate_vertex_normals();
 }
@@ -511,5 +516,5 @@ void Face::transferExpressionFromFace(Face *src_face)
 
     src_face->getWeights(w_id_src,ID,w_exp_src,EXP);
 
-    interpolate(w_id,w_exp_src);
+    setNewIdentityAndExpression(w_id,w_exp_src);
 }

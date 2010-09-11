@@ -207,7 +207,7 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
     }
     cout << endl;
 
-    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
     face_ptr->setAverageDepth(average_depth);
 
     delete[] w_id;
@@ -353,7 +353,7 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
         weights_ex.push_back(w_exp[i]);
     }
 
-    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
     // unecessary it seems 
     face_ptr->setAverageDepth(average_depth);
 

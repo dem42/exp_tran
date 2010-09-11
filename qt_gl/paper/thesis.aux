@@ -212,10 +212,10 @@
 \citation{Press1992}
 \@writefile{lof}{\contentsline {figure}{\numberline {2.13}{\ignorespaces Geometric interpretations of the simplex transformations. Taken from \cite  {Nelder2009}}}{39}{figure.2.13}}
 \newlabel{fg:amoeba}{{2.13}{39}{Geometric interpretations of the simplex transformations. Taken from \cite {Nelder2009}\relax }{figure.2.13}{}}
-\@writefile{toc}{\contentsline {chapter}{\numberline {3}Design and Implementation}{40}{chapter.3}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {3}Design}{40}{chapter.3}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
-\newlabel{design}{{3}{40}{Design and Implementation\relax }{chapter.3}{}}
+\newlabel{design}{{3}{40}{Design\relax }{chapter.3}{}}
 \@writefile{toc}{\contentsline {section}{\numberline {3.1}Design Challenges}{41}{section.3.1}}
 \citation{opencv}
 \citation{opengl}
@@ -259,7 +259,7 @@
 \newlabel{eq:gen1}{{3.18}{49}{Generating new faces\relax }{equation.3.18}{}}
 \newlabel{eq:gen2}{{3.20}{49}{Generating new faces\relax }{equation.3.20}{}}
 \newlabel{eq:gen4}{{3.23}{50}{Generating new faces\relax }{equation.3.23}{}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.5}Fitting Algorithm}{50}{section.3.5}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.5}Model Parameter Estimation}{50}{section.3.5}}
 \citation{viola}
 \@writefile{toc}{\contentsline {subsection}{\numberline {3.5.1}Locating Feature Points}{51}{subsection.3.5.1}}
 \@writefile{lof}{\contentsline {figure}{\numberline {3.2}{\ignorespaces Three newly generated faces with twenty feature points (denoted by the red spheres). These feature points define the correspondence between the model and the image.}}{52}{figure.3.2}}
@@ -312,26 +312,62 @@
 \newlabel{eq:optprob}{{3.51}{64}{Constrained Optimization}{equation.3.51}{}}
 \newlabel{eq:nonneg1}{{3.54}{64}{Constrained Optimization}{equation.3.54}{}}
 \newlabel{eq:nonneg2}{{3.55}{64}{Constrained Optimization}{equation.3.55}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.6}Algorithm}{65}{subsection.3.5.6}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.6}Texture Transfer}{66}{section.3.6}}
-\@writefile{toc}{\contentsline {section}{\numberline {3.7}System Architecture}{66}{section.3.7}}
-\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces System architecture of the expression transfer application.}}{66}{figure.3.6}}
-\newlabel{fg:mvc}{{3.6}{66}{System architecture of the expression transfer application}{figure.3.6}{}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.1}View Layer}{66}{subsection.3.7.1}}
-\@writefile{toc}{\contentsline {paragraph}{OpenGL widget}{66}{section*.19}}
-\@writefile{toc}{\contentsline {paragraph}{Interactive Image Hierarchy}{67}{section*.20}}
-\@writefile{toc}{\contentsline {paragraph}{Main Window}{67}{section*.21}}
-\@writefile{toc}{\contentsline {paragraph}{GUI}{67}{section*.22}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.2}Model Layer}{67}{subsection.3.7.2}}
-\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.3}Controller Layer}{67}{subsection.3.7.3}}
-\@writefile{toc}{\contentsline {chapter}{\numberline {4}Results and Evaluation}{68}{chapter.4}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.5.6}Fitting Algorithm}{65}{subsection.3.5.6}}
+\@writefile{toc}{\contentsline {paragraph}{Multi-Frame Coordinate Descent.}{65}{section*.19}}
+\@writefile{toc}{\contentsline {paragraph}{Feature point generation.}{65}{section*.20}}
+\newlabel{s:fit}{{3.5.6}{66}{Expression Transfer Fitting Algorithm. \relax }{section*.21}{}}
+\@writefile{toc}{\contentsline {paragraph}{Expression Transfer Fitting Algorithm. }{66}{section*.21}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.6}Expression Transfer}{67}{section.3.6}}
+\citation{perez}
+\citation{poisson}
+\citation{perez}
+\@writefile{toc}{\contentsline {paragraph}{Poisson Cloning.}{68}{section*.22}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.6}{\ignorespaces The seamless blending of regions into a target image using poisson image editing.}}{68}{figure.3.6}}
+\newlabel{fg:poisson}{{3.6}{68}{The seamless blending of regions into a target image using poisson image editing}{figure.3.6}{}}
+\@writefile{toc}{\contentsline {paragraph}{Expression transfer algorithm.}{69}{section*.23}}
+\@writefile{toc}{\contentsline {section}{\numberline {3.7}System Architecture}{69}{section.3.7}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.7}{\ignorespaces System architecture of the expression transfer application.}}{69}{figure.3.7}}
+\newlabel{fg:mvc}{{3.7}{69}{System architecture of the expression transfer application}{figure.3.7}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.1}View Layer}{70}{subsection.3.7.1}}
+\@writefile{toc}{\contentsline {paragraph}{OpenGL widget}{70}{section*.24}}
+\@writefile{toc}{\contentsline {paragraph}{Interactive Image Hierarchy}{70}{section*.25}}
+\@writefile{toc}{\contentsline {paragraph}{Main Window}{70}{section*.26}}
+\@writefile{toc}{\contentsline {paragraph}{GUI}{70}{section*.27}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.8}{\ignorespaces The face tab part of the GUI which allows the user to view and move the 3D face.}}{71}{figure.3.8}}
+\newlabel{fg:facetab}{{3.8}{71}{The face tab part of the GUI which allows the user to view and move the 3D face}{figure.3.8}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.9}{\ignorespaces The video tab which provides model fitting and feature point tracking functionality.}}{71}{figure.3.9}}
+\newlabel{fg:videotab}{{3.9}{71}{The video tab which provides model fitting and feature point tracking functionality}{figure.3.9}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.2}Model Layer}{72}{subsection.3.7.2}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.10}{\ignorespaces UML class diagram of the model layer.}}{72}{figure.3.10}}
+\newlabel{fg:modellayer}{{3.10}{72}{UML class diagram of the model layer}{figure.3.10}{}}
+\@writefile{toc}{\contentsline {paragraph}{Model Construction}{72}{section*.28}}
+\@writefile{toc}{\contentsline {paragraph}{Model Fitting}{73}{section*.29}}
+\@writefile{lof}{\contentsline {figure}{\numberline {3.11}{\ignorespaces The sequence diagram showing an invocation of the \texttt  {VideoProcerssor} thread.}}{73}{figure.3.11}}
+\newlabel{fg:videoproc}{{3.11}{73}{The sequence diagram showing an invocation of the \texttt {VideoProcerssor} thread}{figure.3.11}{}}
+\@writefile{toc}{\contentsline {subsection}{\numberline {3.7.3}Controller Layer}{74}{subsection.3.7.3}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {4}Results and Evaluation}{75}{chapter.4}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {4.1}Face Generation}{75}{section.4.1}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.1}{\ignorespaces The graphic shows six expressions of the seven expressions present in the database. From left to right, top to bottom: neutral, surprise, sadness, fear, happiness and disgust.}}{75}{figure.4.1}}
+\newlabel{fg:facegen}{{4.1}{75}{The graphic shows six expressions of the seven expressions present in the database. From left to right, top to bottom: neutral, surprise, sadness, fear, happiness and disgust}{figure.4.1}{}}
+\newlabel{sfg:happyneg}{{4.2a}{76}{Subfigure 4 4.2a\relax }{subfigure.4.2.1}{}}
+\newlabel{sub@sfg:happyneg}{{(a)}{a}{Subfigure 4 4.2a\relax }{subfigure.4.2.1}{}}
+\newlabel{sfg:neghappy}{{4.2b}{76}{Subfigure 4 4.2b\relax }{subfigure.4.2.2}{}}
+\newlabel{sub@sfg:neghappy}{{(b)}{b}{Subfigure 4 4.2b\relax }{subfigure.4.2.2}{}}
+\newlabel{fg:faceaddsub}{{4.1}{76}{Face Generation\relax }{subfigure.4.2.2}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.2}{\ignorespaces New expressions are generated by moving the points in the direction of one of the vectors of the expression mode matrices. This movement is mathematically equivalent to taking a linear combination.}}{76}{figure.4.2}}
+\newlabel{fg:faceinter}{{4.1}{76}{Face Generation\relax }{subfigure.4.3.1}{}}
+\@writefile{lof}{\contentsline {figure}{\numberline {4.3}{\ignorespaces Generating new face through linear interpolation of the original faces.}}{76}{figure.4.3}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.2}Optical Flow Results}{77}{section.4.2}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.3}Optimization Results}{77}{section.4.3}}
+\@writefile{toc}{\contentsline {section}{\numberline {4.4}Expression Transfer Results}{77}{section.4.4}}
 \bibstyle{plain}
 \bibdata{references}
-\@writefile{toc}{\contentsline {chapter}{\numberline {5}Conclusion}{69}{chapter.5}}
+\@writefile{toc}{\contentsline {chapter}{\numberline {5}Conclusion}{78}{chapter.5}}
 \@writefile{lof}{\addvspace {10\p@ }}
 \@writefile{lot}{\addvspace {10\p@ }}
+\@writefile{toc}{\contentsline {section}{\numberline {5.1}Future Work}{78}{section.5.1}}
 \bibcite{FEMbook}{1}
 \bibcite{kanade3}{2}
 \bibcite{bishop}{3}
@@ -350,24 +386,26 @@
 \bibcite{graphics}{16}
 \bibcite{matrix}{17}
 \bibcite{multilinear}{18}
-\bibcite{kanade}{19}
-\bibcite{FEM1ter}{20}
-\bibcite{jacey}{21}
-\bibcite{sdm}{22}
-\bibcite{FEM1pen}{23}
-\bibcite{Press1992}{24}
-\bibcite{vienna}{25}
-\bibcite{ICP}{26}
-\bibcite{Nelder2009}{27}
-\bibcite{opengl}{28}
-\bibcite{kronecker}{29}
-\bibcite{deformTri}{30}
-\bibcite{kanade2}{31}
-\bibcite{eigenfaces91}{32}
-\bibcite{Ter1}{33}
-\bibcite{Ter3}{34}
-\bibcite{Ter2}{35}
-\bibcite{viola}{36}
-\bibcite{faceTransfer05}{37}
-\bibcite{binghamton}{38}
-\bibcite{zhang}{39}
+\bibcite{poisson}{19}
+\bibcite{kanade}{20}
+\bibcite{FEM1ter}{21}
+\bibcite{jacey}{22}
+\bibcite{sdm}{23}
+\bibcite{FEM1pen}{24}
+\bibcite{perez}{25}
+\bibcite{Press1992}{26}
+\bibcite{vienna}{27}
+\bibcite{ICP}{28}
+\bibcite{Nelder2009}{29}
+\bibcite{opengl}{30}
+\bibcite{kronecker}{31}
+\bibcite{deformTri}{32}
+\bibcite{kanade2}{33}
+\bibcite{eigenfaces91}{34}
+\bibcite{Ter1}{35}
+\bibcite{Ter3}{36}
+\bibcite{Ter2}{37}
+\bibcite{viola}{38}
+\bibcite{faceTransfer05}{39}
+\bibcite{binghamton}{40}
+\bibcite{zhang}{41}

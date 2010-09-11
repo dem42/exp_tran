@@ -12,12 +12,13 @@
 
 #include "model/Face.h"
 #include "view/customizablefacewidget.h"
+#include "view/exptranabstractview.h"
 
 class TransferTabController : public QObject
 {
     Q_OBJECT
 public:
-    TransferTabController(ClickableQLabel *sourceLabel,ClickableQLabel *targetLabel,
+    TransferTabController(ClickableQLabel *sourceLabel,ClickableQLabel *targetLabel, ExpTranAbstractView *view,
                           QLineEdit *srcText, QLineEdit *targetText, CustomizableFaceWidget *face_widget);
 
 public slots:
@@ -31,6 +32,7 @@ public slots:
 
     void replayFrame();
     void processingFinished();
+    void restart();
 
 private:
     void convertFrameIntoTexture(Mat &frame);    
@@ -45,6 +47,7 @@ private:
     ClickableQLabel *targetLabel;
     VideoProcessor *src_videoProcessor;
     VideoProcessor *target_videoProcessor;
+    ExpTranAbstractView *view;
 
     bool textureInterpolate;
 

@@ -29,7 +29,7 @@
 \BOOKMARK [2][-]{subsection.2.4.1}{Least Squares and Non Negative Least Squares}{section.2.4}
 \BOOKMARK [2][-]{subsection.2.4.2}{Nelder Mead Downhill Simplex}{section.2.4}
 \BOOKMARK [3][-]{subsubsection.2.4.2.1}{The Downhill Simplex Algorithm}{subsection.2.4.2}
-\BOOKMARK [0][-]{chapter.3}{Design and Implementation}{}
+\BOOKMARK [0][-]{chapter.3}{Design}{}
 \BOOKMARK [1][-]{section.3.1}{Design Challenges}{chapter.3}
 \BOOKMARK [1][-]{section.3.2}{Frameworks and APIs}{chapter.3}
 \BOOKMARK [2][-]{subsection.3.2.1}{OpenCV}{section.3.2}
@@ -42,17 +42,22 @@
 \BOOKMARK [2][-]{subsection.3.4.1}{Data Tensor}{section.3.4}
 \BOOKMARK [2][-]{subsection.3.4.2}{Computing the HOSVD !! NEW}{section.3.4}
 \BOOKMARK [2][-]{subsection.3.4.3}{Generating new faces}{section.3.4}
-\BOOKMARK [1][-]{section.3.5}{Fitting Algorithm}{chapter.3}
+\BOOKMARK [1][-]{section.3.5}{Model Parameter Estimation}{chapter.3}
 \BOOKMARK [2][-]{subsection.3.5.1}{Locating Feature Points}{section.3.5}
 \BOOKMARK [2][-]{subsection.3.5.2}{Tracking Feature Points}{section.3.5}
 \BOOKMARK [2][-]{subsection.3.5.3}{Camera Parameters}{section.3.5}
 \BOOKMARK [2][-]{subsection.3.5.4}{Minimizing the Error Function}{section.3.5}
 \BOOKMARK [2][-]{subsection.3.5.5}{Overfitting}{section.3.5}
-\BOOKMARK [2][-]{subsection.3.5.6}{Algorithm}{section.3.5}
-\BOOKMARK [1][-]{section.3.6}{Texture Transfer}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.5.6}{Fitting Algorithm}{section.3.5}
+\BOOKMARK [1][-]{section.3.6}{Expression Transfer}{chapter.3}
 \BOOKMARK [1][-]{section.3.7}{System Architecture}{chapter.3}
 \BOOKMARK [2][-]{subsection.3.7.1}{View Layer}{section.3.7}
 \BOOKMARK [2][-]{subsection.3.7.2}{Model Layer}{section.3.7}
 \BOOKMARK [2][-]{subsection.3.7.3}{Controller Layer}{section.3.7}
 \BOOKMARK [0][-]{chapter.4}{Results and Evaluation}{}
+\BOOKMARK [1][-]{section.4.1}{Face Generation}{chapter.4}
+\BOOKMARK [1][-]{section.4.2}{Optical Flow Results}{chapter.4}
+\BOOKMARK [1][-]{section.4.3}{Optimization Results}{chapter.4}
+\BOOKMARK [1][-]{section.4.4}{Expression Transfer Results}{chapter.4}
 \BOOKMARK [0][-]{chapter.5}{Conclusion}{}
+\BOOKMARK [1][-]{section.5.1}{Future Work}{chapter.5}

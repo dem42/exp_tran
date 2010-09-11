@@ -33,7 +33,7 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     v_controller = new VideoTabController("/home/martin/project/TrackedSmiles/S003-024.avi",
                                           picLabelV, flowLabelV, this, face_widget2);
 
-    ui.verticalLayoutWidget->setGeometry(10,10,650,650);
+    //ui.verticalLayoutWidget->setGeometry(10,10,650,650);
 
     sourceLabel = new FeaturePointQLabel();
     targetLabel = new FeaturePointQLabel();
@@ -43,13 +43,11 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     ui.targetLayout->addWidget(face_widget3);
 
     ui.transferTabProgressBar->setVisible(false);
-    t_controller = new TransferTabController(sourceLabel,targetLabel,ui.srcText,ui.targetTxt, face_widget3);
+    t_controller = new TransferTabController(sourceLabel,targetLabel,this, ui.srcText,ui.targetTxt, face_widget3);
 
     //tracking determines when value change signal is emitted
     //either after the user lets go (false) or as its being dragged (true)
     ui.expSlider->setTracking(true);
-    ui.expSlider->setSliderPosition(0.5*100);  
-
 
     //setup controllers
     f_controller = new FaceTabController(ui.expSlider,ui.identSlider,face_widget1);
@@ -96,6 +94,7 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(ui.dropS,SIGNAL(clicked()),t_controller,SLOT(dropSrc()));
     connect(ui.dropT,SIGNAL(clicked()),t_controller,SLOT(dropTarget()));
     connect(ui.startT,SIGNAL(clicked()),t_controller,SLOT(beginTransfer()));
+    connect(ui.restartTransferButton,SIGNAL(clicked()),t_controller,SLOT(restart()));
 }
 
 

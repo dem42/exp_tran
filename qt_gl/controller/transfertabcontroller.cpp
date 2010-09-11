@@ -2,9 +2,10 @@
 #include "utility.h"
 #include <QBitmap>
 
-TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, ClickableQLabel *targetLabel,
+TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, ClickableQLabel *targetLabel, ExpTranAbstractView *view,
                                              QLineEdit *srcText, QLineEdit *targetText,CustomizableFaceWidget *face_widget)
 {
+    this->view = view;
     this->targetLabel = targetLabel;
     this->sourceLabel = sourceLabel;
     this->srcText = srcText;
@@ -212,8 +213,8 @@ void TransferTabController::getClonedMouth(const Mat& img, unsigned int frame_in
    cout << "nums are " << hx << " " << ny << endl;
    Mat_<double> mask = Mat_<double>::zeros(img.size());
 
-   for(int i=ly-10;i<=hy+10;i++)
-       for(int j=lx-10;j<=hx+10;j++)
+   for(int i=ly;i<=hy;i++)
+       for(int j=lx;j<=hx;j++)
            mask(i,j) = 1.0;
 
    cout << " the shift is " << ta.x - pa.x << ta.y - pa.y << endl;
@@ -441,4 +442,15 @@ void TransferTabController::targetBrowse()
 void TransferTabController::srcBrowse()
 {
     srcDia->show();
+}
+
+void TransferTabController::restart()
+{
+    srcFrames.clear();
+    targetFrames.clear();
+    s_frameData.clear();
+    t_frameData.clear();
+    featurePoints.clear();
+    srcFileSelected(srcFile);
+    targetFileSelected(targetFile);
 }

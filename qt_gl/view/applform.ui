@@ -50,7 +50,7 @@
         <x>860</x>
         <y>10</y>
         <width>209</width>
-        <height>381</height>
+        <height>231</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_2">
@@ -174,33 +174,13 @@
          </property>
         </widget>
        </item>
-       <item>
-        <spacer name="verticalSpacer">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-       <item>
-        <widget class="QPushButton" name="renderButton">
-         <property name="text">
-          <string>Render</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
      <widget class="QGroupBox" name="optionsBox">
       <property name="geometry">
        <rect>
         <x>860</x>
-        <y>420</y>
+        <y>290</y>
         <width>251</width>
         <height>151</height>
        </rect>
@@ -294,6 +274,19 @@
         <bool>false</bool>
        </property>
       </widget>
+     </widget>
+     <widget class="QPushButton" name="renderButton">
+      <property name="geometry">
+       <rect>
+        <x>860</x>
+        <y>470</y>
+        <width>207</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>Render</string>
+      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="videoTab">
@@ -495,7 +488,7 @@
        <rect>
         <x>10</x>
         <y>560</y>
-        <width>854</width>
+        <width>731</width>
         <height>31</height>
        </rect>
       </property>
@@ -597,6 +590,19 @@
       </property>
       <property name="value">
        <number>24</number>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="restartTransferButton">
+      <property name="geometry">
+       <rect>
+        <x>800</x>
+        <y>560</y>
+        <width>90</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>restart</string>
       </property>
      </widget>
     </widget>

@@ -18,7 +18,7 @@ class FaceModel
                            const int first_dim, const int second_dim, Mode_space_t flag);
     void read_flat(double **a, int m, int n,
                            const int first_dim, const int second_dim, Mode_space_t flag);
-    void interpolate_expression(Point3 *face,double *w_id,double *w_ex,bool brute_exp=false, bool brute_id=false);
+    void generateFace(Point3 *face,double *w_id,double *w_ex,bool brute_exp=false, bool brute_id=false);
 
     Matrix getCoreTensor() const;
     Matrix getUIdentity() const;

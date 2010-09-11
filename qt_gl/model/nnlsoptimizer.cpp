@@ -180,7 +180,7 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
         weights_ex.push_back(w_exp[i]);
     }
 
-    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
     //unecessary it seems 
     face_ptr->setAverageDepth(average_depth);
 
@@ -516,7 +516,7 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
     }
     cout << endl;
 
-    face_ptr->interpolate(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
     cout << " avg depth after : " << face_ptr->getAverageDepth() << "avg depth before : " << average_depth << endl;
     face_ptr->setAverageDepth(average_depth);
 
