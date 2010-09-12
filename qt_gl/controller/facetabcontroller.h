@@ -25,7 +25,12 @@ public slots:
     void face_file_changed(const QString str);
     void render_action();
 
+    void id_inter_toggled(bool);
+    void exp_inter_toggled(bool);
+
 private:
+    Face::InterpolType getInterType();
+
     QSlider *exp_slider;
     QSlider *ident_slider;
     FaceWidget *face_widget;
@@ -36,6 +41,9 @@ private:
 
     int current_expr;
     int current_ident;
+
+    bool id_inter;
+    bool exp_inter;
 
     std::map<QString,ExprType> expr_map;
 };

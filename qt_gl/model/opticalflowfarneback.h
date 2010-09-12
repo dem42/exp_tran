@@ -11,9 +11,11 @@ class OpticalFlowFarneback : public OpticalFlowEngine
 {
 public:
     OpticalFlowFarneback();
+
+protected:
     void computeFlow(const cv::Mat& prevImg, const cv::Mat& nextImg,
                      const std::vector<cv::Point2f>& prevPoints, std::vector<cv::Point2f>& nextPoints,
-                     const std::vector<int> &curIndices, std::vector<int> &nextIndices);
+                     const std::vector<int> &curIndices, std::vector<int> &nextIndices,bool indicesOn);
 private:
     double pyrScale;
     int levels;

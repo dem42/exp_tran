@@ -4,7 +4,7 @@
 using namespace std;
 using namespace cv;
 
-ModelImageError::ModelImageError() : type(IDENTITY)
+ModelImageError::ModelImageError()
 {
     model = FaceModel::getInstance();
     core = model->getCoreTensor();
@@ -12,7 +12,7 @@ ModelImageError::ModelImageError() : type(IDENTITY)
     u_ex = model->getUExpression();
 }
 
-ModelImageError::ModelImageError(Mat P,Mat R,Mat t,ModelImageError::ErrorType type) : P(P), R(R), t(t), type(type)
+ModelImageError::ModelImageError(Mat P,Mat R,Mat t) : P(P), R(R), t(t)
 {    
     model = FaceModel::getInstance();
     core = model->getCoreTensor();
@@ -22,15 +22,10 @@ ModelImageError::ModelImageError(Mat P,Mat R,Mat t,ModelImageError::ErrorType ty
 
 void ModelImageError::setWeights(const vector<double>& w)
 {   
-    weights = w;
-    //if error type is identity then the parameter w here are the expression weights
-    //which will remain constant
-    if(type == IDENTITY)
-        linear_combination_exp = Matrix::matrix_mult(weights,u_ex);
-    else if(type == EXPRESSION)
-        linear_combination_id = Matrix::matrix_mult(weights,u_id);
-    else
-        cerr << "uknown error type" << endl;
+    weights.assign(w.begin(),w.end());
+
+    linear_combination_id = Matrix::matrix_mult(weights,u_id);
+
 }
 
 void ModelImageError::setPoints(const vector<Point2f> &p,const vector<int> &i)
@@ -74,10 +69,8 @@ double ModelImageError::operator()(vector<double>& x)
     }
 
     //here inside of operator() if error is identity then the parameter w is identity weights
-    if(type == IDENTITY)
-        linear_combination_id = Matrix::matrix_mult(Matrix(w),u_id);
-    else if(type == EXPRESSION)
-        linear_combination_exp = Matrix::matrix_mult(Matrix(w),u_ex);
+
+    linear_combination_exp = Matrix::matrix_mult(Matrix(w),u_ex);
 
     K = Matrix::kron(linear_combination_id,linear_combination_exp);
     K = K.t();

@@ -1,5 +1,6 @@
 #include "utility.h"
 #include "model/Matrix.h"
+#include "model/Face.h"
 #include <cmath>
 #include <iostream>
 #include <QPainter>
@@ -11,56 +12,11 @@ using namespace std;
 void Utility::filterForGradient(const Mat &img, Mat &dest)
 {
     Mat d1, d2;
-//    vector<Mat> vM;
-//    cv::split(img,vM);
-//
-//    for(int k=0;k<3;k++)
-//        for(int i=0;i<img.size().height-1;i++)
-//            for(int j=0;j<img.size().width-1;j++)
-//                vM[k].at<char>(i,j) = img.at<char>(i+1,j) - img.at<char>(i,j);
-//
-//    cv::merge(vM,dest);
 
-    cout << endl;
+    float kernel[3][3] = {{-3,0,3},{-10,0,10},{-3,0,3}};
+    Mat filter(3,3,CV_32FC1,kernel);
 
-    cv::Scharr(img,d1,-1,1,0);
-    cv::Scharr(img,d2,-1,0,1);
-    cv::Scharr(img,d1,-1,1,0);
-    cv::Scharr(img,d2,-1,0,1);
-    dest = d1 + d2;
-
-
-
-    Mat src_copy = Mat::zeros(img.rows,img.cols,CV_64FC3);
-    for(int i=0;i<src_copy.rows;i++)
-        for(int j=0;j<src_copy.cols;j++)
-        {
-            src_copy.at<double[3]>(i,j)[0] = (double)img.at<uchar[3]>(i,j)[0] / 255.0;
-            src_copy.at<double[3]>(i,j)[1] = (double)img.at<uchar[3]>(i,j)[1] / 255.0;
-            src_copy.at<double[3]>(i,j)[2] = (double)img.at<uchar[3]>(i,j)[2] / 255.0;
-        }
-
-//    cv::Laplacian(img,dest,-1);
-
-//    cv::Laplacian(img,dest,CV_8UC1);
-//
-//    cout << " XXX " << dest.channels() << endl;
-//    for(int i=0;i<10;i++)
-//        for(int j=0;j<10;j++)
-//        {
-//            cout << (int)(dest.at<uchar[3]>(i,j)[0]) << " " << (int)(dest.at<uchar[3]>(i,j)[1]) << " "
-//                << (int)(dest.at<uchar[3]>(i,j)[2]) << " VS ";
-//            for(int k=0;k<3;k++)
-//                cout << (int)(dest.data[i*dest.step + j*3 + k]) << " ";
-//         }
-
-//    float kernel[3][3] = {{-3,0,3},{-10,0,10},{-3,0,3}};
-//    Mat filter(3,3,CV_32FC1,kernel);
-//    cout << "aaaag " << filter.at<double>(1,2);
-//
-//    cv::filter2D(img,dest,CV_8UC1,filter);
-
-
+    cv::filter2D(img,dest,CV_8UC1,filter);
 }
 
 double static inline clamp(double f) {
@@ -222,17 +178,71 @@ void Utility::poissonClone(const Mat &src, const Mat &mask, Mat &target, int o_x
 
 void Utility::sampleGoodPoints(const vector<Point2f> &points, vector<Point2f> &sampledPoints)
 {
-    Utility::pointSampling(points[3],points[5],10,sampledPoints);
-    Utility::pointSampling(points[3],points[6],10,sampledPoints);
-    Utility::pointSampling(points[5],points[4],10,sampledPoints);
-    Utility::pointSampling(points[6],points[4],10,sampledPoints);
+    int lmci = Face::leftMouthCornerIndex;
+    int rmci = Face::rightMouthCornerIndex;
+    int tl = Face::topLipIndex;
+    int bl = Face::bottomLipIndex;
 
-    Utility::pointSampling(points[11],points[12],10,sampledPoints);
-    Utility::pointSampling(points[13],points[14],10,sampledPoints);
+    int lelc = Face::leftEyeBrow;
+    int lerc = lelc+1;
+    int relc = Face::rightEyeBrow;
+    int rerc = relc+1;
+
+    Utility::pointSampling(points[lmci],points[tl],10,sampledPoints);
+    Utility::pointSampling(points[lmci],points[bl],10,sampledPoints);
+    Utility::pointSampling(points[tl],points[rmci],10,sampledPoints);
+    Utility::pointSampling(points[bl],points[rmci],10,sampledPoints);
+
+    //Utility::pointSamplingNormal(points[tl],40,100,100,sampledPoints);
+
+    Utility::pointSampling(points[lelc],points[lerc],10,sampledPoints);
+    Utility::pointSampling(points[relc],points[rerc],10,sampledPoints);
 
     //Utility::pointSampling(points[17],points[18],10,sampledPoints);
     //Utility::pointSampling(points[17],points[19],10,sampledPoints);
 }
+
+static double random_0_1_unifrom(void)
+{
+    return double(rand()/double(RAND_MAX));
+}
+
+static double random_normal(void)
+{
+    double U1,U2,V1,V2;
+    double S = 2;
+    while(S>=1)
+    {
+        U1 = random_0_1_unifrom();
+        U2 = random_0_1_unifrom();
+        V1 = 2.0*U1 - 1.0;
+        V2 = 2.0*U2 - 1.0;
+        S = ::pow(V1,2) + pow(V2,2);
+    }
+    double X1 = V1*::sqrt((-2.0*::log(S))/S);
+    return X1;
+}
+
+void Utility::pointSamplingNormal(const Point2f&a, const int num, const double var1, const double var2,
+                                  vector<Point2f> &points)
+{
+    srand( (unsigned int)time(0) );
+
+    Point2f newPoint;
+    double n1,n2;
+    for(int i=0;i<num;i++)
+    {
+        n1 = random_normal();
+        n2 = random_normal();
+        newPoint.x = a.x + n1*::sqrt(var1);
+        newPoint.y = a.y + n2*::sqrt(var2);
+        points.push_back(newPoint);
+    }
+    cout << "testing sampling" << endl;
+    for(int i=0;i<points.size();i++)
+        cout << points[i].x << " " << points[i].y << endl;
+}
+
 
 void Utility::pointSampling(const Point2f& a, const Point2f& b, const int num,
                                    vector<Point2f> &points)

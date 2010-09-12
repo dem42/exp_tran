@@ -54,7 +54,7 @@
 \setcounter{secnumdepth}{3}
 \setcounter{tocdepth}{3}
 
-%pmatrix with verical bar
+%pmatrix with vertical bar
 \makeatletter
 \renewcommand*\env@matrix[1][*\c@MaxMatrixCols c]{%
   \hskip -\arraycolsep
@@ -129,7 +129,7 @@ allows the machine to understand what state the environment is in and it may
 then utilize this information using simple if-then rules.
 
 For humans, all of the aforementioned sub-problems seem simple. However, programming
-machines to do the same is quite difficult. Computers often do
+machines to perform these tasks has proven to be quite difficult. Computers often do
 possess better sensors than most humans and thus are readily able to obtain data
 from sensors. Yet, they are sorely lacking when it comes to locating objects
 in this sensory input and correctly assessing the properties and configuration
@@ -139,8 +139,7 @@ face or a tree should look like. Thus, the machine needs to have prior
 information about the objects it can expect. This prior information can be
 encoded in a \textit{model}. The model describes the structure of the object.
 This, in turn, allows the machine to explain aspects of its sensory input as the
-occurrence of that object. Finding objects by means of locating an instance of a
-model in the input is called \textit{model-based recognition}.
+an instance of this model.
 
 Certain objects may also change their shape or
 appearance. For example a face may transition from a closed eyed state to an
@@ -152,38 +151,53 @@ the scene. The challenge thus lies in constructing an appropriate \textit{deform
 model}. 
 
 Given a deformable model, the machine then has to process the sensor input and
-locate instances of the model by adjusting the model's parameters. This task is
-known as \textit{model-based object recognition}. The parameters of the model then allow the
-machine to interpret the scene. In addition to locating an instance of the model
-in one sensory input the machine should also be able to track its movement given a sequence of snapshots of
-the environment. In \textit{model-based tracking} an instance of the model is
-identified and tracked from snapshot to snapshot, in spite of deformations of shape
-and changes in position.
+locate instances of the model by adjusting the model parameters. This task is
+known as \textit{model-based recognition}. The parameters of the model allow the
+machine to interpret the scene. 
 
-We will describe convenient deformable shape
-and appearance models and effective algorithms for locating these models. For our
-sensory snapshots, we will focus exclusively on images. As we will be dealing
-with images we will investigate motion tracking and feature detection
-algorithms. These are necessary to obtain cues from our input image which allow
-us to first locate the model in the image and then track its movements through
-successive images.
+In addition to locating an instance of the model
+in a single sensory input the machine should also be able to track movement of
+this instance given a sequence of snapshots of
+the environment. The task of identifying and tracking an instance of a model from
+one sensory snapshot to another, in spite of deformations of shape
+and changes in position, is known as \textit{model-based tracking}.
+
+This paper will describe convenient deformable shape
+and appearance models and effective algorithms for locating these
+models. Sensory snapshots will be limited exclusively to images of the environment. As we will be dealing
+with images we will investigate motion tracking algorithms. These are necessary
+to follow optical cues in our input image which makes it possible to track the
+movements of the model through successive images.
 
 \section{Contributions}
 
 The area where deformable models are applicable is quite large. We will focus on one very interesting application of dynamical
 models and model extraction which is
 \textit{expression transfer}. The purpose of expression transfer is to capture
-the expressions and visemes -
-speech related mouth articulations - from a video recording of one individual and
+the expressions from a video recording of one individual and
 generate a video of another individual mimicking these
-expressions and visemes. The alternative to transferring these expressions would
+expressions. The alternative to transferring these expressions would
 be to construct a physical model of the face and simulate the observed
-expressions and visemes using the model. However, transferring the dynamics of a subjects face to that of another enables us to
-create very realistic animations without much intervention. On the other hand, it
-is quite difficult to generate realistic expressions by setting the appropriate
-parameters of a physical model simply because of the complexity of the physics
-behind the movement that is responsible for expressions.
+expressions from scratch by manipulating the parameters of the model. The
+advantage of transferring the dynamics of a subjects face to that of another is
+that it enables us to
+create very realistic animations without too much user intervention. 
 
+The paper describes the developement of an expression transfer application, which combines motion tracking and a deformable
+model to gain understanding of the face deformations present an the input video
+recording. 
+
+We make the following contributions
+\begin{itemize}
+\item Developed an expression transfer application complete with a graphical
+  user interface. 
+\item Formalized an algorithm for expression transfer using a deformable model
+  of face shapes (Section \ref{s:exptranalgo}).
+\item Derived a fitting algorithm for finding the deformable model
+  parameters from an image (Sections \ref{s:minerror} and \ref{s:fitalgo}).
+\item Elucidated a multilinear deformable model desgined for expression
+  transfer (Section \ref{s:hosvd}). 
+\end{itemize}
 
 \newpage
 
@@ -191,8 +205,8 @@ behind the movement that is responsible for expressions.
 Considerable amount of research has been done on using models to characterize a
 deformable object as well as on model-based object recognition and
 tracking. In this chapter we will present an overview of various modeling techniques. Likewise, we will discuss
-computer vision algorithms which will allow us to locate the features of
-interest in the image. These features then make it possible to fit an instance
+computer vision algorithms which will allow us to locate and track features of
+interest in the image. These features are necessary to fit an instance
 of the model to the image.
 
 \section{Deformable Models}
@@ -203,7 +217,7 @@ computer prior information about the possible variations. A deformable model
 describes the expected structure of a class of objects while at the same time allowing
 for variations from the expected structure. Thus, if a somewhat deformed
 instance of this class of objects is present in the image, the deformable model
-will be able to explain this is a deformation from the expected shape.
+will be able to explain this is as a deformation from the expected shape.
 
 The quality of a deformable model can be assessed based on two important
 characteristics. First, the model should be \textit{general} enough so that it
@@ -212,10 +226,10 @@ On the other hand, the computer should only to be able to find an instance of th
 model in its surroundings if and only if this object is present. The deformable model
 therefore has to be \textit{specific} so that it does not locate non-existent
 instances of a model in the input. Clearly, a model that is too general will inadvertently fit objects from a
-different class and vice versa a model that is too specific will not be able to
-explain all the variations of the object structure and thus fail to locate
-instances of the correct class. The optimal deformable model should balance these two
-attributes.
+different class and, vice versa, a model that is too specific will not be able to
+explain all the variations of the object structure and will thus fail to locate
+instances of the correct class. The optimal deformable model must balance
+generality and specificity.
 
 The variance in shape or appearance of a model may be due to combination of the following
 factors:
@@ -228,10 +242,11 @@ factors:
 \end{itemize}
 Some of these sources of variation may be explained away using standard machine
 vision techniques. Noisy input can be explained by means of Gaussian
-filtering. Other sources of variation such as those due to deformations of the
-object need to be represented by appropriate parameters of the model. The
-deformable model simulates the deformations based on the parameter values. The
-model thus needs to learn the mapping from parameters to deformations. The two
+filtering. However, other sources of variation such as those due to deformations of the
+object need to be represented by appropriate parameters of the model. This is
+where a deformable model becomes necessary. The
+deformable model simulates deformations based on the parameter values. Thus, to
+construct the model, the mapping from parameters to deformations must be learned. The two
 most prevalent approaches to discovering this mapping are using either \textit{physical
 models} or \textit{statistical models}.
 
@@ -240,31 +255,31 @@ of the class of object they model. The parameters of a physical model control th
 of actual physical deformation.
 
 Statistical deformable models are trained on a set of examples of a class of
-objects. Through statistical analysis a basis for the deformations observed in
-this set of examples is constructed. This basis then allows the model to predict
+objects. With this group of models, a basis for the deformations observed in
+this set of examples is constructed through statistical analysis. This basis then allows the model to predict
 probable instances of the objects of this class. 
 
 An important subgroup of statistical models are the \textit{tensor models}. The
-tensor models are obtained as a generalization of statistical analysis
+tensor models are obtained using a mathematical generalization of statistical analysis
 techniques in higher dimensions.
 
 Finally, given that a deformable model is uniquely defined by its parameters,
  the goal of model-based object recognition is then to fit an instance of a model to
 an appropriate object in the image. The problem of fitting the model to the
-image is in essence an optimization problem. In order to fit the model we need to
+image is essentially an optimization problem. In order to fit the model we need to
 correctly adjust parameters that control the model. In addition to determining
 the intrinsic parameters of the model it is necessary to also find how the
 object is rotated, moved and scaled to explain the variation in structure which
 is not caused by the deformations. The recognition algorithm also needs to be
-robust in order to deal with variations caused by noise.
+robust enought to be able to deal with variations caused by noise.
 
 \subsection{Physics Based Models}
 Natural objects all obey physical laws. Human and animal bodies change shape
 when their muscles contract and loosen, which in turn alters the shape of the
 elastic soft tissues which surround the muscles. Movement is further constrained
-by the skeletons and gravity. Due to the dynamic nature of such objects it is quite impractical to
+by the skeleton and gravity. Due to the dynamic nature of such objects it is quite impractical to
 model the structure of these objects as consisting of only rigid components. To cope with
-these highly dynamic bodies researchers have turned to physics to describe the
+such highly dynamic bodies researchers have turned to physics to describe the
 rules governing these dynamics in form of a set of equations. Pentland and
 Sclaroff in  \cite{FEM1pen} give a closed form solution for extracting a
 physical model from images. Terzopoulos and Metaxas combine physics-based
@@ -295,15 +310,15 @@ fundamental for the FEM and can be formalized as
 \begin{equation}\label{eq:FEMdisplacements}
 u^{(m)}(x,y,z) = \mathbf{H}^{(m)}(x,y,z)*\mathbf{U}
 \end{equation}
-where $u^{(m)}$ is the displacement at $x$,$y$, and $z$ coordinate within the element $m$, $\mathbf{H}^{(m)}$
+where $u^{(m)}$ is the displacement at $x$, $y$, and $z$ coordinate within the element $m$, $\mathbf{H}^{(m)}$
 the displacement interpolation matrix and $\mathbf{U}$ the global
 displacement measured at every nodal point. With equation
 \ref{eq:FEMdisplacements} the displacements at any point in the object can be calculated.
 The values of the displacement interpolation matrix $\mathbf{H}^{(m)}$ depend on
-the choice of the finite elements that make up the mesh.
+the shape of the finite elements that make up the mesh.
 
 From the displacement $u^{(m)}(x,y,z)$, the strain can be calculated as the
-derivative of the displacement with respect to $x$,$y$, and $z$. Thus, the
+derivative of the displacement with respect to $x$, $y$, and $z$. Thus, the
 strain $\epsilon^{(m)}(x,y,z)$ at the element $m$ is given by  
 \begin{equation}\label{eq:FEMstrain}
 \epsilon^{(m)}(x,y,z) = \mathbf{B}^{(m)}(x,y,z)*\mathbf{U}
@@ -320,7 +335,7 @@ object. When a load is applied to the structure of the object it will cause a
 deformation of the mesh. The nodal points in the mesh will bounce and move
 until they reach a state of equilibrium. It is important to stress that in this equilibrium the shape of the
 object is still deformed due the applied force. However, the nodal points may have
-assumed new stable positions hence we refer to it as an equilibrium. The
+assumed new stable positions and hence we refer to it as an equilibrium. The
 equation governing the equilibrium is derived using equations
 \ref{eq:FEMdisplacements}, \ref{eq:FEMstrain} and the Principle of Virtual
 Work \cite{FEMbook}. It relates the stiffness matrix $\mathbf{K}$ and the unknown nodal
@@ -353,8 +368,8 @@ properties of materials and is computed as the constant ratio between stress and
 in the material.
 
 Equation \ref{eq:FEMequilibrium} describes a static equilibrium at a specific
-point in time. If the loads are applied rapidly then element inertial forces and
-energy damping forces must be considered as well. Equation \ref{eq:FEMdynamic} gives
+point in time. If the loads are applied rapidly then inertial and
+energy damping forces must be taken into account. Equation \ref{eq:FEMdynamic} gives
 the dynamic form of the FEM equilibrium equation where $\dot{\mathbf{U}}$, $\ddot{\mathbf{U}}$ are the
 first and second time derivative of $\mathbf{U}$ respectively.
 \begin{equation}\label{eq:FEMdynamic}
@@ -363,18 +378,18 @@ first and second time derivative of $\mathbf{U}$ respectively.
 \end{equation}
 Here $\mathbf{M}$ is the mass matrix and $\mathbf{C}$ the damping matrix. This differential
 equation is often referred to as the FEM governing equation. To solve for the
-unknown nodal displacements $\mathbf{U}$ standard techniques for solving
+unknown nodal displacements $\mathbf{U}$, standard numerical techniques for solving
 differential equations can be used.
 
 \subsubsection{Modal Analysis}
 Solving the dynamic equilibrium equation \ref{eq:FEMdynamic} by direct integration
-is very costly \cite{FEMbook}. However, it is possible to diagonalize the system
+is very costly as shown in \cite{FEMbook}. However, it is possible to diagonalize the system
 of equations by changing the finite element displacement basis to a generalized displacement
 basis $\Phi$ as 
 \begin{equation}
 \mathbf{U} = \Phi \mathbf{\tilde{U}}
 \end{equation}
-The advantage of the new generalized basis can be seen when equation \ref{eq:FEMdynamic} is premultiplied from the left by $\Phi^T$
+The advantage of the new generalized basis can be seen when equation \ref{eq:FEMdynamic} is pre-multiplied from the left by $\Phi^T$
 to give
 \begin{equation}\label{eq:FEMmodal}
 \Phi^T\mathbf{M}\Phi\mathbf{\ddot{\tilde{U}}} + \Phi^T\mathbf{C}\Phi\mathbf{\dot{\tilde{U}}} + \Phi^T\mathbf{K}\Phi^T\mathbf{\tilde{U}}
@@ -394,8 +409,9 @@ These eigenvectors are the free vibrational modes of the equilibrium equation. C
 \mathbf{\ddot{\tilde{U}}} + \mathbf{\tilde{C}}\mathbf{\dot{\tilde{U}}} + \Omega^2\mathbf{\tilde{U}}
 = \mathbf{\tilde{R}}
 \end{equation}
-Under the assumption that the transformed damping matrix $\mathbf{\tilde{C}}$ is
-diagonal as well the above equation \ref{eq:FEMdiag} is diagonalized since
+Under the assumption that the transformed damping matrix $\mathbf{\tilde{C}}$ is also
+diagonal, above equation \ref{eq:FEMdiag} is diagonalized form of equation
+\ref{eq:FEMdynamic} since
 $\Omega^2$ is a diagonal matrix.
 Diagonalizing
 decouples the individual components of $\mathbf{U}$. This means that we obtain a
@@ -407,7 +423,7 @@ $\mathbf{\tilde{U}}$ either in closed form or integrated numerically in fewer st
 
 \subsubsection{Recovering shape with FEM} 
 Through Modal analysis it is possible to easily generate displacements of an
-arbitrary object given a
+arbitrary object given its
 stiffness matrix $\mathbf{K}$. These displacements deform the object. Since the
 matrix $\Phi$ encodes the free vibration modes, it is possible to generate a new
 face by taking a vector of weights $\mathbf{u}$ and calculating a deformed
@@ -416,7 +432,7 @@ $\mathbf{\bar{x}}$ using
 \begin{equation}\label{eq:FEMgenerate}
 \mathbf{x} =  \mathbf{\bar{x}} + \Phi\mathbf{u}
 \end{equation}
-Equation \ref{eq:FEMgenerate} synthesises a new object from a vector of
+Equation \ref{eq:FEMgenerate} synthesizes a new object from a vector of
 parameters $\mathbf{u}$. It is therefore possible to fit a model of a class
 of objects with a known stiffness function to a candidate object in an
 image by solving an optimization problem which locates the parameters $\mathbf{u}$.
@@ -424,16 +440,16 @@ image by solving an optimization problem which locates the parameters $\mathbf{u
 Alternatively, it is also possible to use the equilibrium equation
 \ref{eq:FEMequilibrium} to recover the shape of the candidate object. Assuming
 that the positions of the nodal points are found in the image and that their 3D
-position is recovered then the load vector $\mathbf{R}$ can be calculated as
+position is recovered, then the load vector $\mathbf{R}$ can be calculated as
 \begin{equation}\label{eq:FEMload}
-[r_{3k}, r_{3k+1}, r_{3k+2}] = [x^w_{k}, y^w_{k}, z^w_{k}] - [x_{k}, y_{k},
+[R_{3k}, R_{3k+1}, R_{3k+2}] = [x^w_{k}, y^w_{k}, z^w_{k}] - [x_{k}, y_{k},
   z_{k}]
 \end{equation}
-where $x^w_{k}$, $y^w_{k}$ and $z^w_{k}$ is the position obtained from the image of the nodal point
-with index $k$. The rest position of this nodal point in the model is given by
+where $x^w_{k}$, $y^w_{k}$ and $z^w_{k}$ is the position of the nodal point
+with index $k$ which is obtained from the image. The rest position of this nodal point in the model is given by
 $x_{k}$, $y_{k}$ and $z_{k}$. This approach to constructing the load vector
 $\mathbf{R}$ is analogous to attaching springs between the nodal point
-measurements and their corresponding points in the model. Given the load vector
+measurements and the corresponding points in the model. Given the load vector
 the goal is now to solve the previously seen equilibrium equation 
 \begin{equation}
 \mathbf{K}\mathbf{U} = \mathbf{R}
@@ -442,28 +458,27 @@ To solve for the displacements $\mathbf{U}$ the stiffness matrix $\mathbf{K}$
 needs to be inverted. This is often a very costly operation which can be avoided
 by diagonalizing the equilibrium equation. This is done using modal analysis
 with the generalized
-basis from equation \ref{eq:FEMbasis}.
+basis from given in equation \ref{eq:FEMbasis}.
 
-\subsubsection{Combining Statistical and FEM modes}
 
 \subsection{Statistical Models !ALTERED}
-Statiscal models attempt to understand and model the variation inherent in the
-deformable object through stastical analysis. In statistical analysis a data set
-is examined and characterised so that predictions and judgements based on the
-underlying data distributions can be made. To use the techniques of statistical
-analysis to build a model it is necessary to have a dataset to analyze. This
-dataset is made up of many instances of the class of objects we want to
+Statistical models attempt to understand and model the variation inherent in the
+deformable object through statistical analysis. In statistical analysis a data set
+is examined and characterized so that predictions and judgments based on the
+underlying data distributions can be made. In order to use the techniques of statistical
+analysis to build a deformable model, it is necessary to have a dataset to analyze. This
+dataset should be made up of many instances of the class of objects we want to
 model. These instances are usually given as a set of vertices (either 2D or 3D)
 which define the object. 
 
-The less sophisticated models attempt to model the variation of the data that defines the shape of an
-object. A \textit{shape model} describes the boundaries of an object. For instance, a
-shape model of a face will denote the location and measure of the defining
+The less sophisticated \textit{shape models} attempt to model the variation of the data that defines the shape of an
+object. The shape model describes the boundaries of an object. For instance, a
+shape model of a face will denote the location and measures of the defining
 contours of a face.
 
-The more sophisticated models perform statistical analysis on the entire
+The more sophisticated \textit{appearance models} perform statistical analysis on the entire
 appearance of the object -- which includes variance coming from the texture, lighting etc. 
-This \textit{appearance model} describes the location and color of the pixels
+This appearance model describes the location and color of the pixels
 that define the object.
 
 \subsubsection{PCA and Eigenfaces !ALTERED}
@@ -593,7 +608,7 @@ the examples and as such contain the most information about
 the images. This means any image can now be represented by the linear
 combination of a smaller number of these components than would be
 required of the original examples. The linear combination is controlled by the
-parameters of the deformable model. This is in essence the eigenfaces modelling approach
+parameters of the deformable model. This is in essence the eigenfaces modeling approach
 only now applied to 3D shapes and textures.
 
 The shape vector and texture vector encode the location and texture values at
@@ -663,7 +678,7 @@ Texture variations and shape variations are correlated. Clearly, with any source
 lighting it is the shape of an object which influences what parts of the object
 will appear darker or lighter. Cootes and Taylor \cite{activeApp04} describe modeling approaches
 which account for the correlations between the two sources of
-variation can be modelled. The models they introduce are well suited for highly
+variation can be modeled. The models they introduce are well suited for highly
 variable structures such as faces or internal organs. Using PCA based shape and
 texture models, Cootes and Taylor construct Active
 Shape and Active Appearance Models which, despite the name, are model fitting algorithms that find the parameters statistical models to fit instances of objects in images.
@@ -671,7 +686,7 @@ Shape and Active Appearance Models which, despite the name, are model fitting al
 The shape model are constructed by annotating feature points in
 images, collecting these into a data matrix and then performing PCA on the
 covariance matrix of this data to generate a lower dimensional basis
-$\mathbf{P}_s$. The shape model then makes it possible to synthesise new shapes
+$\mathbf{P}_s$. The shape model then makes it possible to synthesize new shapes
 as follows
 \begin{equation}\label{eq:shape}
 \mathbf{S} = \mathbf{\bar{s}} + \mathbf{P}_s\mathbf{b_s}
@@ -714,7 +729,7 @@ on the statistical models of shape and texture. The ASM enables us to locate a
 shape in an image using an iterative
 procedure as shown in figure \ref{gr:asm}. To search for objects in an image
 using the ASM, we first place the shape model, which we obtained from the training data, into
-the centre of the image. In the next iterations a texture profile of $k$
+the center of the image. In the next iterations a texture profile of $k$
 neighboring points around each point of the shape model is taken and compared
 with the texture profile of this point obtained when training the model. Then
 the point of the shape model is moved to make the difference between the two
@@ -976,10 +991,10 @@ invertible as well. The inverse of the Kronecker product is given by
 thus $(A^{-1} \otimes B^{-1})$ is the inverse of the Kronecker product.
 
 From \ref{eq:kron_mult} and \ref{eq:krontran} we can see that the Kronecker product of two orthogonal matrices is again orthogonal.
-\begin{align*}\label{eq:kron_ortho}
+\begin{align}\label{eq:kron_ortho}
 (A \otimes B)^T(A \otimes B) = (A^T \otimes B^T)(A \otimes B) = (A^TA \otimes
   B^TB) = (I \otimes I) = I
-\end{align*}
+\end{align}
 and similarly to show for $(A \otimes B)(A \otimes B)^T = I$.
 \paragraph{Frobenius Norm.} The Frobenius-norm of a tensor is a measure of the
 size of the tensor. It is defined as
@@ -1017,10 +1032,10 @@ represented using flattened tensors, matrix products and Kronecker products as f
 Equation \ref{eq:modemult} shows the application of $N$ mode-$n$
 products. In equation \ref{eq:kronmodemult} the equivalent formulation is given
 using matrices instead of tensors. Note that the transpose can be brought into
-the parantheses in the second term of
+the parentheses in the second term of
 \ref{eq:kronmodemult}, due to the transpose property of
 the Kronecker product \ref{eq:krontran}. The order of the matrices inside of the
-parantheses is important. If this order is changed than the result has the
+parentheses is important. If this order is changed than the result has the
 same columns but in a different order.
 \paragraph{High Order Singular Value Decomposition (HOSVD).}
 
@@ -1459,7 +1474,7 @@ where $\mathbf{0} = (0,0,0)$.
 Davis and DeMenthon's POSIT algorithm \cite{POSIT}, \cite{opencv} is a simple and efficient method for solving the PnP
 problem. The POSIT algorithm estimates the rotation matrix $R$ and the
 translation vector $t$
-of an object, given a perspecitve camera with known parameters, at least 4 non-coplanar feature points on the 3D object and the corresponding
+of an object, given a perspective camera with known parameters, at least 4 non-coplanar feature points on the 3D object and the corresponding
 projections of these points in the 2D image. To compute an approximation of the
 true $R$ and $t$, we first expresses the camera coordinate system in terms of
 the object coordinate system. Since the rotation matrix aligns the axes of the
@@ -1526,12 +1541,12 @@ $z$-component of the translation vector $Z_0$ is given by the norm of either $I$
 or $J$.
 
 \section{Feature Point Tracking}
-As we have seen, most model based recognition techinques rely on a number identified feature
+As we have seen, most model based recognition techniques rely on a number identified feature
 (landmark) points to estimate the model parameters. To be able to track a model
 between successive frames of a video recording, it is therefore necessary to
 either keep locating the points in every frame or to track the movement points
 themselves. This problem of tracking the movement points or objects between
-images has spurred the developement of many algorithms. Most of these algorithms
+images has spurred the development of many algorithms. Most of these algorithms
 fall into the \textit{optical flow} category since they determine the movement
 of points based on the intensity changes at pixels. One such algorithm is the
 Kanade-Lucas-Tomasi feature tracker.
@@ -1576,7 +1591,7 @@ E(\mathbf{h}) = \int_{\mathcal{W}} (F(x + h) - G(x))^2 \mathop{d}x
 
 The naive way to locate this $h$  would be to iterate through all the possible values of $h$ and measure the $E(\mathbf{h})$ norm. A
 better approach was proposed by Kanade and Lucas. The behavior
-of the function $F(\mathbf{x})$ is approximated using a first order taylor expansion as 
+of the function $F(\mathbf{x})$ is approximated using a first order Taylor expansion as 
 \begin{equation}\label{eq:kanade1}
 F(\mathbf{x + h}) \approx F(\mathbf{x}) + \mathbf{g}^T\mathbf{h}
 \end{equation}
@@ -1605,7 +1620,7 @@ In matrix form the equation \ref{eq:kanade3} can be expressed as
 \begin{equation}\label{eq:kanade4}
 \mathbf{Z}\mathbf{h} = \mathbf{e}
 \end{equation}
-The iterative Kanade-Lusca algorithm specifies the order in which possible values of $\mathbf{h}$ will be explored. The procedure
+The iterative Kanade-Lucas algorithm specifies the order in which possible values of $\mathbf{h}$ will be explored. The procedure
 iteratively improves the guess for $\mathbf{h}$ by solving the equation
 \ref{eq:kanade3} with the spatial intensity
 gradients evaluated at each point $\mathbf{x}$ in the image. Thus, the algorithm locally searches for the best disparity vector $\mathbf{h}$ by using the
@@ -1657,15 +1672,15 @@ The task of locating the correct model parameters which match the model to an
 object in the image is an optimization problem. It may not be possible to find
 an exact match which would explain the object in the image perfectly. Therefore,
 we are interested in finding an instance of the model which is most similar to the
-object in the image. One way to measure disimilarity is through the use of an error function. If the
+object in the image. One way to measure dissimilarity is through the use of an error function. If the
 value of the error function is large it means that the two entities are
-disimilar. To find a model instance which is most similar we therefore need to
-minimize the error function. Optimization techinques make it possible to locate
+dissimilar. To find a model instance which is most similar we therefore need to
+minimize the error function. Optimization techniques make it possible to locate
 minima of functions.
 
 \subsection{Least Squares and Non Negative Least Squares}
 An important error function, which is often utilized in statistics and engineering, is the
-sum of squares error. This error function defines the disimilarity between input
+sum of squares error. This error function defines the dissimilarity between input
 values $y_i$ and target values $t_i$ using a numeric value given by
 \begin{equation}\label{eq:nnls}
 E(y) = \sum_i (y_i - t_i)^2
@@ -1675,7 +1690,7 @@ function. Given is a linear system of equations defined in matrix notation by
 $\mathbf{A}\mathbf{x} = \mathbf{b}$ with $\mathbf{A} \in \mathbb{R}^{m\times
   n}$, $\mathbf{x} \in \mathbb{R}^{n\times 1}$ and $\mathbf{b} \in
 \mathbb{R}^{m\times 1}$. This linear system may not have an exact solution if it
-is overdetermined $m > n$, underdetermined $m < n$  or more generally when
+is over determined $m > n$, underdetermined $m < n$  or more generally when
 $\mathbf{A}$ is not invertible. Solving this linear system in the least squares sense
 means finding a $\mathbf{\hat{x}}$ for which the following error function is
 minimized
@@ -1701,7 +1716,7 @@ means that some of the diagonal elements in $\Sigma$ are 0. However, We obtain a
 least squares solution by inverting the non-zero elements of $\Sigma$ and
 pre-multiplying with $\mathbf{V\Sigma}^{-1}\mathbf{U}^T$.
 
-In some case it may be necessary to enfore constraints on the function. This is
+In some case it may be necessary to enforce constraints on the function. This is
 particularly important when the variables represent real physical entities,
 which should not be negative. Such non negativity constraints are often
 introduced to a linear system. The goal of optimization is then to solve this
@@ -1910,7 +1925,7 @@ restarts of the downhill algorithm are also sometimes utilized \cite{Press1992}.
 \chapter{Design}\label{design}
 In this chapter we will design an application which understands the facial
 dynamics captured in a video recording of an individual. This understanding is
-accomplished by correctly modelling the shape of an individual's face.
+accomplished by correctly modeling the shape of an individual's face.
 
 The practical purpose of the application is to transfer the expressions between two
 subjects. Given are video recordings of two persons and a database of
@@ -1978,7 +1993,7 @@ The model fitting is performed with an error minimization algorithm. To perform
 this minimization, reference measurements are needed against which the minimization is
 performed. These measurements will be points in the frames which comprise the
 video sequences. These points should of course be points located on the
-face. So before the algorithm can be begin fitting a model, it first needs some
+face. So before the algorithm can begin fitting a model, it first needs some
 information about where the face is located in the image. However, it is not
 only necessary to identify the general position of the face -- it is in fact
 imperative to know the position of points on the face which correspond to points in the
@@ -1998,112 +2013,113 @@ fitting algorithm the application needs to perform the following two steps:
 
 Yet this tracking is again an approximation. It often also happens that certain points in the face are lost
 during the tracking procedure. So again it is impossible to guarantee that the
-fitting algorithm will be able to recover the sufficient level of detail it
-needs to correctly estimate the expression.
+fitting algorithm will be able to recover sufficient level of detail to correctly estimate the expression.
 
 
 The final and most crucial problem lies in the fact that usually only very specific
 areas of the face contribute to expressions. The mouth or the brow are excellent
-areas for reference points for the fitting algorithm. However, should points these
+areas for reference points for the fitting algorithm. However, should points in these
 areas be lost during tracking, or misidentified during face location then it is
 very likely that an incorrect expression will be estimated. Even if only a small
 number of points is lost, the algorithm can still fail badly if these were
 points from an important part of the face.
 
-It is clear that that error accumulates in every step of the model
-fitting. A robust application must therefore attempt to enforce constraint to limit this
-accumulation. The fitting algorithm and the model therefore need to be design
+It is clear that error accumulates in every step of the model
+fitting. A robust application must therefore attempt to enforce constraints to limit this
+accumulation. The fitting algorithm and the model therefore need to be designed
 with these considerations in mind.
 
 \section{Frameworks and APIs}
 An important design and implementation question when constructing a large
 application, is deciding which software application programming interfaces
-(APIs) and software frameworks the application should be build with. The
-great advantages of utilizing on APIs and frameworks is that they implement solutions
-and algorithms very efficiently. The disadvantage is that some frameworks may
+(APIs) and software frameworks the application should employ. The
+great advantages of utilizing APIs and frameworks is that they provide efficient
+implementions of algorithms. The disadvantage is that some frameworks may
 require the user to install this framework on his machine to be able to use the
-application. Quite important is also the quality of cross-platfrom
-compatibility, which should motivate the design to choose cross-platform
-frameworks and APIs.
+application. Quite important is also the quality of cross-platform
+compatibility. To desing a portable application only cross-platform
+frameworks and APIs should be chosen.
 
 \subsection{OpenCV}
 The expression transfer application processes images and utilizes many computer
 vision algorithms. An excellent library of computer vision algorithms and
-functions is the OpenCV library. The OpenCV is a multi-platfrom library
-written in C and C++ \cite{opencv}. It was designed to provide a simple-to-use
-computer vision infrastructure for the building vision application. A large part
-of OpenCV was developed by Intel, specifically Intel's Russian branch. The application is build with OpenCV version 2.1.0.
+functions is the OpenCV library. The OpenCV is a multi-platform library
+written for C and C++ \cite{opencv}. It was designed to provide a simple-to-use
+computer vision infrastructure for building vision applications. A large part
+of OpenCV was developed by Intel, specifically Intel's Russian branch. The
+expression application is build with OpenCV version 2.1.0.
 
-Among the algorithms include in the OpenCV library are efficient implementations the Kanade-Lucas feature tracker
+Among the algorithms included in the OpenCV library are efficient implementations the Kanade-Lucas feature tracker
 and the POSIT algorithm for 3D pose estimation. The OpenCV library also provides
-an matrix implementation.
+an excellent matrix data structure.
 
 \subsection{OpenGL}
-Since it deals with a 3D model of the human face, the expression transfer
-application should be able to graphical represent this model to the user. To
+Since the expression transfer
+application deals with a 3D model of the human face, it should be possible for
+this model to be presented graphically to the user. To
 this end we can use the popular graphics interface OpenGL. The Open Graphics Library (OpenGL) is a software interface to the graphics
-hardware \cite{opengl}. It is currently being furhter developed and maintained
+hardware \cite{opengl}. It is currently being further developed and maintained
 by the Khronos Group. The OpenGL API provides a large
-number of commands to render 3D objects. With OpenGL these objects are build
-from graphics primitives like points, lines and polygons. Objects rendering in OpenGL
-implemented using series of processing stages called the rendering pipeline. The
-OpenGL pipeline implements standard graphics operations such transformations
+number of commands to render 3D objects. These objects are constructed
+from graphics primitives like points, lines and polygons. The rendering of
+objects in OpenGL is
+implemented using a series of processing stages called the rendering
+pipeline. The pipeline also provides numerous useful graphics operations such transformations
 between camera and object coordinate systems, texture mapping and lighting. \begin{comment}The
 OpenGL code is streamlined, hardware-independent and highly portable, which in
 addition to its availability has contributed to OpenGL's popularity.\end{comment}
 \subsection{Qt}
 The OpenGL graphical representation needs to be encapsulated in a user-friendly graphical user
 interface (GUI) to allow the user to load and process the video recordings. The GUI
-of choice for this application is Trolltech's Qt, because it integrates well
-with the OpenGL framework. The user interface (UI) framework Qt (pronounced as cute) was developed by Trolltech in 1991. The
-software has since been aquired by Nokia. \begin{comment}The Qt UI frameworks is a
-cross-platformand application, which simple to use especially when used together
+of choice for the expression transfer application is Trolltech's Qt, because it integrates well
+with the OpenGL framework. The Qt framework also includes a build system called qmake, which is
+likewise cross-platform. The Qt framework was developed by Trolltech in 1991. The
+software has since been acquired by Nokia. \begin{comment}The Qt UI frameworks is a
+cross-platform application, which simple to use especially when used together
 with the QtCreator IDE. This IDE has a built in graphical editor to create user
 interfaces. Of special importance to the expression transfer application is the
-possibility to easily integrate a Qt GUI with opengl. \end{comment} 
-The Qt framework also includes a build system called qmake, which is
-likewise cross-platform.
+possibility to easily integrate a Qt GUI with OpenGL. \end{comment} 
+
 
 \section{Pre-processing}
 The primary drawback of the tensor-based model is that it requires the faces in
 the database to be in \textit{correspondence}. To put faces in the database into correspondence
-so that a tensor model can be constructed we must perform pre-processing of the
+so that a tensor model can be constructed, we must perform pre-processing of the
 database data.
 
 \subsection{Correspondence}
 For the purpose of this application we consider two polygon meshes to be in correspondence
-if for any point in one polygon mesh the point in the other polygon mesh, which corresponds to the
+if for any point in one polygon mesh, the point in the other polygon mesh which corresponds to the
 same position on the object, has the same index value. So for example if the
 point corresponding to the tip of the nose has an index value of $i$ in one
-face, then a in the other face there  will be a point with perhaps
-different $x$, $y$ and $z$ but the same $i$ index that also corresponds to the
+face, then  there will be a point in the other face with perhaps
+different $x$, $y$ and $z$ but the same $i$ index which also corresponds to the
 tip of the nose. So essentially, the order of the indices must be the same in both
-polygon meshes which represent the faces. 
+polygon meshes. 
 
 In the case when the two polygon meshes are not in correspondence, then a
 optimization algorithm must be applied to deform the mesh to correspond to a
-reference mesh. There may be fewer vertices, which in turn requires
-generation of new vertices in the mesh. Or the vertices can be have a different
+reference mesh. One mesh may have fewer vertices, or the vertices can be have a different
 ordering than in the reference mesh. To standardize the meshes the vertices in
-one meshes need to be aligned with vertices in the other mesh. 
+one mesh need to be aligned with vertices in the other mesh. 
 
-Correspondence can be computed in two ways. One approach is to use a registration algorithm where the rigid-transformations are located
-which transform a misaligned mesh into the reference mesh. An popular algorithm
+Correspondence may be computed in two ways. One approach is to use a
+registration algorithm which locates the rigid-transformations that transform a misaligned mesh into the reference mesh. A popular algorithm
 for 3D registration is the Iterated Closest Point (ICP) algorithm. Rusinkiewicz
 and Levoy give a comprehensive overview of efficient implementations of the ICP
 algorithm in \cite{ICP}. The other approach involves finding the minimal deformation of
-the polygon mesh which transforms it into the reference mesh. Sumner and Popovic \cite{deformTri}
-describe an algorithm to transfer deformation between triangle meshes.
+the polygon mesh which transforms it into the reference mesh. An example of this
+type of algorithm was described by Sumner and Popovic in \cite{deformTri}
+who achieve this by transferring deformation between triangle meshes.
 
-Other irregularities in the polygonal meshes can be present depending on how the
+Other irregularities in the polygonal mesh can be present depending on how the
 3D face scans in the database were obtained. For example there can be holes or spikes in the
 mesh, which need to be removed by interpolating new points to fill the holes or
 by Gaussian smoothing the spikes. 
 
 \subsection{Database}
-The face database used in the application is the Binghamton database of 3D
-scans of expressions \cite{binghamton}. This database of 3D face scans was developed at the Department of
-Computer Science, State University of New York at Binghamton. The subjects 
+The face database used in the application is the Binghamton expressions database \cite{binghamton}. This database of 3D face scans was developed at the Department of
+Computer Science of the State University of New York at Binghamton. The subjects 
 in the face database perform seven expressions -- neutral, angry,
 disgust, fear, happy, sad and surprise. Every subject carried out each of these
 expressions (except for neutral) in four levels of intensity. 
@@ -2140,8 +2156,8 @@ shown in figure \ref{fg:binghamton}
 \end{figure}
 \clearpage
 
-The Binghamton database consists of faces stored as polygon mesh data in VMRL
-format and texture information in bit map format. For the project the pre-processed Binghamton
+The Binghamton database consists of faces stored as polygon mesh data in VRML
+format and texture information in bitmap format. For the project the pre-processed Binghamton
 database was used. This pre-processed database was created by Dr. Lynn-Minoi
 \cite{jacey} and consists of VTK files of the pre-processed polygon meshes. The
 VTK file lists the $x$, $y$ and $z$ values of every vertex, the topology data
@@ -2151,28 +2167,28 @@ vertices in every face scan is the same. Conveniently, having the face scans in
 correspondence also means that the topology data stays constant.
 
 
-The final pre-processing step before building a model is to move the center the
+The final pre-processing step before building a model is to move the center of the
 face scans to the origin of the object coordinate system. This step is not always required. However, the vertices in the
 pre-processed Binghamton database have a $z$-component with an average value of
 $z_{avg}=-1500$. It serves no purpose to have the face at such a distance. It
 can even cause problems to some algorithms like the POSIT algorithm discussed in
-\ref{posit}. Centering the face scans at the origin of the object coordinate
+\ref{posit}. Moving the center of the face scans to the origin of the object coordinate
 system can be done by merely calculating the average $x$, $y$ and $z$ of the
 entire dataset and then subtracting this average from every vertex.
 
 
 \section{Model Construction}
 Given a database of 3D face scans that are in correspondence, the tensor-based
-model can be constructed by first organizing this data in a tensor and
+model can be constructed by first organizing this data into a tensor and
 then using multilinear algebra to find a decomposition of this tensor.
 
 \subsection{Data Tensor}\label{s:datatesnor}
 The tensor model should be designed to address expression and identity as sources of variation in
-the data. We assume that the points are defined by the set $I_{pts}$, the
-expressions by the set $I_{exp}$ and the identities by $I_{id}$. Then we can
+the data. We assume that the points are defined by a set of size $I_{pts}$, the
+expressions by a set of size $I_{exp}$ and the identities with size $I_{id}$. Then we can
 construct a data tensor $\mathcal{D} \in \mathbb{R}^{I_{pts} \times I_{id}
   \times I_{exp}}$. Each face scan in the database is vector from
-$R^{I_{pts}}$. There are $I_{id}I_{exp}$ such vectors in the database. To load data into the the tensor we need to read each vector
+$R^{I_{pts}}$ and there are $I_{id}I_{exp}$ such vectors in the database. To load data into the the tensor we need to read each vector
 representing a face into the tensor and index the elements of this vector
 appropriately. This is done as follows
 
@@ -2181,14 +2197,14 @@ appropriately. This is done as follows
 \begin{algorithmic}[1]
 \Procedure{Load}{database,$\mathcal{D}$} \Comment{Input the database and the
   empty data tensor}
-\For {$i \in I_{id}$}
-\For {$j \in I_{exp}$}
+\For {$i = 1 \ldots I_{id}$}
+\For {$j = 1 \ldots I_{exp}$}
 
 \State $v \gets $ database($i,j$)
 
-\For {$k \in I_{pts}$}
+\For {$k = 1 \ldots I_{pts}$}
 
-\State $\mathcal{D}(i,j,k) \gets v_i $
+\State $\mathcal{D}(i,j,k) \gets v_k $
 \EndFor
 \EndFor
 \EndFor
@@ -2201,10 +2217,10 @@ Due to the fact that most algorithms operate on matrices instead of tensors, it
 may be preferable to flatten the data tensor right after loading it. Flattening
 the tensor along a mode is done by successively fixing the values of the index of
 the corresponding mode and iterating through the values of the other indices to
-obtain the data. The procedure for flattening a tensor along the identity mode space is given in
-\ref{a:flat}.
+obtain the data. The procedure for flattening a tensor along the identity mode
+space is given in 
 
-\begin{algorithm}\label{a:load}
+\begin{algorithm}
 \caption{Flattening a Tensor along the identity mode space}
 \begin{algorithmic}[1]
 \Procedure{Flatten}{$\mathcal{D}$, $\mathbf{D_{(2)}}$} \Comment{The input
@@ -2226,22 +2242,22 @@ obtain the data. The procedure for flattening a tensor along the identity mode s
 \end{algorithm}
 
 The data tensor itself will need to be loaded once and flattened three times for
-the computation of the HOSVD decomposition. 
+the computation of the HOSVD decomposition.
 
-\subsection{Computing the HOSVD !! NEW}
+\subsection{Computing the HOSVD !! NEW}\label{s:hosvd}
 The generative tensor model for the face transfer application is given by the formula 
 \begin{equation} \label{eq:generative_model2}
 \mathbf{f} = \mathcal{M} \times_2 \mathbf{w}_i^T \times_3 \mathbf{w}_e^T
 \end{equation}
-where $\mathbf{f}$ is the generated 3D face scans in form of a vector and
+where $\mathbf{f}$ is the generated 3D face scan in form of a vector and
 $\mathbf{w}_i$ with $\mathbf{w}_e$ are column vectors of identity and expression
 parameters respectively. Ideally, we should be able to generate new faces using
 equation \ref{eq:generative_model2} by choosing values for the identity and
 expression parameters and obtaining a 3D face scan in form of the $\mathbf{f}$
-vector. To do this it is necessary to compute the multilinear model
+vector. To implement this generative function it is necessary to compute the multilinear model
 $\mathcal{M}$ tensor which governs this mapping between the vector spaces.
 
-As discussed in equation \ref{eq:core} the core tensor is obtained by reversing
+As seen in equation \ref{eq:core}, the core tensor is obtained by reversing
 the HOSVD decomposition. The multilinear model tensor $\mathcal{M}$ is obtained
 by the mode product of the core tensor and the mode matrix of the points. This
 is equivalent to not factoring along the point mode space during the HOSVD.
@@ -2252,8 +2268,8 @@ To construct the model we therefore have to implement the following formula
 \end{equation}
 which relates the data tensor $\mathcal{D}$ with the mode matrices $\mathbf{U}_{id}$
 and $\mathbf{U}_{exp}$. The column vectors of $\mathbf{U}_{id}$ span the space
-of identities and its row vectors encode an identity and point invariant
-representation of each identity seen in the database. Similarly, the column
+of identities and its row vectors are point invariant
+encodings of each identity seen in the database. Similarly, the column
 vectors of $\mathbf{U}_{exp}$ form the basis of the space of expressions and the
 rows are invariant representations of the various expressions. These matrices
 are obtained through singular value decomposition of the flattened
@@ -2282,25 +2298,24 @@ $I_{pts}I_{id} \times I_{pts}I_{id}$.
 
 The memory requirements are best illustrated on an actual application. For
 instance, consider an application with 56 identities, 7 expressions
-and 5090 vertices, the data tensor has three dimensions and a size $56\times
+and 5090 vertices, where the data tensor has three dimensions and a size $56\times
 7\times (5090*3)$. A
 matrix flattened along the expression mode space then has two dimensions and a size
 $7 \times (56*5090*3)$.  Decomposing this flattened matrix into
 $\mathbf{U}_{exp} \mathbf{\Sigma}_{exp} \mathbf{V}_{exp}^T$ requires the
 allocation of memory for matrices of sizes
 $7\times 7$ for $\mathbf{U}_{exp}$, $7$ non-zero singular values in $\mathbf{\Sigma}_{exp}$ and a matrix of size
-$(56*5090*3)\times (56*5090*3)$ for $\mathbf{V}_{exp}$. This means that
+$(56*5090*3)\times (56*5090*3)$ for $\mathbf{V}_{exp}$. This means that the
 $\mathbf{V}_{exp}$ matrix needs to be represented using $855120*855120$ float values. The memory requirement of this is approximately $4*700*10^9$
 bytes. Clearly the $\mathbf{V}_{exp}$ matrix is too large and exceeds the memory capacity of
 most personal computers.
 
 We are not interested in the matrix $\mathbf{V}$ so ideally we should try to
-avoid computing it and thereby avoid needing to allocate memory for it. Note
-that to compute a simplified and less memory demanding version we can
+avoid computing it and thereby avoid needing to allocate memory for it. To compute a simplified and less memory demanding version of the SVD we can
 post-multiply the matrix with its transpose. To illustrate this approach lets
-take a matrix $\mathbf{A}$ with dimension $m \times n$. The SVD of this matrix
+take a matrix $\mathbf{A}$ with dimensions $m \times n$. The SVD of this matrix
 is $\mathbf{A} = \mathbf{U\Sigma V}^T$, where $\mathbf{U}$ is a $m \times m$
-orthonromal matrix, $\mathbf{\Sigma}$ a $m \times n$ diagonal matrix and $\mathbf{V}$ is a $n \times n$
+orthonormal matrix, $\mathbf{\Sigma}$ a $m \times n$ diagonal matrix and $\mathbf{V}$ is a $n \times n$
 orthonormal matrix. If the goal is to obtain
 the left singular matrix $U$ then finding this matrix by means of SVD of
 $\mathbf{A}$ will be memory inefficient if $m \ll n$. However, note that 
@@ -2318,10 +2333,12 @@ equation \ref{eq:trick} simplifies to
 \begin{align}\label{eq:trick2}
 \mathbf{A}\mathbf{A}^T = \mathbf{U\Sigma}^2 \mathbf{U}^T
 \end{align}
-Since the square of a diagonal matrix is again a diagonal matrix. Therefore $\mathbf{\Sigma}^2$ is diagonal, which means that we can calculate the left
+The square of a diagonal matrix is trivially again a diagonal matrix. Since
+$\mathbf{\Sigma}^2$ is diagonal, this means that we can calculate the left
 singular matrix $\mathbf{U}$ in a memory efficient way by computing the SVD
-of $\mathbf{A}\mathbf{A}^T$. The approach defined by equation \ref{eq:trick2} is crucial for the face transfer
-application in the first step of the HOSVD algorithm.
+of $\mathbf{A}\mathbf{A}^T$. The approach defined by equation \ref{eq:trick2} is
+crucial for for the first step of the HOSVD algorithm in the expression transfer
+application.
 
 Once the mode matrices $\mathbf{U}_{id}$ and $\mathbf{U}_{exp}$ have been
 computed, the next step of the HOSVD algorithm is to calculate the multilinear model using equation
@@ -2332,21 +2349,21 @@ decomposition of the data tensor which is given by
 \mathcal{D} = \underbrace{\mathcal{S} \times_1 \mathbf{U}_{pts}}_{\mathcal{M}} \times_2 \mathbf{U}_{id} \times_3 \mathbf{U}_{exp}
 \end{equation}
 where $\mathcal{S}$ is the core tensor and $\mathcal{M}$ is the multilinear
-model we are interested in computing. The HOSVD decomposition can then be
+model which is to be computed. The HOSVD decomposition can then be
 rewritten using Kronecker products by flattening the core tensor and the data
-tensor along the first mode. The 
+tensor along the first mode. Thus 
 \begin{equation}\label{eq:hosvd2}
 \mathbf{D}_{(1)} = \underbrace{\mathbf{U}_{pts}\mathbf{S}_{(1)}}_{\mathbf{M}_{(1)}} (\mathbf{U}_{id} \otimes \mathbf{U}_{exp})^T
 \end{equation}
-As seen in \ref{eq:kron_ortho}, the Kronecker product of orthogonal matricies is
+As seen in \ref{eq:kron_ortho}, the Kronecker product of orthogonal matrices is
 again orthogonal. Therefore equation \ref{eq:hosvd2} can be post-multiplied with
 with $\mathbf{U}_{id} \otimes \mathbf{U}_{exp}$ to give
-\begin{align}\label{eq:hosvd3}
+\begin{align}
 \mathbf{D}_{(1)} (\mathbf{U}_{id} \otimes \mathbf{U}_{exp}) &= \mathbf{M}_{(1)}
 (\mathbf{U}_{id} \otimes \mathbf{U}_{exp})^T (\mathbf{U}_{id} \otimes
-\mathbf{U}_{exp})\\
+\mathbf{U}_{exp})\nonumber\\
 \mathbf{D}_{(1)} (\mathbf{U}_{id} \otimes \mathbf{U}_{exp}) &=
-\mathbf{M}_{(1)}\\
+\mathbf{M}_{(1)}\nonumber\\
 \label{eq:hosvd4}
 \mathbf{M}_{(1)} &= \mathbf{D}_{(1)} (\mathbf{U}_{id} \otimes \mathbf{U}_{exp})
 \end{align}
@@ -2357,16 +2374,15 @@ model matrix $\mathbf{M}_{(1)}$. This is due to the fact that the flattened mult
 model is obtained from the decomposition of the flattened data tensor
 $\mathbf{D}_{(1)}$ as seen in equation \ref{eq:hosvd2}. This flattened data
 tensor is composed of the 3D face scans arranged as the columns of the
-matrix. The goal of the model is to be able to synthesize face. These new faces
+matrix. The goal of the model is to be able to synthesize faces. These new faces
 should be generated as linear combinations of the
 original faces. This implies that generating new faces can be done by linear
 combination of columns of the flattened matrix $\mathbf{D}_{(1)}$. Since the
 flattened multilinear model $\mathbf{M}_{(1)}$ is part of the decomposition of
 $\mathbf{D}_{(1)}$, it can therefore be used to perform this
-linear combination.\\
-
-The two steps described can now be combined into the HOSVD algorithm for the
-face transfer application. The steps of the algorithm are as follows:
+linear combination.
+\paragraph{HOSVD algorithm} The expression transfer HOSVD algorithm calculates
+the flattened multilinear model $\mathbf{M}_{(1)}$ in four steps as follows:
 \begin{itemize}
 \item \textbf{Step 1.} Flatten the data tensor along all modes to obtain the
   matrices $\mathbf{D}_{(1)}$, $\mathbf{D}_{(2)}$ and $\mathbf{D}_{(3)}$.
@@ -2391,9 +2407,10 @@ face transfer application. The steps of the algorithm are as follows:
 As previously mentioned, the general idea that motivates the use of statistical
 analysis techniques when building models, is that
 novel faces can be obtained from linear combinations of the faces in the 3D
-face scan database. This new face will look realistic given that the new face is close in terms of standard
+face scan database. This linear combination can be understood as moving one
+face in a direction given by another face. The resulting new face will look realistic provided that the new face is close in terms of standard
 deviation to the mean. Therefore, one approach to generating new faces from the
-data tensor would be to flatten the tensor along the points mode to obtain
+data tensor is to flatten the tensor along the points mode to obtain
 $\mathbf{D}_{(1)}$ and synthesize new faces using a linear combination of the
 columns of this matrix. A face model would therefore be by choosing a set of
 parameters $\mathbf{w}$ and generating a new face $\mathbf{f}$ as 
@@ -2427,10 +2444,10 @@ the $i$-th position. When this parameter vector is multiplied with the flattened
 data tensor, the $i$-th column will be recovered. This $i$-th column is the
 $i$-th face scan in the database. 
 
-Use of the multilinear model allows more powerful recovery. For
-example to obtain the face which corresponds to the $j$-th identity
-and $k$-th expression. The parameter vector is constructed from the identity and
-expression vectors. The identity parameter vector will have a 1 at the $j$-th
+With the multilinear model even more powerful recovery is possible. For
+example, to obtain the face which corresponds to the $j$-th identity
+and $k$-th expression, the parameter vector will be composed from the identity and
+expression vectors. This identity parameter vector will have a 1 at the $j$-th
 position and the expression parameter vector will have a 1 at the
 $k$-position. Taking the Kronecker product of these two will produce the
 parameter vector $\mathbf{w}$ with a 1 at the $(j*I_{exp} + k)$-th position which
@@ -2438,10 +2455,10 @@ reconstructs the face with the $j$-th identity and the $k$-th expression when
 the parameter vector is multiplied with the flattened data tensor as per
 equation \ref{eq:gen}.
 
-Furhermore, any arbitrary interpolation, or indeed extrapolation of the faces in
+Furthermore, any arbitrary interpolation, or indeed extrapolation of the faces in
 the database can be obtained from the multilinear model based on the choice of
-the attribute parameters. This is because any parameter vector can
-be written as a sum of vectors which all have zeros at all positions except
+the attribute parameters. This is because any vector $\mathbf{w}$ can
+be written as a sum of vectors which have zeros at all positions except
 one. If we define $\mathbf{e}_i$ to be a vector which has a 1 at the $i$-th position and
 a zero everywhere else then $\mathbf{w} = a_1\mathbf{e}_1 + a_2\mathbf{e}_2 +
 \ldots + a_n\mathbf{e}_n$ where the $a_i$ are arbitrary coefficients. Therefore to show that the model produces any
@@ -2457,12 +2474,13 @@ This is due to the fact that the multiplication of $\mathbf{D}_{(1)}\mathbf{e}_i
 $i$-th face. Therefore any linear combination can be generated using the
 multilinear model. 
 
-If the goal is to interpolate a face from the original faces, then the
+If the goal is to linearly interpolate a face from the original faces, then the
 coefficients $a_i$ must all be greater or equal to 0 and they must all sum to
 1. This interpolation can equivalently be done by choosing the $\mathbf{w}_{id}$
 and $\mathbf{w}_{exp}$ to have all components greater or equal to 0 and both
-weight vectors summing to 1. The Kronecker product of two such vectors again has
-components all greater or equal to 0 and summing to 1. If the Kronecker product
+weight vectors summing to 1. The Kronecker product of two such vectors has
+components all greater or equal to 0 and summing to one and it therefore
+satisfies the interpolation condition. If the Kronecker product
 is the vector $\mathbf{w} = \mathbf{w}_{id} \otimes \mathbf{w}_{exp}$, then the
 elements of this vector are all possible combinations of
 $\mathbf{w}_{id_i}\mathbf{w}_{exp_j}$ which are the $i$-th and $j$-th components
@@ -2478,38 +2496,40 @@ If we are not interested in interpolating between the original faces, then it is
 not necessary to store the mode matrices $\mathbf{U}_{id}$ and
 $\mathbf{U}_{exp}$. These mode matrices are invertible and thus form a
 basis for the subspaces $\mathbb{R}^{I_{id}}$ and $\mathbb{R}^{I_{exp}}$
-respectively. Thus, the operands $\mathbf{U}_{id}^T\mathbf{w}_{id}$ and 
+respectively. The operands $\mathbf{U}_{id}^T\mathbf{w}_{id}$ and 
 $\mathbf{U}_{exp}^T\mathbf{w}_{exp}$ of the Kronecker in equation \ref{eq:gen2}
-can generated any vector from these subspaces. Since any vector from these
-subspaces can be obtained inside the Kronecker product, we can safely drop the mode matrices to obtain the generative model.
+can therefore generated any vector from these subspaces. Since any vector from these
+subspaces can be obtained inside the Kronecker product, we can safely drop the mode matrices to obtain the generative model:
 \begin{equation}\label{eq:gen4}
 \mathbf{f} = \mathbf{M}_{(1)}(\mathbf{w}_{id} \otimes \mathbf{w}_{exp})
 \end{equation}
-The matrices computed through HOSVD thus make it possible to synthesize a novel face by
-choosing the identity and expression model parameters $\mathbf{w}_{id}$ and
-$\mathbf{w}_{exp}$. This multilinear models allows the recovery of faces based
-on either of the identity and expression attributes. The expressive power of this model depends solely on the
-variance of the faces in the database from which the new faces are generated as linear
-combinations. 
+\paragraph{Summary.} The matrices computed through HOSVD make it possible to synthesize a novel face by
+choosing values for the identity and expression model parameters $\mathbf{w}_{id}$ and
+$\mathbf{w}_{exp}$. Due to the separability of the multilinear model, these
+parameters can be given values independently of each other, allowing the user to alter the
+corresponding attribute on its own. It is therefore possible to enforce
+linear interpolation constraints on one attribute but not the other. The expressive power of the multilinear model depends solely on the
+variance of the faces in the database, since new face are generated as linear
+combinations of original faces.
 
 \section{Model Parameter Estimation}
 Once the face model is constructed, the objective becomes to correctly adjust the
 parameters that control this model in order to match a face in an
-image. The fitting algorithm must also allow the face in the image to be scaled,
-rotated or moved. So in addition to estimating the model parameters it needs to
-approximate the 3D pose of the object. As discussed in section \ref{s:3dpose}
+image. This fitting algorithm must also allow the face in the image to be scaled,
+rotated or moved. So in addition to estimating the model parameters the
+algorithm also needs to
+approximate the 3D pose of the object. As discussed in section \ref{s:3dpose},
 the 3D pose is defined by a rotation matrix $\mathbf{R}$ and a translation
 vector $\mathbf{t}$. There are 3 parameters which uniquely describe a rotation
 matrix and 3 components in a translation vector. The total number of model parameters depends on
 the amount of persons in the database and on how many expressions these
 individuals perform. In the model construction section we defined these numbers
 to be $I_{id}$ and $I_{exp}$ respectively. Thus, to fit the model to an image there
-are $6+I_{id}+I_{exp}$ parameters which need to be estimated. To approximate
+are $6+I_{id}+I_{exp}$ parameters which need to be estimated. To determine
 these parameters the fitting algorithm will need to minimize the the difference
 between the face in the image and the model with the changed pose.
 
-However, the model is three dimensional and the images are just two dimensional. Therefore, to
-be able to estimate the parameters in an optimization algorithm, the 3D points
+However, the model is three dimensional and the images are just two dimensional. Therefore, to compare the two in an optimization algorithm, the 3D points
 of the model must be projected to a 2D space using a camera model.
 
 After the model has been projected, an error between the projection and the face
@@ -2518,18 +2538,18 @@ to know a set of 2D reference points in the image. These reference points, or fe
 points, correspond to known points on the model. The idea behind the
 fitting algorithm is to find how the model needs to be deformed and what 3D pose
 it needs to have so that these corresponding points on the 3D model are
-projected onto the feature points. The feature points are therefore  crucial to
+projected onto the feature points. How these feature points are selected is therefore crucial to
 determining the difference between the model and the face in the image. Minimizing this
-difference is the purpose of the fitting algorithm. Finding feature points is
+difference is the purpose of the fitting algorithm. Moreover, finding feature points is
 not a trivial task since they need to correspond to points on the model.
 
-The goal of the face transfer application is to understand the facial
+The goal of the expression transfer application is to understand the facial
 dynamics of an individual from a video recording -- so therefore a sequence of images. Since we are dealing with a
 video it means that the fitting algorithm will need to be performed for
-each frame of the video recording and to do that it will need reference points
+each frame of the video recording and for that it will need reference points
 in each and every frame. The application therefore needs to track the movement
-of the feature points so that the fitting algorithm can be automatically applied
-to every frame.
+of the feature points so that there are feature points available for the fitting
+algorithm in every frame.
 
 \subsection{Locating Feature Points}
 The first problem that needs to be addressed before the fitting algorithm is
@@ -2540,13 +2560,13 @@ therefore cannot be picked randomly or even independently of the model.
 
 One approach is to designate which points on
 the model will be used as correspondences to the feature points during the model construction
-step. In the case of the face transfer application these points should be chosen
-so that their positions can be used to determine expressions. These points can
+step. In the case of the expression transfer application these points should be chosen
+so that their positions can be used to determine expressions. Good feature points may
 be the corners of the mouth, the tip of the nose and other easily
 distinguishable features on the face model. Given this predefined set of points
 on the model, the feature points which correspond to them are located in the
-image. This can be done either manuallly by a user who selects the locations of
-these feature points one by one. Reference points selection in the image could likewise be perfromed with an automatic
+image. This may for example be done manually by a user who selects the locations of
+these feature points one by one. Reference points selection in the image could likewise be performed with an automatic
 feature detector such as the Viola-Jones object detection framework \cite{viola}.
 
 The manual approach is more flexible, simple and less error prone. The
@@ -2559,13 +2579,13 @@ automatically.
 The drawback of using automatic feature detectors is the fact that they
 introduce error. The feature locations they detect are guesses. One of the
 challenges that the expression transfer application faces is that estimating the
-correct expression requires alot of detailed information. Any amount of error is
+correct expression requires a considerable amount of detailed information. Any amount of error is
 significantly counterproductive since it will inevitably increase during the
-feature tracking stage.
+latter stages of the fitting algorithm.
 
 For the sake of flexibility and simplicity the expression transfer application
 is designed with a fixed set of feature points on the model. The user is then
-asked to provide the corresponding feature points on the first frame of the
+asked to provide the corresponding image feature points on the first frame of the
 video. The default feature points on the model are shown in figure
 \ref{fg:featurePoints}.
 
@@ -2596,8 +2616,8 @@ him which feature point he should select next. This design is shown in figure
 
 \end{figure}
 
-The selection of corresponding image feature points plays a very important role
-in the optimization process of the fitting algorithm. This again is due to the
+How well the corresponding image feature points are selected plays a very important role
+during the optimization process of the fitting algorithm. This again is due to the
 sensitivity of expression estimation to detail.
 
 \subsection{Tracking Feature Points}
@@ -2608,49 +2628,49 @@ automatically using an optical flow algorithm. This algorithm attempts to
 estimate the movement of the points.
 
 The movement of points is what allows the fitting algorithm to recognize an
-expression. Clearly there are points which provide more information about the
+expression. Clearly, there are always feature points which provide more information about an
 expression than
 other. Points around the mouth for example are especially important for the
 algorithm since most expressions are characterized by unique mouth
 movements. Points on the eyebrows are also a good source of information about
 the expression. Conveniently, these points are also very good for tracking since
-the mouth and the eyebrows are easily distiguishable in terms of texture from
+the mouth and the eyebrows are easily distinguishable in terms of texture from
 other points on the face. 
 
 On the other hand, the features which are imperative to the recognition of a
-person's identity are more static. These features include the distance between the
-corners of the mouth, the distances between the chin, the displacements between
-the mouth and the nose and even the size of the eyes. The problem is that when feature points are selected in places where
-the texture is very constant then they will be difficult to track. For example, selecting
-feature points on the forehead or the cheeks may be cruical to determine the
-diameter of the face. However, the movement of these points will be very
-difficult to predict due to the lack of unique texture around them.
+person's identity are mostly static. These features include the distance between the
+corners of the mouth, the location of the chin, the displacements between
+the mouth and the nose and even the size of the eyes. The problem with feature
+points which are good for estimating identity is they are often located in areas
+where texture is largely constant and they are thus difficult to track. For example, selecting
+feature points on the forehead or the cheeks may be crucial to determine the
+measurements of the face. However, the movement of these points will be very
+difficult to predict due to the lack of unique texture in their surroundings.
 
 The Kanade-Lucas feature tracker, which was discussed in \ref{s:kanade}, is an
-optical flow algorithm well suited for tracking small number of points. A
+optical flow algorithm well suited for tracking a small number of points. A
 pyramidal implementation of the Kanade-Lucas feature tracker is available in the
-OpenCV as the function \texttt{calcOpticalFlowPyrLK()}. The OpenCV
+OpenCV library as the function \texttt{calcOpticalFlowPyrLK()}. The OpenCV
 implementation is described in detail by Bouguet in \cite{kanade4}.  
 
-Feature points may get lost during tracking process with the Kanade-Lucas
+Feature points may sometimes get lost during tracking process with the Kanade-Lucas
 feature tracker. This can happen if the
 texture around the point changes so drastically that it is impossible for the
-algorithm to predict its movement. This can for example happen to feature points
+algorithm to predict the point's movement. This may for instance happen to feature points
 on the eye when a person blinks. There are two possible approaches to dealing
-with lost points. The algorithm can either assume that the point did not move at
-all which is a reasonable assumption for feature points on the eye. The other
-possibility is to discard these points altogether. The second approach works
-better with more general disturbances. Consider a situation when a hand moving
+with lost points. The algorithm may for example assume that the point did not move at
+all, which is a reasonable assumption for feature points on the eye. The other
+possibility is to discard such points altogether. The second approach works
+better with more general disturbances. Consider a situation when a hand is moving
 in front of the face. It should usually take several frames for the hand to
 pass. As the hand appears some points will get lost. If the algorithm assumed
 their position did not change they would begin moving with the hand in the
 following frames.
 \subsection{Camera Parameters}
-The feature points on the 3D model need to be projected into 2D so that a
-difference between these points can be calculated. The points are projected
+The feature points on the 3D model need to be projected into 2D so that their
+difference from user selected points may be calculated. These points are projected
 using a camera model. The parameters of this camera model must be obtained by calibrating the camera which
-was used to capture the image. There are usually three camera parameters, or intrinsic
-parameters. As seen in section \ref{s:camera}, often it is preferrable to use
+was used to capture the image. There are three main camera (intrinsic) parameters. As seen in section \ref{s:camera}, often it is preferable to use
 four parameters. These are the two components of the principal point $c_x$,
 $c_y$ and two parameters $f_x$ and $f_y$ which are computed from the focal
 length $f$ and pixel to real world conversion values. The camera model used in
@@ -2667,7 +2687,7 @@ the 3D geometry. A commonly used planar pattern for camera calibration is
 the chessboard pattern. The feature points in the chessboard pattern image are
 often chosen to be the inside corners of the chessboard squares. These can
 be located automatically since they are easily distinguishable using edge and
-corner detection algorithms. OpenCV provides the
+corner detection filters. OpenCV provides the
 \texttt{cvFindChessboardCorners(.)} function for this purpose.
 
 \begin{figure}[H]
@@ -2683,7 +2703,7 @@ corner detection algorithms. OpenCV provides the
 The expression transfer application uses Zhang's camera calibration algorithm
 \cite{zhang}. Computing the camera parameters with Zhang's algorithm requires
 only a few images of a planer pattern (such as the chessboard) at different
-orientations. An implementation of this algorithm is provided in OpenCV in the
+orientations. An implementation of this algorithm is provided in OpenCV under the
 function \texttt{cvCalibrateCamera(.)}. 
 
 Utilizing OpenCV, we can thus implement camera calibration in a few steps as
@@ -2703,7 +2723,7 @@ Camera calibration can only be performed if the
 user has access to the camera and can take images of a chessboard pattern. To
 allow for more flexibility, it must also be possible for the user to
 input camera parameters into the application manually. The GUI of the expression
-transfer application therefore includes the possibilty of either specifying the
+transfer application therefore includes the possibility of either specifying the
 parameters manually or calling the automatic calibration process. The GUI of
 application provides a dialog for camera calibration. This dialog is shown in
 figure \ref{fg:camdialog}
@@ -2722,14 +2742,14 @@ figure \ref{fg:camdialog}
 
 \subsection{Minimizing the Error Function}\label{s:minerror}
 The goal of the the fitting algorithm is to estimate the model and 3D pose
-parameters given a set of $N$ feature points $f_1, \ldots , f_N$ in every frame of the recording. The in
-order to find the parameters that are closest to the true parameters we need error
-function which measrures this disimilarity between the projected 3D model and
+parameters given a set of $N$ feature points $f_1, \ldots , f_N$ in every frame of the recording. In
+order to find the parameters that are closest to the true parameters we need an error
+function to measure the dissimilarity between the projected 3D model and
 the image. A convenient error function is the sum of squares error function
-which measures this disimilarity as the
+which measures this dissimilarity as the
 sum of the distances between the feature points and the
 projection of their corresponding points in the 3D model. The sum of squares
-function that we need to minimze with respect to the parameters is therefore
+function that we need to minimize with respect to the parameters is therefore
 \begin{equation}\label{eq:fit0}
 E(\mathrm{parameters}) = \sum_{i=1}^N \Big\Vert\mathbf{f}_i - \mathop{proj}(\mathrm{model\; point})\Big\Vert^2
 \end{equation}
@@ -2752,7 +2772,7 @@ and $\mathbf{w}_{exp}$ are therefore the coefficients which generate a
 linear combination of the data tensor columns. As such, we can impose meaningful
 constraints to enforce realistic results as will be seen later. 
 
-The model point $\mathbf{p}_i$ components are three sucessive components of the vector
+The model point $\mathbf{p}_i$ components are three successive components of the vector
 $\mathbf{X}$. The point is therefore
 generated by the corresponding rows from the flattened multilinear
 model. We specify these row as $(\mathbf{M}_{(1)})_{i,*}$,
@@ -2771,7 +2791,7 @@ to estimate the 3D pose parameters of the 3D model so that the optimization can
 account for all the degrees of freedom which available to the subject in the recording. The 3D
 pose is defined by the rotation of the object and its translation. These are
 specified using the rotation matrix $\mathbf{R}$ and the translation vector
-$\mathbf{t}$. This rotion and translation is applied to all model points
+$\mathbf{t}$. This rotation and translation is applied to all model points
 allowing the model to generate a 3D representation of any arbitrarily rotated or
  moved face. The generative function is thus augmented to give
 
@@ -2781,7 +2801,7 @@ allowing the model to generate a 3D representation of any arbitrarily rotated or
 \mathbf{U}_{exp}^T\mathbf{w}_{exp}) + \mathbf{t}
 \end{equation}
 
-Lastly, to measure the disimilarity between the feature points $\mathbf{f}_i$ and the
+Lastly, to measure the dissimilarity between the feature points $\mathbf{f}_i$ and the
 corresponding 3D model points $\mathbf{p}_i$ it is necessary to project the model points
 into 2D. This projection is done using the perspective camera model with a camera matrix $\mathbf{P}$ containing the calibrated (or
 user provided) intrinsic parameters $f_x$, $f_y$, $c_x$ and $c_y$. The result of
@@ -2814,7 +2834,7 @@ solving the resulting equation.
 However, the problem with the perspective projection is that to obtain the feature point
 we need to dehomogenize the result of the projection by dividing with
 $\gamma$. This $\gamma$ to the unknown value of the $z$-component of the point
-whcih is being projected using the camera matrix. In equation \ref{eq:fit8}, $\gamma$ is therefore a function of the model parameters and the rotation
+which is being projected using the camera matrix. In equation \ref{eq:fit8}, $\gamma$ is therefore a function of the model parameters and the rotation
 matrix given by $\gamma(\mathbf{w}_{id},\mathbf{w}_{exp},\mathbf{R},\mathbf{t})$. The
   perspective projection is therefore ill-suited for optimization, because the derivative of the error function will be
 a nonlinear function depending on the partial derivatives of the function
@@ -2842,7 +2862,7 @@ $\mathbf{P}_w$ as
 \end{equation}\\
 For the weak-perspective projection to provide a reasonable approximation of the
 perspective projection, the points must be far enough from the origin so that
-the differences in their depth are small in comparision to this distance. If this condition is not fulfilled, it is
+the differences in their depth are small in comparison to this distance. If this condition is not fulfilled, it is
 possible to still make the approximation good by increasing the distance of the
 image plane (defined by the focal length $f$) before the optimization. Increasing the focal length
 is essentially equivalent to moving the object in the $z$ direction.
@@ -2861,7 +2881,7 @@ Given the error defining function $E(\mathbf{w}_{id}, \mathbf{w}_{exp}, \mathbf{
 \mathbf{t})$, the goal is to find the optimal parameters $\mathbf{w}_{id}^*$,
 $\mathbf{w}_{exp}^*$, $\mathbf{R}^*$ and
 $\mathbf{t}^*$ which minimize this
-error. The minimium can be found by setting the partial derivatives to zero as
+error. The minimum can be found by setting the partial derivatives to zero as
 
 \begin{align}\label{eq:fit11}
 \frac{\partial E}{\partial \mathbf{w}_{id}} &= \mathbf{0} & \frac{\partial
@@ -2895,7 +2915,7 @@ $\mathbf{x}$ is computed using the chain rule as
   \mathbf{y}}\frac{\partial \mathbf{w}}{\partial \mathbf{z}} 
 \end{equation*}
 which is reverse order of the scalar chain rule where multiplication is
-comutitative.
+commutative.
 
 The derivative of a vector function $\mathbf{A}\mathbf{x}$ with respect to a
 vector $\mathbf{x}$ is defined as
@@ -3166,7 +3186,7 @@ to approximate the optimal parameters of a tensor model during each iteration of
 the Kanade-Lucas feature tracker.
 
 Newton's method may not converge if the starting point is far from the
-optimum. Therefore to avoid using the newton's method on a nonlinear system, we
+optimum. Therefore to avoid using the Newton's method on a nonlinear system, we
 minimize the expression transfer error function (\ref{eq:fit10}) using
 a coordinate-descent method which combines the equations
 \ref{eq:nonlin1},\ref{eq:nonlin2} with the POSIT algorithm discussed in section
@@ -3244,13 +3264,13 @@ $\mathbf{\hat{R}}$ and $\mathbf{\hat{t}}$
 
 \State $\mathbf{G}_i = \mathbf{P}_w\mathbf{\hat{R}}[\mathbf{M}_{(1)}]_{i}(\mathbf{U}_{id}^T\mathbf{\hat{w}}_{id}
 \otimes \mathbf{I}_{I_{exp}})\mathbf{U}_{exp}$
-\State $\mathbf{G} \gets $ \texttt{stack-horizontaly}($\mathbf{G}_i$)
+\State $\mathbf{G} \gets $ \texttt{stack-horizontally}($\mathbf{G}_i$)
 \State
 \State $\mathbf{\hat{w}}_{exp} = z_{avg}(\mathbf{G}^T\mathbf{G})^{-1}\mathbf{G}^T\bigl(\mathbf{f} - \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{\hat{t}}\bigr)$
 \State
 \State $\mathbf{H}_i = \mathbf{P}_w\mathbf{\hat{R}}[\mathbf{M}_{(1)}]_{i}(\mathbf{I}_{I_{id}}
 \otimes \mathbf{U}_{exp}^T\mathbf{\hat{w}}_{exp})\mathbf{U}_{id}$
-\State $\mathbf{H} \gets $ \texttt{stack-horizontaly}($\mathbf{H}_i$)
+\State $\mathbf{H} \gets $ \texttt{stack-horizontally}($\mathbf{H}_i$)
 \State
 \State $\mathbf{\hat{w}}_{id} = z_{avg}(\mathbf{H}^T\mathbf{H})^{-1}\mathbf{H}^T\bigl(\mathbf{f} - \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{\hat{t}}\bigr)$
 
@@ -3260,7 +3280,7 @@ $\mathbf{\hat{R}}$ and $\mathbf{\hat{t}}$
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Overfitting}
+\subsection{Overfitting}\label{s:overfitting}
 As pointed out earlier the generative model only generates realistic
 representations of a face when the model parameters are within several standard
 deviations of the mean. In \cite{blanz1}, \cite{jacey} the model parameters are constrained to
@@ -3271,7 +3291,7 @@ expression transfer application.
 To allow the application to perform well, the optimization through coordinate-descent
 should find only model parameters that represent a realistic face. The optimal
 parameters $\mathbf{w}^*_{exp}$, $\mathbf{w}^*_{id}$, $\mathbf{R}^*$ and
-$\mathbf{t}^*$ obtained throught minimization of the error function may not be realistic. This is due to the fact that the model may not
+$\mathbf{t}^*$ obtained through minimization of the error function may not be realistic. This is due to the fact that the model may not
 be able to generate any arbitrary face if it is not present in the database. The model
 can only build linear combinations of the faces in the database. A face present
 in the image may not be obtainable as this linear combination. In such a case the
@@ -3284,7 +3304,7 @@ This problem is well known to machine learning
 where it is known as \textit{overfitting}. The minimization finds the parameters
 of a shape which is too specific. It minimizes the error for a specific set of
 feature points. However, since the model parameters are too specific they cause
-a large error for other points on the image which werent used to fit the
+a large error for other points on the image which were not used to fit the
 model. 
 
 The model fitting algorithm should therefore be \textit{general} enough so that
@@ -3295,7 +3315,7 @@ always clear how many points is enough to make the fitting general.
 
 The expression transfer application support two techniques which ensure that the
 fitting algorithm generates realistic faces. They are \textit{regularization}
-and \textit{constrained minimzation}.
+and \textit{constrained minimization}.
 
 \paragraph{Regularization.}
 As discussed, unrealistic faces are produced when the model parameters are far
@@ -3303,7 +3323,7 @@ from the mean. To enforce that the model parameters obtained through the
 minimization of the error function are close to the mean we can add a
 regularization term to the error function. A reasonable choice for this term is
 one which penalizes the distance of the parameters from their respective mean.
-The augemented error function is then given by
+The augmented error function is then given by
 \begin{equation}\label{eq:regular}
 E = \sum_{i=1}^N \Big\Vert\mathbf{f}_i - \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
 \mathbf{U}_{exp}^T\mathbf{w}_{exp}) + \mathbf{t}\Big\Vert^2
@@ -3342,7 +3362,7 @@ of points which are interpolations of the points on the original faces. With lin
 To ensure that we obtain a linear interpolation we must enforce constraints on
 the model parameters. For both the identity and the expression parameter vector
 it must hold that all the components are greater or equal to zero and
-that they sum to one. The constrained minimzation problem that the fitting
+that they sum to one. The constrained minimization problem that the fitting
 algorithm must solve is therefore given by
 \begin{align}\label{eq:optprob}
 \mathrm{minimize}\quad &\sum_{i=1}^N \Big\Vert\mathbf{f}_i - \frac{1}{z_{avg}}\mathbf{P}_w\mathbf{R}[\mathbf{M}_{(1)}]_{i}(\mathbf{U}_{id}^T\mathbf{w}_{id} \otimes
@@ -3398,11 +3418,11 @@ these constraints the model losses expressive power. However, it is
 impossible to generate an unrealistic face when they are satisfied, which
 warrants enforcing the non-negativity constraints.
 
-\subsection{Fitting Algorithm}
+\subsection{Fitting Algorithm}\label{s:fitalgo}
 Before the complete fitting algorithm can be established two problems need to be
 addressed. 
 
-\paragraph{Multi-Frame Coordinate Descent.} First of all the coordinate descent algoritm discussed sofar was
+\paragraph{Multi-Frame Coordinate Descent.} First of all the coordinate descent algorithm discussed so far was
 designed to optimize the parameters for just one frame. The fitting algorithm
 should however find the identity and the expressions of a person by examining a
 sequence of frames. As an additional constraint, the identity parameters should
@@ -3425,7 +3445,7 @@ The task is thus to generate feature points which
 correspond to known points on the model. This can be done by either selecting
 new 3D points on the model and projecting them to generate the new feature
 points in the image, or
-inversly by selecting points in the 2D image and reprojecting them into 3D. When
+inversely by selecting points in the 2D image and reprojecting them into 3D. When
 points are projected from the model the correspondence is already given. When
 they are reprojected from the image into 3D then the corresponding 3D point to the 2D image
 is chosen to be the 3D point on the model which is closest
@@ -3434,10 +3454,10 @@ in terms of Euclidean distance to the reprojected point.
 To establish the correspondence in this manner the camera matrix and the 3D pose
 need to be
 known. These define the projection from object coordinate space into image
-space. This projection can be inversed to give the reprojection from image space into
+space. This projection can be inverted to give the reprojection from image space into
 object coordinate space. Likewise, it is necessary to know the shape of the face in 3D space. This
 shape is generated using the expression and identity parameters. So to be able
-to generate new points with known correspondences we require all the unknwon parameters
+to generate new points with known correspondences we require all the unknown parameters
 we are attempting to find. This is clearly a problem. The best approach is to find the 3D pose and model parameters of the
 first frame by means of optimization using only the small number of user provided
 feature points. These rough estimations of the parameters can then be used to
@@ -3465,7 +3485,7 @@ due to the model parameters is small in comparison.
 \paragraph{Expression Transfer Fitting Algorithm. } \label{s:fit}Given are $N$ image feature points $f_1, \ldots ,f_N$, the
 calibrated weak perspective camera matrix $\mathbf{P}_w$ and the regularization
 parameter $\lambda$. To fit the
-tensor-based shape model to these point the paramters $\mathbf{w}_{id}$,
+tensor-based shape model to these point the parameters $\mathbf{w}_{id}$,
 $\mathbf{w}_{exp}$, $\mathbf{R}$ and $\mathbf{t}$ are located as follows
 \begin{itemize}
 \item \textbf{Step 1.} Calculate the first frame alignment using the single
@@ -3523,7 +3543,7 @@ change the update steps 6. and 7. so that the parameter vectors are updated usin
 the the Sequential Coordinate-wise Non-negativity Least Squares Algorithm given
 in \ref{a:sca}.
 
-\section{Expression Transfer}
+\section{Expression Transfer}\label{s:exptranalgo}
 Ideally, the expression transfer application should be able to seamlessly change
 the expressions of the individual in the target video with the expressions from
 the source video. This of course involves correctly generating the texture for
@@ -3534,17 +3554,17 @@ understanding of the source and target face. This understanding can be utilized
 to transfer the texture between the target subject in the 2D frames of the
 video.
 
-The simplest way of transfering the texture between the two
+The simplest way of transferring the texture between the two
 video sequences is to create a texture map of the target face and then map
 the texture onto the estimated 3D model of this face. The application can
 construct the texture map after all the model and pose parameters have been
 estimated by projecting all the model points into the image to obtain their
-image coordiantes. The RGB values at these image coordinates make up the texture
+image coordinates. The RGB values at these image coordinates make up the texture
 map's contents and the image coordinates themselves can be used as the texture
-coordiantes. Usually, this texture itself is captured from the first frame of the
+coordinates. Usually, this texture itself is captured from the first frame of the
 target video sequence. If the subject has a neutral expression in the first frame and a smiling expression is
 transferred onto him, then this will cause the original texture to contract and
-stretch to fit the new configuartion of model points. It is clear that this
+stretch to fit the new configuration of model points. It is clear that this
 approach alone cannot produce very realistic results. 
 
 We can however utilize the information available about the target and source
@@ -3554,7 +3574,7 @@ of the source smile can be transferred into the target frame and blended with it
 surroundings. This blending has to be seamless and the result must appear believable. 
 
 \paragraph{Poisson Cloning.} Realistic blending of images can be achieved using
-poisson image editing techniques. The poisson cloning method, described by Perez
+Poisson image editing techniques. The Poisson cloning method, described by Perez
 et al in \cite{perez}, and Leyvand \cite{poisson} allows for seamless cloning of
 regions between images.
 The method is based on the two observations. Firstly, it is known to
@@ -3581,13 +3601,13 @@ This equation reduces to a sparse linear system of equations where the unknowns 
 pixels values inside the region. It can be solved using a sparse linear equation
 solver.
 
-The result of cloning two regions using possion image editing is shown in figure \ref{fg:poisson}
+The result of cloning two regions using Poisson image editing is shown in figure \ref{fg:poisson}
 \begin{figure}[H]
 \begin{centering}
 \includegraphics[scale=0.55]{images/cloning.png}
 \par\end{centering}
 
-\caption{The seamless blending of regions into a target image using poisson
+\caption{The seamless blending of regions into a target image using Poisson
   image editing.}
 \label{fg:poisson}
 
@@ -3596,10 +3616,10 @@ The result of cloning two regions using possion image editing is shown in figure
 \paragraph{Expression transfer algorithm.}Having established how faces will be reanimated using textures, we can now
 summarize the expression transfer algorithm:
 \begin{itemize}
-\item \textbf{Step 1.} Apply the fitting algortihm to the \textbf{source} video sequence
+\item \textbf{Step 1.} Apply the fitting algorithm to the \textbf{source} video sequence
   to obtain the identity, expression model parameters and the 3D pose parameters
   for every frame.
-\item \textbf{Step 2.} Apply the fitting algortihm to the \textbf{target} video sequence
+\item \textbf{Step 2.} Apply the fitting algorithm to the \textbf{target} video sequence
   to obtain the identity, expression model parameters and the 3D pose
   parameters for every frame.
 \item \textbf{Step 3.} Compute a sequence of 3D faces using the identity
@@ -3621,9 +3641,9 @@ summarize the expression transfer algorithm:
 
 \section{System Architecture}
 The system architecture of the expression transfer application follows a
-model-view-controller (MVC) design. There are three conceputal layers -- the
+model-view-controller (MVC) design. There are three conceptual layers -- the
 view layer which is responsible for interacting with the user, the controller
-layer which processes the commands comming from the view and the model or data
+layer which processes the commands coming from the view and the model or data
 layer. The MVC architecture is depicted in figure \ref{fg:mvc} 
 
 \begin{figure}[H]
@@ -3686,7 +3706,7 @@ feature points and \texttt{VectorFieldQLabel} which is used to display an
 optical flow vector field.
 
 \paragraph{Main Window}
-The GUI is itself is encapsulated in a main widnow. In the expression transfer application the
+The GUI is itself is encapsulated in a main window. In the expression transfer application the
 main window's functionality is implemented in the class
 \texttt{ExpTranWindow}. This class is responsible for all the GUI objects such
 as labels, OpenGL widgets and buttons. To has a reference to the controller
@@ -3718,7 +3738,7 @@ sliders. The design for this tab is shown in figure \ref{fg:facetab}
 
 The face tab also includes an options group which allows the user to customize how
 the face is displayed. The menu bar of the window contains an a File and an
-Options drop down menu. Using the file menu the user can load a .vtk file
+Options drop down menu. Using the file menu the user can load a .VTK file
 containing a face object or a video file to use in the video tab.
 
 The video tab processes the loaded video, providing functionality related to tracking points, extracting 3D
@@ -3755,7 +3775,7 @@ to an image.
 
 \paragraph{Model Construction}
 The model construction algorithm is encapsulated in the persistable \texttt{FaceModel}
-class. Persitence means the tensor model needs to be computed only once. After
+class. Persistence means the tensor model needs to be computed only once. After
 the initial computation the the class persists the identity mode
 matrix, the expression mode matrix and the flattened multilinear model matrix in
 a file. When the application is started it will look for this file and if found
@@ -3778,7 +3798,7 @@ expression parameters. The application represents a face object using the
 \paragraph{Model Fitting}
 The model fitting algorithm discussed in paragraph \ref{s:fit} is implemented in
 the class \texttt{VideoProcessor}. To prevent blocking of the application during the
-computation of the fitting algortihm, the class extends \texttt{QThread} so that
+computation of the fitting algorithm, the class extends \texttt{QThread} so that
 each processing of a video can be started in a separate thread.
 
 A \texttt{VideoProcessor} object communicates with an \texttt{Optimizer} object,
@@ -3800,7 +3820,7 @@ The communication between the classes during an invocation of the
 \par\end{centering}
 
 \caption{The sequence diagram showing an invocation of the
-  \texttt{VideoProcerssor} thread.}
+  \texttt{VideoProcessor} thread.}
 \label{fg:videoproc}
 \end{figure}
 
@@ -3812,7 +3832,7 @@ controller classes -- one for each tab in the user interface. The
 face generation functions from \texttt{FaceModel} and then updating the OpenGL
 widget. The \texttt{VideoTabController} starts \texttt{VideoProcessor} threads
 or computes the optical flow using the appropriate classes from the model
-layer. Finally, the \texttt{TransferTabController} provides functionallity to
+layer. Finally, the \texttt{TransferTabController} provides functionality to
 transfer expression between two video files. It allows the user to load a source
 and a target video file and to start the expression transfer process which
 estimates the face model parameters, exchanges the expression and transfers
@@ -3844,7 +3864,7 @@ slider to one and the rest to zero.
   right, top to bottom: neutral, surprise, sadness, fear, happiness and disgust.}
 \label{fg:facegen}
 \end{figure}
-
+ 
 The expression transfer can use the multilinear model to generate novel faces as
 linear combinations of original faces. The variance of the model is thus
 equivalent to the variance of the vertices of which the original faces consist. The extent of the variance of a tensor model constructed from the Binghamton database is depicted in figure \ref{fg:faceaddsub}.
@@ -3876,9 +3896,109 @@ fear, sad, surprise, disgust).
 \caption{Generating new face through linear interpolation of the original faces.}
 \end{figure}
 
+The tensor model is well-suited for expression transfer applications since it to
+manipulates the identity and the expression of the subject separately. This
+is shown in figure \ref{fg:faceidinter}, where we interpolate the identity
+between two subjects from the database first with a neutral expression
+and then with a happy expression.
 
-\section{Optical Flow Results}
+\begin{figure}[H]
+\centering
+\subfloat[Interpolating between two identities with a neutral expression.]{\includegraphics[scale=0.23]{images/ident_interpol.png}}\\
+\subfloat[Interpolating between two identities with a happy expression.]{\includegraphics[scale=0.23]{images/id_inerpol_happy.png}}
+\label{fg:faceidinter}
+\caption{Linear interpolation between subjects from the Binghamton database.}
+\end{figure}
+
+The fitting algorithm finds the model parameters by minimizing the difference
+between projected model feature points and corresponding feature points in the
+image. For this approach to work the feature points on the model must move as
+they would on a real face. For the pre-processed Binghamton database this holds as can be
+seen in figure \ref{fg:featureinter}.
+
+\begin{figure}[H]
+\centering
+\subfloat[Movement of feature points when interpolating between a neutral and
+  fearful expression.]{\includegraphics[scale=0.23]{images/fear.png}}\\
+\subfloat[Movement of feature points when interpolating between a surprised and
+  happy expression.]{\includegraphics[scale=0.23]{images/happy_surprise.png}}
+\label{fg:featureinter}
+\caption{The movement of feature points (designated by red spheres).}
+\end{figure}
+
+
+
+\section{Tracking Results}
+The most important part of the fitting algorithm is feature point
+tracking. Without identifying how the feature points are moving in the image, it
+is impossible to determine the correct expression and 3D pose during using the
+fitting algorithm. The task of tracking points becomes more difficult if there
+are changes in lighting in the image or if the object is moving very
+quickly. Likewise, points located in large areas of constant texture often drift
+away from their true positions. 
+
+The main parameter which affects the performance of the Kanade-Lucas feature
+point tracker is the window size. As discussed in section \ref{s:kanade}, the
+window size is the area around the point, the texture of which the tracker uses
+to determine the movement of the point. If the window size is chosen too small
+then points may jump around since the texture in the window is too small to be
+unique enough. Figure \ref{fg:3opt} shows the tracking of a moving face with
+a $3 \times 3$ window size around every feature point.
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.28]{images/3x3opt2.png}
+\par\end{centering}
+
+\caption{Tracking of feature point using a $3 \times 3$ window size. A large
+  number of feature points jump into incorrect positions, since the
+  window size is too small.}
+\label{fg:3opt}
+\end{figure}
+
+
+If, on the other hand, the window size is chosen too large then small movements of
+points will be subdued. This happens because even though textures close to the
+point change, the ones far from the point may not and the evidence from the far
+off textures will outweigh the small contribution from the nearby
+textures. Figure \ref{fg:50opt} shows tracking with a $50 \times 50$ window
+size. It can be seen that although points are not jumping anymore, the smile and
+the eyebrows do not move as much as the actual pixels of the image.
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.27]{images/50x50opt.png}
+\par\end{centering}
+
+\caption{Tracking of feature point using a $50 \times 50$ window size. The
+  features do not follow their true counterparts because the window size is too large.}
+\label{fg:50opt}
+\end{figure}
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.27]{images/8x8opt.png}
+\par\end{centering}
+
+\caption{Best tracking results obtained using a $15 \times 15$ window size.}
+\label{fg:8opt}
+\end{figure}
 \section{Optimization Results}
+The quality of the model and 3D pose parameter estimation depends on the
+selection of the feature points. This is due to the face that the first frame
+alignment is calculated purely using the user provided (or automatically
+located) feature points. The first frame alignment is then used to determine the
+3D model correspondences of a
+large number of newly generated feature points. These correspondences bias the
+fitting process toward the identity, expression and 3D pose of the first
+alignment, especially when the performance in the video is not very dynamic. So
+if the first frame alignment is
+very different from the true identity, expression and 3D pose of the subject
+then the fitting algorithm also returns an incorrect estimate of the face.
+
+On the other hand, the user cannot be expected to input a large number of
+feature points and an automatic algorithm is likewise only effective for a small
+number of unique features such as the mouth corners, eye corners etc.
 \section{Expression Transfer Results}
 
 \chapter{Conclusion}

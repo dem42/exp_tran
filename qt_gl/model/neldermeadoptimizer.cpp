@@ -1,5 +1,6 @@
 #include "neldermeadoptimizer.h"
 #include "modelimageerror.h"
+#include "modelidentityerror.h"
 #include <cstdio>
 #include <cstdlib>
 #include <iostream>
@@ -17,8 +18,8 @@ void NelderMeadOptimizer::estimateModelParameters(const vector<Point2f> &feature
                                                     const Mat &rotation, const Mat &translation,
                                                     vector<double> &weights_id, vector<double> &weights_ex)
 {
-    double *w_id = new double[56];
-    double *w_exp = new double[7];
+    double *w_id = new double[face_ptr->getIdNum()];
+    double *w_exp = new double[face_ptr->getExpNum()];
 
     Mat_<double> rmatrix;
 
@@ -28,15 +29,15 @@ void NelderMeadOptimizer::estimateModelParameters(const vector<Point2f> &feature
     vector<double> ex;
 
     //get weights from the current face instance
-    face_ptr->getWeights(w_id,56,w_exp,7);
+    face_ptr->getWeights(w_id,face_ptr->getIdNum(),w_exp,face_ptr->getExpNum());
 
     /***********************/
     /* now use the newly */
     /* projected points to */
     /* calculate how to change shape */
     /***********************/
-    id.assign(w_id,w_id+56);
-    ex.assign(w_exp,w_exp+7);
+    id.assign(w_id,w_id+face_ptr->getIdNum());
+    ex.assign(w_exp,w_exp+face_ptr->getExpNum());
     //sizeof(w_exp)/sizeof(double)
     //first expression
     //TODO smaller coz its too slow
@@ -45,7 +46,7 @@ void NelderMeadOptimizer::estimateModelParameters(const vector<Point2f> &feature
 
     for(int i=0;i<3;i++)
     {
-        error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::EXPRESSION);
+        error = new ModelImageError(cameraMatrix,rmatrix,translation);
         error->setWeights(id);
 
         error->setPoints(featurePoints,point_indices);
@@ -58,7 +59,7 @@ void NelderMeadOptimizer::estimateModelParameters(const vector<Point2f> &feature
         //then identity using the expression guess
 
 
-        error = new ModelImageError(cameraMatrix,rmatrix,translation,ModelImageError::IDENTITY);
+        error = new ModelImageError(cameraMatrix,rmatrix,translation);
         error->setWeights(weights_ex);
 
         error->setPoints(featurePoints,point_indices);
@@ -70,12 +71,12 @@ void NelderMeadOptimizer::estimateModelParameters(const vector<Point2f> &feature
     }
 
 
-    for(int i=0;i<7;i++){
+    for(int i=0;i<face_ptr->getExpNum();i++){
 
         cout << weights_ex[i] << " ";
     }
 
-    for(int i=0;i<56;i++){
+    for(int i=0;i<face_ptr->getIdNum();i++){
 
         cout  << weights_id[i] << " ";
     }    
@@ -358,13 +359,95 @@ double NelderMeadOptimizer::mysimplex(ErrorFunction & func,vector<double>& start
                                       const Mat &rotation, const Mat &translation,
                                       vector<double> &weights_ex)
     {
+        double *w_id = new double[face_ptr->getIdNum()];
+        double *w_exp = new double[face_ptr->getExpNum()];
+
+        Mat_<double> rmatrix;
+
+        double min;
+        ModelImageError *error;
+        vector<double> id;
+        vector<double> ex;
+
+        //get weights from the current face instance
+        face_ptr->getWeights(w_id,face_ptr->getIdNum(),w_exp,face_ptr->getExpNum());
+
+        /***********************/
+        /* now use the newly */
+        /* projected points to */
+        /* calculate how to change shape */
+        /***********************/
+        id.assign(w_id,w_id+face_ptr->getIdNum());
+        ex.assign(w_exp,w_exp+face_ptr->getExpNum());
+        //sizeof(w_exp)/sizeof(double)
+        //first expression
+        //TODO smaller coz its too slow
+
+        Rodrigues(rotation,rmatrix);
+
+        error = new ModelImageError(cameraMatrix,rmatrix,translation);
+        error->setWeights(id);
+
+        error->setPoints(featurePoints,point_indices);
+        cout << "min before exp : " << (*error)(ex) << endl;
+        min=mysimplex(*error,ex,ex.size(),1);
+        weights_ex = ex;
+        cout << "min after exp : " << min << endl;
+        delete error;
+
+
+        for(int i=0;i<face_ptr->getExpNum();i++){
+
+            cout << weights_ex[i] << " ";
+        }
+
+
+        delete[] w_id;
+        delete[] w_exp;
     }
 
     void NelderMeadOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&featurePointsVector,
-                                    const Mat &cameraMatrix, const Mat& lensDist,
-                                    Face* face_ptr,const vector<vector<int> >&point_indices_vector,
-                                    const vector<Mat> &rotation, const vector<Mat> &translation,
-                                    const vector<vector<double> > &weights_ex,
-                                    vector<double> &weights_id)
+                                                         const Mat &cameraMatrix, const Mat& lensDist,
+                                                         Face* face_ptr,const vector<vector<int> >&point_indices_vector,
+                                                         const vector<Mat> &rotation, const vector<Mat> &translation,
+                                                         const vector<vector<double> > &weights_ex,
+                                                         vector<double> &weights_id)
     {
+        double *w_id = new double[face_ptr->getIdNum()];
+        double *w_exp = new double[face_ptr->getExpNum()];
+
+        Mat_<double> rmatrix;
+
+        double min;
+        ModelIdentityError *error;
+        vector<double> id;
+        vector<double> ex;
+
+        //get weights from the current face instance
+        face_ptr->getWeights(w_id,face_ptr->getIdNum(),w_exp,face_ptr->getExpNum());
+
+        /***********************/
+        /* now use the newly */
+        /* projected points to */
+        /* calculate how to change shape */
+        /***********************/
+        id.assign(w_id,w_id+face_ptr->getIdNum());
+        ex.assign(w_exp,w_exp+face_ptr->getExpNum());
+        //sizeof(w_exp)/sizeof(double)
+        //first expression
+        //TODO smaller coz its too slow
+
+
+        error = new ModelIdentityError(cameraMatrix);
+        error->setTransformations(rotation,translation);
+        error->setWeights(weights_ex);
+
+        error->setPoints(featurePointsVector,point_indices_vector);
+        cout << "min before id : " << (*error)(id) << endl;
+        min=mysimplex(*error,id,id.size(),1);
+        weights_id = id;
+        cout << "min after id : " << min << endl;
+        delete error;
+        delete[] w_id;
+        delete[] w_exp;
     }

@@ -7,7 +7,6 @@
 \contentsline {subsubsection}{\numberline {2.1.1.1}Finite Element Method (FEM)}{9}{subsubsection.2.1.1.1}
 \contentsline {subsubsection}{\numberline {2.1.1.2}Modal Analysis}{10}{subsubsection.2.1.1.2}
 \contentsline {subsubsection}{\numberline {2.1.1.3}Recovering shape with FEM}{11}{subsubsection.2.1.1.3}
-\contentsline {subsubsection}{\numberline {2.1.1.4}Combining Statistical and FEM modes}{11}{subsubsection.2.1.1.4}
 \contentsline {subsection}{\numberline {2.1.2}Statistical Models !ALTERED}{11}{subsection.2.1.2}
 \contentsline {subsubsection}{\numberline {2.1.2.1}PCA and Eigenfaces !ALTERED}{12}{subsubsection.2.1.2.1}
 \contentsline {subsubsection}{\numberline {2.1.2.2}Morphable Model}{13}{subsubsection.2.1.2.2}
@@ -54,38 +53,40 @@
 \contentsline {section}{\numberline {3.4}Model Construction}{45}{section.3.4}
 \contentsline {subsection}{\numberline {3.4.1}Data Tensor}{45}{subsection.3.4.1}
 \contentsline {subsection}{\numberline {3.4.2}Computing the HOSVD !! NEW}{46}{subsection.3.4.2}
+\contentsline {paragraph}{HOSVD algorithm}{48}{section*.15}
 \contentsline {subsection}{\numberline {3.4.3}Generating new faces}{49}{subsection.3.4.3}
+\contentsline {paragraph}{Summary.}{50}{section*.16}
 \contentsline {section}{\numberline {3.5}Model Parameter Estimation}{50}{section.3.5}
 \contentsline {subsection}{\numberline {3.5.1}Locating Feature Points}{51}{subsection.3.5.1}
-\contentsline {subsection}{\numberline {3.5.2}Tracking Feature Points}{52}{subsection.3.5.2}
+\contentsline {subsection}{\numberline {3.5.2}Tracking Feature Points}{53}{subsection.3.5.2}
 \contentsline {subsection}{\numberline {3.5.3}Camera Parameters}{53}{subsection.3.5.3}
 \contentsline {subsection}{\numberline {3.5.4}Minimizing the Error Function}{55}{subsection.3.5.4}
-\contentsline {paragraph}{Error function.}{57}{section*.15}
-\contentsline {paragraph}{Coordinate-Descent Method}{61}{section*.16}
+\contentsline {paragraph}{Error function.}{57}{section*.17}
+\contentsline {paragraph}{Coordinate-Descent Method}{61}{section*.18}
 \contentsline {subsection}{\numberline {3.5.5}Overfitting}{62}{subsection.3.5.5}
-\contentsline {paragraph}{Regularization.}{63}{section*.17}
-\contentsline {paragraph}{Constrained Optimization.}{64}{section*.18}
+\contentsline {paragraph}{Regularization.}{63}{section*.19}
+\contentsline {paragraph}{Constrained Optimization.}{64}{section*.20}
 \contentsline {subsection}{\numberline {3.5.6}Fitting Algorithm}{65}{subsection.3.5.6}
-\contentsline {paragraph}{Multi-Frame Coordinate Descent.}{65}{section*.19}
-\contentsline {paragraph}{Feature point generation.}{65}{section*.20}
-\contentsline {paragraph}{Expression Transfer Fitting Algorithm. }{66}{section*.21}
+\contentsline {paragraph}{Multi-Frame Coordinate Descent.}{65}{section*.21}
+\contentsline {paragraph}{Feature point generation.}{65}{section*.22}
+\contentsline {paragraph}{Expression Transfer Fitting Algorithm. }{66}{section*.23}
 \contentsline {section}{\numberline {3.6}Expression Transfer}{67}{section.3.6}
-\contentsline {paragraph}{Poisson Cloning.}{68}{section*.22}
-\contentsline {paragraph}{Expression transfer algorithm.}{69}{section*.23}
+\contentsline {paragraph}{Poisson Cloning.}{68}{section*.24}
+\contentsline {paragraph}{Expression transfer algorithm.}{69}{section*.25}
 \contentsline {section}{\numberline {3.7}System Architecture}{69}{section.3.7}
 \contentsline {subsection}{\numberline {3.7.1}View Layer}{70}{subsection.3.7.1}
-\contentsline {paragraph}{OpenGL widget}{70}{section*.24}
-\contentsline {paragraph}{Interactive Image Hierarchy}{70}{section*.25}
-\contentsline {paragraph}{Main Window}{70}{section*.26}
-\contentsline {paragraph}{GUI}{70}{section*.27}
+\contentsline {paragraph}{OpenGL widget}{70}{section*.26}
+\contentsline {paragraph}{Interactive Image Hierarchy}{70}{section*.27}
+\contentsline {paragraph}{Main Window}{70}{section*.28}
+\contentsline {paragraph}{GUI}{70}{section*.29}
 \contentsline {subsection}{\numberline {3.7.2}Model Layer}{72}{subsection.3.7.2}
-\contentsline {paragraph}{Model Construction}{72}{section*.28}
-\contentsline {paragraph}{Model Fitting}{73}{section*.29}
+\contentsline {paragraph}{Model Construction}{72}{section*.30}
+\contentsline {paragraph}{Model Fitting}{73}{section*.31}
 \contentsline {subsection}{\numberline {3.7.3}Controller Layer}{74}{subsection.3.7.3}
 \contentsline {chapter}{\numberline {4}Results and Evaluation}{75}{chapter.4}
 \contentsline {section}{\numberline {4.1}Face Generation}{75}{section.4.1}
-\contentsline {section}{\numberline {4.2}Optical Flow Results}{77}{section.4.2}
-\contentsline {section}{\numberline {4.3}Optimization Results}{77}{section.4.3}
-\contentsline {section}{\numberline {4.4}Expression Transfer Results}{77}{section.4.4}
-\contentsline {chapter}{\numberline {5}Conclusion}{78}{chapter.5}
-\contentsline {section}{\numberline {5.1}Future Work}{78}{section.5.1}
+\contentsline {section}{\numberline {4.2}Tracking Results}{78}{section.4.2}
+\contentsline {section}{\numberline {4.3}Optimization Results}{80}{section.4.3}
+\contentsline {section}{\numberline {4.4}Expression Transfer Results}{80}{section.4.4}
+\contentsline {chapter}{\numberline {5}Conclusion}{81}{chapter.5}
+\contentsline {section}{\numberline {5.1}Future Work}{81}{section.5.1}

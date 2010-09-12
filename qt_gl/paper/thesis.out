@@ -7,7 +7,6 @@
 \BOOKMARK [3][-]{subsubsection.2.1.1.1}{Finite Element Method \(FEM\)}{subsection.2.1.1}
 \BOOKMARK [3][-]{subsubsection.2.1.1.2}{Modal Analysis}{subsection.2.1.1}
 \BOOKMARK [3][-]{subsubsection.2.1.1.3}{Recovering shape with FEM}{subsection.2.1.1}
-\BOOKMARK [3][-]{subsubsection.2.1.1.4}{Combining Statistical and FEM modes}{subsection.2.1.1}
 \BOOKMARK [2][-]{subsection.2.1.2}{Statistical Models !ALTERED}{section.2.1}
 \BOOKMARK [3][-]{subsubsection.2.1.2.1}{PCA and Eigenfaces !ALTERED}{subsection.2.1.2}
 \BOOKMARK [3][-]{subsubsection.2.1.2.2}{Morphable Model}{subsection.2.1.2}
@@ -56,7 +55,7 @@
 \BOOKMARK [2][-]{subsection.3.7.3}{Controller Layer}{section.3.7}
 \BOOKMARK [0][-]{chapter.4}{Results and Evaluation}{}
 \BOOKMARK [1][-]{section.4.1}{Face Generation}{chapter.4}
-\BOOKMARK [1][-]{section.4.2}{Optical Flow Results}{chapter.4}
+\BOOKMARK [1][-]{section.4.2}{Tracking Results}{chapter.4}
 \BOOKMARK [1][-]{section.4.3}{Optimization Results}{chapter.4}
 \BOOKMARK [1][-]{section.4.4}{Expression Transfer Results}{chapter.4}
 \BOOKMARK [0][-]{chapter.5}{Conclusion}{}

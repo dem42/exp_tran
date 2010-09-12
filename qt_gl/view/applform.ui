@@ -204,7 +204,7 @@
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QRadioButton" name="bruteIdRadio">
+      <widget class="QRadioButton" name="interIdRadio">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -217,13 +217,13 @@
         <string>identity interpolation</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="autoExclusive">
         <bool>false</bool>
        </property>
       </widget>
-      <widget class="QRadioButton" name="bruteExpRadio">
+      <widget class="QRadioButton" name="interExpRadio">
        <property name="geometry">
         <rect>
          <x>10</x>
@@ -236,7 +236,7 @@
         <string>expression interpolation</string>
        </property>
        <property name="checked">
-        <bool>true</bool>
+        <bool>false</bool>
        </property>
        <property name="autoExclusive">
         <bool>false</bool>

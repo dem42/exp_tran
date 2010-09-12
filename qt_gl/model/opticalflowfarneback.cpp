@@ -19,16 +19,14 @@ OpticalFlowFarneback::OpticalFlowFarneback() : OpticalFlowEngine()
 
 void OpticalFlowFarneback::computeFlow(const Mat& prevImg, const Mat& nextImg,
                                     const vector<Point2f>& prevPoints, vector<Point2f>& nextPoints,
-                                    const std::vector<int> &curIndices, std::vector<int> &nextIndices)
+                                    const std::vector<int> &curIndices, std::vector<int> &nextIndices,bool indicesOn)
 {
     Mat flowOutput;
     int sizeX,sizeY;
-    //cout << prevPoints[2].x << " " << prevPoints[2].y << endl;
+
     int x,y;
     float dx,dy;
-//    cout << prevImg.size().height << " " << prevImg.size().width << " "
-//         << nextImg.size().height << " " << nextImg.size().width << " "
-//         << prevImg.channels() << " " << nextImg.channels() << endl;
+
 
     calcOpticalFlowFarneback(prevImg.reshape(1),nextImg.reshape(1),flowOutput,pyrScale,levels,winsize,iter,polyN,polySigma,flags);
 

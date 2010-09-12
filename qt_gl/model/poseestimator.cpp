@@ -7,6 +7,23 @@ PoseEstimator::PoseEstimator()
 {
 }
 
+void PoseEstimator::projectModelPointsInto2D(const Mat &rotation, const Mat &translation,
+                                             const Mat& cameraMatrix, const Mat& lensDist,
+                                             Face *face_ptr, vector<int> &correspondence3d,
+                                             vector<Point2f> &imagePoints)
+{
+    vector<Point3f> obj;
+    for(int i=0;i<Face::mouth_size;i++)
+    {
+        correspondence3d.push_back(face_ptr->getPointIndexFromPolygon(Face::mouth[i]));
+        obj.push_back(face_ptr->getPointFromPolygon(Face::mouth[i]));
+    }
+
+    projectPoints(Mat(obj),rotation,translation,cameraMatrix,lensDist,imagePoints);
+}
+
+
+
 void PoseEstimator::reprojectInto3DUsingWeak(const vector<Point2f> &imagePoints,
                                              const Mat &rotation, const Mat &translation,
                                              const Mat& cameraMatrix, const Mat& lensDist,

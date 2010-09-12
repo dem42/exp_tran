@@ -12,10 +12,8 @@ using namespace cv;
 class ModelImageError : public ErrorFunction
 {
 public:
-    enum ErrorType {IDENTITY = 0, EXPRESSION = 1};
-
     ModelImageError();
-    ModelImageError(Mat P,Mat R,Mat t,ModelImageError::ErrorType type);
+    ModelImageError(Mat P,Mat R,Mat t);
     void setWeights(const vector<double> &);
     void setPoints(const vector<Point2f> &, const vector<int> &);
 
@@ -28,7 +26,6 @@ private:
     //translation
     Mat_<double> t;
 
-    const ModelImageError::ErrorType type;
 
     Matrix core;
     Matrix u_id;

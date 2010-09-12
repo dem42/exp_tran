@@ -16,6 +16,10 @@ TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, Click
     target_face_ptr = new Face();
     face_widget->setFace(src_face_ptr);
 
+    opttype = VideoProcessor::OptType_INTERPOLATE;
+    regParam = 2000.0;
+    frame_num = 10;
+    iter_num = 3;
 
     srcFileSelected("/home/martin/project/TrackedSmiles/S003-024.avi");
     targetFileSelected("/home/martin/project/TrackedSmiles/S008-005.avi");
@@ -164,8 +168,7 @@ void TransferTabController::beginTransfer()
         s_frameData.push_back(copyFrame);
     }
 
-    src_videoProcessor = new VideoProcessor(sourceLabel->getMarked(),s_frameData, cameraSrc, lensDist);
-                                            //,VideoProcessor::OptType_LIN_COMB,1000.0,6,2);
+    src_videoProcessor = new VideoProcessor(sourceLabel->getMarked(),s_frameData, cameraSrc, lensDist,opttype,regParam,frame_num,iter_num);
     connect(src_videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
     src_videoProcessor->start();
 
@@ -181,8 +184,7 @@ void TransferTabController::beginTransfer()
         t_frameData.push_back(copyFrame);
     }
 
-    target_videoProcessor = new VideoProcessor(targetLabel->getMarked(),t_frameData, cameraSrc, lensDist);
-                                               //,VideoProcessor::OptType_LIN_COMB,1000.0,6,2);
+    target_videoProcessor = new VideoProcessor(targetLabel->getMarked(),t_frameData, cameraSrc, lensDist,opttype,regParam,frame_num,iter_num);
     connect(target_videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
     target_videoProcessor->start();
 
@@ -239,8 +241,6 @@ void TransferTabController::processingFinished()
     //we dont actually distinguish which one is finished atm
     //we could use 2 functions to do that
 
-    cout << "IN HEEEEEEEEEEEEEEEEEEEREEEEEEEEEE " << endl;
-
     mutex.lock();
     if(!srcFinished && !targetFinished)
     {
@@ -287,9 +287,7 @@ void TransferTabController::replayFrame()
     //compute and set the pose parameters
     Rodrigues(rot,rmatrix);
     Utility::computeEulerAnglesFromRmatrix(rmatrix,euler_x,euler_y,euler_z);
-    //only y needs to be negative so that it agrees with the transposes
-    cout << "setting trans param " << euler_x << " " << euler_y << " "
-            << euler_z  << " " << tx << " " << ty << " " << tz  << endl;
+    //only y needs to be negative so that it agrees with the transposes   
 
     //set the parameters in face widget
     face_widget->setTransParams(euler_x,-euler_y,euler_z,tx,ty,tz);
@@ -332,7 +330,7 @@ void TransferTabController::replayFrame()
     tranM(1,3) = ty;
     tranM(2,3) = tz;
     tranM(3,3) = 1.0;
-    cout << "tranM " << Matrix(tranM);
+
     //face_widget->setTransformationMatrix(tranM);
 
 
@@ -359,6 +357,7 @@ void TransferTabController::replayFrame()
 
     getClonedMouth(s_frameData[i],i,t_frameData[i]);
 
+    sourceLabel->setPixmap(Utility::mat2QPixmap(s_frameData[i]));
     targetLabel->setPixmap(Utility::mat2QPixmap(t_frameData[i]));
 
     i++;
@@ -400,9 +399,7 @@ void TransferTabController::convertFrameIntoTexture(Mat &imgO)
     width = img.cols;
     step = img.step;
     channels = img.channels();
-    data = img.data;
-    cout << "in convert frame into texture " << endl;
-    cout << height << " " << width << " " << channels << " " << step << endl;;
+    data = img.data;    
     img_data = new uchar[width*height*3];
 
     for(int i=0;i<height;i++)
@@ -453,4 +450,29 @@ void TransferTabController::restart()
     featurePoints.clear();
     srcFileSelected(srcFile);
     targetFileSelected(targetFile);
+}
+
+void TransferTabController::setOptNelder(bool toggled)
+{
+    if(toggled == true)
+        opttype = VideoProcessor::OptType_NELDER_INT;
+}
+void TransferTabController::setOptReg(double regParam)
+{    
+    this->regParam = regParam;
+}
+void TransferTabController::setOptType(int t)
+{    
+    if(t == 0)
+        opttype = VideoProcessor::OptType_LIN_COMB;
+    else
+        opttype = VideoProcessor::OptType_INTERPOLATE;
+}
+void TransferTabController::setFrameNum(int n)
+{
+    frame_num = n;
+}
+void TransferTabController::setIterNum(int n)
+{
+    iter_num = n;
 }

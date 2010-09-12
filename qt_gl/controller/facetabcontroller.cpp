@@ -49,7 +49,7 @@ FaceTabController::FaceTabController(QSlider *exp_slider, QSlider *ident_slider,
     for(int i=0;i<7;i++)
         cout << w_exp[i] << endl;
 
-    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp,getInterType());
 
     face_widget->setFace(face_ptr);
 
@@ -71,6 +71,18 @@ FaceTabController::~FaceTabController()
     delete face_ptr;
 }
 
+Face::InterpolType FaceTabController::getInterType()
+{
+    if(id_inter && exp_inter)
+        return Face::ID_EXP_INTER;
+    else if(id_inter)
+        return Face::ID_INTER;
+    else if(exp_inter)
+        return Face::EXP_INTER;
+    else
+        return Face::NO_INTER;
+}
+
 void FaceTabController::face_file_changed(const QString str)
 {
     cout << str.toStdString() << endl;    
@@ -82,7 +94,7 @@ void FaceTabController::exp_slider_moved(int val)
 {
     w_exp[current_expr] = (float)val/100.0;
     cout << "exp slider at : " << val/100. << endl;
-    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp,getInterType());
     face_widget->setFace(face_ptr);    
 }
 
@@ -90,7 +102,7 @@ void FaceTabController::id_slider_moved(int val)
 {
     w_id[current_ident] = (float)val/100.0;
     cout << "id slider at : " << val/100. << endl;
-    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp,getInterType());
     face_widget->setFace(face_ptr); 
 }
 
@@ -108,6 +120,24 @@ void FaceTabController::identity_activated(int ident)
 
 void FaceTabController::render_action()
 {
-    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp,getInterType());
     face_widget->refreshGL();
+}
+
+void FaceTabController::id_inter_toggled(bool toggled)
+{
+    this->id_inter = toggled;
+    if(id_inter == true)
+        ident_slider->setMinimum(0);
+    else
+        ident_slider->setMinimum(-100);
+}
+
+void FaceTabController::exp_inter_toggled(bool toggled)
+{    
+    this->exp_inter = toggled;
+    if(exp_inter == true)
+        exp_slider->setMinimum(0);
+    else
+        exp_slider->setMinimum(-100);
 }

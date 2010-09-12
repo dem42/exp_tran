@@ -31,6 +31,10 @@ public:
                                   const Mat &rotation, const Mat &translation,
                                   const Mat& cameraMatrix, const Mat& lensDist,
                                   Face *face_ptr, vector<int> &correspondence3d);
+    void projectModelPointsInto2D(const Mat &rotation, const Mat &translation,
+                                             const Mat& cameraMatrix, const Mat& lensDist,
+                                             Face *face_ptr, vector<int> &correspondence3d,
+                                             vector<Point2f> &imagePoints);
 };
 
 #endif // POSEESTIMATOR_H

@@ -62,11 +62,14 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(ui.actionPreferences,SIGNAL(triggered()),settings,SLOT(show()));
 
 
+    //face controller connects
     connect(ui.expComboBox,SIGNAL(activated(QString)),f_controller,SLOT(expression_activated(QString)));    
     connect(ui.expSlider,SIGNAL(valueChanged(int)),f_controller,SLOT(exp_slider_moved(int)));
     connect(ui.identSlider,SIGNAL(valueChanged(int)),f_controller,SLOT(id_slider_moved(int)));
     connect(ui.identSpinBox,SIGNAL(valueChanged(int)),f_controller,SLOT(identity_activated(int)));
-    connect(ui.renderButton,SIGNAL(clicked()),f_controller,SLOT(render_action()));    
+    connect(ui.renderButton,SIGNAL(clicked()),f_controller,SLOT(render_action()));
+    connect(ui.interExpRadio,SIGNAL(toggled(bool)),f_controller,SLOT(exp_inter_toggled(bool)));
+    connect(ui.interIdRadio,SIGNAL(toggled(bool)),f_controller,SLOT(id_inter_toggled(bool)));
 
     //menu
     connect(f_dialog,SIGNAL(fileSelected(const QString)),f_controller,SLOT(face_file_changed(const QString)));
@@ -83,7 +86,7 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(ui.pauseButton,SIGNAL(clicked()),v_controller,SLOT(pauseTransfer()));
     connect(ui.flowButton,SIGNAL(clicked()),v_controller,SLOT(findGoodFeaturePoints()));
     connect(ui.drawRadio,SIGNAL(clicked(bool)),v_controller,SLOT(toggleDrawable(bool)));
-    connect(ui.extractBtn,SIGNAL(clicked()),v_controller,SLOT(startFaceTransfer()));
+    connect(ui.extractBtn,SIGNAL(clicked()),v_controller,SLOT(extractPose()));
     connect(ui.dropButton,SIGNAL(clicked()),v_controller,SLOT(dropFrame()));
     connect(ui.modelButton,SIGNAL(clicked()),v_controller,SLOT(playBack()));
     connect(ui.cameraButton,SIGNAL(clicked()),v_controller,SLOT(calibrate()));
@@ -95,6 +98,19 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(ui.dropT,SIGNAL(clicked()),t_controller,SLOT(dropTarget()));
     connect(ui.startT,SIGNAL(clicked()),t_controller,SLOT(beginTransfer()));
     connect(ui.restartTransferButton,SIGNAL(clicked()),t_controller,SLOT(restart()));
+
+    //settings connects
+    connect(sUi.optBox,SIGNAL(activated(int)),t_controller,SLOT(setOptType(int)));
+    connect(sUi.regBox,SIGNAL(valueChanged(double)),t_controller,SLOT(setOptReg(double)));
+    connect(sUi.nelder,SIGNAL(toggled(bool)),t_controller,SLOT(setOptNelder(bool)));
+    connect(sUi.iterBox,SIGNAL(valueChanged(int)),t_controller,SLOT(setIterNum(int)));
+    connect(sUi.frameBox,SIGNAL(valueChanged(int)),t_controller,SLOT(setFrameNum(int)));
+
+    connect(sUi.optBox,SIGNAL(activated(int)),v_controller,SLOT(setOptType(int)));
+    connect(sUi.regBox,SIGNAL(valueChanged(double)),v_controller,SLOT(setOptReg(double)));
+    connect(sUi.nelder,SIGNAL(toggled(bool)),v_controller,SLOT(setOptNelder(bool)));
+    connect(sUi.iterBox,SIGNAL(valueChanged(int)),v_controller,SLOT(setIterNum(int)));
+    connect(sUi.frameBox,SIGNAL(valueChanged(int)),v_controller,SLOT(setFrameNum(int)));
 }
 
 

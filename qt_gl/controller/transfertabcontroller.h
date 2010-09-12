@@ -21,6 +21,7 @@ public:
     TransferTabController(ClickableQLabel *sourceLabel,ClickableQLabel *targetLabel, ExpTranAbstractView *view,
                           QLineEdit *srcText, QLineEdit *targetText, CustomizableFaceWidget *face_widget);
 
+
 public slots:
     void targetFileSelected(const QString str);
     void srcFileSelected(const QString str);
@@ -34,14 +35,25 @@ public slots:
     void processingFinished();
     void restart();
 
+    //settings
+    void setOptNelder(bool);
+    void setOptReg(double regParam);
+    void setOptType(int);
+    void setFrameNum(int);
+    void setIterNum(int);
 private:
     void convertFrameIntoTexture(Mat &frame);    
     void initSrcSide();
     void initTargetSide();
 
-    void getClonedMouth(const Mat& img, unsigned int frame_index, Mat &target);
+    void getClonedMouth(const Mat& img, unsigned int frame_index, Mat &target);       
     Mat getMaskForLeftEyebrow();
     Mat getMaskForRightEyebrow();
+
+    VideoProcessor::OptType opttype;
+    double regParam;
+    int frame_num;
+    int iter_num;
 
     ClickableQLabel *sourceLabel;
     ClickableQLabel *targetLabel;

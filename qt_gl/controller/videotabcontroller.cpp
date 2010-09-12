@@ -44,14 +44,19 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
     //init the optimizer
     poseEstimator = new PoseEstimator();
 
+    opttype = VideoProcessor::OptType_INTERPOLATE;
+    regParam = 2000.0;
+    frame_num = 10;
+    iter_num = 3;
+
     //setup the timer
     timer = new QTimer(this);
     connect(timer, SIGNAL(timeout()), this, SLOT(captureFrame()));
 
     //initialize the capture so that we can capture
     //successive frames
-     capture = new VideoCapture(fileName.toStdString());
-     frameCount = capture->get(CV_CAP_PROP_FRAME_COUNT); //SEEMS TO BE UNSUPPORTED AND RETURNS 0
+    capture = new VideoCapture(fileName.toStdString());
+    frameCount = capture->get(CV_CAP_PROP_FRAME_COUNT); //SEEMS TO BE UNSUPPORTED AND RETURNS 0
 
     Mat m;
 
@@ -59,7 +64,6 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
 
     double c_x = m.size().width / 2.;
     double c_y = m.size().height / 2.;
-    cout << "frame count is : " << frameCount << " " << c_x << " " << c_y << endl;
 
     frames.push_back(m);
 
@@ -135,8 +139,7 @@ void VideoTabController::calcIntrinsicParams()
         p.x = (s.width) * -3;
                 for(int j=0;j<s.width;j++)
         {
-            p.x += 3;
-            cout << p.x << " " << p.y << endl;
+            p.x += 3;            
             worldCoord.push_back(p);
         }
     }
@@ -223,8 +226,6 @@ void VideoTabController::replayFrame()
     Rodrigues(rot,rmatrix);
     Utility::computeEulerAnglesFromRmatrix(rmatrix,euler_x,euler_y,euler_z);
     //only y needs to be negative so that it agrees with the transposes
-    cout << "setting trans param " << euler_x << " " << euler_y << " "
-            << euler_z  << " " << tx << " " << ty << " " << tz  << endl;
 
     //set the parameters in face widget
     face_widget->setTransParams(euler_x,-euler_y,euler_z,tx,ty,tz);
@@ -282,8 +283,7 @@ void VideoTabController::playBack()
         frameData.push_back(copyFrame);
     }
 
-    videoProcessor = new VideoProcessor(picLabel->getMarked(),frameData,cameraMatrix,lensDist,
-                                        VideoProcessor::OptType_LIN_COMB,5000.,20,3);
+    videoProcessor = new VideoProcessor(picLabel->getMarked(),frameData,cameraMatrix,lensDist,opttype,regParam,frame_num,iter_num);
 
     connect(videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
 
@@ -300,197 +300,90 @@ void VideoTabController::calibrate()
 }
 
 
-
-//later do a pyramid version
-void VideoTabController::startFaceTransfer()
+void VideoTabController::extractPose()
 {
+    vector<int> correspondences;
+    vector<int>::iterator cit, cit_end;
+
+    double euler_x, euler_y, euler_z;
+    double tx, ty, tz;
+
+    Mat_<double> rvec, tvec;
+    Mat_<double> rmatrix;
+    vector<Point2f> sampledPoints;
+
+    Face *face_guess = new Face();
+    double *w_id = new double[face_guess->getIdNum()];
+    double *w_exp = new double[face_guess->getExpNum()];
+    vector<Point2f> marked = picLabel->getMarked();
+
+    vector<int> indices(Face::fPoints,Face::fPoints+Face::fPoints_size);
+
     flowLabel->setVisible(false);
     face_widget->setVisible(true);
-
-    //first align our face guess over the marked feature points
-    vector<Point2f> marked = picLabel->getMarked();
 
     //marked points should get recentered but we are gonna get rid of shifts anyway
     //marked points are ordered (should be ordered if the user clicked correctly)
     //the order is the same as the index order in fPoints
 
-    //calcIntrinsicParams();
-
-
-    MatConstIterator_<double> it = cameraMatrix.begin(), it_end = cameraMatrix.end();
-    for(; it != it_end; ++it)
-        cout << *it << " ";
-    cout << endl;
-    lensDist(0,0) = 0;
-    lensDist(0,1) = 0;
-    lensDist(0,2) = 0;
-    lensDist(0,3) = 0;
-    lensDist(0,4) = 0;
-
-    //setup the result vectors for the extrinsic parameters
-    Mat_<double> rvec, tvec;
-
-    Face *face_guess = new Face();
-    double *w_id = new double[56];
-    double *w_exp = new double[7];
-
-    for(int i=0;i<56;i++)
+    int ID = face_guess->getIdNum();
+    int EXP = face_guess->getExpNum();
+    for(int i=0;i<ID;i++)
     {
-        if(i==33)w_id[i] = 0.2;
-        else if(i==10)w_id[i] = 0.2;
-        else if(i==20)w_id[i] = 0.2;
-        else if(i==1)w_id[i] = 0.2;
-        else if(i==50)w_id[i] = 0.2;
-        else w_id[i] = 0;
+        w_id[i] = 1./(double)(ID);
     }
-    w_exp[0] = 0.0;
-    w_exp[1] = 0.0;
-    w_exp[2] = 0.0;
-    w_exp[3] = 0.0;
-    w_exp[4] = 1.0;
-    w_exp[5] = 0.0;
-    w_exp[6] = 0.0;
+    for(int i=0;i<EXP;i++)
+    {
+        w_exp[i] = 1./(double)(EXP);
+    }
+
     face_guess->setNewIdentityAndExpression(w_id,w_exp);
-    vector<int> indices(Face::fPoints,Face::fPoints+Face::fPoints_size);
+
     poseEstimator->calculateTransformation(marked,face_guess,cameraMatrix,lensDist,indices,rvec,tvec,false);
 
-    Mat_<double> rmatrix;
     //convert the rotation vector to a rotation matrix
     cv::Rodrigues(rvec,rmatrix);
+    Utility::computeEulerAnglesFromRmatrix(rmatrix,euler_x,euler_y,euler_z);
 
-    const double PI = 3.141593;
+    tx = tvec.at<double>(0,0);
+    ty = tvec.at<double>(0,1);
+    tz = tvec.at<double>(0,2);
 
-
-    double rot_y, rot_x, rot_z,cy, cx,sx,cz,sz;
-    rot_y = asin( rmatrix.at<double>(2,0));        /* Calculate Y-axis angle */
-    cy           =  cos( rot_y );
-
-    if ( fabs( cy ) > 0.005 )             /* Gimball lock? */
-      {
-      cx      =  rmatrix.at<double>(2,2) / cy;           /* No, so get X-axis angle */
-      sx      = rmatrix.at<double>(2,1)  / cy;
-
-      rot_x  = atan2( sx, cx );
-
-      cz      =  rmatrix.at<double>(0,0) / cy;            /* Get Z-axis angle */
-      sz      = rmatrix.at<double>(1,0) / cy;
-
-      rot_z  = atan2( sz, cz );
-  }
+    Utility::sampleGoodPoints(marked,sampledPoints);
+    //picLabel->setMarked(sampledPoints);
 
 
-    double rx[3][3] = {{1,0,0},{0,::cos(rot_x),-::sin(rot_x)},{0,::sin(rot_x),::cos(rot_x)}};
-    double ry[3][3] = {{::cos(rot_y),0,-::sin(rot_y)},{0,1,0},{::sin(rot_y),0,::cos(rot_y)}};
-    double rz[3][3] = {{::cos(rot_z),-::sin(rot_z),0},{::sin(rot_z),::cos(rot_z),0},{0,0,1}};
+    vector<Point3f> obj;
+    vector<Point2f> imagePoints;
 
-    Mat rX(3,3,CV_64F,rx), rY(3,3,CV_64F,ry), rZ(3,3,CV_64F,rz);
-    Mat result = rZ*rY*rX;
-
-    cout << "its so dumb i want to scream rZT*rYT*rXT" << Matrix(result);
-    cout << "so soooo dumb rmatrix: " << Matrix(rmatrix);
-
-    double r11 = rmatrix.at<double>(0,0), r12 = rmatrix.at<double>(0,1),r13 = rmatrix.at<double>(0,2);
-    double r21 = rmatrix.at<double>(1,0), r22 = rmatrix.at<double>(1,1),r23 = rmatrix.at<double>(1,2);
-    double r31 = rmatrix.at<double>(2,0), r32 = rmatrix.at<double>(2,1),r33 = rmatrix.at<double>(2,2);
-    double tx = tvec.at<double>(0,0);
-    double ty = tvec.at<double>(0,1);
-    double tz = tvec.at<double>(0,2);    
-
-    double r[3][4] = {{r11, r12, r13, tx},{r21,r22,r23,ty},{r31,r32,r33,tz}};
-    Mat R(3,4,CV_64F,r);
-    Mat res = cameraMatrix * R;
+    for(int i=0;i<Face::mouth_size;i++)
+        obj.push_back(face_guess->getPointFromPolygon(Face::mouth[i]));
 
 
-    //decompose
-    Vec3d euler;
-    Mat cam,rot,trans,rotX,rotY,rotZ;
-    decomposeProjectionMatrix(res,cam,rot,trans,rotX,rotY,rotZ,euler);
+//    poseEstimator->reprojectInto3DUsingWeak(imagePoints,rvec,tvec,cameraMatrix,lensDist,face_guess,correspondences);
+//    cit = correspondences.begin();
+//    cit_end = correspondences.end();
+//    cout << "correspondences are : " << endl;
+//    for(;cit!=cit_end;cit++)
+//        cout << *cit << " ";
+//    cout << endl;
+//
+//    obj.clear();
+//    for(int i=0;i<correspondences.size();i++)
+//        obj.push_back(face_guess->getPoint(correspondences[i]));
 
-    cout << "euler" << endl;    
-    for(int i=0; i<3; ++i)
-        cout << euler[i] << " ";
-    cout << endl;
-
-    Point3f p;
-    Mat_<double> point3dMat(3,1);
-    Mat_<double> point2dMat(3,1);
-    vector<Point2f> points;
-
-    Mat_<double> translation = tvec;
-
-    cout << "TRANS : " << tvec.at<double>(0,0) << " " << tvec.at<double>(1,0)  << " " << tvec.at<double>(2,0) << endl;
-
-    Point2d pp;
-
-    double scale = 1;
-
-    for(int i=0; i<Face::fPoints_size; i++)
-    {
-        p = face_guess->getPoint(Face::fPoints[i]);
-        point3dMat(0,0) = p.x;
-        point3dMat(1,0) = p.y;
-        point3dMat(2,0) = p.z;
-
-        point2dMat = cameraMatrix * ((rmatrix * point3dMat));
-        point2dMat = scale*point2dMat;
-        point2dMat = point2dMat + cameraMatrix*translation;
-
-        //translation = cameraMatrix*tvec;
-//        //homogenous coord
-//        translation = (1/translation.at<double>(2,0)) * translation;
-
-        //homogenous coord
-        point2dMat(0,0) /= point2dMat(2,0);
-        point2dMat(1,0) /= point2dMat(2,0);
-
-        //point2dMat = point2dMat + translation;
-
-        cout << "2d: " << point2dMat(0,0) << " " << point2dMat(1,0) << endl;
-
-        //objectPoints.push_back(Point3f(p.x,p.y,p.z));
-
-        points.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));
-    }
-
-    //picLabel->setMarked(points);
-
-    vector<Point2f> sampledPoints;
-    Utility::sampleGoodPoints(points,sampledPoints);
-    picLabel->setMarked(sampledPoints);
-
-
-    vector<int> correspondences;
-    vector<int>::iterator cit, cit_end;
-    poseEstimator->reprojectInto3DUsingWeak(points,rvec,tvec,cameraMatrix,lensDist,face_guess,correspondences);
-    cit = correspondences.begin();
-    cit_end = correspondences.end();
-    cout << "correspondences are : " << endl;
-    for(;cit!=cit_end;cit++)
-        cout << *cit << " ";
-    cout << endl;
-    double euler_x = rot_x * 180./PI;
-    double euler_y = rot_y * 180./PI;
-    double euler_z = rot_z * 180./PI;
-
-    cout << "my euler : " << euler_x << " " << euler_y << " " << euler_z << endl;
-    cout << "their euler : " << euler[0]<< " " << euler[1]<< " " << euler[2] << endl;
-
+    imagePoints.clear();
+    projectPoints(Mat(obj),rvec,tvec,cameraMatrix,lensDist,imagePoints);
+    picLabel->setMarked(imagePoints);
     //the sign here doesnt seem to make a difference as far as orientation of
     //the object is concerned .. however it does flip the extreme head
     //z is the one we dont need to inverse since opengl displays with upvector as 0,0,-1
     //x also changes if we the up vector is upside down
     //only y needs to be negative so that it agrees with the transposes
     //that the pose estimation returns .. (solvePnP return R = rzTryTrxT but a different upvector
-    face_widget->setTransParams(euler[0],-euler[1],euler[2],tx,ty,tz);
-    //face_widget->setTransParams(euler[0],euler[1],euler[2],tx,ty,tz);
+    face_widget->setTransParams(euler_x,-euler_y,euler_z,tx,ty,tz);
     face_widget->setFace(face_guess);
     face_widget->refreshGL();
-
-
-    Mat gradImg(frames[frames.size()-1].size().height,frames[frames.size()-1].size().width, CV_8UC1);
-    Utility::filterForGradient(frames[frames.size()-1],gradImg);
-
-    picLabel->setPixmap(Utility::mat2QPixmap(gradImg));
 
     delete[] w_id;
     delete[] w_exp;
@@ -640,7 +533,6 @@ void VideoTabController::selectGoodFeaturePoints(const Mat& m)
 }
 
 
-//alot of shift nonesense .. plz just display the entire image
 void VideoTabController::computeFlow()
 {
     if(frames.size() < 2)
@@ -649,41 +541,30 @@ void VideoTabController::computeFlow()
     Mat f1;
     Mat f2;
     vector<Point2f> curPoints = picLabel->getMarked();
-    vector<Point2f> curPoints_centered;
     vector<Point2f> nextPoints;
-    vector<Point2f> nextPoints_centered;
     vector<Vec2f> vectors;
+    vector<int> a;
+    vector<int> b;
 
     vector<Mat>::iterator it = frames.end();
     f2 = *(--it);
     f1 = *(--it);
 
-    int x_shift = picLabel->getXShift();
-    int y_shift = picLabel->getYShift();
-    //readjust the shift in curPoints
-    for(unsigned int j=0;j<curPoints.size();j++)
-    {
-        curPoints_centered.push_back(Point2f(curPoints[j].x + x_shift,curPoints[j].y + y_shift));
-    }
-    flowEngine->computeFlow(f1,f2,curPoints_centered,nextPoints);
-    for(unsigned int j=0;j<nextPoints.size();j++)
-    {
-        nextPoints_centered.push_back(Point2f(nextPoints[j].x - x_shift,nextPoints[j].y - y_shift));
-    }
-    picLabel->setMarked(nextPoints_centered);
+    flowEngine->computeFlow(f1,f2,curPoints,nextPoints);
+
+    picLabel->setMarked(nextPoints);
     flowLabel->setMarked(curPoints);
 
     for(unsigned int j=0;j<nextPoints.size();j++)
     {
-        vectors.push_back(Vec2f(nextPoints[j].x - curPoints_centered[j].x, nextPoints[j].y - curPoints_centered[j].y));
+        vectors.push_back(Vec2f(nextPoints[j].x - curPoints[j].x, nextPoints[j].y - curPoints[j].y));
     }
     flowLabel->setVectorField(vectors);
 
     QImage img_q = Utility::mat2QImage( *(frames.end()-1) );
     QPixmap p_map;
     p_map = QPixmap::fromImage(img_q);
-    flowLabel->setPixmap(p_map);
-    //flowLabel->setGeometry(800,0,400,400);
+    flowLabel->setPixmap(p_map);    
     flowLabel->show();
 }
 
@@ -736,6 +617,33 @@ void VideoTabController::toggleDrawable(bool drawable)
     flowLabel->clearMarked();
     picLabel->setDrawable(drawable);
     flowLabel->setDrawable(drawable);
+}
+
+//settings
+void VideoTabController::setOptNelder(bool toggled)
+{
+    if(toggled == true)
+        opttype = VideoProcessor::OptType_NELDER_INT;
+}
+void VideoTabController::setOptReg(double regParam)
+{
+    opttype = VideoProcessor::OptType_LIN_COMB;
+    this->regParam = regParam;
+}
+void VideoTabController::setOptType(int t)
+{    
+    if(t == 0)
+        opttype = VideoProcessor::OptType_LIN_COMB;
+    else
+        opttype = VideoProcessor::OptType_INTERPOLATE;
+}
+void VideoTabController::setFrameNum(int n)
+{
+    frame_num = n;
+}
+void VideoTabController::setIterNum(int n)
+{
+    iter_num = n;
 }
 
 VideoTabController::~VideoTabController()

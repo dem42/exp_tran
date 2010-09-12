@@ -122,8 +122,20 @@ void FaceWidget::render()
       {
           result = std::find(mouthPoly.begin(),mouthPoly.end(),i);
           //this is a mouth polygon so dont render it
+//          if(result != mouthPoly.end())
+//              continue;
           if(result != mouthPoly.end())
-              continue;
+          {
+              int index = face_ptr->getPointIndexFromPolygon(*result);
+              glPushMatrix();
+              glTranslatef(vertexes[index].x,vertexes[index].y,vertexes[index].z);
+
+              glColor3f(0.5f, 0.0f, 0.0f); // red reflective properties
+              //adjust to the correct diameter
+              gluSphere(quad,diameter*(3./144.32) ,10,10);
+
+              glPopMatrix();
+          }
       }
 
       v1 = triangles[i][0];

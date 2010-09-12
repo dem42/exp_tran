@@ -45,17 +45,29 @@ public slots:
     void toggleDrawable(bool);
     void video_file_changed(const QString str);
     void findGoodFeaturePoints();
-    void startFaceTransfer();
+    void extractPose();
     void dropFrame();
     void playBack();
 
     void replayFrame();
     void calibrate();
     void setCameraParameters();
-
     void processingFinished();
+
+    //settings
+    void setOptNelder(bool);
+    void setOptReg(double regParam);
+    void setOptType(int);
+    void setFrameNum(int);
+    void setIterNum(int);
 private:
     void calcIntrinsicParams();
+
+    VideoProcessor::OptType opttype;
+    double regParam;
+    int frame_num;
+    int iter_num;
+
     //video fileName
     QString fileName;
     bool autoSelectFeaturePoints;

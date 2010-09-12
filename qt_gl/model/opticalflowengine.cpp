@@ -27,8 +27,6 @@ void OpticalFlowEngine::computeFlow(const Mat& prevImg, const Mat& nextImg,
                                     const std::vector<int> &curIndices, std::vector<int> &nextIndices,
                                     bool indicesOn)
 {
-    std::cout << "in compute flow" << std::endl;
-
     vector<uchar> status;
     vector<float> err;
 
@@ -71,7 +69,7 @@ void OpticalFlowEngine::computeFlow(const Mat& prevImg, const Mat& nextImg,
         features[i].y = prevPoints[i].y;
     }
 
-    CvSize window = cvSize(5,5);
+    CvSize window = cvSize(15,15);
     char flow_status[number_of_features];
     float flow_error[number_of_features];
 

@@ -22,20 +22,9 @@ public:
                    const unsigned int fmax=5, const unsigned int imax=3);
     VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
                    const unsigned int fmax=5, const unsigned int imax=3);
+    ~VideoProcessor();
 
     //process video
-    void processVideo2(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
-                      const Mat &cameraMatrix, const Mat &lensDist,
-                      vector<cv::Mat> &frameTranslation, vector<cv::Mat> &frameRotation,
-                      vector<vector<cv::Point2f> > &generatedPoints,
-                      vector<vector<double> >&vector_weights_exp,
-                      vector<vector<double> >&vector_weights_id );
-    void processVideo3(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
-                      const Mat &cameraMatrix, const Mat &lensDist,
-                      vector<cv::Mat> &frameTranslation, vector<cv::Mat> &frameRotation,
-                      vector<vector<cv::Point2f> > &generatedPoints,
-                      vector<vector<double> >&vector_weights_exp,
-                      vector<vector<double> >&vector_weights_id );
     void processVideo(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
                       const Mat &cameraMatrix, const Mat &lensDist,
                       vector<cv::Mat> &frameTranslation, vector<cv::Mat> &frameRotation,
