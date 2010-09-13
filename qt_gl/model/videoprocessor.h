@@ -44,6 +44,9 @@ public:
     void run();
 
 private:    
+    bool termination(const vector<vector<double> >&prevExp, const vector<vector<double> >&exp,
+                                 const vector<double> &prevId, const vector<double> &id);
+
     const unsigned int FRAME_MAX;
     const unsigned int ITER_MAX;
 

@@ -90,13 +90,13 @@ const int Face::fPolygons[20] = {9521,8899,310,7455,1386,8934,8945,6284,7140,819
 
 const int Face::fPoints_size = 20;
 
-const int Face::leftMouthCornerIndex = 1;
-const int Face::rightMouthCornerIndex = 2;
-const int Face::topLipIndex = 3;
-const int Face::bottomLipIndex = 4;
+const int Face::leftMouthCornerIndex = 3;
+const int Face::rightMouthCornerIndex = 4;
+const int Face::topLipIndex = 5;
+const int Face::bottomLipIndex = 6;
 
-const int Face::leftEyeBrow = 9;
-const int Face::rightEyeBrow = 11;
+const int Face::leftEyeBrow = 13;
+const int Face::rightEyeBrow = 15;
 
 
 const int Face::mouth[43] = {975,769,768,561,352,558,349,141,142,9569,9572,9361,9360,9149,9152,8940,
@@ -147,6 +147,45 @@ int Face::getIdNum() const
 int Face::getExpNum() const
 {
     return EXP;
+}
+
+string Face::getEmotionString() const
+{
+    double dist = 0.0;
+    double sofar = numeric_limits<double>::max();
+    int index = 0;
+
+    for(int i=0;i<EXP;i++)
+    {
+        cout << "w_exp[" <<i<<"] = " << w_exp[i] << endl;
+    }
+
+    for(int i=0;i<EXP;i++)
+    {
+        for(int j=0;j<EXP;j++)
+        {
+            if(i == j)
+                dist += (w_exp[j]-1)*(w_exp[j]-1);
+            else
+                dist += w_exp[j]*w_exp[j];
+        }        
+        if(sofar > dist)
+        {
+            sofar = dist;
+            index = i;
+        }
+        dist = 0;
+    }    
+    switch(index)
+    {
+        case 0: return "Angry";
+        case 1: return "Disgust";
+        case 2: return "Fear";
+        case 3: return "Happy";
+        case 4: return "Neutral";
+        case 5: return "Sad";
+        case 6: return "Surprise";
+     }
 }
 
 /**** this is how we interpolate

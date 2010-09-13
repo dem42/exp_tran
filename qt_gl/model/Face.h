@@ -27,6 +27,7 @@ class Face
     int getPointNum() const;
     int getIdNum() const;
     int getExpNum() const;
+    string getEmotionString() const;
 
     Point3 getPointFromPolygon(int);
     Point3 getPoint(int index) const;

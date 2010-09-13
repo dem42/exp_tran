@@ -114,6 +114,15 @@ void FaceWidget::render()
   glEnable(GL_COLOR_MATERIAL);
   glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
+  double left = center_x - diameter/2.;
+  double top = center_y + diameter/2.;
+  double near = center_z + diameter/2;
+
+
+  string str = face_ptr->getEmotionString();
+
+  renderText(left,top,near,QString(str.c_str()));
+
   for(int i=0; i<polygonNumber; i++)
     {
 
@@ -161,7 +170,8 @@ void FaceWidget::render()
 
       //calls to glLoadName are ignored if we arent in GL_SELECT render mode
       //its used to tell us what the user clicked on
-      glLoadName(i);
+      glLoadName(i);      
+
       glColor3f(0.6f, 0.6f, 0.6f); // grey material properties
       glBegin(gl_display_style);
 

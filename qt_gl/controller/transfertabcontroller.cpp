@@ -199,6 +199,9 @@ void TransferTabController::getClonedMouth(const Mat& img, unsigned int frame_in
    target_videoProcessor->getGeneratedPointsForFrame(frame_index,genPointsTarget);
 
    Point2f ta = genPointsSrc[3];
+   Point2f tb = genPointsSrc[5];
+   Point2f tc = genPointsSrc[4];
+   Point2f td = genPointsSrc[6];
 
    Point2f pa = genPointsTarget[3];
    Point2f pb = genPointsTarget[5];
@@ -210,13 +213,21 @@ void TransferTabController::getClonedMouth(const Mat& img, unsigned int frame_in
    int lx = (pc.x >= pa.x)?pa.x:pc.x;
    int hy = (pd.y >= pb.y)?pd.y:pb.y;
    int ly = (pd.y >= pb.y)?pb.y:pd.y;
-   int nx = hx - lx;
-   int ny = hy - ly;
-   cout << "nums are " << hx << " " << ny << endl;
+   int nx = (hx + lx)/2.;
+   int ny = (hy + ly)/2.;
+
+
+   int hx2 = (tc.x >= ta.x)?tc.x:ta.x;
+   int lx2 = (tc.x >= ta.x)?ta.x:tc.x;
+   int hy2 = (td.y >= tb.y)?td.y:tb.y;
+   int ly2 = (td.y >= tb.y)?tb.y:td.y;
+   int nx2 = (hx2 - lx2)/2.;
+   int ny2 = (hy2 - ly2)/2.;
+   cout << "nums are " << hx << " " << hx2 << " " << ny2 << " " << ny << endl;
    Mat_<double> mask = Mat_<double>::zeros(img.size());
 
-   for(int i=ly;i<=hy;i++)
-       for(int j=lx;j<=hx;j++)
+   for(int i=ny-ny2;i<=ny+ny2;i++)
+       for(int j=nx-nx2;j<=nx+nx2;j++)
            mask(i,j) = 1.0;
 
    cout << " the shift is " << ta.x - pa.x << ta.y - pa.y << endl;
