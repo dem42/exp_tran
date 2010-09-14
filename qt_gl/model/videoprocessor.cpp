@@ -12,6 +12,7 @@ VideoProcessor::VideoProcessor(const unsigned int fmax, const unsigned int imax)
     flowEngine = new OpticalFlowEngine();
     paramOptimizer = new NNLSOptimizer();
     poseEstimator = new PoseEstimator();
+    threadCrashed = false;
 }
 
 VideoProcessor::VideoProcessor(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
@@ -33,6 +34,7 @@ VideoProcessor::VideoProcessor(const vector<cv::Point2f> &featurePoints, const v
 
     flowEngine = new OpticalFlowEngine();
     poseEstimator = new PoseEstimator();
+    threadCrashed = false;
 }
 
 VideoProcessor::VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
@@ -41,6 +43,7 @@ VideoProcessor::VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flo
     this->flowEngine = flowEngine;
     this->paramOptimizer = paramOptimizer;
     this->poseEstimator = new PoseEstimator();
+    threadCrashed = false;
 }
 
 VideoProcessor::~VideoProcessor()
@@ -52,8 +55,20 @@ VideoProcessor::~VideoProcessor()
 
 void VideoProcessor::run()
 {
-    this->processVideo(fPoints,fData,cameraMatrix,lensDist,frameTranslation,frameRotation,generatedPoints,
-                       vector_weights_exp,vector_weights_id);    
+    try
+    {
+        this->processVideo(fPoints,fData,cameraMatrix,lensDist,frameTranslation,frameRotation,generatedPoints,
+                           vector_weights_exp,vector_weights_id);
+    }catch(cv::Exception &e)
+    {        
+        cerr << e.what() << endl;
+        threadCrashed = true;
+    }
+}
+
+bool VideoProcessor::getCrashed() const
+{
+    return threadCrashed;
 }
 
 void VideoProcessor::setFlowEngine(OpticalFlowEngine *flowEngine)
@@ -120,28 +135,27 @@ bool VideoProcessor::termination(const vector<vector<double> >&prevExp, const ve
                                  const vector<double> &prevId, const vector<double> &id)
 {
     double dif;
-    const double eps = 0.0001;
+    const double exp_eps = 0.0001;
+    const double id_eps = 0.001;
     for(unsigned int i=0;i<prevExp.size();i++)
     {
         dif = 0;
         cout << "ugh" << endl;
         for(unsigned int j=0;j<prevExp[i].size();j++)
         {
-            dif += (prevExp[i][j] - exp[i][j])*(prevExp[i][j] - exp[i][j]);
-            cout << prevExp[i][j] << " vs " << exp[i][j] << " ";
+            dif += (prevExp[i][j] - exp[i][j])*(prevExp[i][j] - exp[i][j]);            
         }
-        cout << "dif at  " << dif << " frame " << i << endl;
-        if(dif > eps)
+        cout << "dif exp  " << dif << " frame " << i << endl;
+        if(dif > exp_eps)
             return false;
     }
     dif = 0;
     for(unsigned int i=0;i<prevId.size();i++)
     {
-        dif += (prevId[i] - id[i])*(prevId[i] - id[i]);
-        cout << prevId[i] << " vs " << id[i] << " ";
+        dif += (prevId[i] - id[i])*(prevId[i] - id[i]);       
     }
-    cout << "dif at  " << dif << endl;
-    if(dif > eps)
+    cout << "dif id at  " << dif << endl;
+    if(dif > id_eps)
         return false;
     return true;
 }
@@ -178,19 +192,9 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
 
     //make a face guess
     for(int i=0;i<face_ptr->getIdNum();i++)
-    {
-        if(i==33)w_id[i] = 0.1;
-        else if(i==7)w_id[i] = 0.8;
-        else if(i==20)w_id[i] = 0.1;
-        else w_id[i] = 0;
-    }
-    w_exp[0] = 0.0;
-    w_exp[1] = 0.0;
-    w_exp[2] = 0.0;
-    w_exp[3] = 0.2;
-    w_exp[4] = 0.0;
-    w_exp[5] = 0.8;
-    w_exp[6] = 0.0;
+        w_id[i] = 1./face_ptr->getIdNum();
+    for(int i=0;i<face_ptr->getExpNum();i++)
+        w_exp[i] = 1./face_ptr->getExpNum();
 
     face_ptr->setNewIdentityAndExpression(w_id,w_exp);
 
@@ -247,23 +251,26 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
     indices.insert(indices.begin(),Face::fPoints,Face::fPoints+Face::fPoints_size);
 
     //first frame alignment computes the first face in face_ptr
-    paramOptimizer->estimateModelParameters(currentPoints,cameraMatrix,lensDist,face_ptr,indices,
-                                            frameRotation[0],frameTranslation[0],weights_id,weights_exp);
+//    paramOptimizer->estimateModelParameters(currentPoints,cameraMatrix,lensDist,face_ptr,indices,
+//                                            frameRotation[0],frameTranslation[0],weights_id,weights_exp);
 
 
 
     //add new points so that we start tracking them
     //we arent actually altering the first featurePoints[0] just the rest throught compute flow
-//    poseEstimator->generatePoints(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,420,face_ptr,newPoints,indices);
-//    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+    poseEstimator->generatePoints(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,420,face_ptr,newPoints,indices);
+    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
 
 
     //now sample new points using the first frame alignment and add them to the feature points
     Utility::sampleGoodPoints(currentPoints,newPoints);
     poseEstimator->reprojectInto3DUsingWeak(newPoints,frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,face_ptr,indices);
-
-    //poseEstimator->projectModelPointsInto2D(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,face_ptr,indices,newPoints);
     currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+
+    newPoints.clear();
+    poseEstimator->projectModelPointsInto2D(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,face_ptr,indices,newPoints);
+    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+
     cout << " after " << currentPoints.size() << endl;
 
     estimationPoints.push_back(currentPoints);
@@ -295,15 +302,16 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
         //vector_prev_weights_exp.assign(vector_weights_exp.begin(),vector_weights_exp.end());
         vector_prev_weights_exp.clear();
         vector<double> wexp;
-        for(int k=0;k<vector_weights_exp.size();k++)
+        for(unsigned int k=0;k<vector_weights_exp.size();k++)
         {
             wexp.clear();
-            for(int l=0;l<vector_weights_exp[k].size();l++)
+            for(unsigned int l=0;l<vector_weights_exp[k].size();l++)
                 wexp.push_back(vector_weights_exp[k][l]);
             vector_prev_weights_exp.push_back(wexp);
         }
 
         vector_weights_exp.clear();
+        vector_weights_id.clear();
         for(unsigned int i=0;i<FRAME_MAX;++i)
         {
             /**********************/
@@ -323,7 +331,7 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
         }
         //prevWeightsId.assign(weights_id.begin(),weights_id.end());
         prevWeightsId.clear();
-        for(int k=0;k<weights_id.size();k++)
+        for(unsigned int k=0;k<weights_id.size();k++)
             prevWeightsId.push_back(weights_id[k]);
 
         cout << "weights size " << prevWeightsId.size() << endl;
@@ -337,22 +345,11 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
         cout << "weights size " << weights_id.size() << endl;
         vector_weights_id.push_back(weights_id);
 
-//        if(j > 0 && termination(vector_prev_weights_exp,vector_weights_exp,prevWeightsId,weights_id) == true)
-//        {
-//            cout << prevWeightsId.size() << endl;
-//            cout << "terminating in frame " << j << endl;
-//            break;
-//        }
-
-        for(unsigned int i=0;i<FRAME_MAX;++i)
+        if(j > 0 && termination(vector_prev_weights_exp,vector_weights_exp,prevWeightsId,weights_id) == true)
         {
-
-            //estimate the pose parameters and place estimations into vectors rotations and translations
-            //the rotations vector holds the rodrigues rotation vectors which can be converted to a rotation matrix
-            poseEstimator->calculateTransformation(featurePoints[i],face_ptr,cameraMatrix,lensDist,point_indices[i],rvec,tvec,useExt);
-            frameRotation.push_back(rvec.clone());
-            frameTranslation.push_back(tvec.clone());
-            useExt |= true;
+            cout << prevWeightsId.size() << endl;
+            cout << "terminating in frame " << j << endl;
+            break;
         }
     }
 

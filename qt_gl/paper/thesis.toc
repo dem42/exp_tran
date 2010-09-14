@@ -7,10 +7,10 @@
 \contentsline {subsubsection}{\numberline {2.1.1.1}Finite Element Method (FEM)}{9}{subsubsection.2.1.1.1}
 \contentsline {subsubsection}{\numberline {2.1.1.2}Modal Analysis}{10}{subsubsection.2.1.1.2}
 \contentsline {subsubsection}{\numberline {2.1.1.3}Recovering shape with FEM}{11}{subsubsection.2.1.1.3}
-\contentsline {subsection}{\numberline {2.1.2}Statistical Models !ALTERED}{11}{subsection.2.1.2}
-\contentsline {subsubsection}{\numberline {2.1.2.1}PCA and Eigenfaces !ALTERED}{12}{subsubsection.2.1.2.1}
+\contentsline {subsection}{\numberline {2.1.2}Statistical Models}{11}{subsection.2.1.2}
+\contentsline {subsubsection}{\numberline {2.1.2.1}PCA and Eigenfaces !!ALTERED}{12}{subsubsection.2.1.2.1}
 \contentsline {subsubsection}{\numberline {2.1.2.2}Morphable Model}{13}{subsubsection.2.1.2.2}
-\contentsline {subsubsection}{\numberline {2.1.2.3}Combined Models of Shape and Appearance !ALTERED}{14}{subsubsection.2.1.2.3}
+\contentsline {subsubsection}{\numberline {2.1.2.3}Combined Models of Shape and Appearance}{14}{subsubsection.2.1.2.3}
 \contentsline {paragraph}{Active Shape Model.}{15}{section*.2}
 \contentsline {paragraph}{Active Appearance Model.}{17}{section*.3}
 \contentsline {subsection}{\numberline {2.1.3}Tensor Models}{18}{subsection.2.1.3}
@@ -34,7 +34,7 @@
 \contentsline {subsubsection}{\numberline {2.2.1.2}Orthogonal Camera Model}{26}{subsubsection.2.2.1.2}
 \contentsline {subsubsection}{\numberline {2.2.1.3}Weak Perspective Camera Model}{27}{subsubsection.2.2.1.3}
 \contentsline {subsection}{\numberline {2.2.2}Rotation and Translation}{28}{subsection.2.2.2}
-\contentsline {subsection}{\numberline {2.2.3}Pose estimation with the POSIT algorithm !NEW}{31}{subsection.2.2.3}
+\contentsline {subsection}{\numberline {2.2.3}Pose estimation with the POSIT algorithm}{31}{subsection.2.2.3}
 \contentsline {section}{\numberline {2.3}Feature Point Tracking}{32}{section.2.3}
 \contentsline {subsection}{\numberline {2.3.1}Kanade-Lucas-Tomasi Feature Tracker}{32}{subsection.2.3.1}
 \contentsline {section}{\numberline {2.4}Optimization}{34}{section.2.4}
@@ -52,7 +52,7 @@
 \contentsline {subsection}{\numberline {3.3.2}Database}{43}{subsection.3.3.2}
 \contentsline {section}{\numberline {3.4}Model Construction}{45}{section.3.4}
 \contentsline {subsection}{\numberline {3.4.1}Data Tensor}{45}{subsection.3.4.1}
-\contentsline {subsection}{\numberline {3.4.2}Computing the HOSVD !! NEW}{46}{subsection.3.4.2}
+\contentsline {subsection}{\numberline {3.4.2}Computing the HOSVD !!NOT SURE}{46}{subsection.3.4.2}
 \contentsline {paragraph}{HOSVD algorithm}{48}{section*.15}
 \contentsline {subsection}{\numberline {3.4.3}Generating new faces}{49}{subsection.3.4.3}
 \contentsline {paragraph}{Summary.}{50}{section*.16}
@@ -60,13 +60,13 @@
 \contentsline {subsection}{\numberline {3.5.1}Locating Feature Points}{51}{subsection.3.5.1}
 \contentsline {subsection}{\numberline {3.5.2}Tracking Feature Points}{53}{subsection.3.5.2}
 \contentsline {subsection}{\numberline {3.5.3}Camera Parameters}{53}{subsection.3.5.3}
-\contentsline {subsection}{\numberline {3.5.4}Minimizing the Error Function}{55}{subsection.3.5.4}
+\contentsline {subsection}{\numberline {3.5.4}Minimizing the Error Function !CRUCIAL}{55}{subsection.3.5.4}
 \contentsline {paragraph}{Error function.}{57}{section*.17}
 \contentsline {paragraph}{Coordinate-Descent Method}{61}{section*.18}
-\contentsline {subsection}{\numberline {3.5.5}Overfitting}{62}{subsection.3.5.5}
+\contentsline {subsection}{\numberline {3.5.5}Overfitting !CRUCIAL}{62}{subsection.3.5.5}
 \contentsline {paragraph}{Regularization.}{63}{section*.19}
 \contentsline {paragraph}{Constrained Optimization.}{64}{section*.20}
-\contentsline {subsection}{\numberline {3.5.6}Fitting Algorithm}{65}{subsection.3.5.6}
+\contentsline {subsection}{\numberline {3.5.6}Fitting Algorithm !CRUCIAL}{65}{subsection.3.5.6}
 \contentsline {paragraph}{Multi-Frame Coordinate Descent.}{65}{section*.21}
 \contentsline {paragraph}{Feature point generation.}{65}{section*.22}
 \contentsline {paragraph}{Expression Transfer Fitting Algorithm. }{66}{section*.23}
@@ -83,11 +83,11 @@
 \contentsline {paragraph}{Model Construction}{72}{section*.30}
 \contentsline {paragraph}{Model Fitting}{73}{section*.31}
 \contentsline {subsection}{\numberline {3.7.3}Controller Layer}{74}{subsection.3.7.3}
-\contentsline {chapter}{\numberline {4}Results and Evaluation}{75}{chapter.4}
+\contentsline {chapter}{\numberline {4}Results and Evaluation !NEW}{75}{chapter.4}
 \contentsline {section}{\numberline {4.1}Face Generation}{75}{section.4.1}
 \contentsline {section}{\numberline {4.2}Tracking Results}{78}{section.4.2}
 \contentsline {section}{\numberline {4.3}Optimization Results}{80}{section.4.3}
 \contentsline {section}{\numberline {4.4}Expression Transfer Results}{80}{section.4.4}
-\contentsline {section}{\numberline {4.5}Performance}{80}{section.4.5}
+\contentsline {section}{\numberline {4.5}Performance !NOT SURE}{80}{section.4.5}
 \contentsline {chapter}{\numberline {5}Conclusion}{81}{chapter.5}
-\contentsline {section}{\numberline {5.1}Future Work}{81}{section.5.1}
+\contentsline {section}{\numberline {5.1}Future Work !NOT SURE}{81}{section.5.1}

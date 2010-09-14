@@ -67,6 +67,10 @@ class Face
     static const int mouth[43];
     static const int mouth_size;
 
+    static const int lEyeB[4];
+    static const int rEyeB[4];
+    static const int brow;
+
 private:
     void loadPolygonDataFromModel();
     //Vector3 *surface_normals;

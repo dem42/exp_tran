@@ -76,7 +76,6 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
     Mat_<double> proP;
     Mat_<double> pM(3,1);
 
-    cout << "huh" << endl;
     Rodrigues(rotation,rmatrix);
 
     //get weights from the current face instance
@@ -86,7 +85,6 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
     pM(0,0) = 1;
     pM(1,0) = 1;
     pM(2,0) = average_depth;
-    cout << "face is at a distance " << p.z << endl;
     proP = cameraMatrix*rmatrix*pM;
     proP = proP + cameraMatrix*translation;
     Z_avg = proP(0,2);
@@ -128,7 +126,6 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
     for(unsigned int i=0;i<point_indices.size();++i)
     {
         index = point_indices[i];
-        cout << "hey : " << index << endl;
         Mi = core.submatrix( index*3 , index*3 + 2 );
         prm = pr*Mi;
         PRM.row(2*i) = prm.row(0) + 0;
@@ -200,12 +197,10 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
     for(int i=0;i<exr_size;i++){        
         weights_ex.push_back(w_exp[i]);
     }
-    cout << endl;
 
     for(int i=0;i<id_size;i++){        
         weights_id.push_back(w_id[i]);        
     }
-    cout << endl;
 
     face_ptr->setNewIdentityAndExpression(w_id,w_exp);
     face_ptr->setAverageDepth(average_depth);
@@ -265,15 +260,12 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
 
     //find average depth
     average_depth = face_ptr->getAverageDepth();
-    cout << "is the average depth 0 .. i think it is always the same" << average_depth << endl;
     pM(0,0) = 1;
     pM(1,0) = 1;
     pM(2,0) = average_depth;
     proP = cameraMatrix*rmatrix*pM;
     proP = proP + cameraMatrix*translation;
     Z_avg = proP(0,2);
-    cout << " with a z_avg after projecting " << Z_avg << endl;
-
     /***************************************************************/
     /*create weak-perspecitve camera matrix from camera matrix*/
     /***************************************************************/
@@ -287,7 +279,6 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
     //precompute translation
     Pt = (1./translation.at<double>(2,0)) * (weakCamera*translation);
 
-    cout << "here " << featurePoints.size() << " &  " << point_indices.size() << endl;
     //preprocess points and core tensor rows
     //for points subtract translation too
     for(unsigned int i=0;i<featurePoints.size();i++)
@@ -343,7 +334,6 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
     cv::solve(W,B,x,DECOMP_SVD);
     //x = Matrix::solveLinSysSvd(W,B);
 
-    //cout << " OPT EXP " << Matrix(x);
 
     for(int i=0;i<exr_size;i++){
         w_exp[i] = x(i,0);
@@ -419,7 +409,6 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
 
     for(unsigned int i=0;i<featurePointsVector.size();i++)
         featurePointNum += featurePointsVector[i].size();
-    cout << "total number of points " << featurePointNum << endl;
 
     f = Mat_<double>(featurePointNum*2,1);
     fi = Mat_<double>(2,1);
@@ -442,7 +431,7 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
             f.row(count + 2*j) = fi.row(0) + 0;
             f.row(count + 2*j+1) = fi.row(1) + 0;
         }
-        count += featurePointsVector[i].size();
+        count += 2*featurePointsVector[i].size();
     }
 
 
@@ -455,8 +444,6 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
     pM(1,0) = 1;
     pM(2,0) = average_depth;
 
-    cout << "featurePointsVector size : " << featurePointsVector.size() << endl;
-    cout << "point indices vector size : " << point_indices_vector.size() << endl;
 
     for(unsigned int i=0, count = 0;i<point_indices_vector.size();++i)
     {
@@ -464,8 +451,6 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
         proP = cameraMatrix*rmatrix*pM;
         proP = proP + cameraMatrix*translation[i];
         Z_avg = proP(0,2);
-        cout << " with a z_avg after projecting in frame : " << i << " " << Z_avg << endl;
-
         pr = weakCamera*rmatrix;
 
 
@@ -491,7 +476,7 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
             A_id.row(count + 2*j) = seg_A_id.row(0) + 0;
             A_id.row(count + 2*j+1) = seg_A_id.row(1) + 0;
         }
-        count += point_indices_vector[i].size();
+        count += 2*point_indices_vector[i].size();
     }
 
 
@@ -510,13 +495,23 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
     cv::solve(W,B,y,DECOMP_SVD);
 
 
+    cout << "in closed .. the y " << Matrix(y);
+
     for(int i=0;i<id_size;i++){
         w_id[i] = y(i,0);
+    }
+
+    for(int i=0;i<exr_size;i++)
+    {
+        w_exp[i] = weights_ex[0][i];
     }
 
     for(int i=0;i<id_size;i++){
         weights_id.push_back(w_id[i]);
     }
+
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
+    face_ptr->setAverageDepth(average_depth);
 
     delete[] w_id;
     delete[] w_exp;

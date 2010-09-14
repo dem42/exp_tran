@@ -47,7 +47,7 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
     opttype = VideoProcessor::OptType_INTERPOLATE;
     regParam = 2000.0;
     frame_num = 10;
-    iter_num = 3;
+    iter_num = 30;
 
     //setup the timer
     timer = new QTimer(this);
@@ -87,11 +87,11 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
     //     double mat[3][3] = {{283.536, 0, 337.789},{0, 286.4, 299.076},{0, 0, 1}};
     //    cameraMatrix = Mat(3,3,CV_64F,mat);
     cameraMatrix = Mat_<double>(3,3);
-    cameraMatrix(0,0) = 900;//589.515;
+    cameraMatrix(0,0) = 600;//589.515;
     cameraMatrix(0,1) = 0;
     cameraMatrix(0,2) = c_x;//337.789;//303.703;
     cameraMatrix(1,0) = 0;
-    cameraMatrix(1,1) = 900;//594.657;
+    cameraMatrix(1,1) = 600;//594.657;
     cameraMatrix(1,2) = c_y;//299.076;//159.174;
     cameraMatrix(2,0) = 0;
     cameraMatrix(2,1) = 0;
@@ -238,6 +238,7 @@ void VideoTabController::replayFrame()
     cout << "FRAAME " << i << endl;
     i++;
 
+    view->incrementVideoProgress();
     if(i == videoProcessor->getFrameNum())
     {
         timerReplay->stop();
@@ -253,11 +254,20 @@ void VideoTabController::replayFrame()
 void VideoTabController::processingFinished()
 {
     cout << "PROCESSING OVER" << endl;        
-
-    //after processing is complete start the timer
-    timerReplay = new QTimer(this);
-    connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
-    timerReplay->start(500);
+    if(!videoProcessor->getCrashed())
+    {
+        //after processing is complete start the timer
+        timerReplay = new QTimer(this);
+        connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
+        timerReplay->start(500);
+    }
+    else
+    {
+        ExpTranException e("execution of video processor failed .. see log for reason");
+        view->displayException(e);
+        view->setAllVideoTabButtonsDisabled(false);
+        delete videoProcessor;
+    }
 }
 
 void VideoTabController::playBack()
@@ -286,8 +296,10 @@ void VideoTabController::playBack()
     videoProcessor = new VideoProcessor(picLabel->getMarked(),frameData,cameraMatrix,lensDist,opttype,regParam,frame_num,iter_num);
 
     connect(videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
+    connect(videoProcessor,SIGNAL(terminated()),this,SLOT(processingFinished()));
+    connect(videoProcessor,SIGNAL(expectionInducedTermination(ExpTranException&)),this,SLOT(threadTerminated(ExpTranException&)));
 
-    videoProcessor->start();    
+    videoProcessor->start();
 
 //    videoProcessor->processVideo(picLabel->getMarked(),frameData, cameraMatrix, lensDist,
 //                                 frameTranslation,frameRotation, generatedPoints,vector_weights_exp,vector_weights_id);
@@ -633,9 +645,9 @@ void VideoTabController::setOptReg(double regParam)
 void VideoTabController::setOptType(int t)
 {    
     if(t == 0)
-        opttype = VideoProcessor::OptType_LIN_COMB;
-    else
         opttype = VideoProcessor::OptType_INTERPOLATE;
+    else
+        opttype = VideoProcessor::OptType_LIN_COMB;
 }
 void VideoTabController::setFrameNum(int n)
 {

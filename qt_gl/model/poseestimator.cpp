@@ -13,10 +13,18 @@ void PoseEstimator::projectModelPointsInto2D(const Mat &rotation, const Mat &tra
                                              vector<Point2f> &imagePoints)
 {
     vector<Point3f> obj;
-    for(int i=0;i<Face::mouth_size;i++)
+    /*mouth*/
+//    for(int i=0;i<Face::mouth_size;i++)
+//    {
+//        correspondence3d.push_back(face_ptr->getPointIndexFromPolygon(Face::mouth[i]));
+//        obj.push_back(face_ptr->getPointFromPolygon(Face::mouth[i]));
+//    }
+    for(int i=0;i<Face::brow;i++)
     {
-        correspondence3d.push_back(face_ptr->getPointIndexFromPolygon(Face::mouth[i]));
-        obj.push_back(face_ptr->getPointFromPolygon(Face::mouth[i]));
+        correspondence3d.push_back(Face::lEyeB[i]);
+        obj.push_back(face_ptr->getPoint(Face::lEyeB[i]));
+        correspondence3d.push_back(Face::rEyeB[i]);
+        obj.push_back(face_ptr->getPoint(Face::rEyeB[i]));
     }
 
     projectPoints(Mat(obj),rotation,translation,cameraMatrix,lensDist,imagePoints);
@@ -54,15 +62,13 @@ void PoseEstimator::reprojectInto3DUsingWeak(const vector<Point2f> &imagePoints,
     proP = cameraMatrix*rmatrix*pM;
     proP = proP + cameraMatrix*tranM;
     Z_avg = proP(0,2);
-    cout << " with a z_avg after projecting " << Z_avg << endl;
 
     //reverse weak perspective (x,y,1) = (1/zavg)*(fx*X,fy*Y,zavg) + (c_x,c_y,0)
     //to get (X,Y,zavg) = (  zavg*[x-c_x]/fx, zavg*[y-c_y]/fy , zavg)
     //the entire projection to reverse is x = PwRX + Pt
     for(unsigned int i=0;i<imagePoints.size();i++)
     {
-//        cout << "things " << zavg << " " << principalPoint(0,0) <<  " " << principalPoint(1,0)
-//             << " " << cameraMatrix.at<double>(0,0) << " " << cameraMatrix.at<double>(1,1) << endl;
+
         point3dMat(0,0) = imagePoints[i].x - principalPoint(0,0);
         point3dMat(1,0) = imagePoints[i].y - principalPoint(1,0);
 
@@ -79,8 +85,6 @@ void PoseEstimator::reprojectInto3DUsingWeak(const vector<Point2f> &imagePoints,
         //reverse rotation which is orthogonal
         point3dMat = rmatrix.t()*point3dMat;
 
-        cout << "2d point is " << imagePoints[i].x << " " << imagePoints[i].y << endl;
-        cout << "3d point is " << point3dMat(0,0) << " " << point3dMat(1,0) << " " << point3dMat(2,0) << endl;
 
         p.x = point3dMat(0,0);
         p.y = point3dMat(1,0);
@@ -140,11 +144,8 @@ void PoseEstimator::generatePoints(const Mat &rotation, const Mat &translation,
         //homogenous coord
         if(zavg == 0)
             zavg = point2dMat(2,0);
-        cout << "zavg : " << zavg << " point z : " << point2dMat(2,0) << endl;
-        point2dMat  = (1./zavg)*point2dMat;
 
-        cout << "feature point : " << point3dMat(0,0) << " " << point3dMat(1,0) << " " << point3dMat(2,0) << endl;
-        cout << "generated new point : " << point2dMat(0,0) << " " << point2dMat(1,0) << endl;
+        point2dMat  = (1./zavg)*point2dMat;
 
         generatedPoints.push_back(Point2f(point2dMat(0,0) , point2dMat(1,0)));
     }
@@ -187,30 +188,14 @@ void PoseEstimator::calculateTransformation(const vector<Point2f> &imagePoints, 
 {
     vector<Point3f> objectPoints;
 
-    cout << " size of image points " << imagePoints.size() << endl;
-
     Point3f p3;
     for(unsigned int i=0;i<indices.size();i++)
     {
         p3 = face_ptr->getPoint(indices[i]);
 
-        //cout << "point at polygon " << face_ptr->getPointIndexFromPolygon(fPoints[i]) << endl;
-
-        cout << "point at " << indices[i] << " is " <<  p3.x << " " << p3.y << " " << p3.z << endl;
         objectPoints.push_back(p3);
     }
-    MatConstIterator_<double> it = cameraMatrix.begin<double>(), it_end = cameraMatrix.end<double>();
-    for(; it != it_end; ++it)
-        cout << *it << " ";
-    cout << endl;
-    vector<Point2f>::const_iterator itp = imagePoints.begin(), itp_end = imagePoints.end();
-    for(; itp != itp_end; ++itp)
-        cout << (*itp).x << " , " << (*itp).y << " ";
-    cout << endl;
 
-    cout << "use ext is : " << useExt << endl;
-    cout << "before solve pnp" << endl;
     //transform vectors into Mats with 3 (2) channels
     cv::solvePnP(Mat(objectPoints),Mat(imagePoints),cameraMatrix,lensDist,rvec,tvec,useExt);
-    cout << "after solve pnp" << endl;
 }

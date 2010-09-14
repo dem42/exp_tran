@@ -41,6 +41,9 @@ public slots:
     void setOptType(int);
     void setFrameNum(int);
     void setIterNum(int);
+    void setTexture(bool);
+    void setPoisson(bool);
+    void setUsingBackground(bool);
 private:
     void convertFrameIntoTexture(Mat &frame);    
     void initSrcSide();
@@ -62,6 +65,7 @@ private:
     ExpTranAbstractView *view;
 
     bool textureInterpolate;
+    bool show3D;
 
     VideoCapture *capSrc;
     VideoCapture *capTarget;
@@ -85,7 +89,6 @@ private:
     Face *src_face_ptr;
     Face *target_face_ptr;
 
-    //TEMPORARY to test texture
     //for now so that we can use them in a timer
     vector<cv::Mat> s_frameData, t_frameData;
     //points we use for optical flow .. more points will be used for model estimation
@@ -93,6 +96,7 @@ private:
 
     bool srcFinished;
     bool targetFinished;
+
     QMutex mutex;
 
     QTimer *timerReplay;

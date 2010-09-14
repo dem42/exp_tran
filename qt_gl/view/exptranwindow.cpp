@@ -111,6 +111,10 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(sUi.nelder,SIGNAL(toggled(bool)),v_controller,SLOT(setOptNelder(bool)));
     connect(sUi.iterBox,SIGNAL(valueChanged(int)),v_controller,SLOT(setIterNum(int)));
     connect(sUi.frameBox,SIGNAL(valueChanged(int)),v_controller,SLOT(setFrameNum(int)));
+
+    connect(sUi.poisson,SIGNAL(toggled(bool)),t_controller,SLOT(setPoisson(bool)));
+    connect(sUi.interpolate,SIGNAL(toggled(bool)),t_controller,SLOT(setTexture(bool)));
+    connect(sUi.background,SIGNAL(toggled(bool)),t_controller,SLOT(setUsingBackground(bool)));
 }
 
 
@@ -124,6 +128,36 @@ ExpTranWindow::~ExpTranWindow()
 void ExpTranWindow::setAllVideoTabButtonsDisabled(bool disabled)
 {
     ui.modelButton->setDisabled(disabled);
+    ui.restartButton->setDisabled(disabled);
+    ui.playButton->setDisabled(disabled);
+    ui.pauseButton->setDisabled(disabled);
+    ui.dropButton->setDisabled(disabled);
+    ui.flowButton->setDisabled(disabled);
+    ui.extractBtn->setDisabled(disabled);
+}
+
+void ExpTranWindow::setAllTransferTabButtonsDisabled(bool disabled)
+{
+    ui.browseD->setDisabled(disabled);
+    ui.browseS->setDisabled(disabled);
+    ui.dropS->setDisabled(disabled);
+    ui.dropT->setDisabled(disabled);
+    ui.restartTransferButton->setDisabled(disabled);
+    ui.startT->setDisabled(disabled);
+}
+
+void ExpTranWindow::incrementTransferProgress()
+{
+    static int counter = 1;
+    counter++;
+    ui.transferTabProgressBar->setValue(counter);
+}
+
+void ExpTranWindow::incrementVideoProgress()
+{
+    static int counter = 1;
+    ui.videoTabProgressBar->setValue(counter);
+    counter++;
 }
 
 void ExpTranWindow::displayException(const std::exception &e)

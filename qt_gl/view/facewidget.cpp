@@ -14,8 +14,7 @@
 using namespace std;
 
 FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
-{
-  cout << "building" << endl;
+{  
   setFormat(QGLFormat(QGL::DoubleBuffer | QGL::DepthBuffer));
 
   polygonNumber = 0;
@@ -23,6 +22,7 @@ FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
   gl_display_style = GL_POLYGON;
   displayFeature = false;
   displayMouth = false;
+  labeled = true;
 
   face_index = -1;
 
@@ -63,14 +63,13 @@ void FaceWidget::setFace(Face* face_ptr)
     this->face_ptr = face_ptr;
     this->polygonNumber = face_ptr->getPolyNum();
     face_ptr->calculateBoundingSphere(center_x,center_y,center_z,diameter);
-    cout << center_x << " " << center_y << " " << center_z << " " << diameter << endl;
+
     this->resizeGL(this->width(), this->height());
     this->updateGL();
 }
 
 void FaceWidget::setFace(Face* face_ptr, Point2 *texture_coord)
-{
-    cout << "in set face with text coord" << endl;
+{    
     this->face_ptr = face_ptr;
     this->polygonNumber = face_ptr->getPolyNum();
 
@@ -81,7 +80,7 @@ void FaceWidget::setFace(Face* face_ptr, Point2 *texture_coord)
     }
 
     face_ptr->calculateBoundingSphere(center_x,center_y,center_z,diameter);
-    cout << center_x << " " << center_y << " " << center_z << " " << diameter << endl;
+
     this->resizeGL(this->width(), this->height());
     this->updateGL();
 }
@@ -119,9 +118,12 @@ void FaceWidget::render()
   double near = center_z + diameter/2;
 
 
-  string str = face_ptr->getEmotionString();
+  if(labeled)
+  {
+      string str = face_ptr->getEmotionString();
 
-  renderText(left,top,near,QString(str.c_str()));
+      renderText(left,top,near,QString(str.c_str()));
+  }
 
   for(int i=0; i<polygonNumber; i++)
     {
@@ -199,11 +201,10 @@ void FaceWidget::setTransParams(double r_x, double r_y, double r_z, double t_x, 
     rot_x = r_x;
     rot_y = r_y;
     rot_z = r_z;
-    cout << "ROTATION" << rot_x << " " << rot_y << " " << rot_z << endl;
+
     trans_x = t_x;
     trans_y = t_y;
-    trans_z = t_z;
-    cout << "TRANSLATION" << trans_x << " " << trans_y << " " << trans_z << endl;
+    trans_z = t_z;    
 }
 
 void FaceWidget::mousePressEvent(QMouseEvent *event)
@@ -229,7 +230,6 @@ void FaceWidget::mouseMoveEvent(QMouseEvent *event)
 
 void FaceWidget::initializeGL(void)
 {
-
   //background color
   qglClearColor(Qt::white);
 
@@ -285,8 +285,7 @@ void FaceWidget::zoom(int step)
 }
 
 void FaceWidget::wheelEvent(QWheelEvent *event)
-{
-    cout << "IN WHEEL EVENT" << endl;
+{    
     //mouse work in steps of 15 degrees and delta is in eights of a degree
     int numDegrees = event->delta() / 8;
     int numSteps = numDegrees / 15;
@@ -326,8 +325,7 @@ void FaceWidget::setupFrustumParameters(GLdouble &left, GLdouble &right, GLdoubl
     {
         left *= aspect;
         right *= aspect;
-    }
-    cout <<  "frustum params are: " << left << " " << right << " " << top << " " << bottom << " " << near << " " << far << endl;
+    }   
 }
 
 
@@ -482,4 +480,9 @@ void FaceWidget::setTexture(uchar *img_data, int img_height, int img_width)
     delete[] img_data;
 
     texture_id = texture;
+}
+
+void FaceWidget::setLabeled(bool b)
+{
+    labeled = b;
 }

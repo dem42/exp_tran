@@ -195,8 +195,8 @@ void Utility::sampleGoodPoints(const vector<Point2f> &points, vector<Point2f> &s
 
     //Utility::pointSamplingNormal(points[tl],40,100,100,sampledPoints);
 
-    Utility::pointSampling(points[lelc],points[lerc],10,sampledPoints);
-    Utility::pointSampling(points[relc],points[rerc],10,sampledPoints);
+//    Utility::pointSampling(points[lelc],points[lerc],10,sampledPoints);
+//    Utility::pointSampling(points[relc],points[rerc],10,sampledPoints);
 
     //Utility::pointSampling(points[17],points[18],10,sampledPoints);
     //Utility::pointSampling(points[17],points[19],10,sampledPoints);

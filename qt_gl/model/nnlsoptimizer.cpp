@@ -108,15 +108,13 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
     face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
 
     //find average depth
-    average_depth = face_ptr->getAverageDepth();
-    cout << "is the average depth 0 .. i think it is always the same" << average_depth << endl;
+    average_depth = face_ptr->getAverageDepth();    
     pM(0,0) = 1;
     pM(1,0) = 1;
     pM(2,0) = average_depth;
     proP = cameraMatrix*rmatrix*pM;
     proP = proP + cameraMatrix*translation;
     Z_avg = proP(0,2);
-    cout << " with a z_avg after projecting " << Z_avg << endl;
 
     /***************************************************************/
     /*create weak-perspecitve camera matrix from camera matrix*/
@@ -131,8 +129,7 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
     //precompute translation
     Pt = (1./translation.at<double>(2,0)) * (weakCamera*translation);
 
-    cout << "here " << featurePoints.size() << " &  " << point_indices.size() << endl;
-    //preprocess points and core tensor rows
+     //preprocess points and core tensor rows
     //for points subtract translation too
     for(unsigned int i=0;i<featurePoints.size();i++)
     {
@@ -143,7 +140,7 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
         fi = fi - Pt;
         f.row(2*i) = fi.row(0) + 0;
         f.row(2*i+1) = fi.row(1) + 0;
-    }
+    }    
 
     pr = (1.0/Z_avg)*weakCamera*rmatrix;
     A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);
@@ -163,14 +160,19 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
         A_ex.row(2*i+1) = seg_A_ex.row(1) + 0;
     }
 
-
     //do not use the guess in the first frame but do for every following frame
     for(int i=0;i<exr_size;i++)
         x_t(0,i) = x(i,0) = w_exp[i];
 
+    Mat_<double> temp = (A_ex*x - f);
+    Mat_<double> e = temp.t()*temp;
+    cout << "exp, error before " << Matrix(e);
     //op .. lets see if we get here
     this->scannls(A_ex,f,x);
-    cout << " OPT EXP " << Matrix(x);
+    temp = (A_ex*x - f);
+    e = temp.t()*temp;
+    cout << "exp, error after " << Matrix(e);
+
 
     for(int i=0;i<exr_size;i++){
         w_exp[i] = x(i,0);
@@ -245,7 +247,6 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
 
     for(unsigned int i=0;i<featurePointsVector.size();i++)
         featurePointNum += featurePointsVector[i].size();
-    cout << "total number of points " << featurePointNum << endl;
 
     f = Mat_<double>(featurePointNum*2,1);
     fi = Mat_<double>(2,1);
@@ -268,9 +269,8 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
             f.row(count + 2*j) = fi.row(0) + 0;
             f.row(count + 2*j+1) = fi.row(1) + 0;
         }
-        count += featurePointsVector[i].size();
+        count += 2*featurePointsVector[i].size();
     }
-
 
     A_id = Mat_<double>(2*featurePointNum,id_size);
     seg_A_id = Mat_<double>(2,id_size);
@@ -281,8 +281,6 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
     pM(1,0) = 1;
     pM(2,0) = average_depth;
 
-    cout << "featurePointsVector size : " << featurePointsVector.size() << endl;
-    cout << "point indices vector size : " << point_indices_vector.size() << endl;
 
     for(unsigned int i=0, count = 0;i<point_indices_vector.size();++i)
     {
@@ -290,7 +288,6 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
         proP = cameraMatrix*rmatrix*pM;
         proP = proP + cameraMatrix*translation[i];
         Z_avg = proP(0,2);
-        cout << " with a z_avg after projecting in frame : " << i << " " << Z_avg << endl;
 
         pr = (1.0/Z_avg)*weakCamera*rmatrix;
 
@@ -310,7 +307,7 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
             A_id.row(count + 2*j) = seg_A_id.row(0) + 0;
             A_id.row(count + 2*j+1) = seg_A_id.row(1) + 0;
         }
-        count += point_indices_vector[i].size();
+        count += 2*point_indices_vector[i].size();
     }
 
 
@@ -318,19 +315,28 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
     for(int i=0;i<id_size;i++)
         y_t(0,i) = y(i,0) = w_id[i];
 
+    Mat_<double> temp = (A_id*y - f);
+    Mat_<double> e = temp.t()*temp;
+    cout << "id, error before " << Matrix(e);
     //optimize using sequential coordinate descent
-    this->scannls(A_id,f,y);
-
-    cout << "OPT id .. not that well ever get here .. " << Matrix(y);
-
+    this->scannls(A_id,f,y);    
+    temp = (A_id*y - f);
+    e = temp.t()*temp;
+    cout << "id, error after " << Matrix(e);
 
     for(int i=0;i<id_size;i++){
         w_id[i] = y(i,0);
+    }
+    for(int i=0;i<exr_size;i++){
+        w_exp[i] = weights_ex[0][i];
     }
 
     for(int i=0;i<id_size;i++){
         weights_id.push_back(w_id[i]);
     }
+
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
+    face_ptr->setAverageDepth(average_depth);
 
     delete[] w_id;
     delete[] w_exp;
@@ -389,7 +395,6 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
     Mat_<double> proP;
     Mat_<double> pM(3,1);
 
-    cout << "huh" << endl;
     Rodrigues(rotation,rmatrix);
 
     //get weights from the current face instance
@@ -398,12 +403,10 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
     average_depth = face_ptr->getAverageDepth();
     pM(0,0) = 1;
     pM(1,0) = 1;
-    pM(2,0) = average_depth;
-    cout << "face is at a distance " << p.z << endl;
+    pM(2,0) = average_depth;    
     proP = cameraMatrix*rmatrix*pM;
     proP = proP + cameraMatrix*translation;
     Z_avg = proP(0,2);
-    cout << " with a z_avg after projecting " << Z_avg << endl;
 
     /***************************************************************/
     /*create weak-perspecitve camera matrix from camera matrix*/
@@ -418,7 +421,6 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
     //precompute translation
     Pt = (1./translation.at<double>(2,0)) * (weakCamera*translation);
 
-    cout << "here " << featurePoints.size() << " &  " << point_indices.size() << endl;
     //preprocess points and core tensor rows
     //for points subtract translation too
     for(unsigned int i=0;i<featurePoints.size();i++)
@@ -439,8 +441,7 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
 
     for(unsigned int i=0;i<point_indices.size();++i)
     {
-        index = point_indices[i];
-        cout << "hey : " << index << endl;
+        index = point_indices[i];        
         Mi = core.submatrix( index*3 , index*3 + 2 );
         prm = pr*Mi;
         PRM.row(2*i) = prm.row(0) + 0;
@@ -453,9 +454,6 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
         x_t(0,i) = x(i,0) = w_exp[i];
     for(int i=0;i<id_size;i++)
         y_t(0,i) = y(i,0) = w_id[i];
-
-    cout << "and here! " << endl;
-
 
     A_ex = Mat_<double>::zeros(2*featurePoints.size(),exr_size);
     A_id = Mat_<double>::zeros(2*featurePoints.size(),id_size);
@@ -506,18 +504,15 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
 //    Vector3::normalize(w_id, id_size);
 
     for(int i=0;i<exr_size;i++){
-        weights_ex.push_back(w_exp[i]);
-        //cout << w_exp[i] << " == " << weights_ex[i] << " ";
+        weights_ex.push_back(w_exp[i]);    
     }
-    cout << endl;
+
 
     for(int i=0;i<id_size;i++){
         weights_id.push_back(w_id[i]);        
     }
-    cout << endl;
 
-    face_ptr->setNewIdentityAndExpression(w_id,w_exp);
-    cout << " avg depth after : " << face_ptr->getAverageDepth() << "avg depth before : " << average_depth << endl;
+    face_ptr->setNewIdentityAndExpression(w_id,w_exp);    
     face_ptr->setAverageDepth(average_depth);
 
     delete[] w_id;
@@ -530,7 +525,7 @@ void NNLSOptimizer::scannls(const Mat& A, const Mat& b,Mat &x)
     int m = A.size().height;
     int n = A.size().width;
     Mat_<double> AT = A.t();
-    double error = 1e-10;
+    double error = 1e-8;
     Mat_<double> H = AT*A;
     Mat_<double> f = -AT*b;
 
@@ -560,8 +555,7 @@ void NNLSOptimizer::scannls(const Mat& A, const Mat& b,Mat &x)
         }
 
         if(eKKT(H,f,x_new,error) == true)
-        {
-            cout << "coz of this at " << iter << endl;
+        {            
             break;
         }
     }

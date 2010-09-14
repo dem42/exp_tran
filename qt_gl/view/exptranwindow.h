@@ -26,7 +26,12 @@ public:
     ExpTranWindow(QMainWindow *window = 0);
     ~ExpTranWindow();
     void displayException(const std::exception &e);
+
+    //overwritten view functions
     void setAllVideoTabButtonsDisabled(bool);
+    void setAllTransferTabButtonsDisabled(bool);
+    void incrementTransferProgress();
+    void incrementVideoProgress();
 
 public slots:
     void changeSettings();

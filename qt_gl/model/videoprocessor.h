@@ -8,6 +8,7 @@
 #include <cv.h>
 #include <vector>
 #include <QThread>
+#include "exptranexception.h"
 
 class VideoProcessor : public QThread
 {
@@ -40,12 +41,15 @@ public:
     void getFaceAndPoseForFrame(unsigned int frameIndex, Face *face_ptr, Mat &rot, Mat &tran) const;
     void getGeneratedPointsForFrame(unsigned int frameIndex, vector<Point2f> &points) const;
     unsigned int getFrameNum() const;
+    bool getCrashed() const;
 
     void run();
 
 private:    
     bool termination(const vector<vector<double> >&prevExp, const vector<vector<double> >&exp,
                                  const vector<double> &prevId, const vector<double> &id);
+
+    bool threadCrashed;
 
     const unsigned int FRAME_MAX;
     const unsigned int ITER_MAX;

@@ -154,15 +154,14 @@ void FaceModel::generateFace(Point3 *face,double *w_id,double *w_ex,bool brute_e
     for(i=0;i<n_e;i++)
         m_wex[0][i] = w_ex[i];
 
+//    cout << "wex " << m_wex;
+//    cout << "wid " << m_wid;
+
     if(brute_exp == false)
     {
         //multiply with u2 and u3     
         row_ex = Matrix::matrix_mult(m_wex,U_ex);                
         //Vector3::normalize(row_ex.mat[0],n_e);
-
-        for(int i=0;i<n_e;i++)
-            cout << row_ex[0][i] << " ";
-        cout << endl;
     }
     else
     {

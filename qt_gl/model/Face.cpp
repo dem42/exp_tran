@@ -110,6 +110,11 @@ const int Face::mouth[43] = {975,769,768,561,352,558,349,141,142,9569,9572,9361,
 //                     9568,8725,140,7666,138,142,8088,345,349,8299,347,767,975};
 const int Face::mouth_size = 43;
 
+
+const int Face::lEyeB[4] = {3278,4246,3924,4572};
+const int Face::rEyeB[4] = {953,1052,1537,1992};
+const int Face::brow = 4;
+
 double Face::getAverageDepth() const
 {
     double zavg = 0;
@@ -154,11 +159,6 @@ string Face::getEmotionString() const
     double dist = 0.0;
     double sofar = numeric_limits<double>::max();
     int index = 0;
-
-    for(int i=0;i<EXP;i++)
-    {
-        cout << "w_exp[" <<i<<"] = " << w_exp[i] << endl;
-    }
 
     for(int i=0;i<EXP;i++)
     {
@@ -215,8 +215,7 @@ void Face::setNewIdentityAndExpression(double *w_id,double *w_exp,Face::Interpol
     if(it == Face::EXP_INTER || it == Face::ID_EXP_INTER)
     {        
         for(int i=0;i<EXP;i++)
-        {
-            cout << "w_exp["<<i<<"] = " << w_exp[i] << endl;
+        {            
             sum += w_exp[i];
         }
         //normalize:
@@ -234,8 +233,7 @@ void Face::setNewIdentityAndExpression(double *w_id,double *w_exp,Face::Interpol
         for(int i=0;i<ID;i++)
         {
             sum += w_id[i];
-        }
-        cout << "in id inter" << endl;
+        }        
         if(sum == 0)
             w_id[28] = 1;
         else
@@ -318,6 +316,8 @@ void Face::calculateBoundingSphere(float &cx,float &cy,float &cz, float &diamete
     float bx_u,bx_d,by_u,by_d,bz_u,bz_d;
     bx_u = by_u = bz_u = -5000;
     bx_d = by_d = bz_d = 5000;
+
+    bx_u = bx_d = by_u = by_d = bz_u = bz_d = 0;
 
     cout << poly_num << endl;
     for(int i=0; i<poly_num; i++)

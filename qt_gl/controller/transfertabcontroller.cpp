@@ -11,6 +11,8 @@ TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, Click
     this->srcText = srcText;
     this->targetText = targetText;
     this->face_widget = face_widget;
+    this->face_widget->setLabeled(false);
+
     this->face_widget->setCameraParameters(-200,-1,-200);
     src_face_ptr = new Face();
     target_face_ptr = new Face();
@@ -19,7 +21,7 @@ TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, Click
     opttype = VideoProcessor::OptType_INTERPOLATE;
     regParam = 2000.0;
     frame_num = 10;
-    iter_num = 3;
+    iter_num = 30;
 
     srcFileSelected("/home/martin/project/TrackedSmiles/S003-024.avi");
     targetFileSelected("/home/martin/project/TrackedSmiles/S008-005.avi");
@@ -42,6 +44,7 @@ TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, Click
 
     //set the texture functions
     textureInterpolate = false;
+    show3D = false;
 }
 
 void TransferTabController::initSrcSide()
@@ -59,11 +62,11 @@ void TransferTabController::initSrcSide()
     capSrc = new VideoCapture(srcFile.toStdString());
 
     cameraSrc = Mat_<double>(3,3);
-    cameraSrc(0,0) = 900;
+    cameraSrc(0,0) = 600;
     cameraSrc(0,1) = 0;
     cameraSrc(0,2) = c_x;
     cameraSrc(1,0) = 0;
-    cameraSrc(1,1) = 900;
+    cameraSrc(1,1) = 600;
     cameraSrc(1,2) = c_y;
     cameraSrc(2,0) = 0;
     cameraSrc(2,1) = 0;
@@ -87,11 +90,11 @@ void TransferTabController::initTargetSide()
     capTarget = new VideoCapture(targetFile.toStdString());
 
     cameraTarget = Mat_<double>(3,3);
-    cameraTarget(0,0) = 900;
+    cameraTarget(0,0) = 600;
     cameraTarget(0,1) = 0;
     cameraTarget(0,2) = c_x;
     cameraTarget(1,0) = 0;
-    cameraTarget(1,1) = 900;
+    cameraTarget(1,1) = 600;
     cameraTarget(1,2) = c_y;
     cameraTarget(2,0) = 0;
     cameraTarget(2,1) = 0;
@@ -152,8 +155,13 @@ void TransferTabController::beginTransfer()
 {
     Mat frame, rgb_frame, copyFrame;
 
-//    targetLabel->setVisible(false);
-//    face_widget->setVisible(true);
+    if(show3D == true)
+    {
+        targetLabel->setVisible(false);
+        face_widget->setVisible(true);
+    }
+
+    view->setAllTransferTabButtonsDisabled(true);
 
     /**********************/
     /*first collect frames*/
@@ -202,12 +210,15 @@ void TransferTabController::getClonedMouth(const Mat& img, unsigned int frame_in
    Point2f tb = genPointsSrc[5];
    Point2f tc = genPointsSrc[4];
    Point2f td = genPointsSrc[6];
+   cout << "src points are " << ta.x << " " << ta.y << " " << tb.x << " " << tb.y
+        << " " << tc.x << " " << tc.y << " " << td.x << " " << td.y << endl;
 
    Point2f pa = genPointsTarget[3];
    Point2f pb = genPointsTarget[5];
    Point2f pc = genPointsTarget[4];
    Point2f pd = genPointsTarget[6];
-   cout << "points are " << pa.x << " " << pa.y << " " << pb.x << " " << pb.y << endl;
+   cout << "target points are " << pa.x << " " << pa.y << " " << pb.x << " " << pb.y
+        << " " << pc.x << " " << pc.y << " " << pd.x << " " << pd.y << endl;
 
    int hx = (pc.x >= pa.x)?pc.x:pa.x;
    int lx = (pc.x >= pa.x)?pa.x:pc.x;
@@ -223,11 +234,11 @@ void TransferTabController::getClonedMouth(const Mat& img, unsigned int frame_in
    int ly2 = (td.y >= tb.y)?tb.y:td.y;
    int nx2 = (hx2 - lx2)/2.;
    int ny2 = (hy2 - ly2)/2.;
-   cout << "nums are " << hx << " " << hx2 << " " << ny2 << " " << ny << endl;
+   cout << "nums are " << nx << " " << ny << " " << nx2 << " " << ny2 << endl;
    Mat_<double> mask = Mat_<double>::zeros(img.size());
 
-   for(int i=ny-ny2;i<=ny+ny2;i++)
-       for(int j=nx-nx2;j<=nx+nx2;j++)
+   for(int i=ny-ny2-10;i<=ny+ny2+10;i++)
+       for(int j=nx-nx2-10;j<=nx+nx2-10;j++)
            mask(i,j) = 1.0;
 
    cout << " the shift is " << ta.x - pa.x << ta.y - pa.y << endl;
@@ -267,10 +278,22 @@ void TransferTabController::processingFinished()
     {
         targetFinished = true;
     }
+
     mutex.unlock();
-    timerReplay = new QTimer(this);
-    connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
-    timerReplay->start(1000);
+    if(!src_videoProcessor->getCrashed() && !target_videoProcessor->getCrashed())
+    {        
+        timerReplay = new QTimer(this);
+        connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
+        timerReplay->start(500);
+    }
+    else
+    {
+        ExpTranException e("execution of video processor failed .. see log for reason");
+        view->displayException(e);
+        view->setAllTransferTabButtonsDisabled(false);
+        delete src_videoProcessor;
+        delete target_videoProcessor;
+    }
 }
 
 
@@ -289,8 +312,8 @@ void TransferTabController::replayFrame()
     int img_width;
     int img_height;
 
-    src_videoProcessor->getFaceAndPoseForFrame(i,src_face_ptr,rot,tran);
-    target_videoProcessor->getFaceForFrame(i,target_face_ptr);
+    src_videoProcessor->getFaceForFrame(i,src_face_ptr);
+    target_videoProcessor->getFaceAndPoseForFrame(i,target_face_ptr,rot,tran);
 
     double tx = tran(0,0);
     double ty = tran(0,1);
@@ -306,14 +329,14 @@ void TransferTabController::replayFrame()
 
     //transfer texture
     for(int j=0;j<target_face_ptr->getPointNum();j++)
-        objectPoints.push_back(src_face_ptr->vertexes[j]);
+        objectPoints.push_back(target_face_ptr->vertexes[j]);
 
     cv::projectPoints(Mat(objectPoints),rot,tran,cameraSrc,lensDist,imagePoints);
     textureData = new Point2[imagePoints.size()];
     //    img_width = srcFrames[i].size().width;
     //    img_height = srcFrames[i].size().height;
-    img_width = Utility::closestLargetPowerOf2(s_frameData[i].size().width);
-    img_height = Utility::closestLargetPowerOf2(s_frameData[i].size().height);
+    img_width = Utility::closestLargetPowerOf2(t_frameData[i].size().width);
+    img_height = Utility::closestLargetPowerOf2(t_frameData[i].size().height);
 
     for(unsigned int j=0;j<imagePoints.size();j++)
     {
@@ -344,41 +367,64 @@ void TransferTabController::replayFrame()
 
     //face_widget->setTransformationMatrix(tranM);
 
+    target_face_ptr->transferExpressionFromFace(src_face_ptr);
 
     //face_widget->bindTexture(Utility::mat2QImage(frameData[i]));
-    srcFrames.push_back(s_frameData[i]);
-    convertFrameIntoTexture(s_frameData[i]);
-
-    src_face_ptr->transferExpressionFromFace(target_face_ptr);
-    face_widget->setFace(src_face_ptr,textureData);
-    delete[] textureData;
-
-
-    if(textureInterpolate)
-    {
-        QImage qimg = face_widget->grabFrameBuffer(false);
-        QPixmap pimg = QPixmap::fromImage(qimg);
-        pimg.setMask(pimg.createMaskFromColor(Qt::white,Qt::MaskInColor));
-        QPixmap result = Utility::composePixmaps(Utility::mat2QPixmap(s_frameData[i]),pimg);
-        sourceLabel->setPixmap(result);
-    }
+    srcFrames.push_back(t_frameData[i]);
 
     sourceLabel->clearMarked();
     targetLabel->clearMarked();
 
-    getClonedMouth(s_frameData[i],i,t_frameData[i]);
+    if(!show3D)
+    {
+        convertFrameIntoTexture(t_frameData[i]);
+        face_widget->setFace(target_face_ptr,textureData);
+    }
+    else
+    {
+        convertFrameIntoTexture(t_frameData[i]);
+        face_widget->setFace(target_face_ptr,textureData);
+        //face_widget->setFace(target_face_ptr);
+    }
 
-    sourceLabel->setPixmap(Utility::mat2QPixmap(s_frameData[i]));
-    targetLabel->setPixmap(Utility::mat2QPixmap(t_frameData[i]));
+    delete[] textureData;
+    cout << "iwith texint " << textureInterpolate << endl;
+
+    if(textureInterpolate && !show3D)
+    {
+        cout << "in  here " << i << endl;
+
+        QImage qimg = face_widget->grabFrameBuffer(false);
+        QPixmap pimg = QPixmap::fromImage(qimg);
+        pimg.setMask(pimg.createMaskFromColor(Qt::white,Qt::MaskInColor));
+        QPixmap result = Utility::composePixmaps(Utility::mat2QPixmap(t_frameData[0]),pimg);
+        targetLabel->setPixmap(result);
+        sourceLabel->setPixmap(QPixmap::fromImage(qimg));
+        //sourceLabel->setPixmap(Utility::mat2QPixmap(s_frameData[i]));
+    }
+    else if(!textureInterpolate && !show3D)
+    {
+        getClonedMouth(s_frameData[i],i,t_frameData[i]);
+
+        sourceLabel->setPixmap(Utility::mat2QPixmap(s_frameData[i]));
+        targetLabel->setPixmap(Utility::mat2QPixmap(t_frameData[i]));
+    }
 
     i++;
+    view->incrementTransferProgress();
+
     if(i == src_videoProcessor->getFrameNum())
     {
         timerReplay->stop();
         i = 0;
         s_frameData.clear();
+        t_frameData.clear();
         featurePoints.clear();
-        cout << "DONE!!!!!!!!!" << endl;
+
+        view->setAllTransferTabButtonsDisabled(false);
+
+        delete src_videoProcessor;
+        delete target_videoProcessor;
     }
 
 }
@@ -475,9 +521,9 @@ void TransferTabController::setOptReg(double regParam)
 void TransferTabController::setOptType(int t)
 {    
     if(t == 0)
-        opttype = VideoProcessor::OptType_LIN_COMB;
-    else
         opttype = VideoProcessor::OptType_INTERPOLATE;
+    else
+        opttype = VideoProcessor::OptType_LIN_COMB;
 }
 void TransferTabController::setFrameNum(int n)
 {
@@ -486,4 +532,16 @@ void TransferTabController::setFrameNum(int n)
 void TransferTabController::setIterNum(int n)
 {
     iter_num = n;
+}
+void TransferTabController::setTexture(bool tex)
+{
+    textureInterpolate = true;
+}
+void TransferTabController::setPoisson(bool tex)
+{    
+    textureInterpolate = false;
+}
+void TransferTabController::setUsingBackground(bool background)
+{    
+    this->show3D = !background;    
 }

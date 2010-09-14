@@ -461,7 +461,7 @@ with the generalized
 basis from given in equation \ref{eq:FEMbasis}.
 
 
-\subsection{Statistical Models !ALTERED}
+\subsection{Statistical Models}
 Statistical models attempt to understand and model the variation inherent in the
 deformable object through statistical analysis. In statistical analysis a data set
 is examined and characterized so that predictions and judgments based on the
@@ -481,7 +481,7 @@ appearance of the object -- which includes variance coming from the texture, lig
 This appearance model describes the location and color of the pixels
 that define the object.
 
-\subsubsection{PCA and Eigenfaces !ALTERED}
+\subsubsection{PCA and Eigenfaces !!ALTERED}
 In 1991, Turk and Pentland \cite{eigenfaces91} pioneered a 2D model-based face recognition approach
 based on the statistical
 technique called \textit{principal component analysis} (PCA). The PCA is an orthogonal
@@ -673,7 +673,7 @@ illumination-corrected texture extraction algorithm.
 \end{comment}
 
 
-\subsubsection{Combined Models of Shape and Appearance !ALTERED}
+\subsubsection{Combined Models of Shape and Appearance}
 Texture variations and shape variations are correlated. Clearly, with any source of
 lighting it is the shape of an object which influences what parts of the object
 will appear darker or lighter. Cootes and Taylor \cite{activeApp04} describe modeling approaches
@@ -1470,7 +1470,7 @@ $Q = (p_x,p_y,p_z,1)^T$ in the object coordinate system to a point $\mathbf{x}
 where $\mathbf{0} = (0,0,0)$. 
 
 
-\subsection{Pose estimation with the POSIT algorithm !NEW}\label{posit}
+\subsection{Pose estimation with the POSIT algorithm}\label{posit}
 Davis and DeMenthon's POSIT algorithm \cite{POSIT}, \cite{opencv} is a simple and efficient method for solving the PnP
 problem. The POSIT algorithm estimates the rotation matrix $R$ and the
 translation vector $t$
@@ -2245,7 +2245,7 @@ space is given in
 The data tensor itself will need to be loaded once and flattened three times for
 the computation of the HOSVD decomposition.
 
-\subsection{Computing the HOSVD !! NEW}\label{s:hosvd}
+\subsection{Computing the HOSVD !!NOT SURE}\label{s:hosvd}
 The generative tensor model for the face transfer application is given by the formula 
 \begin{equation} \label{eq:generative_model2}
 \mathbf{f} = \mathcal{M} \times_2 \mathbf{w}_i^T \times_3 \mathbf{w}_e^T
@@ -2741,7 +2741,7 @@ figure \ref{fg:camdialog}
 
 \end{figure}
 
-\subsection{Minimizing the Error Function}\label{s:minerror}
+\subsection{Minimizing the Error Function !CRUCIAL}\label{s:minerror}
 The goal of the the fitting algorithm is to estimate the model and 3D pose
 parameters given a set of $N$ feature points $f_1, \ldots , f_N$ in every frame of the recording. In
 order to find the parameters that are closest to the true parameters we need an error
@@ -2848,7 +2848,7 @@ $\gamma(\mathbf{w}_{id},\mathbf{w}_{exp},\mathbf{R},\mathbf{t})$. Setting the de
   zero would then result in a nonlinear equation which are difficult to solve.
 
 The presence of the scaling factor means that the perspective projection is not a linear transformation since $\gamma$ is a
-function of the point $p_i$. The weak-perspective projection however is a linear
+function of the point $p_i$. The weak-perspective projection, however, is a linear
 transformation and it may be used to approximate the perspective projection. The idea
 behind the weak-perspective projection is that when the distance of the object
 from the camera is large enough then the points on the object can be thought to have effectively same
@@ -3286,7 +3286,7 @@ $\mathbf{\hat{R}}$ and $\mathbf{\hat{t}}$
 \end{algorithmic}
 \end{algorithm}
 
-\subsection{Overfitting}\label{s:overfitting}
+\subsection{Overfitting !CRUCIAL}\label{s:overfitting}
 As pointed out earlier the generative model only generates realistic
 representations of a face when the model parameters are within several standard
 deviations of the mean. In \cite{blanz1}, \cite{jacey} the model parameters are constrained to
@@ -3316,7 +3316,7 @@ model.
 The model fitting algorithm should therefore be \textit{general} enough so that
 the obtained model parameters minimize the error function not only for the feature points used during the fitting stage, but also for any
 arbitrary point on the face. This can be achieve trivially by increasing the
-number of feature points. Such an approach is however error prone since it is not
+number of feature points. Such an approach is, however, error prone since it is not
 always clear how many points is enough to make the fitting general. 
 
 The expression transfer application supports two techniques which ensure that the
@@ -3383,7 +3383,7 @@ algorithm must solve is therefore given by
 
 Constrained minimization of a nonlinear function is a difficult task. It
 involves setting up the Karush-Kuhn-Tucker conditions or the Lagrangian function
-and taking the derivatives. We can however be solve the problem using the Nelder
+and taking the derivatives. We can, however, solve the problem using the Nelder
 Mead downhill simplex discussed in section \ref{s:nelder}. The downhill simplex
 method does not require the derivatives. It finds the minimum by evaluating the
 function at specific points in order to move towards the minimum. 
@@ -3425,13 +3425,13 @@ these constraints the model losses expressive power. However, it is
 impossible to generate an unrealistic face when they are satisfied, which
 warrants enforcing the non-negativity constraints.
 
-\subsection{Fitting Algorithm}\label{s:fitalgo}
+\subsection{Fitting Algorithm !CRUCIAL}\label{s:fitalgo}
 Before the complete fitting algorithm can be established two problems need to be
 addressed. 
 
 \paragraph{Multi-Frame Coordinate Descent.} First of all the coordinate descent algorithm discussed so far was
 designed to optimize the parameters for just one frame. The fitting algorithm
-should however find the identity and the expressions of a person by examining a
+should, however, find the identity and the expressions of a person by examining a
 sequence of frames. As an additional constraint, the identity parameters should
 stay the same in all frames since the identity of the person in the video
 sequence should not change. In the multi-frame coordinate descent algorithm we
@@ -3560,7 +3560,7 @@ the expressions of the individual in the target video with the expressions from
 the source video. This of course involves correctly generating the texture for
 the respective expressions. Since the tensor model we have constructed is a
 shape model and not an appearance model, it cannot be used to directly generate
-the correct texture. The shape model does however provide the application with an
+the correct texture. The shape model does, however, provide the application with an
 understanding of the source and target face. This understanding can be utilized
 to transfer the texture between the target subject in the 2D frames of the
 video.
@@ -3578,7 +3578,7 @@ transferred onto him, then this will cause the original texture to contract and
 stretch to fit the new configuration of model points. It is clear that this
 approach alone cannot produce very realistic results. 
 
-We may however utilize the information available about the target and source
+However, we may utilize the information available about the target and source
 face shape to generate more realistic results. If the exact measurements of the
 source subject's smile and the size of the target's mouth are known then the texture
 of the source smile can be transferred into the target frame and blended with its
@@ -3849,7 +3849,7 @@ estimates the face model parameters, exchanges the expression and transfers
 texture.
 
 
-\chapter{Results and Evaluation}
+\chapter{Results and Evaluation !NEW}
 The expression transfer application's performance depends heavily on the speed
 and accuracy of the fitting algorithm and the expressive power of the tensor
 model. This chapter presents results obtained from the application which can be
@@ -4011,7 +4011,7 @@ feature points and an automatic algorithm is likewise only effective for a small
 number of unique features such as the mouth corners, eye corners etc.
 \section{Expression Transfer Results}
 
-\section{Performance}
+\section{Performance !NOT SURE}
 The expression transfer application was tested on the following system
 \begin{itemize}
 \item \textbf{System Type:} Thinkpad Laptop
@@ -4024,18 +4024,26 @@ On this system, constructing a tensor model from the Binghamton databases with
 5090 vertices, 7 expressions and 56 identities averages at around 2 minutes. This
 includes loading the data from the database and computing the HOSVD.
 
-Fitting the algorithm to using a linear combination algorithm with
-regularization takes less than about a third of a second per frame. 
+Fitting the tensor model using a linear combination algorithm with
+regularization takes on average about a third of a second per frame. For a 100
+feature points the runtime averages at around 13 seconds for 40 frames and 18
+seconds for 50 frames. 
 
-Fitting the model parameters by enforcing linear interpolation through
+The runtime of fitting the model parameters by enforcing linear interpolation through
 non-negativity constraints and solving using the sequential coordinate-wise
-non-negativity least squares algorithm averages at around 25 seconds for 40
-frames and around 28 seconds for 50 frames for 100 feature points, thus averaging at a little over 0.6
+non-negativity least squares algorithm is around 25 seconds for 40
+frames and around 28 seconds for 50 frames for 100 feature points, thus averaging a little over 0.6
 seconds per frame. 
+
+The slower runtime of the non-negativity least squares algorithm is due to the
+fact that it performs a sequence of iterations until convergence during every parameter update step in the
+coordinate descent expression transfer fitting algoritm. The linear
+combination fitting algorithm, on the other hand, updates parameters using a
+closed form solution, which is computationally much more effective.
 
 \chapter{Conclusion}
 To summarize, we developed the expression transfer application for 
-\section{Future Work}
+\section{Future Work !NOT SURE}
 As part of the expression transfer application, we constructed a deformable model from a simple database of 3D face scans displaying
 expressions. An intriguing prospect for future work would be to perform data
 gathering and construct larger, more powerful 3D databases,
@@ -4051,7 +4059,7 @@ databases not consisting of face scans by simply adapting the number of
 parameters and mode matrices. 
 
 Of course, to build a new database it would be necessary to perform 3D data
-gathering. It should however be possible to perform this gathering without the
+gathering. It should, however, be possible to perform this gathering without the
 need for expensive equipement. Structured light based scanning equipment and other 3D shape recovery approaches
 such as computational or photometric stereo are increasingly becoming more readily
 available to casual users and they would lend themselves well for data gathering
