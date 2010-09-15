@@ -125,9 +125,8 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
 
     for(unsigned int i=0;i<point_indices.size();++i)
     {
-        index = point_indices[i];
-        Mi = core.submatrix( index*3 , index*3 + 2 );
-        prm = pr*Mi;
+        index = point_indices[i];        
+        prm = pr*M[index];
         PRM.row(2*i) = prm.row(0) + 0;
         PRM.row(2*i+1) = prm.row(1) + 0;
     }
@@ -331,8 +330,15 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
     B = A_ext*f;
     B = B + Z_avg*leftTerm_exp;
 
+    Mat_<double> temp = (A_ex*x - f);
+    Mat_<double> e = temp.t()*temp;
+    cout << "exp, error before " << Matrix(e);
     cv::solve(W,B,x,DECOMP_SVD);
     //x = Matrix::solveLinSysSvd(W,B);
+    temp = (A_ex*x - f);
+    e = temp.t()*temp;
+    cout << "exp, error after " << Matrix(e);
+
 
 
     for(int i=0;i<exr_size;i++){
@@ -492,8 +498,13 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
     B = A_idt*f;
     B = B + Z_avg*leftTerm_id;
 
-    cv::solve(W,B,y,DECOMP_SVD);
-
+    Mat_<double> temp = (A_id*y - f);
+    Mat_<double> e = temp.t()*temp;
+    cout << "id, error before " << Matrix(e);
+    cv::solve(W,B,y,DECOMP_SVD);      
+    temp = (A_id*y - f);
+    e = temp.t()*temp;
+    cout << "id, error after " << Matrix(e);
 
     cout << "in closed .. the y " << Matrix(y);
 

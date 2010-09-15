@@ -64,6 +64,9 @@ FaceTabController::FaceTabController(QSlider *exp_slider, QSlider *ident_slider,
     expr_map.insert(std::pair<QString,ExprType>("Neutral",NEUTRAL));
     expr_map.insert(std::pair<QString,ExprType>("Sad",SAD));
     expr_map.insert(std::pair<QString,ExprType>("Surprise",SURPRISE));
+
+    id_inter = false;
+    exp_inter = false;
 }
 
 FaceTabController::~FaceTabController()

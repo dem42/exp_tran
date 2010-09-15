@@ -46,7 +46,7 @@ void ModelIdentityError::setPoints(const vector<vector<Point2f> >&p,const vector
             index = indices[j][i];
             if(Z.find(index) == Z.end())
             {
-                core_extracted = core.submatrix(index*3,index*3+2);
+                core_extracted = Matrix::submatrix(core, index*3,index*3+2);
                 projected = P*rotations[j]*core_extracted;
                 Z[index] = projected.clone();
             }

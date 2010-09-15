@@ -58,6 +58,7 @@ void ClickableQLabel::setDrawable(bool drawable)
 
 void ClickableQLabel::mousePressEvent ( QMouseEvent * ev )
 {
+    cout << "CLICKED " << ev->x() << " " << ev->y() << endl;
     cv::Point2f point(ev->x(),ev->y());
     if(drawable == true)
          drawing = true;

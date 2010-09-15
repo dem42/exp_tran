@@ -41,7 +41,7 @@ void ModelImageError::setPoints(const vector<Point2f> &p,const vector<int> &i)
     for(unsigned int i=0; i<points.size(); ++i)
     {
         index = indices[i];       
-        core_extracted = core.submatrix(index*3,index*3+2);
+        core_extracted = Matrix::submatrix(core,index*3,index*3+2);
         projected = P*R*core_extracted;
         Z.push_back(projected.clone());
     }

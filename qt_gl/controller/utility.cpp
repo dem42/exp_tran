@@ -46,7 +46,6 @@ void Utility::poissonClone(const Mat &src, const Mat &mask, Mat &target, int o_x
                 N++;
             }
 
-    cout << "the N is " << N << endl;
 
     Mat_<double> A = Mat_<double>::zeros(N,N);
     Mat_<double> b1(N,1),b2(N,1),b3(N,1);
@@ -86,8 +85,8 @@ void Utility::poissonClone(const Mat &src, const Mat &mask, Mat &target, int o_x
     }
 
     cv::Laplacian(src_copy,laplacian,-1);
-//    IplImage ipl = laplacian;
-//    cvShowImage("ugh",&ipl);
+    IplImage ipl = laplacian;
+    cvShowImage("ugh",&ipl);
 
     int count = 0;
     uint id = 0;
@@ -237,10 +236,7 @@ void Utility::pointSamplingNormal(const Point2f&a, const int num, const double v
         newPoint.x = a.x + n1*::sqrt(var1);
         newPoint.y = a.y + n2*::sqrt(var2);
         points.push_back(newPoint);
-    }
-    cout << "testing sampling" << endl;
-    for(int i=0;i<points.size();i++)
-        cout << points[i].x << " " << points[i].y << endl;
+    }    
 }
 
 
@@ -267,10 +263,7 @@ void Utility::pointSampling(const Point2f& a, const Point2f& b, const int num,
         newPoint.x = (1-random)*a.x + random*b.x;
         newPoint.y = (1-random)*a.y + random*b.y;
         points.push_back(newPoint);
-    }
-    cout << "testing sampling" << endl;
-    for(int i=0;i<points.size();i++)
-        cout << points[i].x << " " << points[i].y << endl;
+    }    
 }
 
 QPixmap Utility::composePixmaps(const QPixmap &src, const QPixmap &dest)

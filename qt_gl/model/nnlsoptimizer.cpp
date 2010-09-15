@@ -1,7 +1,7 @@
 #include "nnlsoptimizer.h"
 #include "model/FaceModel.h"
 
-NNLSOptimizer::NNLSOptimizer() : Optimizer(), NNLS_MAX_ITER(1000), max_iterations(3)
+NNLSOptimizer::NNLSOptimizer() : Optimizer(), NNLS_MAX_ITER(1000), max_iterations(5)
 {
 
 }
@@ -360,18 +360,11 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
 
     //core tensor rows
     Mat_<double> Mi;
-    Mat_<double> M;
 
     //featurePoints converted to 2x1 matrices
     Mat_<double> fi;
     Mat_<double> f;
     Mat_<double> O;
-
-    //initialize model-morph bases
-    FaceModel *model = FaceModel::getInstance();
-    Matrix core = model->getCoreTensor();
-    Mat_<double> u_id = model->getUIdentity();
-    Mat_<double> u_ex = model->getUExpression();
 
     int index = 0;
     const int exr_size = model->getExpSize();
@@ -437,13 +430,11 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
     pr = (1.0/Z_avg)*weakCamera*rmatrix;
     PRM = Mat_<double>(2*featurePoints.size(),exr_size*id_size);
     prm = Mat_<double>(2,exr_size*id_size);
-    Mi = Mat_<double>(3,exr_size*id_size);
 
     for(unsigned int i=0;i<point_indices.size();++i)
     {
-        index = point_indices[i];        
-        Mi = core.submatrix( index*3 , index*3 + 2 );
-        prm = pr*Mi;
+        index = point_indices[i];                
+        prm = pr*M[index];
         PRM.row(2*i) = prm.row(0) + 0;
         PRM.row(2*i+1) = prm.row(1) + 0;
     }
@@ -486,10 +477,15 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
 
         A_id = PRM*ZU;
 
+        Mat_<double> temp = (A_id*y - f);
+        Mat_<double> e = temp.t()*temp;
+        cout << "id, error before " << Matrix(e);
         this->scannls(A_id,f,y);
+        temp = (A_id*y - f);
+        e = temp.t()*temp;
+        cout << "id, error after " << Matrix(e);
 
     }
-
 
 
     for(int i=0;i<exr_size;i++){

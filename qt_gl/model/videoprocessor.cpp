@@ -18,12 +18,15 @@ VideoProcessor::VideoProcessor(const unsigned int fmax, const unsigned int imax)
 VideoProcessor::VideoProcessor(const vector<cv::Point2f> &featurePoints, const vector<cv::Mat> &frameData,
                                const cv::Mat &cameraMatrix, const cv::Mat &lensDist,
                                VideoProcessor::OptType type, double regParam,
+                               VideoProcessor::IdConstraintType idconst, VideoProcessor::PointGenerationType pgtype,
                                const unsigned int fmax,const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax)
 {
     fPoints.assign(featurePoints.begin(),featurePoints.end());
     fData.assign(frameData.begin(),frameData.end());
     this->cameraMatrix = cameraMatrix;
     this->lensDist = lensDist;
+    this->pgt = pgtype;
+    this->idct = idconst;
 
     if(type == OptType_INTERPOLATE)
         paramOptimizer = new NNLSOptimizer();
@@ -56,9 +59,8 @@ VideoProcessor::~VideoProcessor()
 void VideoProcessor::run()
 {
     try
-    {
-        this->processVideo(fPoints,fData,cameraMatrix,lensDist,frameTranslation,frameRotation,generatedPoints,
-                           vector_weights_exp,vector_weights_id);
+    {        
+        this->processVideo(fPoints,fData,frameTranslation,frameRotation,generatedPoints,vector_weights_exp,vector_weights_id);
     }catch(cv::Exception &e)
     {        
         cerr << e.what() << endl;
@@ -91,6 +93,8 @@ void VideoProcessor::getFaceForFrame(unsigned int frameIndex, Face *face_ptr) co
     int ID = face_ptr->getIdNum();
     int EXP = face_ptr->getExpNum();
 
+    int id_index = 0;
+
     double w_id[ID];
     double w_exp[EXP];
     double avg = face_ptr->getAverageDepth();
@@ -101,17 +105,21 @@ void VideoProcessor::getFaceForFrame(unsigned int frameIndex, Face *face_ptr) co
         os << "frame index " << frameIndex << " < than number of frames computed " << vector_weights_exp.size();
         throw ExpTranException(os.str());
     }
-
-    for(int i=0;i<ID;i++)
-    {
-
-        w_id[i] = vector_weights_id[0][i];
-    }
-
     for(int i=0;i<EXP;i++)
     {
 
         w_exp[i] = vector_weights_exp[frameIndex][i];
+    }
+
+    if(idct == VideoProcessor::IdConstraintType_CONST)
+        id_index = 0;
+    else if(idct == VideoProcessor::IdConstraintType_NONE)
+        id_index = frameIndex;
+
+    for(int i=0;i<ID;i++)
+    {
+
+        w_id[i] = vector_weights_id[id_index][i];
     }
 
     face_ptr->setNewIdentityAndExpression(w_id,w_exp);
@@ -132,15 +140,14 @@ void VideoProcessor::getGeneratedPointsForFrame(unsigned int frameIndex, vector<
 
 
 bool VideoProcessor::termination(const vector<vector<double> >&prevExp, const vector<vector<double> >&exp,
-                                 const vector<double> &prevId, const vector<double> &id)
+                                 const vector<vector<double> >&prevId, const vector<vector<double> >&id)
 {
     double dif;
     const double exp_eps = 0.0001;
     const double id_eps = 0.001;
     for(unsigned int i=0;i<prevExp.size();i++)
     {
-        dif = 0;
-        cout << "ugh" << endl;
+        dif = 0;        
         for(unsigned int j=0;j<prevExp[i].size();j++)
         {
             dif += (prevExp[i][j] - exp[i][j])*(prevExp[i][j] - exp[i][j]);            
@@ -152,16 +159,86 @@ bool VideoProcessor::termination(const vector<vector<double> >&prevExp, const ve
     dif = 0;
     for(unsigned int i=0;i<prevId.size();i++)
     {
-        dif += (prevId[i] - id[i])*(prevId[i] - id[i]);       
-    }
-    cout << "dif id at  " << dif << endl;
-    if(dif > id_eps)
-        return false;
+        dif = 0;        
+        for(unsigned int j=0;j<prevId[i].size();j++)
+        {            
+            dif += (prevId[i][j] - id[i][j])*(prevId[i][j] - id[i][j]);
+        }
+        cout << "dif exp  " << dif << " frame " << i << endl;
+        if(dif > id_eps)
+            return false;
+    }   
     return true;
 }
 
+void VideoProcessor::generateNewFeaturePoints(const Mat& rotation, const Mat &translation, Face *face_ptr, vector<Point2f> &currentPoints, vector<int> &indices)
+{
+    vector<Point2f> newPoints;
+    if(pgt == PointGenerationType_2D)
+    {
+        //now sample new points using the first frame alignment and add them to the feature points
+        Utility::sampleGoodPoints(currentPoints,newPoints);
+        poseEstimator->reprojectInto3DUsingWeak(newPoints,rotation,translation,cameraMatrix,lensDist,face_ptr,indices);
+        currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+    }
+    else if(pgt == PointGenerationType_3D)
+    {
+        poseEstimator->generatePoints(rotation,translation,cameraMatrix,lensDist,100,face_ptr,newPoints,indices);
+        currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+
+        newPoints.clear();
+        poseEstimator->projectModelPointsInto2D(rotation,translation,cameraMatrix,lensDist,face_ptr,indices,newPoints);
+        currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+    }
+}
+
+/**********************/
+/*estimate model parameters + pose*/
+/**********************/
+void VideoProcessor::identityExpressionUpdate(const vector<vector<Point2f> >&estimationPoints,
+                                              const vector<vector<int> >&estimation_point_indices,
+                                              const vector<cv::Mat> &frameTranslation, const vector<cv::Mat> &frameRotation,
+                                              Face *face_ptr,
+                                              vector<vector<double> >&vector_weights_exp,
+                                              vector<vector<double> >&vector_weights_id)
+{
+    vector<double> weights_id;
+    vector<double> weights_exp;
+
+    if(idct == IdConstraintType_NONE)
+    {
+        for(unsigned int i=0;i<FRAME_MAX;++i)
+        {
+            paramOptimizer->estimateModelParameters(estimationPoints[i],cameraMatrix,lensDist,face_ptr,
+                                                    estimation_point_indices[i],frameRotation[i],
+                                                    frameTranslation[i],weights_id,weights_exp);
+            vector_weights_exp.push_back(weights_exp);
+            vector_weights_id.push_back(weights_id);
+        }
+
+    }
+    else if(idct == IdConstraintType_CONST)
+    {
+        for(unsigned int i=0;i<FRAME_MAX;++i)
+        {            
+            weights_exp.clear();
+            paramOptimizer->estimateExpressionParameters(estimationPoints[i],cameraMatrix,lensDist,face_ptr,
+                                                         estimation_point_indices[i], frameRotation[i],frameTranslation[i],
+                                                         weights_exp);
+            vector_weights_exp.push_back(weights_exp);
+
+        }
+
+        weights_id.clear();
+        paramOptimizer->estimateIdentityParameters(estimationPoints,cameraMatrix,lensDist,face_ptr,
+                                                   estimation_point_indices, frameRotation,frameTranslation,
+                                                   vector_weights_exp,weights_id);
+        vector_weights_id.push_back(weights_id);
+
+    }
+}
+
 void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const vector<cv::Mat> &frameData,
-                                  const Mat &cameraMatrix, const Mat &lensDist,
                                   vector<cv::Mat> &frameTranslation, vector<cv::Mat> &frameRotation,
                                   vector<vector<cv::Point2f> > &generatedPoints,
                                   vector<vector<double> >&vector_weights_exp,
@@ -187,7 +264,7 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
     vector<double> weights_id;
     vector<double> weights_exp;
 
-    vector<double> prevWeightsId;
+    vector<vector<double> >vector_prev_weights_id;
     vector<vector<double> >vector_prev_weights_exp;
 
     //make a face guess
@@ -251,27 +328,15 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
     indices.insert(indices.begin(),Face::fPoints,Face::fPoints+Face::fPoints_size);
 
     //first frame alignment computes the first face in face_ptr
-//    paramOptimizer->estimateModelParameters(currentPoints,cameraMatrix,lensDist,face_ptr,indices,
-//                                            frameRotation[0],frameTranslation[0],weights_id,weights_exp);
+    paramOptimizer->setPointIndices(indices);
+    paramOptimizer->estimateModelParameters(currentPoints,cameraMatrix,lensDist,face_ptr,indices,
+                                            frameRotation[0],frameTranslation[0],weights_id,weights_exp);
 
 
 
     //add new points so that we start tracking them
     //we arent actually altering the first featurePoints[0] just the rest throught compute flow
-    poseEstimator->generatePoints(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,420,face_ptr,newPoints,indices);
-    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
-
-
-    //now sample new points using the first frame alignment and add them to the feature points
-    Utility::sampleGoodPoints(currentPoints,newPoints);
-    poseEstimator->reprojectInto3DUsingWeak(newPoints,frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,face_ptr,indices);
-    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
-
-    newPoints.clear();
-    poseEstimator->projectModelPointsInto2D(frameRotation[0],frameTranslation[0],cameraMatrix,lensDist,face_ptr,indices,newPoints);
-    currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
-
-    cout << " after " << currentPoints.size() << endl;
+    generateNewFeaturePoints(frameRotation[0],frameTranslation[0],face_ptr,currentPoints,indices);
 
     estimationPoints.push_back(currentPoints);
     estimation_point_indices.push_back(indices);
@@ -298,65 +363,39 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
 
     for(unsigned int j=0;j<ITER_MAX;j++)
     {
-        //clear before putting new set of params in
-        //vector_prev_weights_exp.assign(vector_weights_exp.begin(),vector_weights_exp.end());
-        vector_prev_weights_exp.clear();
-        vector<double> wexp;
-        for(unsigned int k=0;k<vector_weights_exp.size();k++)
-        {
-            wexp.clear();
-            for(unsigned int l=0;l<vector_weights_exp[k].size();l++)
-                wexp.push_back(vector_weights_exp[k][l]);
-            vector_prev_weights_exp.push_back(wexp);
-        }
-
+        vector_prev_weights_exp.assign(vector_weights_exp.begin(),vector_weights_exp.end());
         vector_weights_exp.clear();
+
+        vector_prev_weights_id.assign(vector_weights_id.begin(),vector_weights_id.end());
         vector_weights_id.clear();
-        for(unsigned int i=0;i<FRAME_MAX;++i)
-        {
-            /**********************/
-            /*estimate model parameters + pose*/
-            /**********************/
-            weights_exp.clear();            
-            paramOptimizer->estimateExpressionParameters(estimationPoints[i],cameraMatrix,lensDist,face_ptr,
-                                                         estimation_point_indices[i], frameRotation[i],frameTranslation[i],
-                                                         weights_exp);
-            vector_weights_exp.push_back(weights_exp);
+
+        identityExpressionUpdate(estimationPoints,estimation_point_indices,frameTranslation,frameRotation,face_ptr,
+                                 vector_weights_exp,vector_weights_id);
 
 
-
-            //could overload generatePoints in closedform optim to do weak perspective
-            cout << "frame : " << i << endl;
-
-        }
-        //prevWeightsId.assign(weights_id.begin(),weights_id.end());
-        prevWeightsId.clear();
-        for(unsigned int k=0;k<weights_id.size();k++)
-            prevWeightsId.push_back(weights_id[k]);
-
-        cout << "weights size " << prevWeightsId.size() << endl;
-        weights_id.clear();
-        cout << "weights size " << prevWeightsId.size() << endl;
-        paramOptimizer->estimateIdentityParameters(estimationPoints,cameraMatrix,lensDist,face_ptr,
-                                                   estimation_point_indices, frameRotation,frameTranslation,
-                                                   vector_weights_exp,weights_id);
-
-
-        cout << "weights size " << weights_id.size() << endl;
-        vector_weights_id.push_back(weights_id);
-
-        if(j > 0 && termination(vector_prev_weights_exp,vector_weights_exp,prevWeightsId,weights_id) == true)
-        {
-            cout << prevWeightsId.size() << endl;
+        if(j > 0 && termination(vector_prev_weights_exp,vector_weights_exp,vector_prev_weights_id,vector_weights_id) == true)
+        {            
             cout << "terminating in frame " << j << endl;
             break;
         }
     }
 
+    if(idct == VideoProcessor::IdConstraintType_CONST)
+        for(unsigned int k=0;k<vector_weights_id[0].size();k++)
+            w_id[k] = vector_weights_id[0][k];
 
     for(unsigned int i=0;i<FRAME_MAX;i++)
     {
         newPoints.clear();
+        for(unsigned int k=0;k<vector_weights_exp[i].size();k++)
+            w_exp[k] = vector_weights_exp[i][k];
+
+        if(idct == VideoProcessor::IdConstraintType_NONE)
+            for(unsigned int k=0;k<vector_weights_id[i].size();k++)
+                w_id[k] = vector_weights_id[i][k];
+
+
+        face_ptr->setNewIdentityAndExpression(w_id,w_exp);
         poseEstimator->weakPerspectiveProjectPoints(frameRotation[i],frameTranslation[i],cameraMatrix,lensDist,estimation_point_indices[i],face_ptr,newPoints);
         generatedPoints.push_back(newPoints);
     }

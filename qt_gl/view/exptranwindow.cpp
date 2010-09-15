@@ -112,9 +112,19 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(sUi.iterBox,SIGNAL(valueChanged(int)),v_controller,SLOT(setIterNum(int)));
     connect(sUi.frameBox,SIGNAL(valueChanged(int)),v_controller,SLOT(setFrameNum(int)));
 
+    connect(sUi.constantId,SIGNAL(toggled(bool)),v_controller,SLOT(setConstID(bool)));
+    connect(sUi.project2D,SIGNAL(toggled(bool)),v_controller,SLOT(setPointGen2D(bool)));
+    connect(sUi.project3D,SIGNAL(toggled(bool)),v_controller,SLOT(setPointGen3D(bool)));
+
     connect(sUi.poisson,SIGNAL(toggled(bool)),t_controller,SLOT(setPoisson(bool)));
     connect(sUi.interpolate,SIGNAL(toggled(bool)),t_controller,SLOT(setTexture(bool)));
     connect(sUi.background,SIGNAL(toggled(bool)),t_controller,SLOT(setUsingBackground(bool)));
+
+    connect(sUi.constantId,SIGNAL(toggled(bool)),t_controller,SLOT(setConstID(bool)));
+    connect(sUi.project2D,SIGNAL(toggled(bool)),t_controller,SLOT(setPointGen2D(bool)));
+    connect(sUi.project3D,SIGNAL(toggled(bool)),t_controller,SLOT(setPointGen3D(bool)));
+
+    connect(sUi.texture3d,SIGNAL(toggled(bool)),t_controller,SLOT(setTextured3D(bool)));
 }
 
 

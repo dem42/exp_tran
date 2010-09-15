@@ -60,10 +60,15 @@ public slots:
     void setOptType(int);
     void setFrameNum(int);
     void setIterNum(int);
+    void setConstID(bool);
+    void setPointGen2D(bool);
+    void setPointGen3D(bool);
 private:
     void calcIntrinsicParams();
 
     VideoProcessor::OptType opttype;
+    VideoProcessor::IdConstraintType idconstype;
+    VideoProcessor::PointGenerationType projtype;
     double regParam;
     int frame_num;
     int iter_num;

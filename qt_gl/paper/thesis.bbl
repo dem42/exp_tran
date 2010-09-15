@@ -35,6 +35,14 @@ Gary Bradski and Adrian Kaehler.
 \newblock {\em Learning OpenCV}.
 \newblock O'Reilly Media, Inc., 2008.
 
+\bibitem{projection}
+Jinxiang Chai.
+\newblock Csce 641 - computer graphics: The geometry of perspective projection.
+\newblock Department of Computer Science and Engineering, Dwight Look College
+  of Engineering, Texas A\&M University.
+\newblock
+  http://faculty.cs.tamu.edu/jchai/cpsc641\_spring10/PerspectiveProjection.pdf.
+
 \bibitem{nnls2}
 Donghui Chen and Rober~J. Plemmons.
 \newblock Nonnegativity constraints in numerical analysis.

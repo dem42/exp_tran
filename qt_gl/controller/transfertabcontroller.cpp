@@ -19,6 +19,8 @@ TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, Click
     face_widget->setFace(src_face_ptr);
 
     opttype = VideoProcessor::OptType_INTERPOLATE;
+    idconstype = VideoProcessor::IdConstraintType_CONST;
+    projtype = VideoProcessor::PointGenerationType_2D;
     regParam = 2000.0;
     frame_num = 10;
     iter_num = 30;
@@ -45,6 +47,7 @@ TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, Click
     //set the texture functions
     textureInterpolate = false;
     show3D = false;
+    textured3D = false;    
 }
 
 void TransferTabController::initSrcSide()
@@ -176,7 +179,8 @@ void TransferTabController::beginTransfer()
         s_frameData.push_back(copyFrame);
     }
 
-    src_videoProcessor = new VideoProcessor(sourceLabel->getMarked(),s_frameData, cameraSrc, lensDist,opttype,regParam,frame_num,iter_num);
+    src_videoProcessor = new VideoProcessor(sourceLabel->getMarked(),s_frameData, cameraSrc, lensDist,opttype,
+                                            regParam,idconstype,projtype,frame_num,iter_num);
     connect(src_videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
     src_videoProcessor->start();
 
@@ -192,7 +196,8 @@ void TransferTabController::beginTransfer()
         t_frameData.push_back(copyFrame);
     }
 
-    target_videoProcessor = new VideoProcessor(targetLabel->getMarked(),t_frameData, cameraSrc, lensDist,opttype,regParam,frame_num,iter_num);
+    target_videoProcessor = new VideoProcessor(targetLabel->getMarked(),t_frameData, cameraSrc, lensDist,opttype,
+                                               regParam,idconstype,projtype,frame_num,iter_num);
     connect(target_videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
     target_videoProcessor->start();
 
@@ -206,17 +211,22 @@ void TransferTabController::getClonedMouth(const Mat& img, unsigned int frame_in
    src_videoProcessor->getGeneratedPointsForFrame(frame_index,genPointsSrc);
    target_videoProcessor->getGeneratedPointsForFrame(frame_index,genPointsTarget);
 
-   Point2f ta = genPointsSrc[3];
-   Point2f tb = genPointsSrc[5];
-   Point2f tc = genPointsSrc[4];
-   Point2f td = genPointsSrc[6];
+   int lmc = Face::leftMouthCornerIndex;
+   int rmc = Face::rightMouthCornerIndex;
+   int tl = Face::topLipIndex;
+   int bl = Face::bottomLipIndex;
+
+   Point2f ta = genPointsSrc[lmc];
+   Point2f tb = genPointsSrc[tl];
+   Point2f tc = genPointsSrc[rmc];
+   Point2f td = genPointsSrc[bl];
    cout << "src points are " << ta.x << " " << ta.y << " " << tb.x << " " << tb.y
         << " " << tc.x << " " << tc.y << " " << td.x << " " << td.y << endl;
 
-   Point2f pa = genPointsTarget[3];
-   Point2f pb = genPointsTarget[5];
-   Point2f pc = genPointsTarget[4];
-   Point2f pd = genPointsTarget[6];
+   Point2f pa = genPointsTarget[lmc];
+   Point2f pb = genPointsTarget[tl];
+   Point2f pc = genPointsTarget[rmc];
+   Point2f pd = genPointsTarget[bl];
    cout << "target points are " << pa.x << " " << pa.y << " " << pb.x << " " << pb.y
         << " " << pc.x << " " << pc.y << " " << pd.x << " " << pd.y << endl;
 
@@ -237,12 +247,15 @@ void TransferTabController::getClonedMouth(const Mat& img, unsigned int frame_in
    cout << "nums are " << nx << " " << ny << " " << nx2 << " " << ny2 << endl;
    Mat_<double> mask = Mat_<double>::zeros(img.size());
 
-   for(int i=ny-ny2-10;i<=ny+ny2+10;i++)
-       for(int j=nx-nx2-10;j<=nx+nx2-10;j++)
+   for(int i=ny-ny2-10;i<=(ny+ny2+10);i++)
+       for(int j=nx-nx2-10;j<=(nx+nx2+10);j++)
            mask(i,j) = 1.0;
 
-   cout << " the shift is " << ta.x - pa.x << ta.y - pa.y << endl;
-   Utility::poissonClone(img,mask,target,ta.x - pa.x,ta.y - pa.y);
+
+   int shift_x = ta.x - (nx-nx2);
+
+   cout << " the shift is " << ta.x - pa.x << " " << ta.y - pa.y << endl;
+   Utility::poissonClone(img,mask,target,shift_x,ta.y - pa.y);
 }
 
 Mat TransferTabController::getMaskForLeftEyebrow()
@@ -377,30 +390,30 @@ void TransferTabController::replayFrame()
 
     if(!show3D)
     {
-        convertFrameIntoTexture(t_frameData[i]);
+        convertFrameIntoTexture(t_frameData[0]);
         face_widget->setFace(target_face_ptr,textureData);
     }
     else
     {
-        convertFrameIntoTexture(t_frameData[i]);
-        face_widget->setFace(target_face_ptr,textureData);
-        //face_widget->setFace(target_face_ptr);
+        if(textured3D)
+        {
+            convertFrameIntoTexture(t_frameData[0]);
+            face_widget->setFace(target_face_ptr,textureData);
+        }
+        else
+            face_widget->setFace(target_face_ptr);
     }
 
     delete[] textureData;
-    cout << "iwith texint " << textureInterpolate << endl;
 
     if(textureInterpolate && !show3D)
     {
-        cout << "in  here " << i << endl;
-
         QImage qimg = face_widget->grabFrameBuffer(false);
         QPixmap pimg = QPixmap::fromImage(qimg);
         pimg.setMask(pimg.createMaskFromColor(Qt::white,Qt::MaskInColor));
-        QPixmap result = Utility::composePixmaps(Utility::mat2QPixmap(t_frameData[0]),pimg);
-        targetLabel->setPixmap(result);
-        sourceLabel->setPixmap(QPixmap::fromImage(qimg));
-        //sourceLabel->setPixmap(Utility::mat2QPixmap(s_frameData[i]));
+        QPixmap result = Utility::composePixmaps(Utility::mat2QPixmap(t_frameData[i]),pimg);
+        targetLabel->setPixmap(result);        
+        sourceLabel->setPixmap(Utility::mat2QPixmap(s_frameData[i]));
     }
     else if(!textureInterpolate && !show3D)
     {
@@ -500,6 +513,9 @@ void TransferTabController::srcBrowse()
 
 void TransferTabController::restart()
 {
+    sourceLabel->clearMarked();
+    targetLabel->clearMarked();
+
     srcFrames.clear();
     targetFrames.clear();
     s_frameData.clear();
@@ -544,4 +560,25 @@ void TransferTabController::setPoisson(bool tex)
 void TransferTabController::setUsingBackground(bool background)
 {    
     this->show3D = !background;    
+}
+void TransferTabController::setTextured3D(bool b)
+{
+    this->textured3D = b;
+}
+void TransferTabController::setConstID(bool b)
+{
+    if(b == true)
+        this->idconstype = VideoProcessor::IdConstraintType_CONST;
+    else
+        this->idconstype = VideoProcessor::IdConstraintType_NONE;
+}
+void TransferTabController::setPointGen2D(bool b)
+{
+    if(b == true)
+        this->projtype = VideoProcessor::PointGenerationType_2D;
+}
+void TransferTabController::setPointGen3D(bool b)
+{
+    if(b == true)
+        this->projtype = VideoProcessor::PointGenerationType_3D;
 }

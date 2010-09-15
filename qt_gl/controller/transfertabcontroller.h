@@ -44,6 +44,10 @@ public slots:
     void setTexture(bool);
     void setPoisson(bool);
     void setUsingBackground(bool);
+    void setTextured3D(bool);
+    void setConstID(bool);
+    void setPointGen2D(bool);
+    void setPointGen3D(bool);
 private:
     void convertFrameIntoTexture(Mat &frame);    
     void initSrcSide();
@@ -54,6 +58,8 @@ private:
     Mat getMaskForRightEyebrow();
 
     VideoProcessor::OptType opttype;
+    VideoProcessor::IdConstraintType idconstype;
+    VideoProcessor::PointGenerationType projtype;
     double regParam;
     int frame_num;
     int iter_num;
@@ -66,6 +72,7 @@ private:
 
     bool textureInterpolate;
     bool show3D;
+    bool textured3D;
 
     VideoCapture *capSrc;
     VideoCapture *capTarget;

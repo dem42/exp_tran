@@ -1,4 +1,4 @@
-This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  13 SEP 2010 12:02
+This is pdfTeXk, Version 3.141592-1.40.3 (Web2C 7.5.6) (format=pdflatex 2010.5.7)  15 SEP 2010 01:16
 entering extended mode
  %&-line parsing enabled.
 **thesis.tex
@@ -356,23 +356,11 @@ Document Style algorithmicx 1.2 - a greatly improved `algorithmic' style
 \ALG@tmplength=\skip55
 )
 Document Style - pseudocode environments for use with the `algorithmicx' style
-) (/usr/share/texmf-texlive/tex/latex/geometry/geometry.sty
-Package: geometry 2002/07/08 v3.2 Page Geometry
-\Gm@cnth=\count134
-\Gm@cntv=\count135
-\c@Gm@tempcnt=\count136
-\Gm@bindingoffset=\dimen133
-\Gm@wd@mp=\dimen134
-\Gm@odd@mp=\dimen135
-\Gm@even@mp=\dimen136
-\Gm@dimlist=\toks26
-
-(/usr/share/texmf-texlive/tex/xelatex/xetexconfig/geometry.cfg))
-(/usr/share/texmf-texlive/tex/latex/hyperref/hyperref.sty
+) (/usr/share/texmf-texlive/tex/latex/hyperref/hyperref.sty
 Package: hyperref 2007/02/07 v6.75r Hypertext links for LaTeX
-\@linkdim=\dimen137
-\Hy@linkcounter=\count137
-\Hy@pagecounter=\count138
+\@linkdim=\dimen133
+\Hy@linkcounter=\count134
+\Hy@pagecounter=\count135
 
 (/usr/share/texmf-texlive/tex/latex/hyperref/pd1enc.def
 File: pd1enc.def 2007/02/07 v6.75r Hyperref: PDFDocEncoding definition (HO)
@@ -397,26 +385,26 @@ Package hyperref Info: Bookmarks ON on input line 2444.
 Package: url 2005/06/27  ver 3.2  Verb mode for urls, etc.
 )
 LaTeX Info: Redefining \url on input line 2599.
-\Fld@menulength=\count139
-\Field@Width=\dimen138
-\Fld@charsize=\dimen139
-\Choice@toks=\toks27
-\Field@toks=\toks28
+\Fld@menulength=\count136
+\Field@Width=\dimen134
+\Fld@charsize=\dimen135
+\Choice@toks=\toks26
+\Field@toks=\toks27
 Package hyperref Info: Hyper figures OFF on input line 3102.
 Package hyperref Info: Link nesting OFF on input line 3107.
 Package hyperref Info: Hyper index ON on input line 3110.
 Package hyperref Info: backreferencing OFF on input line 3117.
 Package hyperref Info: Link coloring OFF on input line 3122.
-\Hy@abspage=\count140
-\c@Item=\count141
-\c@Hfootnote=\count142
+\Hy@abspage=\count137
+\c@Item=\count138
+\c@Hfootnote=\count139
 )
 *hyperref using default driver hpdftex*
 (/usr/share/texmf-texlive/tex/latex/hyperref/hpdftex.def
 File: hpdftex.def 2007/02/07 v6.75r Hyperref driver for pdfTeX
-\Fld@listcount=\count143
+\Fld@listcount=\count140
 )
-Package hyperref Info: Option `colorlinks' set `true' on input line 21.
+Package hyperref Info: Option `colorlinks' set `true' on input line 22.
 
 (/usr/share/texmf-texlive/tex/latex/fancyhdr/fancyhdr.sty
 \fancy@headwidth=\skip56
@@ -428,16 +416,7 @@ Package hyperref Info: Option `colorlinks' set `true' on input line 21.
 \f@ncyO@erf=\skip62
 \f@ncyO@olf=\skip63
 \f@ncyO@orf=\skip64
-)
-
-Package Fancyhdr Warning: \fancyhead's `E' option without twoside option is use
-less on input line 28.
-
-
-Package Fancyhdr Warning: \fancyhead's `E' option without twoside option is use
-less on input line 29.
-
-(./thesis.aux
+) (./thesis.aux
 
 LaTeX Warning: Label `eq:nnls2' multiply defined.
 
@@ -447,69 +426,30 @@ LaTeX Warning: Label `eq:projective' multiply defined.
 )
 \openout1 = `thesis.aux'.
 
-LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 52.
-LaTeX Font Info:    Try loading font information for TS1+cmr on input line 52.
+LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 53.
+LaTeX Font Info:    ... okay on input line 53.
+LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 53.
+LaTeX Font Info:    ... okay on input line 53.
+LaTeX Font Info:    Checking defaults for OT1/cmr/m/n on input line 53.
+LaTeX Font Info:    ... okay on input line 53.
+LaTeX Font Info:    Checking defaults for OMS/cmsy/m/n on input line 53.
+LaTeX Font Info:    ... okay on input line 53.
+LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 53.
+LaTeX Font Info:    ... okay on input line 53.
+LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 53.
+LaTeX Font Info:    ... okay on input line 53.
+LaTeX Font Info:    Checking defaults for TS1/cmr/m/n on input line 53.
+LaTeX Font Info:    Try loading font information for TS1+cmr on input line 53.
  (/usr/share/texmf-texlive/tex/latex/base/ts1cmr.fd
 File: ts1cmr.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-LaTeX Font Info:    ... okay on input line 52.
-LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 52.
-LaTeX Font Info:    ... okay on input line 52.
+LaTeX Font Info:    ... okay on input line 53.
+LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 53.
+LaTeX Font Info:    ... okay on input line 53.
 Package caption Info: hyperref package v6.74m (or newer) detected on input line
- 52.
-Package caption Info: subref 1.2 or 1.3 detected on input line 52.
-LaTeX Info: Redefining \subref on input line 52.
--------------------- Geometry parameters
-paper: a4paper
-landscape: --
-twocolumn: --
-twoside: --
-asymmetric: --
-h-parts: 91.04872pt, 415.41043pt, 91.04872pt
-v-parts: 85.35826pt, 645.87756pt, 113.81102pt
-hmarginratio: --
-vmarginratio: --
-lines: --
-heightrounded: --
-bindingoffset: 0.0pt
-truedimen: --
-includehead: --
-includefoot: --
-includemp: --
-driver: pdftex
--------------------- Page layout dimensions and switches
-\paperwidth  597.50787pt
-\paperheight 845.04684pt
-\textwidth  415.41043pt
-\textheight 645.87756pt
-\oddsidemargin  18.77873pt
-\evensidemargin 18.77873pt
-\topmargin  -23.91173pt
-\headheight 15.2pt
-\headsep    25.0pt
-\footskip   30.0pt
-\marginparwidth 50.0pt
-\marginparsep   10.0pt
-\columnsep  10.0pt
-\skip\footins  10.0pt plus 4.0pt minus 2.0pt
-\hoffset 0.0pt
-\voffset 0.0pt
-\mag 1000
-
-(1in=72.27pt, 1cm=28.45pt)
------------------------
+ 53.
+Package caption Info: subref 1.2 or 1.3 detected on input line 53.
+LaTeX Info: Redefining \subref on input line 53.
 
 (/usr/share/texmf-texlive/tex/latex/graphics/color.sty
 Package: color 2005/11/14 v1.0j Standard LaTeX Color (DPC)
@@ -519,7 +459,7 @@ File: color.cfg 2007/01/18 v1.5 color configuration of teTeX/TeXLive
 )
 Package color Info: Driver file: pdftex.def on input line 130.
 )
-Package hyperref Info: Link coloring ON on input line 52.
+Package hyperref Info: Link coloring ON on input line 53.
 
 (/usr/share/texmf-texlive/tex/latex/hyperref/nameref.sty
 Package: nameref 2006/12/27 v2.28 Cross-referencing by name of section
@@ -527,395 +467,47 @@ Package: nameref 2006/12/27 v2.28 Cross-referencing by name of section
 (/usr/share/texmf-texlive/tex/latex/oberdiek/refcount.sty
 Package: refcount 2006/02/20 v3.0 Data extraction from references (HO)
 )
-\c@section@level=\count144
+\c@section@level=\count141
 )
-LaTeX Info: Redefining \ref on input line 52.
-LaTeX Info: Redefining \pageref on input line 52.
+LaTeX Info: Redefining \ref on input line 53.
+LaTeX Info: Redefining \pageref on input line 53.
  (./thesis.out)
 (./thesis.out)
 \@outlinefile=\write3
 \openout3 = `thesis.out'.
 
-LaTeX Font Info:    Try loading font information for U+msa on input line 83.
- (/usr/share/texmf-texlive/tex/latex/amsfonts/umsa.fd
-File: umsa.fd 2002/01/19 v2.2g AMS font definitions
-)
-LaTeX Font Info:    Try loading font information for U+msb on input line 83.
 
-(/usr/share/texmf-texlive/tex/latex/amsfonts/umsb.fd
-File: umsb.fd 2002/01/19 v2.2g AMS font definitions
-)
-LaTeX Font Info:    Try loading font information for U+rsfs on input line 83.
-
-(/usr/share/texmf-texlive/tex/latex/jknapltx/ursfs.fd
-File: ursfs.fd 1998/03/24 rsfs font definition file (jk)
-) [1
-
-{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}]pdfTeX warning (ext4): dest
-ination with the same identifier (name{page.1}) has been already used, duplicat
-e ignored
-<to be read again> 
-                   \relax 
-l.104 \newpage
-               [1] [2] (./thesis.toc [3
-
-])
-\tf@toc=\write4
-\openout4 = `thesis.toc'.
-
- [4]
-Chapter 1.
-[5
-
-] [6]
-Chapter 2.
-[7
-
-] [8] [9] [10] [11]
-<images/eigenfaces_comb_from_nn_vienna.png, id=435, 770.88pt x 362.85562pt>
-File: images/eigenfaces_comb_from_nn_vienna.png Graphic file (type png)
-
-<use images/eigenfaces_comb_from_nn_vienna.png> [12] [13 <./images/eigenfaces_c
-omb_from_nn_vienna.png (PNG copy)>] [14]
-<images/scary_face2.png, id=471, 815.29594pt x 257.46187pt>
-File: images/scary_face2.png Graphic file (type png)
-
-<use images/scary_face2.png> [15]
-<images/bad_asm.png, id=486, 576.65437pt x 213.04594pt>
-File: images/bad_asm.png Graphic file (type png)
-
-<use images/bad_asm.png> [16 <./images/scary_face2.png (PNG copy)> <./images/ba
-d_asm.png (PNG copy)>]
-<images/amm_example.png, id=498, 602.25pt x 392.96812pt>
-File: images/amm_example.png Graphic file (type png)
-
-<use images/amm_example.png>
-Overfull \hbox (6.16168pt too wide) in paragraph at lines 803--805
-[][] 
- []
-
-[17 <./images/amm_example.png (PNG copy)>] [18]
-<images/flattening3.png, id=534, 391.4625pt x 322.95656pt>
-File: images/flattening3.png Graphic file (type png)
-
-<use images/flattening3.png> [19 <./images/flattening3.png (PNG copy)>]
-[20] [21] <images/n_mode_svd2.png, id=577, 531.48563pt x 182.18062pt>
-File: images/n_mode_svd2.png Graphic file (type png)
-
-<use images/n_mode_svd2.png> [22 <./images/n_mode_svd2.png (PNG copy)>]
-<images/modes_faces.png, id=593, 317.68687pt x 173.89969pt>
-File: images/modes_faces.png Graphic file (type png)
-
-<use images/modes_faces.png> [23 <./images/modes_faces.png (PNG copy)>]
-[24] <images/pinhole.png, id=619, 563.85657pt x 220.57407pt>
-File: images/pinhole.png Graphic file (type png)
-
-<use images/pinhole.png>
-Overfull \hbox (7.48096pt too wide) in paragraph at lines 1250--1251
- [][] 
- []
-
-[25] [26 <./images/pinhole.png (PNG copy)>]
-<images/weak_persp.png, id=636, 609.02531pt x 246.1697pt>
-File: images/weak_persp.png Graphic file (type png)
-
-<use images/weak_persp.png>
-Overfull \hbox (41.35742pt too wide) in paragraph at lines 1327--1329
- [][] 
- []
-
-[27 <./images/weak_persp.png (PNG copy)>]
-<images/camera_object5.png, id=644, 721.69624pt x 290.08376pt>
-File: images/camera_object5.png Graphic file (type png)
-
-<use images/camera_object5.png> [28 <./images/camera_object5.png>]
-<images/rotation.png, id=658, 565.36218pt x 326.72063pt>
-File: images/rotation.png Graphic file (type png)
-
-<use images/rotation.png>
-Overfull \hbox (8.61015pt too wide) in paragraph at lines 1421--1426
- [][] 
- []
-
-[29] [30 <./images/rotation.png (PNG copy)>] [31] [32]
-<images/fx.png, id=704, 602.25pt x 432.61626pt>
-File: images/fx.png Graphic file (type png)
- <use images/fx.png>
-<images/gx.png, id=705, 401.5pt x 359.3425pt>
-File: images/gx.png Graphic file (type png)
- <use images/gx.png> [33 <./images/fx.png> <./images/gx.png>] [34] [35]
-Package hyperref Info: bookmark level for unknown algorithm defaults to 0 on in
-put line 1751.
- [36]
-Underfull \hbox (badness 10000) in paragraph at lines 1855--1857
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1858--1860
-
- []
-
-[37]
-Underfull \hbox (badness 10000) in paragraph at lines 1860--1868
-
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 1882--1886
-
- []
-
-<images/amoeba.png, id=776, 602.25pt x 602.25pt>
-File: images/amoeba.png Graphic file (type png)
- <use images/amoeba.png>
-[38] [39 <./images/amoeba.png>]
-Chapter 3.
-
-Overfull \hbox (1.44759pt too wide) in paragraph at lines 1964--1972
-[]\OT1/cmr/m/n/10.95 To make the ap-pli-ca-tion user-friendly, the im-ple-men-t
-a-tion of this func-tion-al-ity should
- []
-
-[40
-
-] [41] [42] [43] <images/binghamton.png, id=830, 414.04688pt x 345.54094pt>
-File: images/binghamton.png Graphic file (type png)
-
-<use images/binghamton.png> [44 <./images/binghamton.png (PNG copy)>]pdfTeX war
-ning (ext4): destination with the same identifier (name{algorithm.\\theHalgorit
-hm\040}) has been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.2215 \end{algorithm}
-                       [45
-
-]pdfTeX warning (ext4): destination with the same identifier (name{algorithm.\\
-theHalgorithm\040}) has been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.2243 \end{algorithm}
-                       [46] [47] [48] [49] [50] [51]
-<images/featurePoints.png, id=913, 829.0975pt x 325.215pt>
-File: images/featurePoints.png Graphic file (type png)
-
-<use images/featurePoints.png>
-<images/featureSelection.png, id=915, 361.35pt x 353.32pt>
-File: images/featureSelection.png Graphic file (type png)
-
-<use images/featureSelection.png> [52 <./images/featurePoints.png (PNG copy)> <
-./images/featureSelection.png (PNG copy)>] [53]
-<images/chessboard_pattern.png, id=932, 872.25874pt x 361.35pt>
-File: images/chessboard_pattern.png Graphic file (type png)
-
-<use images/chessboard_pattern.png>
-Overfull \hbox (3.26901pt too wide) in paragraph at lines 2696--2697
- [][] 
- []
-
-[54 <./images/chessboard_pattern.png (PNG copy)>]
-<images/cameraDialog.png, id=942, 386.44376pt x 261.97874pt>
-File: images/cameraDialog.png Graphic file (type png)
-
-<use images/cameraDialog.png> [55 <./images/cameraDialog.png>] [56] [57]
-[58]
-Underfull \hbox (badness 10000) in paragraph at lines 3055--3061
-
- []
-
-
-Overfull \hbox (31.15706pt too wide) in paragraph at lines 3109--3109
-[] 
- []
-
-[59] [60] [61]pdfTeX warning (ext4): destination with the same identifier (name
-{algorithm.\\theHalgorithm\040}) has been already used, duplicate ignored
-<to be read again> 
-                   \relax 
-l.3287 \end{algorithm}
-                       [62]
-Overfull \hbox (18.54182pt too wide) in paragraph at lines 3297--3308
-[]\OT1/cmr/m/n/10.95 So that the ap-pli-ca-tion gen-er-ates be-liev-able re-sul
-ts, the op-ti-miza-tion through coordinate-
- []
-
-[63] [64] [65] [66] [67]
-<images/cloning.png, id=1077, 767.11594pt x 328.97906pt>
-File: images/cloning.png Graphic file (type png)
-
-<use images/cloning.png>
-Overfull \hbox (6.50464pt too wide) in paragraph at lines 3618--3619
- [][] 
- []
-
-[68 <./images/cloning.png (PNG copy)>]
-<images/mvc.png, id=1089, 442.65375pt x 125.71968pt>
-File: images/mvc.png Graphic file (type png)
- <use images/mvc.png>
-[69 <./images/mvc.png (PNG copy)>]
-<images/facetab.png, id=1097, 1112.155pt x 735.74875pt>
-File: images/facetab.png Graphic file (type png)
-
-<use images/facetab.png>
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-<images/videotab.png, id=1098, 1168.365pt x 703.62875pt>
-File: images/videotab.png Graphic file (type png)
-
-<use images/videotab.png> [70] [71 <./images/facetab.png> <./images/videotab.pn
-g>] <images/modellayer.png, id=1117, 658.71094pt x 239.39438pt>
-File: images/modellayer.png Graphic file (type png)
-
-<use images/modellayer.png>
-Overfull \hbox (25.9236pt too wide) in paragraph at lines 3774--3775
- [][] 
- []
-
-[72 <./images/modellayer.png (PNG copy)>]
-Overfull \hbox (6.55383pt too wide) in paragraph at lines 3814--3823
-[]\OT1/cmr/m/n/10.95 A \OT1/cmtt/m/n/10.95 VideoProcessor \OT1/cmr/m/n/10.95 ob
--ject com-mu-ni-cates with an \OT1/cmtt/m/n/10.95 Optimizer \OT1/cmr/m/n/10.95 
-ob-ject, a \OT1/cmtt/m/n/10.95 PoseEstimator
- []
-
-<images/videoproc.png, id=1127, 539.01375pt x 347.79938pt>
-File: images/videoproc.png Graphic file (type png)
-
-<use images/videoproc.png> [73 <./images/videoproc.png (PNG copy)>] [74]
-Chapter 4.
-<images/faces_generated.png, id=1138, 1284.8pt x 803.0pt>
-File: images/faces_generated.png Graphic file (type png)
-
-<use images/faces_generated.png> [75
-
- <./images/faces_generated.png (PNG copy)>] <images/sub_neu_from_happy.png, id=
-1145, 1614.03pt x 347.2975pt>
-File: images/sub_neu_from_happy.png Graphic file (type png)
-
-<use images/sub_neu_from_happy.png>
-<images/sub_happy_from_neutral.png, id=1146, 1514.65875pt x 368.37625pt>
-File: images/sub_happy_from_neutral.png Graphic file (type png)
-
-<use images/sub_happy_from_neutral.png>
-<images/interpol_neu_sur.png, id=1149, 1232.605pt x 343.2825pt>
-File: images/interpol_neu_sur.png Graphic file (type png)
-
-<use images/interpol_neu_sur.png>
-Overfull \hbox (16.00778pt too wide) in paragraph at lines 3904--3904
- [][] 
- []
-
-[76 <./images/sub_neu_from_happy.png (PNG copy)> <./images/sub_happy_from_neutr
-al.png (PNG copy)> <./images/interpol_neu_sur.png (PNG copy)>]
-<images/ident_interpol.png, id=1160, 1422.31375pt x 346.29375pt>
-File: images/ident_interpol.png Graphic file (type png)
-
-<use images/ident_interpol.png>
-<images/id_inerpol_happy.png, id=1161, 1467.4825pt x 343.2825pt>
-File: images/id_inerpol_happy.png Graphic file (type png)
-
-<use images/id_inerpol_happy.png>
-<images/fear.png, id=1163, 1209.51875pt x 337.26pt>
-File: images/fear.png Graphic file (type png)
- <use images/fear.png>
-<images/happy_surprise.png, id=1164, 1050.92625pt x 346.29375pt>
-File: images/happy_surprise.png Graphic file (type png)
-
-<use images/happy_surprise.png> [77 <./images/ident_interpol.png (PNG copy)> <.
-/images/id_inerpol_happy.png (PNG copy)> <./images/fear.png (PNG copy)> <./imag
-es/happy_surprise.png (PNG copy)>]
-<images/3x3opt2.png, id=1177, 1312.905pt x 1043.9pt>
-File: images/3x3opt2.png Graphic file (type png)
- <use images/3x3opt2.png>
-<images/50x50opt.png, id=1179, 1308.89pt x 1012.78375pt>
-File: images/50x50opt.png Graphic file (type png)
-
-<use images/50x50opt.png> [78 <./images/3x3opt2.png (PNG copy)>]
-<images/8x8opt.png, id=1187, 1317.92375pt x 1027.84pt>
-File: images/8x8opt.png Graphic file (type png)
- <use images/8x8opt.png>
-[79 <./images/50x50opt.png (PNG copy)> <./images/8x8opt.png (PNG copy)>]
-Overfull \hbox (0.93053pt too wide) in paragraph at lines 4032--4037
-[]\OT1/cmr/m/n/10.95 The run-time of fit-ting the model pa-ram-e-ters by en-for
-c-ing lin-ear in-ter-po-la-tion through
- []
-
-
-Overfull \hbox (6.89511pt too wide) in paragraph at lines 4032--4037
-\OT1/cmr/m/n/10.95 non-negativity con-straints and solv-ing us-ing the se-quen-
-tial coordinate-wise non-negativity
- []
-
-[80]
-Chapter 5.
-[81
-
-] (./thesis.bbl [82]
-Underfull \hbox (badness 10000) in paragraph at lines 9--12
-[]\OT1/cmr/m/n/10.95 Stan Birch-field.  Deriva-tion of kanade-lucas-tomas track
--ing equa-tion.
- []
-
-[83
-
-]
-Underfull \hbox (badness 2020) in paragraph at lines 100--104
-[]\OT1/cmr/m/n/10.95 Tommer Ley-vand.  Ad-vanced top-ics in com-puter graph-ics
-: Pois-son im-
- []
-
-
-Underfull \hbox (badness 1163) in paragraph at lines 100--104
-\OT1/cmr/m/n/10.95 age edit-ing.  Blavat-nik School of Com-puter Sci-ence, Tel 
-Avid Uni-ver-sity.
- []
-
-
-Underfull \hbox (badness 2617) in paragraph at lines 166--170
-[]\OT1/cmr/m/n/10.95 Dave Shreiner, Ma-son Woo, Jackie Nei-der, and Tom Davis. 
- \OT1/cmr/m/it/10.95 OpenGL
- []
-
-
-Underfull \hbox (badness 10000) in paragraph at lines 166--170
-\OT1/cmr/m/it/10.95 Pro-gram-ming Guide: The Of-fi-cial Guide to Learn-ing Open
-GL\OT1/cmr/m/n/10.95 .
- []
-
-[84]) [85] (./thesis.aux)
-
-LaTeX Warning: There were multiply-defined labels.
-
- ) 
+Underfull \vbox (badness 10000) has occurred while \output is active []
+
+ [1
+
+{/var/lib/texmf/fonts/map/pdftex/updmap/pdftex.map}] [2]
+
+! LaTeX Error: Can be used only in preamble.
+
+See the LaTeX manual or LaTeX Companion for explanation.
+Type  H <return>  for immediate help.
+ ...                                              
+                                                  
+l.108 \usepackage
+                 [left=2.5cm, right=2cm, top=2cm, bottom=2cm]{geometry}
+? 
+! Emergency stop.
+ ...                                              
+                                                  
+l.108 \usepackage
+                 [left=2.5cm, right=2cm, top=2cm, bottom=2cm]{geometry}
+Your command was ignored.
+Type  I <command> <return>  to replace it with another command,
+or  <return>  to continue without it.
+
+ 
 Here is how much of TeX's memory you used:
- 7780 strings out of 95086
- 112536 string characters out of 1183256
- 179174 words of memory out of 1500000
- 10374 multiletter control sequences out of 10000+50000
- 19746 words of font info for 73 fonts, out of 1200000 for 2000
+ 6771 strings out of 95086
+ 97428 string characters out of 1183256
+ 161506 words of memory out of 1500000
+ 9799 multiletter control sequences out of 10000+50000
+ 6098 words of font info for 22 fonts, out of 1200000 for 2000
  28 hyphenation exceptions out of 8191
- 43i,20n,43p,543b,423s stack positions out of 5000i,500n,6000p,200000b,5000s
- </home/martin/.texmf-var/fonts/pk/ljfour/jknappen/ec/tcrm1095.600pk></usr/sh
-are/texmf-texlive/fonts/type1/bluesky/cm/cmbx10.pfb></usr/share/texmf-texlive/f
-onts/type1/bluesky/cm/cmbx12.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/
-cm/cmbx8.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmcsc10.pfb></usr
-/share/texmf-texlive/fonts/type1/bluesky/cm/cmex10.pfb></usr/share/texmf-texliv
-e/fonts/type1/bluesky/cm/cmmi10.pfb></usr/share/texmf-texlive/fonts/type1/blues
-ky/cm/cmmi6.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmmi8.pfb></us
-r/share/texmf-texlive/fonts/type1/bluesky/cm/cmr10.pfb></usr/share/texmf-texliv
-e/fonts/type1/bluesky/cm/cmr12.pfb></usr/share/texmf-texlive/fonts/type1/bluesk
-y/cm/cmr6.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmr8.pfb></usr/s
-hare/texmf-texlive/fonts/type1/bluesky/cm/cmr9.pfb></usr/share/texmf-texlive/fo
-nts/type1/bluesky/cm/cmsl10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/c
-m/cmsy10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmsy6.pfb></usr/s
-hare/texmf-texlive/fonts/type1/bluesky/cm/cmsy8.pfb></usr/share/texmf-texlive/f
-onts/type1/bluesky/cm/cmti10.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/
-cm/cmti12.pfb></usr/share/texmf-texlive/fonts/type1/bluesky/cm/cmtt10.pfb></usr
-/share/texmf-texlive/fonts/type1/bluesky/ams/msbm10.pfb>
-Output written on thesis.pdf (86 pages, 6774891 bytes).
-PDF statistics:
- 1378 PDF objects out of 1440 (max. 8388607)
- 403 named destinations out of 1000 (max. 131072)
- 701 words of extra memory for PDF output out of 10000 (max. 10000000)
-
+ 43i,11n,43p,584b,455s stack positions out of 5000i,500n,6000p,200000b,5000s
+!  ==> Fatal error occurred, no output PDF file produced!

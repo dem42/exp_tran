@@ -104,7 +104,8 @@ Matrix::Matrix(const cv::Mat &matrix)
     }
 }
 Matrix::~Matrix()
-{
+{ 
+    //std::cout << "destroying mat with " << this->m << " " << this->n << std::endl;
     if(mat != NULL)
         delete[] mat;    
 }
@@ -358,7 +359,7 @@ convergence:
                 } /* end z */
         } /* end k */
 
-        free(e);
+        delete(e);
         return retval;
 }
 
@@ -460,14 +461,14 @@ void Matrix::scalar_mult(double scalar)
                         mat[i][j] = scalar*mat[i][j];
 }
 
-Matrix Matrix::submatrix(int rowstart, int rowend) const
+Matrix Matrix::submatrix(Matrix &A, int rowstart, int rowend)
 {
     //from rowstart to rowend including the row with index rowend
     int size = rowend - rowstart + 1;
-    Matrix sub(size,getN());
+    Matrix sub(size,A.getN());
     for(int i=0, ri = rowstart; i<size; ++i, ++ri)
-        for(int j=0; j<getN(); ++j)
-            sub[i][j] = mat[ri][j];
+        for(int j=0; j<A.getN(); ++j)
+            sub[i][j] = A.mat[ri][j];
     return sub;
 }
 
@@ -596,7 +597,8 @@ void Matrix::test(void)
                         std::cout << std::endl;
                 }
 
-        Matrix sub = K.submatrix(2,4);
+        Matrix sub(3,6);
+        sub = submatrix(K,2,4);
         std::cout << "Submatix of K rows 2 to 4 is : \n" << sub;
 
         std::cout << "now test solving a linear system using SVD: " << std::endl;
@@ -619,4 +621,6 @@ void Matrix::test(void)
         Matrix result = solveLinSysSvd(M,b);
         std::cout << " The result of the linear system is : " << std::endl;
         std::cout << result;
+
+        A = Matrix::matrix_mult(Matrix::eye(2),Matrix::matrix_mult(Matrix::eye(2),Matrix::eye(2)));
     }

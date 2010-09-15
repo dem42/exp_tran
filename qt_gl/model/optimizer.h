@@ -14,6 +14,7 @@ class Optimizer
 {
 public:
     Optimizer();
+    virtual ~Optimizer();
     virtual void estimateModelParameters(const vector<Point2f> &featurePoints,
                                          const Mat &cameraMatrix, const Mat& lensDist,
                                          Face* face_ptr,const vector<int> &point_indices,

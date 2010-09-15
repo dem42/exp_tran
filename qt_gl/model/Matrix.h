@@ -58,7 +58,7 @@ public:
     void transpose(Matrix &mt);
     void scalar_mult(double scalar);
 
-    Matrix submatrix(int rowstart, int rowend) const;
+    static Matrix submatrix(Matrix &A, int rowstart, int rowend);
 
     void test(void);
 
