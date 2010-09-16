@@ -115,6 +115,9 @@ Professor ~Duncan \textsc{Gillies}
 \LARGE \textbf{Acknowledgments}
 \end{center}
 
+First of all, I would like to thank my supervisor, Professor Duncan Fyfe Gillies
+for his help, encouragement and invaluable feedback. Finally, I would also like to thank
+my parents for their continuous support. 
 
 
 \tableofcontents
@@ -4296,24 +4299,74 @@ On this system, constructing a tensor model from the Binghamton databases with
 includes loading the data from the database and computing the HOSVD.
 
 Fitting the tensor model using a linear combination algorithm with
-regularization takes on average about a third of a second per frame. For a 100
-feature points the runtime averages at around 13 seconds for 40 frames and 18
-seconds for 50 frames. 
+regularization takes on average about a tenth of a second per frame. For 500
+feature points the runtime averages at around 36 seconds for 3 iterations with 100 frames and 18
+seconds for 3 iterations with 50 frames.
 
 The runtime of fitting the model parameters by enforcing linear interpolation through
 non-negativity constraints and solving using the sequential coordinate-wise
-non-negativity least squares algorithm is around 25 seconds for 40
-frames and around 28 seconds for 50 frames for 100 feature points, thus averaging a little over 0.6
-seconds per frame. 
+non-negativity least squares algorithm is around 53 seconds for 100
+frames and around 29 seconds for 50 frames for 500 feature points, thus
+averaging a little under 0.2 of a seconds per frame. 
 
-The slower runtime of the non-negativity least squares algorithm is due to the
+The performance of either version of the fitting algorithm is thus fast enough
+to make the application accessible for casual users. The slower runtime of the non-negativity least squares algorithm is due to the
 fact that it performs a sequence of iterations until convergence during every parameter update step in the
 coordinate descent expression transfer fitting algoritm. The linear
 combination fitting algorithm, on the other hand, updates parameters using a
-closed form solution, which is computationally much more effective.
+closed form solution, which is computationally much more effective. The regularized linear combination algorithm
+decreases faster than the constrained algorithm. However, if the maximum number
+of iterations is not constrained it may take the regularized algorithm longer to
+converge to a stable solution.
+
 
 \chapter{Conclusion}
-To summarize, we developed the expression transfer application for 
+We developed the expression transfer application which allows a
+casual user to construct and explore a tensor based 3D model of faces shapes. The user
+can use the application to synthesize generate novel faces or to manipulate and
+change the expression or identity of an existing face using a simple 3D OpenGL
+based GUI. 
+
+The tensor based shape model is constructed using the Binghamton database of 3D face
+scans. This is done by first aligining the face scans into a data tensor and
+then performing the high order singular value decomposition (HOSVD) on this
+tensor. With the HOSVD the tensor can be broken down into a multilinear model
+tensor and two orthonormal mode matrices. We have shown how a generative model
+can be obtained using the multilinear model tensor. The idea behind the
+generative model is that it produces new face shapes as linear combinations of
+the original shapes from the data tensor. To generate any arbitrarily moved face
+shape the generative function may include 3D pose data in form of a rotation
+matrix and a translation vector.
+
+The tensor model has the very important property of separability. The user can
+therefore easily manipulate the expression or the identity of a 3D face shape
+independently.
+
+The application also utilizes a fitting algorithm to support
+recognition and extraction of a 3D model from a 2D image. We have derived this
+algorithm from the generative model using matrix calculus by minimizing an error
+between the projected 3D model and the 2D image. To combat overfitting
+we have discussed using either a regularization
+parameter or we enforce non-negativity constraints on the model parameters. 
+
+The fitting algorithm uses the Kanade-Lucas optical flow tracker to follow the
+movement of a set of feature points in the image. The user therefore only needs
+to select feature points in the first frame. The tracking process then locates
+the positions of these feature points in the rest of the video sequence frames.
+
+Given the fitting algorithm we formalized an expression transfer procedure to
+transfer an expression from a source video recording of a performer to a subject
+in a target video recording. Since the tensor model only encapsulated shape
+information, the face transfer algorithm utilizes poisson image
+editing to transfer the textures in order to reanimate the target
+recording. However, the reanimation results are not realistic enough to create a
+smooth and believable video sequence of the target individual with a new
+expression. 
+
+The expression transfer application was designed to obey the model-view-controller (MVC) design
+pattern. It supports multi-threading so that multiple fitting algorithm invocations may
+be computed in parallel without blocking the application.
+
 \section{Future Work}
 As part of the expression transfer application, we constructed a deformable model from a simple database of 3D face scans displaying
 expressions. An intriguing prospect for future work would be to perform data
