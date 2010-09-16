@@ -54,6 +54,20 @@ FaceModel::FaceModel(string filename,string dir,string db_list,int f,int e,int v
 
     cout << "model : point_num and poly_num : " << point_num << " " << poly_num << endl;
 
+
+    uex = Mat_<double>(U_ex.getM(),U_ex.getN());
+    uid = Mat_<double>(U_id.getM(),U_id.getN());
+    coreMat = Mat_<double>(core.getM(),core.getN());
+
+    for(int i=0;i<core.getM();i++)
+        for(int j=0;j<core.getN();j++)
+            coreMat(i,j) = core.mat[i][j];
+    for(int i=0;i<uid.rows;i++)
+        for(int j=0;j<uid.cols;j++)
+            uid(i,j) = U_id.mat[i][j];    
+    for(int i=0;i<uex.rows;i++)
+        for(int j=0;j<uex.cols;j++)
+            uex(i,j) = U_ex.mat[i][j];
     core.test();
 }
 
@@ -66,10 +80,22 @@ FaceModel::~FaceModel()
     delete[] triangles;
 }
 
-Matrix FaceModel::getCoreTensor() const
+Mat FaceModel::getCoreTensor() const
 {
     cout << "core" << endl;
-    return core;
+    return coreMat;
+}
+
+
+cv::Mat FaceModel::coreSubmatrix(int rowstart,int rowend)
+{
+    //from rowstart to rowend including the row with index rowend
+    int size = rowend - rowstart + 1;
+    cv::Mat_<double> sub(size,core.getN());
+    for(int i=0, ri = rowstart; i<size; ++i, ++ri)
+        for(int j=0; j<core.getN(); ++j)
+            sub(i,j) = core.mat[ri][j];
+    return sub;
 }
 
 int FaceModel::getIdSize() const
@@ -82,15 +108,13 @@ int FaceModel::getExpSize() const
     return n_e;
 }
 
-Matrix FaceModel::getUIdentity() const
-{
-    cout << "u id" << endl;
-    return U_id;
+cv::Mat FaceModel::getUIdentity() const
+{ 
+    return uid;
 }
-Matrix FaceModel::getUExpression() const
-{
-    cout << "u exp" << endl;
-    return U_ex;
+cv::Mat FaceModel::getUExpression() const
+{    
+    return uex;
 }
 
 double FaceModel::getSigmaIdAt(int i) const
@@ -141,18 +165,23 @@ void FaceModel::initializeDbStrings()
 //@param brute .. whether we interpolate using U2 and U3 or just the weights right away
 void FaceModel::generateFace(Point3 *face,double *w_id,double *w_ex,bool brute_exp, bool brute_id)
 {
-    Matrix m_wid(1,n_f);
-    Matrix m_wex(1,n_e);
+//    Matrix m_wid(1,n_f);
+//    Matrix m_wex(1,n_e);
+    cv::Mat_<double> m_wid(1,n_f);
+    cv::Mat_<double> m_wex(1,n_e);
 
     //linear combinations
-    Matrix row_id(1,n_f);
-    Matrix row_ex(1,n_e);
+//    Matrix row_id(1,n_f);
+//    Matrix row_ex(1,n_e);
+    cv::Mat_<double> row_id(1,n_f);
+    cv::Mat_<double> row_ex(1,n_e);
+
     int i = 0,j=0;
 
     for(i=0;i<n_f;i++)
-        m_wid[0][i] = w_id[i];
+        m_wid(0,i) = w_id[i];
     for(i=0;i<n_e;i++)
-        m_wex[0][i] = w_ex[i];
+        m_wex(0,i) = w_ex[i];
 
 //    cout << "wex " << m_wex;
 //    cout << "wid " << m_wid;
@@ -160,7 +189,7 @@ void FaceModel::generateFace(Point3 *face,double *w_id,double *w_ex,bool brute_e
     if(brute_exp == false)
     {
         //multiply with u2 and u3     
-        row_ex = Matrix::matrix_mult(m_wex,U_ex);                
+        row_ex = m_wex*uex;
         //Vector3::normalize(row_ex.mat[0],n_e);
     }
     else
@@ -169,36 +198,36 @@ void FaceModel::generateFace(Point3 *face,double *w_id,double *w_ex,bool brute_e
         //just copy w_exp over from the output
         //brute means we are turning the dials that correspond to the basis vectors
         for(i=0;i<n_e;i++)
-            row_ex[0][i] = w_ex[i];
+            row_ex(0,i) = w_ex[i];
         //Vector3::normalize(row_ex.mat[0],n_e);
     }
     if(brute_id == false)
     {
         //multiply with u2 and u3
-        row_id = Matrix::matrix_mult(m_wid,U_id);        
+        row_id = m_wid*uid;
         //Vector3::normalize(row_id.mat[0],n_f);
     }
     else
     {        
         for(i=0;i<n_f;i++)
-            row_id[0][i] = w_id[i];
+            row_id(0,i) = w_id[i];
         //Vector3::normalize(row_id.mat[0],n_f);
     }
 
 
-    Matrix K(1,n_f*n_e), KT(n_f*n_e,1), f(3*n_v,1);
+    cv::Mat_<double> K(1,n_f*n_e), KT(n_f*n_e,1), f(3*n_v,1);
 
-    K = Matrix::kron(row_id,row_ex);
-    K.transpose(KT);
+    K = Matrix::kronecker(row_id,row_ex);
+    KT = K.t();
 
     //core * kron( (w2*u2), (w3*u3) )' = f
-    f = Matrix::matrix_mult(core,KT);
+    f = coreMat*KT;
 
     for(i=0,j=0;i<3*n_v;i=i+3,j++)
     {
-        face[j].x = (float)(f[i][0]);
-        face[j].y = (float)(f[i+1][0]);
-        face[j].z = (float)(f[i+2][0]);
+        face[j].x = (float)(f(i,0));
+        face[j].y = (float)(f(i+1,0));
+        face[j].z = (float)(f(i+2,0));
     }
 }
 
@@ -329,7 +358,7 @@ void FaceModel::compute_core_tensor(void)
     /********************************/
     /*********calculate flat core tensor core = a1_flat*kron(u2,u3)*/
     /********************************/
-    K = Matrix::kron(U_id,U_ex);
+    K = Matrix::kron_(U_id,U_ex);
     core = Matrix::matrix_mult(a_flat,K);
 
     /**** test

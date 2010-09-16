@@ -359,13 +359,13 @@ convergence:
                 } /* end z */
         } /* end k */
 
-        delete(e);
+        delete[] e;
         return retval;
 }
 
 /*nothing better than a tasty kronecker (product) to wash down the singular value matrices*/
 /* c (m*p x n*q) = a (mxn) * b(pxq)*/
-Matrix Matrix::kron(const Matrix &a,const Matrix &b)
+Matrix Matrix::kron_(const Matrix &a,const Matrix &b)
 {
         Matrix c(a.getM()*b.getM(),a.getN()*b.getN());
 
@@ -382,6 +382,25 @@ Matrix Matrix::kron(const Matrix &a,const Matrix &b)
                                 for(l=0;l<q;l++)
                                         c.mat[i*p+k][j*q+l] = a.mat[i][j]*b.mat[k][l];
         return c;
+}
+
+
+cv::Mat Matrix::kronecker(const cv::Mat&a, const cv::Mat&b)
+{
+    cv::Mat_<double> c(a.rows*b.rows,a.cols*b.cols);
+    int i,j,k,l;
+    int m,n,p,q;
+    m = a.rows;
+    n = a.cols;
+    p = b.rows;
+    q = b.cols;
+    //reordering loops will probably make this faster should it ever need to be fast
+    for(i=0;i<m;i++)
+        for(j=0;j<n;j++)
+            for(k=0;k<p;k++)
+                for(l=0;l<q;l++)
+                    c(i*p+k,j*q+l) = a.at<double>(i,j)*b.at<double>(k,l);
+    return c;
 }
 
 //mult c (mxr) = a (mxn) * b (nxr)
@@ -461,7 +480,7 @@ void Matrix::scalar_mult(double scalar)
                         mat[i][j] = scalar*mat[i][j];
 }
 
-Matrix Matrix::submatrix(Matrix &A, int rowstart, int rowend)
+Matrix Matrix::submatrix_(Matrix &A, int rowstart, int rowend)
 {
     //from rowstart to rowend including the row with index rowend
     int size = rowend - rowstart + 1;
@@ -530,7 +549,7 @@ std::ostream& operator<<(std::ostream& stream, const Matrix &matrix)
     {
         for(int j=0;j<matrix.n;j++)
             stream << matrix.mat[i][j] << " ";
-        stream << std::endl;
+        stream << "; "<<std::endl;
     }
     return stream;
 }
@@ -586,7 +605,7 @@ void Matrix::test(void)
 
         std::cout << "now Kronecker product" << std::endl;
 
-        K = Matrix::kron(A,B);
+        K = Matrix::kron_(A,B);
 
         std::cout << "product calced " << K.getM() << " " << K.getN()  << std::endl;
 
@@ -597,8 +616,28 @@ void Matrix::test(void)
                         std::cout << std::endl;
                 }
 
+        cv::Mat_<double> a(3,2), l(2,3);
+        a(0,0) = 0;
+        a(0,1) = 1;
+        a(1,0) = 3;
+        a(1,1) = 1;
+        a(2,0) = 2;
+        a(2,1) = 0;
+
+        l(0,0) = 4;
+        l(0,1) = 1;
+        l(0,2) = 0;
+        l(1,0) = 2;
+        l(1,1) = 1;
+        l(1,2) = 2;
+
+        cv::Mat_<double> k = Matrix::kronecker(a,l);
+
+        std::cout << "mat cv Kronecker" << std::endl << Matrix(k);
+
+
         Matrix sub(3,6);
-        sub = submatrix(K,2,4);
+        sub = submatrix_(K,2,4);
         std::cout << "Submatix of K rows 2 to 4 is : \n" << sub;
 
         std::cout << "now test solving a linear system using SVD: " << std::endl;

@@ -90,8 +90,8 @@ void OpticalFlowEngine::computeFlow(const Mat& prevImg, const Mat& nextImg,
         }
     }
 
-//    for(int i=0;i<err.size();i++)
-//        cout << err[i] << " and " << (float)status[i] << " ";
-//    cout << endl;
-
+    cvReleaseImage(&frame1);
+    cvReleaseImage(&frame2);
+    cvReleaseImage(&pyramid1);
+    cvReleaseImage(&pyramid2);
 }

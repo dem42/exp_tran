@@ -98,6 +98,8 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(ui.dropT,SIGNAL(clicked()),t_controller,SLOT(dropTarget()));
     connect(ui.startT,SIGNAL(clicked()),t_controller,SLOT(beginTransfer()));
     connect(ui.restartTransferButton,SIGNAL(clicked()),t_controller,SLOT(restart()));
+    connect(ui.srcFeat,SIGNAL(clicked()),t_controller,SLOT(selectGoodFeatureSrcPoints()));
+    connect(ui.targetFeat,SIGNAL(clicked()),t_controller,SLOT(selectGoodFeatureTargetPoints()));
 
     //settings connects
     connect(sUi.optBox,SIGNAL(activated(int)),t_controller,SLOT(setOptType(int)));
@@ -115,7 +117,12 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(sUi.constantId,SIGNAL(toggled(bool)),v_controller,SLOT(setConstID(bool)));
     connect(sUi.project2D,SIGNAL(toggled(bool)),v_controller,SLOT(setPointGen2D(bool)));
     connect(sUi.project3D,SIGNAL(toggled(bool)),v_controller,SLOT(setPointGen3D(bool)));
+    connect(sUi.hybrid,SIGNAL(toggled(bool)),v_controller,SLOT(setHybrid(bool)));
+    connect(sUi.none,SIGNAL(toggled(bool)),v_controller,SLOT(setNone(bool)));
+    connect(sUi.projModel,SIGNAL(toggled(bool)),v_controller,SLOT(setProjModel(bool)));
+    connect(sUi.firstFrame,SIGNAL(toggled(bool)),v_controller,SLOT(setWithFirstFrame(bool)));
 
+    //settings t_cont
     connect(sUi.poisson,SIGNAL(toggled(bool)),t_controller,SLOT(setPoisson(bool)));
     connect(sUi.interpolate,SIGNAL(toggled(bool)),t_controller,SLOT(setTexture(bool)));
     connect(sUi.background,SIGNAL(toggled(bool)),t_controller,SLOT(setUsingBackground(bool)));
@@ -125,6 +132,10 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(sUi.project3D,SIGNAL(toggled(bool)),t_controller,SLOT(setPointGen3D(bool)));
 
     connect(sUi.texture3d,SIGNAL(toggled(bool)),t_controller,SLOT(setTextured3D(bool)));
+    connect(sUi.hybrid,SIGNAL(toggled(bool)),t_controller,SLOT(setHybrid(bool)));
+    connect(sUi.projModel,SIGNAL(toggled(bool)),t_controller,SLOT(setProjModel(bool)));
+    connect(sUi.none,SIGNAL(toggled(bool)),t_controller,SLOT(setNone(bool)));
+    connect(sUi.firstFrame,SIGNAL(toggled(bool)),t_controller,SLOT(setWithFirstFrame(bool)));
 }
 
 
@@ -133,6 +144,10 @@ ExpTranWindow::~ExpTranWindow()
     delete face_widget1;
     delete f_dialog;
     delete f_controller;
+    delete face_widget2;
+    delete face_widget3;
+    delete t_controller;
+    delete v_controller;
 }
 
 void ExpTranWindow::setAllVideoTabButtonsDisabled(bool disabled)

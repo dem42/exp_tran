@@ -3,7 +3,9 @@
 #include "model/Face.h"
 #include <cmath>
 #include <iostream>
+#include <fstream>
 #include <QPainter>
+#include <QFileDialog>
 #include <cstdio>
 #include <cstdlib>
 using namespace std;
@@ -85,8 +87,6 @@ void Utility::poissonClone(const Mat &src, const Mat &mask, Mat &target, int o_x
     }
 
     cv::Laplacian(src_copy,laplacian,-1);
-    IplImage ipl = laplacian;
-    cvShowImage("ugh",&ipl);
 
     int count = 0;
     uint id = 0;
@@ -343,3 +343,25 @@ void Utility::grabThumbnailForVideo(string videoName, Mat& thumbnail)
 
     cap.release();
 }
+
+void Utility::selectGoodFeaturePoints(ClickableQLabel *label)
+{
+    vector<Point2f> marked;
+
+    QFileDialog *qfd = new QFileDialog();
+
+    QString filename = qfd->getOpenFileName();
+    fstream filestr(filename.toStdString().c_str(), fstream::in | fstream::out);
+
+    float x, y;
+
+    for(int i=0;i<Face::fPoints_size;i++)
+    {
+        filestr >> x >> y;
+        marked.push_back(Point2f(x,y));
+    }
+    filestr.close();
+    label->setMarked(marked);
+    delete qfd;
+}
+

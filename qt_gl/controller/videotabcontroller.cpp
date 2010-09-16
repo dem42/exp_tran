@@ -3,6 +3,7 @@
 #include "utility.h"
 
 #include <iostream>
+#include <fstream>
 #include <QImage>
 #include <QTimer>
 #include <cv.h>
@@ -50,6 +51,8 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
     regParam = 2000.0;
     frame_num = 10;
     iter_num = 30;
+    projModel = false;
+    withFirstFrame = true;
 
     //setup the timer
     timer = new QTimer(this);
@@ -233,9 +236,16 @@ void VideoTabController::replayFrame()
     face_widget->setTransParams(euler_x,-euler_y,euler_z,tx,ty,tz);
     face_widget->setFace(face_ptr);
 
-    videoProcessor->getGeneratedPointsForFrame(i,points);
+    if(projModel)
+    {
+        videoProcessor->getGeneratedPointsForFrame(i,points);
+        picLabel->setMarked(points);
+    }
+    else
+        picLabel->clearMarked();
+
     picLabel->setPixmap(Utility::mat2QPixmap(frameData[i]));
-    picLabel->setMarked(points);
+
 
     cout << "FRAAME " << i << endl;
     i++;
@@ -269,12 +279,14 @@ void VideoTabController::processingFinished()
         view->displayException(e);
         view->setAllVideoTabButtonsDisabled(false);
         delete videoProcessor;
+        restartCapturing();
     }
 }
 
 void VideoTabController::playBack()
 {
     Mat frame, rgb_frame, copyFrame;
+    int counter = 0;
 
     flowLabel->setVisible(false);
     face_widget->setVisible(true);
@@ -293,10 +305,12 @@ void VideoTabController::playBack()
         cvtColor(frame, rgb_frame, CV_BGR2RGB);
         copyFrame = rgb_frame.clone();
         frameData.push_back(copyFrame);
+        counter++;
     }
+    if(counter < frame_num) frame_num = counter;
 
     videoProcessor = new VideoProcessor(picLabel->getMarked(),frameData,cameraMatrix,lensDist,opttype,
-                                        regParam,idconstype,projtype,frame_num,iter_num);
+                                        regParam,idconstype,projtype,frame_num,iter_num,withFirstFrame);
 
     connect(videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
 
@@ -502,45 +516,8 @@ void VideoTabController::pauseTransfer()
 
 void VideoTabController::findGoodFeaturePoints()
 {
-    Mat curFrame, curFrame2;
-
-    if(frames.size() > 0)
-        curFrame = *(frames.end()-1);
-    else
-        Utility::grabThumbnailForVideo(this->fileName.toStdString(),curFrame);
-
-    cvtColor(curFrame,curFrame2,CV_RGB2GRAY);
-
-    selectGoodFeaturePoints(curFrame);
+    Utility::selectGoodFeaturePoints(picLabel);
 }
-
-void VideoTabController::selectGoodFeaturePoints(const Mat& m)
-{
-    vector<Point2f> marked;
-
-    int number_of_features = 60;
-
-    IplImage img, *frame, *eigen_image, *temp_img;
-
-    CvSize size = m.size();
-    img = m;
-    frame = cvCreateImage(size,IPL_DEPTH_8U, 1);
-    cvConvertImage(&img,frame,0);
-
-    eigen_image = cvCreateImage(size,IPL_DEPTH_32F, 1);
-    temp_img= cvCreateImage(size,IPL_DEPTH_32F, 1);
-
-    CvPoint2D32f features[number_of_features];
-
-    cvGoodFeaturesToTrack(frame,eigen_image,temp_img,features,&number_of_features,0.01,0.01,NULL,5,0,0.04);
-
-    for(int i=0;i<number_of_features;i++)
-    {    
-        marked.push_back(Point2f(features[i].x,features[i].y));
-    }
-    picLabel->setMarked(marked);
-}
-
 
 void VideoTabController::computeFlow()
 {
@@ -587,37 +564,18 @@ void VideoTabController::video_file_changed(const QString str)
 
 void VideoTabController::setCameraParameters()
 {
-    QString fxs = cameraUi.fx->selectedText();
-    QString fys = cameraUi.fy->selectedText();
-    QString cxs = cameraUi.cx->selectedText();
-    QString cys = cameraUi.cy->selectedText();
-    bool ok = true;
+    if(cameraUi.paramBox->isChecked())
+    {
+        cameraMatrix.at<double>(0,0) = cameraUi.fx->value();
 
-    double fxd = fxs.toDouble(&ok);
-    if(ok == false)
-    {
-        cerr << "not a double" << endl;
-        cameraMatrix.at<double>(0,0) = fxd;
+        cameraMatrix.at<double>(1,1) = cameraUi.fy->value();
+
+        cameraMatrix.at<double>(0,2) = cameraUi.cx->value();
+
+        cameraMatrix.at<double>(1,2) = cameraUi.cy->value();
     }
-    double fyd = fys.toDouble(&ok);
-    if(ok == false)
-    {
-        cerr << "not a double" << endl;
-        cameraMatrix.at<double>(1,1) = fyd;
-    }
-    double cxd = cxs.toDouble(&ok);
-    if(ok == false)
-    {
-        cerr << "not a double" << endl;
-        cameraMatrix.at<double>(0,2) = cxd;
-    }
-    double cyd = cys.toDouble(&ok);
-    if(ok == false)
-    {
-        cerr << "not a double" << endl;
-        cameraMatrix.at<double>(1,2) = cyd;
-    }
-    calcIntrinsicParams();
+    else if(cameraUi.cameraBox->isChecked())
+        calcIntrinsicParams();
 }
 
 void VideoTabController::toggleDrawable(bool drawable)
@@ -671,6 +629,24 @@ void VideoTabController::setPointGen3D(bool b)
     if(b == true)
         this->projtype = VideoProcessor::PointGenerationType_3D;
 }
+void VideoTabController::setHybrid(bool b)
+{
+    if(b == true)
+        this->projtype = VideoProcessor::PointGenerationType_HYBRID;
+}
+void VideoTabController::setNone(bool b)
+{
+    if(b == true)
+        this->projtype = VideoProcessor::PointGenerationType_NONE;
+}
+void VideoTabController::setProjModel(bool b)
+{
+    this->projModel = b;
+}
+void VideoTabController::setWithFirstFrame(bool b)
+{
+    this->withFirstFrame = b;
+}
 
 VideoTabController::~VideoTabController()
 {
@@ -679,8 +655,6 @@ VideoTabController::~VideoTabController()
 
     delete flowEngine;
     delete poseEstimator;
-    delete videoProcessor;
-
     delete picLabel;
     delete flowLabel;
 

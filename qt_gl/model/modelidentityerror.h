@@ -23,9 +23,9 @@ private:
     //projection
     Mat_<double> P;
     //rotation
-    Matrix core;
-    Matrix u_id;
-    Matrix u_ex;
+
+    Mat_<double> u_id;
+    Mat_<double> u_ex;
 
     //face model
     FaceModel *model;
@@ -34,8 +34,8 @@ private:
     vector<Mat_<double> > rotations;
     vector<Mat_<double> > translations;
 
-    Matrix linear_combination_id;
-    Matrix linear_combination_exp;
+    Mat_<double> linear_combination_id;
+    Mat_<double> linear_combination_exp;
     //points that we sum the error over
     //the index points to one of the 1-5090 points
     vector<vector<int> > indices;

@@ -38,8 +38,7 @@ public:
 
 protected:
     map<int,Mat> M;
-    FaceModel *model;
-    Matrix core;
+    FaceModel *model;    
     Mat_<double> u_ex;
     Mat_<double> u_id;
 

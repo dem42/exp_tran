@@ -3659,11 +3659,11 @@ summarize the expression transfer algorithm:
 \item \textbf{Step 4.} For each frame.
 \begin{itemize}
 \item[\textbullet] Use the geometry and topology of the \textbf{source face} obtained in step 1 to
-  find the mouth and the eyebrows.
+  find the mouth.
 \item[\textbullet] Use the geometry and topology of the \textbf{target face} obtained in step 2 to
-  find the mouth and the eyebrows.
-\item[\textbullet] Poisson clone the mouth and the eyebrows from the source texture into
-  the target texture using the size of the target mouth and eyebrows as the
+  find the mouth.
+\item[\textbullet] Poisson clone the mouth from the source texture into
+  the target texture using the size of the target face with the transferred expression as the
   region size.
 \end{itemize}
 \end{itemize}
@@ -3954,6 +3954,13 @@ seen in figure \ref{fg:featureinter}.
 \caption{The movement of feature points (designated by red spheres).}\label{fg:featureinter}
 \end{figure}
 
+In summary, the tensor based shape model allows the user to easily synthesise
+realistic expressions. Thereby, it is made possible for casual users and
+begininng animators to generate believable 3D models of faces. These models then
+allow the user to manipulate identity and expression separately. The only
+requirement is that a database of face scans is necessary to construct the
+model. The generative power of the model depends only on the variance of
+the faces used to build to model. 
 
 
 \section{Tracking Results}
@@ -4016,27 +4023,264 @@ videos. An example is shown in figure \ref{fg:8opt}.
 \caption{Best tracking results obtained using a $15 \times 15$ window size.}
 \label{fg:8opt}
 \end{figure}
-\section{Optimization Results}
-The quality of the model and 3D pose parameter estimation depends on the
-selection of the feature points. This is due to the fact that the first frame
-alignment is calculated purely using the user provided (or automatically
+\section{Fitting Algorithm Results}
+The performance of the fitting algorithm is determined primarily by the four
+following factors
+\begin{itemize}
+\item The quality of the user provided feature points.
+\item The number of newly generated points and the correctness of their
+  established 3D correspondence.
+\item The optimization algorithm, which can be based on regularization or
+  constrained optimization.
+\item The number of frames in the video recording.
+\end{itemize}
+In this section we will provide fitting algorithm results and evaluate them
+based on these factors.
+\paragraph{Feature point selection.}
+The quality of the model and 3D pose parameter estimation depends on the input set of feature points. This is due to the fact that the first frame
+alignment is calculated purely using these user provided (or automatically
 located) feature points. The first frame alignment is then used to determine the
 3D model correspondences of a
 large number of newly generated feature points. These correspondences bias the
 fitting process toward the identity, expression and 3D pose of the first
 alignment. This is especially the case when the individual does not perform
-dynamic expressions in the recording. So if the first frame alignment is
-very different from the true identity, expression and 3D pose of the subject, then the fitting algorithm also returns an incorrect estimate of the face.
-
-On the other hand, the user cannot be expected to input a large number of
+dynamic expressions in the recording. On the other hand, the user cannot be expected to input a large number of
 feature points and an automatic algorithm is likewise only effective for a small
-number of unique features such as the mouth corners, eye corners etc. This means
-that the feature points need to be selected in places which provide alot of
-information for the fitting algorithm. Feature points around the mouth are for
-example very good at giving the fitting algorithm a good idea of the mouth
-movements. As mouth movements are very common in most expressions these points
-are what we mostly utilized during testing.
+number of unique features such as the mouth corners, eye corners etc. 
+
+The more points the fitting algorithm utilizes the more information it will have about the
+movement of the facial features. Using more points also helps avoid
+overfitting. However, the more points are generated the more biased the result
+is toward the first frame alignment parameters. Figures
+\ref{fg:nonep} and \ref{fg:manypoints} illustrate this trade-off between bias
+and improved optimization result on an interesting frames of a 100 frame video
+sequence optimized using a coonstrained non-negativty minimization scheme.
+
+\begin{figure}[H]
+\centering
+\subfloat[No feature points generated.]{\label{fg:nonep}\includegraphics[scale=0.27]{images/too_few_points.png}}
+\subfloat[Most of the feature points were generated, only a small fraction was
+  provided by the user.]{\label{fg:manypoints}\includegraphics[scale=0.27]{images/too_many_points.png}}
+
+\caption{The above images illustrate the trade-off between quality of
+  optimization and the introduced bias. With too few points the identity
+  estimate can never be very accurate. With too many points, the result becomes biased for the
+  first frame alignment
+  face which is different from the one in the image.}\label{fg:points}
+\end{figure}
+
+From figure \ref{fg:points} we see that when the first frame alignment is
+very different from the true identity, expression and 3D pose of the subject,
+the fitting algorithm also returns an incorrect estimate of the face. However,
+to obtain a good estimate of a person's identity a large number of points is
+necessary. The identity depends small details such as the width of the nose, the
+fullness of lips and others. A user cannot manually select all these these features.
+
+\paragraph{Optimization scheme.}
+The two optimization approaches to finding model parameters which generate
+realistic face are regularization and constrained optimization. Of the two,
+regularization is more difficult to use since it requires a regularization
+parameter $\lambda$ to control the distance from the mean. Reasonable values of
+this parameter can be obtained through trail and error. The regularization
+parameter also needs to be increased when more frames or more points are
+utilized. This is due to the fact that the error function generally increases when more
+frames or points are used, making the penalty value of the regularization
+parameter smaller by comparison. Constrained optimization is easier to use,
+however, a fitting algorithm using constrained optimization has a weaker
+expressive power since it prohibits parameter vectors with negative
+components. 
+
+The convergence of both fitting approaches is shown in figure
+\ref{fg:convergence}. Regularization-based fitting algorithms are faster, but
+they are also more likely to overfit if the regularization parameter is poorly chosen.
+
+\begin{figure}[H]
+\begin{centering}
+\includegraphics[scale=0.75]{images/convergence.png}
+\par\end{centering}
+
+\caption{The convergence behaviour of the two fitting algorithm
+  variations. Regularization converges to a lower error value faster but often
+  produces unrealistic face scans for low values of the regularization parameter
+$\lambda$.}
+\label{fg:convergence}
+\end{figure}
+The results of applying the various optimization schemes to a fitting problem is
+shown in figure \ref{fg:optimization}. An almost inhuman face is generated with
+$\lambda = 100$. On the other hand, the best result was obtained with
+constrained optimization. 
+
+\begin{figure}[H]
+\centering
+\subfloat[Regularization $\lambda=100$.]{\includegraphics[scale=0.23]{images/angry_reg20.png}}$\;$
+\subfloat[Regularization $\lambda=60$.]{\includegraphics[scale=0.23]{images/angry_reg60.png}}\\
+\subfloat[Regularization $\lambda=20$.]{\includegraphics[scale=0.23]{images/angry_reg100.png}}$\;$
+\subfloat[Constrained Optimization.]{\includegraphics[scale=0.23]{images/angry_sca.png}}
+\caption{The result of fitting the model to an image using the various fitting algorithms.}\label{fg:optimization}
+\end{figure}
+
+Experiments with regularization have shown that the this approach tends to
+keep the mouth on the model open when fitting the model to image. This is due to
+the fact that the mean face from the Binghamton database has an open mouth. Since the regularization algorithm
+penalizes any large discrepancy from the mean face, it therefore often falsly
+approximates the face in the image with an open mouthed model instance, as can be seen in figure \ref{fg:meanface}. The
+results for fitting faces with the regularized fitting algorithm are
+shown in figures \ref{fg:regularization1} and \ref{fg:regularization2}.
+
+
+\begin{figure}[H]
+\centering
+\subfloat[Regularization with $\lambda=500$ matches the identity and expression
+  very well.]{\includegraphics[scale=0.38]{images/reg_good.png}}\\
+\subfloat[The regularized fitting algorithm falsly assumes the mouth is open, since this minimizes error better than an open mouth.]{\label{fg:meanface}\includegraphics[scale=0.35]{images/reg_mouth_open.png}}\\
+\subfloat[Regularization with $\lambda=400$ correctly identifies a happy expression.]{\label{fg:inhuman}\includegraphics[scale=0.40]{images/reg_res1.png}}
+\caption{Results obtained from applying the regularized fitting algorithm.}\label{fg:regularization1}
+\end{figure}
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.32]{images/reg_bad.png}
+\caption{The fitting algorithm is prone to overfitting when no regularization
+  is performed ($\lambda=0$) and there is only a small number of feature points available.}\label{fg:regularization2}
+\end{figure}
+
+From \ref{fg:inhuman}, we can see that the regularized algorithm even matches face shapes which
+are very different from the shapes in the database. However, there are two
+significant disadvantages. Firstly, the choice of the regularization parameter $\lambda$
+has to be done by trial and error. Secondly, the fitting algorithm often falsly
+identifies subjects as having their mouth open, since this enables the algorithm
+to achieve a better error function minimum.
+
+On the other hand, the constrained optimization algorithm only fits realistic
+models to faces in images, without requiring the user to provide a value for a
+regularization parameter. However, unlike the regularized fitting algorithm, it
+limits the variance available in the database by allowing only positive
+coefficients in the linear combination. The face scans from the data tensor are therefore only added
+together and never subtracted from each other. This means that effectively only
+a small portion of the space spanned by the columns of the data tensor is
+available to us. Results for constrained fitting are shown in figures
+\ref{fg:constrained1} and \ref{fg:constrained2}.
+
+
+
+
+\begin{figure}[H]
+\centering
+\subfloat[Using only 16 feature points, the constrained algorithm finds a good match.]{\includegraphics[scale=0.31]{images/const_1.png}}\\
+\subfloat[The constrained algorithm correctly identifies a surprised expression.]{\includegraphics[scale=0.31]{images/const_3.png}}
+\caption{Result obtained using the constrained fitting algorithm}\label{fg:constrained1}
+\end{figure}
+
+
+
+\begin{figure}[H]
+\includegraphics[scale=0.40]{images/const_2.png}
+\caption{Using a larger number of automatically generated feature points, the
+  constrained algorithm correctly perceives the facial dynamics, but
+  misidentifies the expression as fear.}\label{fg:constrained2}
+\end{figure}
+
+In summary, we have discussed and explored two approaches to avoiding
+overfitting in the fitting algorithm. This overfitting is exemplified by
+unrealistic face shapes. 
+
+The regularization approach yields realistic face
+shapes for certain values of a regularization parameter $\lambda$. However, this
+parameter must often be found by trial and error. The parameter's magintude
+controls the attraction to the mean and can cause the algorithm to recover
+incorrect shapes, such as ones with an open mouth even when the mouth in the
+image is closed.
+
+With the constrained optimization approach we exchange a significant portion of
+the expressive power of the model for being able to only recover realistic
+faces. The constrained fitting algorithm does not require any input parmaters
+which makes the application more accessible to the casual user.
+
+\paragraph{Video Length.}
+In the expression transfer algorithm (section \ref{s:exptranalgo}), we require
+that the identity of the person will not change during the video recording. This
+means that the mult-frame coordinate descent algorithm has to find an expression
+parameter vector for each frame but just one identity parameter vector for the
+entire video sequence. This is essentially a constraint on the fitting
+algorithm. This constraint also limits the algorithm's performance. It first of all
+it necessitates that the solution of a large linear system, obtained by
+collecting the feature points from all frames. Secondly, some identities in the database did produce certain expressions. 
+
+
 \section{Expression Transfer Results}
+Given a 3D model of the source subject and a 3D model of the target subject, the
+final task is transfer the source expression to the target and then reanimate
+the target in the target video recording. Transferring the expression between
+the two models is trivial since we only need to input the source expression
+parameters along with the target identity parameters into the generative
+function. This may not provide us with exactly the same facial movements as
+displayed by the source. The target subject may have a different type of smile
+than the source individual for example.
+
+On the other hand, the second step is a very challenging one. As discussed in section
+\ref{s:exptranalgo}, since we only have a model of a face shape and not a model
+of the texture, we cannot directly use the tensor model to synthesize the
+correct appearence. We therefore must utilize shape information to transfer
+texture. 
+
+This can be done by finding the texture coordinates by
+projecting the newly generated face into target the image and using the image as
+a texture. This leads to decent results as seen in figure
+\ref{fg:transfer}. However, certain expressions such as a strong smile may stretch the
+texture in an unrealstic way. 
+
+\begin{figure}[H]
+\centering
+\subfloat[Step 1: Transfer of a neutral expression.]{\includegraphics[scale=0.20]{images/transfer2.png}}
+\subfloat[Step 2: Transfer of a weak smile.]{\includegraphics[scale=0.20]{images/transfer3.png}}\\
+\subfloat[Step 3. The stronger smile stretches the texture.]{\includegraphics[scale=0.20]{images/transfer1.png}}
+\subfloat[The 3D model with the transferred expression.]{\includegraphics[scale=0.20]{images/transfer4.png}}
+\caption{Expression transfer by reanimating the augmented target subject with
+  texture data obtained from the first target recording frame.}\label{fg:transfer}
+\end{figure}
+
+In figure \ref{fg:transfer2} a smiling expression is transferred causing a
+noticably skewed texture in the target image.
+
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.40]{images/transfer5.png}
+\caption{Transfer of a smile using the first frame of the target recording as
+  texture.}\label{fg:transfer2}
+\end{figure}
+
+The other approach to reanimating faces is to exploit the knowledge of the shape of both faces to
+clone the features from the source texture into the target texture. So that the
+result seems realistic this is done with seamless blending to produce results
+depicted in figures \ref{fg:poisson1} and \ref{fg:poisson2}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.40]{images/poisson6.png}
+\caption{The cloning of the smile from the source (left) image into the target (right) image.}\label{fg:poisson1}
+\end{figure}
+\begin{figure}[H]
+\centering
+\includegraphics[scale=0.40]{images/poisson1.png}
+\caption{Another example of using poisson cloning to achieve a somewhat realistic
+  expression transfer result.}\label{fg:poisson2}
+\end{figure}
+ 
+Since the geometry of both 3D models is known from fitting algorithm, the
+transfer is done by simply taking smile texture from the source image and cloning it
+over the mouth on the target image. This approach was also utlized by Vlasic et
+al \cite{faceTransfer05} in their expression transfer application. It produces
+good results when both faces are the same size. Figure \ref{poisson3}
+illustrates the case when one face is considerably larger than the other. Note
+that a small fragment of the source nose is transferred as well. This occurred because the mouth of
+the target image was larger than mouth of the source.
+
+\begin{figure}[H]
+\centering
+\subfloat[Step 1: Transfer of a neutral expression.]{\includegraphics[scale=0.38]{images/poisson2.png}}\\
+\subfloat[Step 2: Transfer of the begininngs of a smile.]{\includegraphics[scale=0.35]{images/poisson4.png}}
+\caption{Texture transfer using poisson cloning. Depicted is a case where the
+  techinque does not work well due to the discrepancy in size.}\label{poisson3}
+\end{figure}
 
 \section{Performance}
 The expression transfer application was tested on the following system

@@ -86,8 +86,11 @@
 \contentsline {chapter}{\numberline {4}Results and Evaluation}{64}{chapter.4}
 \contentsline {section}{\numberline {4.1}Face Generation}{64}{section.4.1}
 \contentsline {section}{\numberline {4.2}Tracking Results}{67}{section.4.2}
-\contentsline {section}{\numberline {4.3}Optimization Results}{69}{section.4.3}
-\contentsline {section}{\numberline {4.4}Expression Transfer Results}{69}{section.4.4}
-\contentsline {section}{\numberline {4.5}Performance}{69}{section.4.5}
-\contentsline {chapter}{\numberline {5}Conclusion}{70}{chapter.5}
-\contentsline {section}{\numberline {5.1}Future Work}{70}{section.5.1}
+\contentsline {section}{\numberline {4.3}Fitting Algorithm Results}{69}{section.4.3}
+\contentsline {paragraph}{Feature point selection.}{69}{section*.32}
+\contentsline {paragraph}{Optimization scheme.}{70}{section*.33}
+\contentsline {paragraph}{Video Length.}{73}{section*.34}
+\contentsline {section}{\numberline {4.4}Expression Transfer Results}{73}{section.4.4}
+\contentsline {section}{\numberline {4.5}Performance}{76}{section.4.5}
+\contentsline {chapter}{\numberline {5}Conclusion}{77}{chapter.5}
+\contentsline {section}{\numberline {5.1}Future Work}{77}{section.5.1}

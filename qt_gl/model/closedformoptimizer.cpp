@@ -25,8 +25,7 @@ ClosedFormOptimizer::ClosedFormOptimizer(double regParam) : Optimizer(), max_ite
     leftTerm_id = regParam*leftTerm_id;
 
     regTerm_exp = regParam*regTerm_exp;
-    regTerm_id = regParam*regTerm_id;
-
+    regTerm_id = regParam*regTerm_id;    
 }
 
 void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints,
@@ -66,8 +65,8 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
     Mat_<double> x(exr_size,1);
     Mat_<double> y(id_size,1);
     //used for x_t*U_ex and y_t*U_id
-    Matrix lin_comb_x(exr_size,1);
-    Matrix lin_comb_y(id_size,1);
+    Mat_<double> lin_comb_x(exr_size,1);
+    Mat_<double> lin_comb_y(id_size,1);
 
 
     double Z_avg;
@@ -88,7 +87,7 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
     proP = cameraMatrix*rmatrix*pM;
     proP = proP + cameraMatrix*translation;
     Z_avg = proP(0,2);
-
+    cout << "z " << Z_avg << endl;
 
     //get weights from the current face instance
     face_ptr->getWeights(w_id,id_size,w_exp,exr_size);
@@ -121,7 +120,6 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
     pr = (1.0/Z_avg)*weakCamera*rmatrix;
     PRM = Mat_<double>(2*featurePoints.size(),exr_size*id_size);
     prm = Mat_<double>(2,exr_size*id_size);
-    Mi = Mat_<double>(3,exr_size*id_size);
 
     for(unsigned int i=0;i<point_indices.size();++i)
     {
@@ -154,9 +152,9 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
          * Sum( [U*Z'*Mi'*R'*PW'*PW*R*Mi*Z*U'] *x ) = Sum( U*Z'*Mi'*R'*PW'*fi - (1/tz)*U*Z'*Mi'*R'*PW'*PW'*t )
          */
         for(int i=0;i<id_size;i++)
-            y_t(0,i) = y(i,0);
-        Matrix::matrix_mult(y_t,u_id).transpose(lin_comb_y);
-        Z_ex = Matrix::kron(lin_comb_y,Matrix::eye(exr_size));
+            y_t(0,i) = y(i,0);        
+        lin_comb_y = (y_t*u_id).t();
+        Z_ex = Matrix::kronecker(lin_comb_y,Mat_<double>::eye(exr_size,exr_size));
         ZU = Z_ex*(u_ex.t());
 
         A_ex = PRM*ZU;
@@ -167,23 +165,24 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
         B_ex = A_ext*f;
         B_ex = B_ex + leftTerm_exp;
         
-        cv::solve(W,B_ex,x,DECOMP_SVD);
+        cv::solve(W,B_ex,x);
 
         for(unsigned int k=0;k<exr_size;k++)
             x_t(0,k) = x(k,0);
-        Matrix::matrix_mult(x_t,u_ex).transpose(lin_comb_x);
-        Z_id = Matrix::kron(Matrix::eye(id_size),lin_comb_x);
+        lin_comb_x = (x_t*u_ex).t();
+        Z_id = Matrix::kronecker(Mat_<double>::eye(id_size,id_size),lin_comb_x);
         ZU = Z_id*(u_id.t());
 
         A_id = PRM*ZU;
         A_idt = A_id.t();
         W = A_idt*A_id;
+
         W = W + regTerm_id;
         
         B_id = A_idt*f;
         B_id = B_id + leftTerm_id;
         
-        cv::solve(W,B_id,y,DECOMP_SVD);
+        cv::solve(W,B_id,y);
     }
 
     for(int i=0;i<exr_size;i++){
@@ -204,6 +203,19 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
     face_ptr->setNewIdentityAndExpression(w_id,w_exp);
     face_ptr->setAverageDepth(average_depth);
 
+    prm.release();
+    PRM.release();
+    ZU.release();
+    Z_id.release();
+    A_id.release();
+    A_idt.release();
+    W.release();
+    B_ex.release();
+    B_id.release();    
+    Z_ex.release();
+    A_ex.release();
+    A_ext.release();
+    f.release();
     delete[] w_id;
     delete[] w_exp;
 }
@@ -243,8 +255,8 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
     Mat_<double> x(exr_size,1);
     Mat_<double> y(id_size,1);
     //used for x_t*U_ex and y_t*U_id
-    Matrix lin_comb_x(exr_size,1);
-    Matrix lin_comb_y(id_size,1);
+    Mat_<double> lin_comb_x(exr_size,1);
+    Mat_<double> lin_comb_y(id_size,1);
 
     double Z_avg;
     double average_depth;
@@ -297,8 +309,9 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
 
     for(int i=0;i<id_size;i++)
         y_t(0,i) = w_id[i];
-    Matrix::matrix_mult(y_t,u_id).transpose(lin_comb_y);
-    Z_ex = Matrix::kron(lin_comb_y,Matrix::eye(exr_size));
+
+    lin_comb_y = (y_t*u_id).t();
+    Z_ex = Matrix::kronecker(lin_comb_y,Mat_<double>::eye(exr_size,exr_size));
 
     //without brute ->
     ZU = Z_ex*(u_ex.t());
@@ -330,14 +343,14 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
     B = A_ext*f;
     B = B + Z_avg*leftTerm_exp;
 
-    Mat_<double> temp = (A_ex*x - f);
+    Mat_<double> temp = ((1.0/Z_avg)*A_ex*x - f);
     Mat_<double> e = temp.t()*temp;
-    cout << "exp, error before " << Matrix(e);
-    cv::solve(W,B,x,DECOMP_SVD);
+    cout << "exp, error before " << e(0,0)<<endl;
+    cv::solve(W,B,x);
     //x = Matrix::solveLinSysSvd(W,B);
-    temp = (A_ex*x - f);
+    temp = ((1.0/Z_avg)*A_ex*x - f);
     e = temp.t()*temp;
-    cout << "exp, error after " << Matrix(e);
+    cout << "exp, error after " << e(0,0)<<endl;
 
 
 
@@ -353,6 +366,14 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
     // unecessary it seems 
     face_ptr->setAverageDepth(average_depth);
 
+
+    ZU.release();
+    W.release();
+    B.release();
+    Z_ex.release();
+    A_ex.release();
+    A_ext.release();
+    f.release();
     delete[] w_id;
     delete[] w_exp;
 }
@@ -395,7 +416,7 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
     Mat_<double> x(exr_size,1);
     Mat_<double> y(id_size,1);
     //used for x_t*U_ex and y_t*U_id
-    Matrix lin_comb_x(exr_size,1);
+    Mat_<double> lin_comb_x(exr_size,1);
 
     double Z_avg;
     double average_depth;
@@ -465,8 +486,8 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
             x(k,0) = x_t(0,k) = weights_ex[i][k];
 
         //without brute
-        Matrix::matrix_mult(x_t,u_ex).transpose(lin_comb_x);
-        Z_id = Matrix::kron(Matrix::eye(id_size),lin_comb_x);
+        lin_comb_x = (x_t*u_ex).t();
+        Z_id = Matrix::kronecker(Mat_<double>::eye(id_size,id_size),lin_comb_x);
         ZU = Z_id*(u_id.t());
 
         //with brute
@@ -498,15 +519,16 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
     B = A_idt*f;
     B = B + Z_avg*leftTerm_id;
 
-    Mat_<double> temp = (A_id*y - f);
-    Mat_<double> e = temp.t()*temp;
-    cout << "id, error before " << Matrix(e);
-    cv::solve(W,B,y,DECOMP_SVD);      
-    temp = (A_id*y - f);
-    e = temp.t()*temp;
-    cout << "id, error after " << Matrix(e);
+    Mat_<double> temp = ((1./Z_avg)*A_id*y - f);
+    Mat_<double> e1 = temp.t()*temp ,e2;
+    cout << "id, error before " << e1(0,0)<<endl;
+    cv::solve(W,B,y);
+    temp = ((1./Z_avg)*A_id*y - f);
+    e2 = temp.t()*temp;
+    cout << "id, error after " << e2(0,0)<<endl;
+    if(e1(0,0) < e2(0,0))
+        cout << "!!!! " << Matrix(y);
 
-    cout << "in closed .. the y " << Matrix(y);
 
     for(int i=0;i<id_size;i++){
         w_id[i] = y(i,0);
@@ -524,6 +546,14 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
     face_ptr->setNewIdentityAndExpression(w_id,w_exp);
     face_ptr->setAverageDepth(average_depth);
 
+
+    ZU.release();
+    Z_id.release();
+    A_id.release();
+    A_idt.release();
+    W.release();
+    B.release();
+    f.release();
     delete[] w_id;
     delete[] w_exp;
 }

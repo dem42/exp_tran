@@ -1,7 +1,7 @@
 #include "nnlsoptimizer.h"
 #include "model/FaceModel.h"
 
-NNLSOptimizer::NNLSOptimizer() : Optimizer(), NNLS_MAX_ITER(1000), max_iterations(5)
+NNLSOptimizer::NNLSOptimizer() : Optimizer(), NNLS_MAX_ITER(3000), max_iterations(5)
 {
 
 }
@@ -93,8 +93,8 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
     Mat_<double> x(exr_size,1);
     Mat_<double> y(id_size,1);
     //used for x_t*U_ex and y_t*U_id
-    Matrix lin_comb_x(exr_size,1);
-    Matrix lin_comb_y(id_size,1);
+    Mat_<double> lin_comb_x(exr_size,1);
+    Mat_<double> lin_comb_y(id_size,1);
 
     double Z_avg;
     double average_depth;
@@ -148,8 +148,8 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
 
     for(int i=0;i<id_size;i++)
         y_t(0,i) = w_id[i];
-    Matrix::matrix_mult(y_t,u_id).transpose(lin_comb_y);
-    Z_ex = Matrix::kron(lin_comb_y,Matrix::eye(exr_size));
+    lin_comb_y = (y_t*u_id).t();
+    Z_ex = Matrix::kronecker(lin_comb_y,Mat_<double>::eye(exr_size,exr_size));
     ZU = Z_ex*(u_ex.t());
 
     for(unsigned int i=0;i<point_indices.size();++i)
@@ -166,12 +166,12 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
 
     Mat_<double> temp = (A_ex*x - f);
     Mat_<double> e = temp.t()*temp;
-    cout << "exp, error before " << Matrix(e);
+    cout << "exp, error before " << e(0,0)<<endl;
     //op .. lets see if we get here
     this->scannls(A_ex,f,x);
     temp = (A_ex*x - f);
     e = temp.t()*temp;
-    cout << "exp, error after " << Matrix(e);
+    cout << "exp, error after " << e(0,0)<<endl;
 
 
     for(int i=0;i<exr_size;i++){
@@ -186,6 +186,12 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
     //unecessary it seems 
     face_ptr->setAverageDepth(average_depth);
 
+
+
+    ZU.release();    
+    Z_ex.release();
+    A_ex.release();
+    f.release();
     delete[] w_id;
     delete[] w_exp;
 }
@@ -226,7 +232,7 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
     Mat_<double> x(exr_size,1);
     Mat_<double> y(id_size,1);
     //used for x_t*U_ex and y_t*U_id
-    Matrix lin_comb_x(exr_size,1);
+    Mat_<double> lin_comb_x(exr_size,1);
 
     double Z_avg;
     double average_depth;    
@@ -295,8 +301,8 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
         //load the appropriate weights for the i-th frame
         for(unsigned int k=0;k<weights_ex[i].size();k++)
             x_t(0,k) = weights_ex[i][k];
-        Matrix::matrix_mult(x_t,u_ex).transpose(lin_comb_x);
-        Z_id = Matrix::kron(Matrix::eye(id_size),lin_comb_x);
+        lin_comb_x = (x_t*u_ex).t();
+        Z_id = Matrix::kronecker(Mat_<double>::eye(id_size,id_size),lin_comb_x);
         ZU = Z_id*(u_id.t());
 
         for(unsigned int j=0;j<point_indices_vector[i].size();++j)
@@ -317,12 +323,13 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
 
     Mat_<double> temp = (A_id*y - f);
     Mat_<double> e = temp.t()*temp;
-    cout << "id, error before " << Matrix(e);
+    cout << "id, error before " << e(0,0)<<endl;
     //optimize using sequential coordinate descent
     this->scannls(A_id,f,y);    
     temp = (A_id*y - f);
     e = temp.t()*temp;
-    cout << "id, error after " << Matrix(e);
+    cout << "id, error after " << e(0,0)<<endl;
+
 
     for(int i=0;i<id_size;i++){
         w_id[i] = y(i,0);
@@ -338,6 +345,10 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
     face_ptr->setNewIdentityAndExpression(w_id,w_exp);
     face_ptr->setAverageDepth(average_depth);
 
+    ZU.release();
+    Z_id.release();
+    A_id.release();
+    f.release();
     delete[] w_id;
     delete[] w_exp;
 }
@@ -379,8 +390,8 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
     Mat_<double> x(exr_size,1);
     Mat_<double> y(id_size,1);
     //used for x_t*U_ex and y_t*U_id
-    Matrix lin_comb_x(exr_size,1);
-    Matrix lin_comb_y(id_size,1);
+    Mat_<double> lin_comb_x(exr_size,1);
+    Mat_<double> lin_comb_y(id_size,1);
 
     double Z_avg;
     double average_depth;
@@ -433,7 +444,7 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
 
     for(unsigned int i=0;i<point_indices.size();++i)
     {
-        index = point_indices[i];                
+        index = point_indices[i];        
         prm = pr*M[index];
         PRM.row(2*i) = prm.row(0) + 0;
         PRM.row(2*i+1) = prm.row(1) + 0;
@@ -453,9 +464,10 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
     {
         //put the guesses into matrix y and x
         y_t = y.t();
-        Matrix::matrix_mult(y_t,u_id).transpose(lin_comb_y);
 
-        Z_ex = Matrix::kron(lin_comb_y,Matrix::eye(exr_size));
+        lin_comb_y = (y_t*u_id).t();
+
+        Z_ex = Matrix::kronecker(lin_comb_y,Mat_<double>::eye(exr_size,exr_size));
         ZU = Z_ex*(u_ex.t());
 
 
@@ -465,9 +477,9 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
         this->scannls(A_ex,f,x);
 
         x_t = x.t();
-        Matrix::matrix_mult(x_t,u_ex).transpose(lin_comb_x);
+        lin_comb_x = (x_t*u_ex).t();
 
-        Z_id = Matrix::kron(Matrix::eye(id_size),lin_comb_x);
+        Z_id = Matrix::kronecker(Mat_<double>::eye(id_size,id_size),lin_comb_x);
         ZU = Z_id*(u_id.t());
 
         /* compute the formula :
@@ -479,12 +491,11 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
 
         Mat_<double> temp = (A_id*y - f);
         Mat_<double> e = temp.t()*temp;
-        cout << "id, error before " << Matrix(e);
+        cout << "id, error before " << e(0,0)<<endl;
         this->scannls(A_id,f,y);
         temp = (A_id*y - f);
         e = temp.t()*temp;
-        cout << "id, error after " << Matrix(e);
-
+        cout << "id, error after " << e(0,0)<<endl;
     }
 
 
@@ -511,6 +522,15 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
     face_ptr->setNewIdentityAndExpression(w_id,w_exp);    
     face_ptr->setAverageDepth(average_depth);
 
+
+    prm.release();
+    PRM.release();
+    ZU.release();
+    Z_id.release();
+    A_id.release();
+    Z_ex.release();
+    A_ex.release();
+    f.release();
     delete[] w_id;
     delete[] w_exp;
 }
@@ -555,7 +575,7 @@ void NNLSOptimizer::scannls(const Mat& A, const Mat& b,Mat &x)
             break;
         }
     }
-    x = x_new;
+    x_new.copyTo(x);
 }
 
 

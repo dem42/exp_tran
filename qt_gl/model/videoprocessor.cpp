@@ -7,7 +7,7 @@
 
 #include "model/exptranexception.h"
 
-VideoProcessor::VideoProcessor(const unsigned int fmax, const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax)
+VideoProcessor::VideoProcessor(const unsigned int fmax, const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax), NEW_POINT_SIZE(100)
 {
     flowEngine = new OpticalFlowEngine();
     paramOptimizer = new NNLSOptimizer();
@@ -19,7 +19,8 @@ VideoProcessor::VideoProcessor(const vector<cv::Point2f> &featurePoints, const v
                                const cv::Mat &cameraMatrix, const cv::Mat &lensDist,
                                VideoProcessor::OptType type, double regParam,
                                VideoProcessor::IdConstraintType idconst, VideoProcessor::PointGenerationType pgtype,
-                               const unsigned int fmax,const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax)
+                               const unsigned int fmax,const unsigned int imax,
+                               bool withFirstFrame) : FRAME_MAX(fmax), ITER_MAX(imax), NEW_POINT_SIZE(400)
 {
     fPoints.assign(featurePoints.begin(),featurePoints.end());
     fData.assign(frameData.begin(),frameData.end());
@@ -31,17 +32,18 @@ VideoProcessor::VideoProcessor(const vector<cv::Point2f> &featurePoints, const v
     if(type == OptType_INTERPOLATE)
         paramOptimizer = new NNLSOptimizer();
     else if(type == OptType_LIN_COMB)
-        paramOptimizer = new ClosedFormOptimizer(regParam);
+        paramOptimizer = new ClosedFormOptimizer(regParam*fmax);
     else
         paramOptimizer = new NNLSOptimizer();
 
     flowEngine = new OpticalFlowEngine();
     poseEstimator = new PoseEstimator();
     threadCrashed = false;
+    this->withFirstFrame = withFirstFrame;
 }
 
 VideoProcessor::VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
-                               const unsigned int fmax, const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax)
+                               const unsigned int fmax, const unsigned int imax) : FRAME_MAX(fmax), ITER_MAX(imax), NEW_POINT_SIZE(100)
 {
     this->flowEngine = flowEngine;
     this->paramOptimizer = paramOptimizer;
@@ -151,8 +153,7 @@ bool VideoProcessor::termination(const vector<vector<double> >&prevExp, const ve
         for(unsigned int j=0;j<prevExp[i].size();j++)
         {
             dif += (prevExp[i][j] - exp[i][j])*(prevExp[i][j] - exp[i][j]);            
-        }
-        cout << "dif exp  " << dif << " frame " << i << endl;
+        }        
         if(dif > exp_eps)
             return false;
     }
@@ -163,8 +164,7 @@ bool VideoProcessor::termination(const vector<vector<double> >&prevExp, const ve
         for(unsigned int j=0;j<prevId[i].size();j++)
         {            
             dif += (prevId[i][j] - id[i][j])*(prevId[i][j] - id[i][j]);
-        }
-        cout << "dif exp  " << dif << " frame " << i << endl;
+        }        
         if(dif > id_eps)
             return false;
     }   
@@ -183,12 +183,26 @@ void VideoProcessor::generateNewFeaturePoints(const Mat& rotation, const Mat &tr
     }
     else if(pgt == PointGenerationType_3D)
     {
-        poseEstimator->generatePoints(rotation,translation,cameraMatrix,lensDist,100,face_ptr,newPoints,indices);
+        poseEstimator->generatePoints(rotation,translation,cameraMatrix,lensDist,NEW_POINT_SIZE,face_ptr,newPoints,indices);
         currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
 
         newPoints.clear();
         poseEstimator->projectModelPointsInto2D(rotation,translation,cameraMatrix,lensDist,face_ptr,indices,newPoints);
         currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+    }
+    else if(pgt == PointGenerationType_HYBRID)
+    {
+        Utility::sampleGoodPoints(currentPoints,newPoints);
+        poseEstimator->reprojectInto3DUsingWeak(newPoints,rotation,translation,cameraMatrix,lensDist,face_ptr,indices);
+        currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+
+        newPoints.clear();
+        poseEstimator->generatePoints(rotation,translation,cameraMatrix,lensDist,NEW_POINT_SIZE,face_ptr,newPoints,indices);
+        currentPoints.insert(currentPoints.end(),newPoints.begin(),newPoints.end());
+    }
+    else if(pgt == PointGenerationType_NONE)
+    {
+        return;
     }
 }
 
@@ -328,11 +342,12 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
     indices.insert(indices.begin(),Face::fPoints,Face::fPoints+Face::fPoints_size);
 
     //first frame alignment computes the first face in face_ptr
-    paramOptimizer->setPointIndices(indices);
-    paramOptimizer->estimateModelParameters(currentPoints,cameraMatrix,lensDist,face_ptr,indices,
-                                            frameRotation[0],frameTranslation[0],weights_id,weights_exp);
-
-
+    if(withFirstFrame == true)
+    {
+        paramOptimizer->setPointIndices(indices);
+        paramOptimizer->estimateModelParameters(currentPoints,cameraMatrix,lensDist,face_ptr,indices,
+                                                frameRotation[0],frameTranslation[0],weights_id,weights_exp);
+    }
 
     //add new points so that we start tracking them
     //we arent actually altering the first featurePoints[0] just the rest throught compute flow
@@ -372,6 +387,7 @@ void VideoProcessor::processVideo(const vector<cv::Point2f> &inputPoints, const 
         identityExpressionUpdate(estimationPoints,estimation_point_indices,frameTranslation,frameRotation,face_ptr,
                                  vector_weights_exp,vector_weights_id);
 
+        cout << "frame : " << j << endl;
 
         if(j > 0 && termination(vector_prev_weights_exp,vector_weights_exp,vector_prev_weights_id,vector_weights_id) == true)
         {            

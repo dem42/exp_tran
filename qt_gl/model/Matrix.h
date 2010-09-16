@@ -58,7 +58,7 @@ public:
     void transpose(Matrix &mt);
     void scalar_mult(double scalar);
 
-    static Matrix submatrix(Matrix &A, int rowstart, int rowend);
+    static Matrix submatrix_(Matrix &A, int rowstart, int rowend);
 
     void test(void);
 
@@ -70,7 +70,8 @@ public:
     static int svd(int m,int n,int withu,int withv,double eps,double tol,
         double **a,double *q,double **u,double **v);
     //kronecker product
-    static Matrix kron(const Matrix &a,const Matrix &b);
+    static Matrix kron_(const Matrix &a,const Matrix &b);
+    static cv::Mat kronecker(const cv::Mat&a, const cv::Mat&b);
     //matrix multiplication c = a*b
     //seems to have been faster when we passed a reference back
     static Matrix matrix_mult(const Matrix &a,const Matrix &b);

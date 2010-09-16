@@ -15,7 +15,7 @@ class VideoProcessor : public QThread
 public:
     enum OptType { OptType_INTERPOLATE, OptType_LIN_COMB, OptType_NELDER_INT, OptType_NELDER_LIN };
     enum IdConstraintType { IdConstraintType_NONE, IdConstraintType_CONST};
-    enum PointGenerationType {PointGenerationType_3D, PointGenerationType_2D};
+    enum PointGenerationType {PointGenerationType_3D, PointGenerationType_2D, PointGenerationType_HYBRID, PointGenerationType_NONE};
 
     //constructors with default frame max and iteration max values
     VideoProcessor(const unsigned int fmax=5, const unsigned int imax=3);
@@ -24,7 +24,8 @@ public:
                    VideoProcessor::OptType type = OptType_INTERPOLATE, double regParam = 2000.0,
                    VideoProcessor::IdConstraintType idconst = IdConstraintType_CONST,
                    VideoProcessor::PointGenerationType pgtype = PointGenerationType_3D,
-                   const unsigned int fmax=5, const unsigned int imax=3);
+                   const unsigned int fmax=5, const unsigned int imax=3,
+                   bool withFirstFrame = true);
     VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
                    const unsigned int fmax=5, const unsigned int imax=3);
     ~VideoProcessor();
@@ -61,9 +62,11 @@ private:
 
 
     bool threadCrashed;
+    bool withFirstFrame;
 
     const unsigned int FRAME_MAX;
     const unsigned int ITER_MAX;
+    const unsigned int NEW_POINT_SIZE;
 
     Optimizer *paramOptimizer;
     OpticalFlowEngine *flowEngine;

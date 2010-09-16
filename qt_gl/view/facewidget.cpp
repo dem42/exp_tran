@@ -28,6 +28,7 @@ FaceWidget::FaceWidget(QGLWidget *parent) : QGLWidget(parent)
 
   face_ptr = new Face();
   texture_coord = new Point2[face_ptr->getPointNum()];
+  delete face_ptr;
   texture_id = -1;
 
   //initialize camera parameters
@@ -59,7 +60,7 @@ void FaceWidget::refreshGL()
 }
 
 void FaceWidget::setFace(Face* face_ptr)
-{
+{    
     this->face_ptr = face_ptr;
     this->polygonNumber = face_ptr->getPolyNum();
     face_ptr->calculateBoundingSphere(center_x,center_y,center_z,diameter);
@@ -90,6 +91,12 @@ void FaceWidget::render()
   int v1,v2,v3;
   GLUquadric *quad = gluNewQuadric();
 
+  //nothing to render
+  if(face_ptr == NULL)
+      return;
+  if(face_ptr->getPointNum() == 0)
+      return;
+
   Point3 *vertexes = face_ptr->vertexes;
   Vector3 *vertex_normals = face_ptr->vertex_normals;
   float (*triangles)[3] = face_ptr->triangles;
@@ -102,11 +109,6 @@ void FaceWidget::render()
 
   vector<int>fP;
   fP.assign(Face::fPoints,Face::fPoints+Face::fPoints_size);
-
-  //nothing to render
-  if(face_ptr == NULL)
-      return;
-
 
 
   glEnable(GL_TEXTURE_2D);

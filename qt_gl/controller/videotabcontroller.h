@@ -63,6 +63,10 @@ public slots:
     void setConstID(bool);
     void setPointGen2D(bool);
     void setPointGen3D(bool);
+    void setHybrid(bool);
+    void setNone(bool);
+    void setProjModel(bool);
+    void setWithFirstFrame(bool);
 private:
     void calcIntrinsicParams();
 
@@ -72,6 +76,8 @@ private:
     double regParam;
     int frame_num;
     int iter_num;
+    bool projModel;
+    bool withFirstFrame;
 
     //video fileName
     QString fileName;

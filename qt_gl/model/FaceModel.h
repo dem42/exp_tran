@@ -4,6 +4,10 @@
 #include "Vector3.h"
 #include "Matrix.h"
 #include <string>
+#include <cv.h>
+
+using namespace cv;
+
 
 //singleton persistable class
 class FaceModel
@@ -20,9 +24,11 @@ class FaceModel
                            const int first_dim, const int second_dim, Mode_space_t flag);
     void generateFace(Point3 *face,double *w_id,double *w_ex,bool brute_exp=false, bool brute_id=false);
 
-    Matrix getCoreTensor() const;
-    Matrix getUIdentity() const;
-    Matrix getUExpression() const;
+    cv::Mat coreSubmatrix(int rowstart,int rowend);
+
+    cv::Mat getCoreTensor() const;
+    cv::Mat getUIdentity() const;
+    cv::Mat getUExpression() const;
     double getSigmaIdAt(int i) const;
     double getSigmaExpAt(int i) const;
 
@@ -60,6 +66,10 @@ private:
     Matrix U_id;
     Matrix U_ex;
     Matrix core;
+
+    Mat_<double> uid;
+    Mat_<double> uex;
+    Mat_<double> coreMat;
 
     double *sigma_id;
     double *sigma_exp;

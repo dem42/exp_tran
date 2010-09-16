@@ -27,7 +27,7 @@
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="faceTab">
      <attribute name="title">
@@ -488,7 +488,7 @@
        <rect>
         <x>10</x>
         <y>560</y>
-        <width>731</width>
+        <width>571</width>
         <height>31</height>
        </rect>
       </property>
@@ -603,6 +603,32 @@
       </property>
       <property name="text">
        <string>restart</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="srcFeat">
+      <property name="geometry">
+       <rect>
+        <x>590</x>
+        <y>560</y>
+        <width>90</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>src features</string>
+      </property>
+     </widget>
+     <widget class="QPushButton" name="targetFeat">
+      <property name="geometry">
+       <rect>
+        <x>680</x>
+        <y>560</y>
+        <width>111</width>
+        <height>27</height>
+       </rect>
+      </property>
+      <property name="text">
+       <string>target features</string>
       </property>
      </widget>
     </widget>

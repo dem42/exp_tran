@@ -8,7 +8,7 @@ using namespace cv;
 ModelIdentityError::ModelIdentityError(Mat P) : P(P)
 {
     model = FaceModel::getInstance();
-    core = model->getCoreTensor();
+
     u_id = model->getUIdentity();
     u_ex = model->getUExpression();
 }
@@ -46,7 +46,7 @@ void ModelIdentityError::setPoints(const vector<vector<Point2f> >&p,const vector
             index = indices[j][i];
             if(Z.find(index) == Z.end())
             {
-                core_extracted = Matrix::submatrix(core, index*3,index*3+2);
+                core_extracted = model->coreSubmatrix(index*3,index*3+2);
                 projected = P*rotations[j]*core_extracted;
                 Z[index] = projected.clone();
             }
@@ -75,13 +75,13 @@ double ModelIdentityError::operator()(vector<double>& x)
     }
 
     //here inside of operator() if error is identity then the parameter w is identity weights
-    linear_combination_exp = Matrix::matrix_mult(Matrix(x),u_ex);
+    linear_combination_exp = Mat_<double>(x)*u_ex;
     for(int j=0;j<indices.size();j++)
     {
 
-        linear_combination_id = Matrix::matrix_mult(weights[j],u_id);
+        linear_combination_id = Mat_<double>(weights[j])*u_id;
 
-        K = Matrix::kron(linear_combination_id,linear_combination_exp);
+        K = Matrix::kronecker(linear_combination_id,linear_combination_exp);
         K = K.t();
 
         projectedT = P*translations[j];

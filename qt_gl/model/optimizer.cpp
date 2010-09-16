@@ -4,8 +4,7 @@
 Optimizer::Optimizer()
 {
     //initialize model-morph bases
-    model = FaceModel::getInstance();
-    core = model->getCoreTensor();
+    model = FaceModel::getInstance();    
     u_id = model->getUIdentity();
     u_ex = model->getUExpression();
 }
@@ -31,7 +30,7 @@ void Optimizer::setPointIndices(const vector<int>&point_indices)
          //if not already in the map
          if(M.find(index) == M.end())
          {
-             Mi = Matrix::submatrix(core, index*3 , index*3 + 2 );
+             Mi = model->coreSubmatrix(index*3 , index*3 + 2 );             
              M[index] = Mi;
          }
      }

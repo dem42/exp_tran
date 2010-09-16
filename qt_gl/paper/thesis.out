@@ -1,0 +1,63 @@
+\BOOKMARK [0][-]{chapter.1}{Introduction}{}
+\BOOKMARK [1][-]{section.1.1}{Motivation}{chapter.1}
+\BOOKMARK [1][-]{section.1.2}{Contributions}{chapter.1}
+\BOOKMARK [0][-]{chapter.2}{Background}{}
+\BOOKMARK [1][-]{section.2.1}{Deformable Models}{chapter.2}
+\BOOKMARK [2][-]{subsection.2.1.1}{Physics Based Models}{section.2.1}
+\BOOKMARK [3][-]{subsubsection.2.1.1.1}{Finite Element Method \(FEM\)}{subsection.2.1.1}
+\BOOKMARK [3][-]{subsubsection.2.1.1.2}{Modal Analysis}{subsection.2.1.1}
+\BOOKMARK [3][-]{subsubsection.2.1.1.3}{Recovering shape with FEM}{subsection.2.1.1}
+\BOOKMARK [2][-]{subsection.2.1.2}{Statistical Models}{section.2.1}
+\BOOKMARK [3][-]{subsubsection.2.1.2.1}{PCA and Eigenfaces}{subsection.2.1.2}
+\BOOKMARK [3][-]{subsubsection.2.1.2.2}{Morphable Model}{subsection.2.1.2}
+\BOOKMARK [3][-]{subsubsection.2.1.2.3}{Combined Models of Shape and Appearance}{subsection.2.1.2}
+\BOOKMARK [2][-]{subsection.2.1.3}{Tensor Models}{section.2.1}
+\BOOKMARK [3][-]{subsubsection.2.1.3.1}{Multilinear Algebra}{subsection.2.1.3}
+\BOOKMARK [3][-]{subsubsection.2.1.3.2}{Tensor-Based Model}{subsection.2.1.3}
+\BOOKMARK [3][-]{subsubsection.2.1.3.3}{Tensor-based Statistical Discriminant Method}{subsection.2.1.3}
+\BOOKMARK [1][-]{section.2.2}{3D Pose Estimation}{chapter.2}
+\BOOKMARK [2][-]{subsection.2.2.1}{Camera Model}{section.2.2}
+\BOOKMARK [3][-]{subsubsection.2.2.1.1}{Perspective Camera Model}{subsection.2.2.1}
+\BOOKMARK [3][-]{subsubsection.2.2.1.2}{Orthogonal Camera Model}{subsection.2.2.1}
+\BOOKMARK [3][-]{subsubsection.2.2.1.3}{Weak Perspective Camera Model}{subsection.2.2.1}
+\BOOKMARK [2][-]{subsection.2.2.2}{Rotation and Translation}{section.2.2}
+\BOOKMARK [2][-]{subsection.2.2.3}{Pose estimation with the POSIT algorithm}{section.2.2}
+\BOOKMARK [1][-]{section.2.3}{Feature Point Tracking}{chapter.2}
+\BOOKMARK [2][-]{subsection.2.3.1}{Kanade-Lucas-Tomasi Feature Tracker}{section.2.3}
+\BOOKMARK [1][-]{section.2.4}{Optimization}{chapter.2}
+\BOOKMARK [2][-]{subsection.2.4.1}{Least Squares and Non Negative Least Squares}{section.2.4}
+\BOOKMARK [2][-]{subsection.2.4.2}{Nelder Mead Downhill Simplex}{section.2.4}
+\BOOKMARK [3][-]{subsubsection.2.4.2.1}{The Downhill Simplex Algorithm}{subsection.2.4.2}
+\BOOKMARK [0][-]{chapter.3}{Design}{}
+\BOOKMARK [1][-]{section.3.1}{Design Challenges}{chapter.3}
+\BOOKMARK [1][-]{section.3.2}{Frameworks and APIs}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.2.1}{OpenCV}{section.3.2}
+\BOOKMARK [2][-]{subsection.3.2.2}{OpenGL}{section.3.2}
+\BOOKMARK [2][-]{subsection.3.2.3}{Qt}{section.3.2}
+\BOOKMARK [1][-]{section.3.3}{Pre-processing}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.3.1}{Correspondence}{section.3.3}
+\BOOKMARK [2][-]{subsection.3.3.2}{Database}{section.3.3}
+\BOOKMARK [1][-]{section.3.4}{Model Construction}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.4.1}{Data Tensor}{section.3.4}
+\BOOKMARK [2][-]{subsection.3.4.2}{Computing the HOSVD}{section.3.4}
+\BOOKMARK [2][-]{subsection.3.4.3}{Generating new faces}{section.3.4}
+\BOOKMARK [1][-]{section.3.5}{Model Parameter Estimation}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.5.1}{Locating Feature Points}{section.3.5}
+\BOOKMARK [2][-]{subsection.3.5.2}{Tracking Feature Points}{section.3.5}
+\BOOKMARK [2][-]{subsection.3.5.3}{Camera Parameters}{section.3.5}
+\BOOKMARK [2][-]{subsection.3.5.4}{Minimizing the Error Function}{section.3.5}
+\BOOKMARK [2][-]{subsection.3.5.5}{Overfitting}{section.3.5}
+\BOOKMARK [2][-]{subsection.3.5.6}{Fitting Algorithm}{section.3.5}
+\BOOKMARK [1][-]{section.3.6}{Expression Transfer}{chapter.3}
+\BOOKMARK [1][-]{section.3.7}{System Architecture}{chapter.3}
+\BOOKMARK [2][-]{subsection.3.7.1}{View Layer}{section.3.7}
+\BOOKMARK [2][-]{subsection.3.7.2}{Model Layer}{section.3.7}
+\BOOKMARK [2][-]{subsection.3.7.3}{Controller Layer}{section.3.7}
+\BOOKMARK [0][-]{chapter.4}{Results and Evaluation}{}
+\BOOKMARK [1][-]{section.4.1}{Face Generation}{chapter.4}
+\BOOKMARK [1][-]{section.4.2}{Tracking Results}{chapter.4}
+\BOOKMARK [1][-]{section.4.3}{Fitting Algorithm Results}{chapter.4}
+\BOOKMARK [1][-]{section.4.4}{Expression Transfer Results}{chapter.4}
+\BOOKMARK [1][-]{section.4.5}{Performance}{chapter.4}
+\BOOKMARK [0][-]{chapter.5}{Conclusion}{}
+\BOOKMARK [1][-]{section.5.1}{Future Work}{chapter.5}

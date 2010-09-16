@@ -35,6 +35,9 @@ public slots:
     void processingFinished();
     void restart();
 
+    void selectGoodFeatureTargetPoints();
+    void selectGoodFeatureSrcPoints();
+
     //settings
     void setOptNelder(bool);
     void setOptReg(double regParam);
@@ -48,14 +51,16 @@ public slots:
     void setConstID(bool);
     void setPointGen2D(bool);
     void setPointGen3D(bool);
+    void setHybrid(bool);
+    void setNone(bool);
+    void setProjModel(bool);
+    void setWithFirstFrame(bool);
 private:
     void convertFrameIntoTexture(Mat &frame);    
     void initSrcSide();
     void initTargetSide();
 
     void getClonedMouth(const Mat& img, unsigned int frame_index, Mat &target);       
-    Mat getMaskForLeftEyebrow();
-    Mat getMaskForRightEyebrow();
 
     VideoProcessor::OptType opttype;
     VideoProcessor::IdConstraintType idconstype;
@@ -63,6 +68,8 @@ private:
     double regParam;
     int frame_num;
     int iter_num;
+    bool projModel;
+    bool withFirstFrame;
 
     ClickableQLabel *sourceLabel;
     ClickableQLabel *targetLabel;

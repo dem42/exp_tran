@@ -6,8 +6,7 @@ using namespace cv;
 
 ModelImageError::ModelImageError()
 {
-    model = FaceModel::getInstance();
-    core = model->getCoreTensor();
+    model = FaceModel::getInstance();    
     u_id = model->getUIdentity();
     u_ex = model->getUExpression();
 }
@@ -15,7 +14,6 @@ ModelImageError::ModelImageError()
 ModelImageError::ModelImageError(Mat P,Mat R,Mat t) : P(P), R(R), t(t)
 {    
     model = FaceModel::getInstance();
-    core = model->getCoreTensor();
     u_id = model->getUIdentity();
     u_ex = model->getUExpression(); 
 }
@@ -24,7 +22,7 @@ void ModelImageError::setWeights(const vector<double>& w)
 {   
     weights.assign(w.begin(),w.end());
 
-    linear_combination_id = Matrix::matrix_mult(weights,u_id);
+    linear_combination_id = Mat_<double>(weights)*u_id;
 
 }
 
@@ -41,7 +39,7 @@ void ModelImageError::setPoints(const vector<Point2f> &p,const vector<int> &i)
     for(unsigned int i=0; i<points.size(); ++i)
     {
         index = indices[i];       
-        core_extracted = Matrix::submatrix(core,index*3,index*3+2);
+        core_extracted = model->coreSubmatrix(index*3,index*3+2);
         projected = P*R*core_extracted;
         Z.push_back(projected.clone());
     }
@@ -70,9 +68,9 @@ double ModelImageError::operator()(vector<double>& x)
 
     //here inside of operator() if error is identity then the parameter w is identity weights
 
-    linear_combination_exp = Matrix::matrix_mult(Matrix(w),u_ex);
+    linear_combination_exp = w*u_ex;
 
-    K = Matrix::kron(linear_combination_id,linear_combination_exp);
+    K = Matrix::kronecker(linear_combination_id,linear_combination_exp);
     K = K.t();
 
     projectedT = P*t;

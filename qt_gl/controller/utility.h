@@ -7,6 +7,7 @@
 #include <QString>
 #include <QLabel>
 #include <QPixmap>
+#include "view/clickableqlabel.h"
 
 #include <cv.h>
 #include <vector>
@@ -31,6 +32,8 @@ public:
 
     static void filterForGradient(const Mat &img, Mat &dest);
     static void poissonClone(const Mat &src, const Mat &mask, Mat &target,int o_x=0, int o_y=0);
+
+    static void selectGoodFeaturePoints(ClickableQLabel *label);
 };
 
 #endif // UTILITY_H

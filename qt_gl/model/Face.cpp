@@ -36,6 +36,9 @@ Face::Face()
         cerr << "error allocating memory for vertexes" << endl;
         return;
     }
+    vertex_normals = new (nothrow) Vector3[point_num];
+    if(vertex_normals == NULL)cerr<<"error allocating vertex normals"<<endl;
+
 
     //finally we use default weights to interpolate values for vertexes
     w_id = new double[ID];
@@ -46,22 +49,7 @@ Face::Face()
     for(int i=0;i<EXP;i++)
         w_exp[i] = 0;
 
-//    for(int i=0;i<ID;i++)
-//    {
-//        if(i==33)w_id[i] = 0.2;
-//        else if(i==10)w_id[i] = 0.2;
-//        else if(i==20)w_id[i] = 0.2;
-//        else if(i==1)w_id[i] = 0.2;
-//        else if(i==50)w_id[i] = 0.2;
-//        else w_id[i] = 0;
-//    }
-//    w_exp[0] = 0.0;
-//    w_exp[1] = 0.0;
-//    w_exp[2] = 0.0;
-//    w_exp[3] = 0.0;
-//    w_exp[4] = 1.0;
-//    w_exp[5] = 0.0;
-//    w_exp[6] = 0.0;
+
     setNewIdentityAndExpression(w_id,w_exp);
 }
 
@@ -80,23 +68,23 @@ Face::~Face()
   //delete[] texture_2d_coord;
 }
   
-const int Face::fPoints[20] = {4925,4609,261,3878,702,4733,4632,3285,3828,4147,
-                                    1058,1451,1824,3278,4572,953,1992,4332/*,2540,1509*/,3196,1930};
-const int Face::fPolygons[20] = {9521,8899,310,7455,1386,8934,8945,6284,7140,8197,
-                                    2080,2851,3580,6058,8825,1680,3907,8144/*,4836,2967*/,6111,3786};
+const int Face::fPoints[16] = {4925,/*4609,261,*/3878,702,4733,4632,/*3285,*/3828,/*4147,*/
+                                    /*1058,*/1451,/*1824,*/3278,4572,953,1992,4332,2540,1509,3196,1930};
+const int Face::fPolygons[16] = {9521,/*8899,310,*/7455,1386,8934,8945,/*6284,*/7140,/*8197,*/
+                                    /*2080,*/2851,/*3580,*/6058,8825,1680,3907,8144/*,4836,2967*/,6111,3786};
 
 //const int Face::fPoints[12] = {4925,3878,702,4733,4632,3828,1451,3924,1537,4332,3196,1930};
 //const int Face::fPolygons[12] = {9521,7455,1386,8934,8945,7140,2851,7336,3020,8144,6111,3786};
 
-const int Face::fPoints_size = 20;
+const int Face::fPoints_size = 16;
 
-const int Face::leftMouthCornerIndex = 3;
-const int Face::rightMouthCornerIndex = 4;
-const int Face::topLipIndex = 5;
-const int Face::bottomLipIndex = 6;
+const int Face::leftMouthCornerIndex = 1;
+const int Face::rightMouthCornerIndex = 2;
+const int Face::topLipIndex = 3;
+const int Face::bottomLipIndex = 4;
 
-const int Face::leftEyeBrow = 13;
-const int Face::rightEyeBrow = 15;
+const int Face::leftEyeBrow = 7;
+const int Face::rightEyeBrow = 9;
 
 
 const int Face::mouth[43] = {975,769,768,561,352,558,349,141,142,9569,9572,9361,9360,9149,9152,8940,
@@ -413,6 +401,14 @@ void Face::test(void)
 //needs triangles AND the computed vertices
  void Face::generate_vertex_normals(void)
  {
+     //reset the normals
+     for(int i=0;i<point_num;i++)
+     {
+         vertex_normals[i].x = 0;
+         vertex_normals[i].y = 0;
+         vertex_normals[i].z = 0;
+     }
+
    Vector3 *surface_normals = new (nothrow) Vector3[poly_num];
    if(surface_normals == NULL)cerr<<"error allocating vertex normals"<<endl;
    //array to tell us how many polygons share a vertex
@@ -435,10 +431,7 @@ void Face::test(void)
        delete vec1;
        delete vec2;
      }
-   
-   vertex_normals = new (nothrow) Vector3[point_num];
-   if(vertex_normals == NULL)cerr<<"error allocating vertex normals"<<endl;
-   
+
    for(int i=0; i<poly_num; i++)
      {
        v1 = triangles[i][0];
@@ -476,6 +469,8 @@ void Face::loadPolygonDataFromModel()
     point_num = model->getPointNum();
     poly_num = model->getPolyNum();
 
+    if(!triangles)
+        delete[] triangles;
     triangles = new (nothrow) float[poly_num][3];
     if(triangles == NULL)
     {

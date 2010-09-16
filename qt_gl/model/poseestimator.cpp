@@ -14,11 +14,11 @@ void PoseEstimator::projectModelPointsInto2D(const Mat &rotation, const Mat &tra
 {
     vector<Point3f> obj;
     /*mouth*/
-//    for(int i=0;i<Face::mouth_size;i++)
-//    {
-//        correspondence3d.push_back(face_ptr->getPointIndexFromPolygon(Face::mouth[i]));
-//        obj.push_back(face_ptr->getPointFromPolygon(Face::mouth[i]));
-//    }
+    for(int i=0;i<Face::mouth_size;i++)
+    {
+        correspondence3d.push_back(face_ptr->getPointIndexFromPolygon(Face::mouth[i]));
+        obj.push_back(face_ptr->getPointFromPolygon(Face::mouth[i]));
+    }
     for(int i=0;i<Face::brow;i++)
     {
         correspondence3d.push_back(Face::lEyeB[i]);
