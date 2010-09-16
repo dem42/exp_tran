@@ -73,7 +73,7 @@
 \textsc{\LARGE Department Of Computing}\\[5.5cm]
 
 
-{ \huge \bfseries Model based Expression Transfer}\\[1cm]
+{ \huge \bfseries Tensor-based Modelling of Deformable Face Shapes}\\[1cm]
 \LARGE by\\[1cm]
 \LARGE Martin Papanek\\[7.5cm]
 
@@ -109,15 +109,39 @@ Professor ~Duncan \textsc{Gillies}
 \LARGE \textbf{Abstract}
 \end{center}
 
+Deformable models allow computers to understand dynamic objects. To enable a
+machine to perform a complex task on real world objects, it must
+have an understanding of the attributes of these objects. Using a deformable model, this
+understanding is provided as a set of parameter values. Given a deformable model
+of a human face, the computer can be programmed to recognize or even synthesize
+novel face shapes by adjusting these parameters. Tensor-based models enhance this ability by making it
+possible to separately manipulate the attributes of the deformable object. This
+important quality of separability makes it possible to easily transfer deformations
+between objects. We develop an application that understands a face shape using
+its tensor-based deformable model. In this face shape model, the sources of deformations are given by
+an identity and an expression attribute. The tensor model encodes each of the
+attributes using a separate parameter vector. We can therefore transfer the
+deformations caused by a change in expression by transferring the corresponding
+parameters. The tensor model makes it possible to conveniently generate novel
+faces by simply choosing a set of parameter values, which can be useful in the field of 3D
+animation. However, setting the parameters manually to achieve complex deformations can
+be difficult. We therefore derive a fitting algorithm to automatically locate
+the model parameter values from an image
+of an object.
+
+
 \newpage
 
 \begin{center}
 \LARGE \textbf{Acknowledgments}
 \end{center}
 
-First of all, I would like to thank my supervisor, Professor Duncan Fyfe Gillies
-for his help, encouragement and invaluable feedback. Finally, I would also like to thank
-my parents for their continuous support. 
+First of all, I would like to thank my supervisor, Professor Duncan Gillies
+for his help, encouragement and invaluable feedback throughout the course of the
+project. I would also like to thank my friends for providing me with much needed
+distractions from work. Finally, I would like to thank
+my parents for their continuous support and for helping shape me into who I am
+today.
 
 
 \tableofcontents
@@ -184,7 +208,9 @@ movements of the model through successive images.
 
 The area where deformable models are applicable is quite large. We will focus on one very interesting application of dynamical
 models and model extraction which is
-\textit{expression transfer}. The purpose of expression transfer is to capture
+\textit{expression transfer}. The primary purpose of expression transfer is to change the expression of a subject independent of other attributes
+that define the shape or texture of his or her face. The ultimate goal is to be
+able to capture
 the expressions from a video recording of one individual and
 generate a video of another individual mimicking these
 expressions. The alternative to transferring these expressions would
@@ -194,9 +220,11 @@ advantage of transferring the dynamics of a subjects face to that of another is
 that it enables us to
 create very realistic animations without too much user intervention. 
 
-This paper describes the developement of an expression transfer application, which combines motion tracking and a deformable
+This paper describes the development of an expression transfer application, which combines motion tracking and a deformable
 model to gain understanding of the face deformations present in the input video
-recording. 
+recording. The application allows the user to separately manipulate the identity and
+expression of a face shape. Furthermore, the user can locate the parameters of
+the face shape model using the model fitting algorithms provided by the application.
 
 We made the following contributions
 \begin{itemize}
@@ -206,7 +234,7 @@ We made the following contributions
   of face shapes (Section \ref{s:exptranalgo}).
 \item Derived a fitting algorithm for finding the deformable model
   parameters from an image (Sections \ref{s:minerror} and \ref{s:fitalgo}).
-\item Elucidated a multilinear deformable model desgined for expression
+\item Elucidated a multilinear deformable model designed for expression
   transfer (Section \ref{s:hosvd}). 
 \end{itemize}
 
@@ -282,7 +310,7 @@ correctly adjust parameters that control the model. In addition to determining
 the intrinsic parameters of the model it is necessary to also find how the
 object is rotated, moved and scaled to explain the variation in structure which
 is not caused by the deformations. The recognition algorithm also needs to be
-robust enought to be able to deal with variations caused by noise.
+robust enough to be able to deal with variations caused by noise.
 
 \subsection{Physics Based Models}
 Natural objects all obey physical laws. Human and animal bodies change shape
@@ -1118,8 +1146,9 @@ of order $N$ is computed as follows:
 The possibility of using a multilinear approach to construct face models was explored
 by numerous researchers. Vasilescu and Terzopoulos \cite{Ter1} build a tensor from a
 database of face images and construct \textit{tensorfaces} by performing HOSVD
-on the data tensor. Tensorfaces are contained as vector the mode matrices
-$\mathbf{U}_i$. Vlasic, Brand, Pfister and Popovic \cite{faceTransfer05} build a
+on the data tensor. The Tensorfaces are given by $\mathcal{S}\times_1
+\mathbf{U}_1$. They are essentially the the eigenvectors of
+$\mathbf{U}_1$ transformed into eigenmodes using the core tensor. Vlasic, Brand, Pfister and Popovic \cite{faceTransfer05} build a
 tensor model of 3D faces an utilize it to recognize faces in video sequences for
 the purpose of expression transfer. The group
 successfully managed to implemented a face transfer application based on a
@@ -1274,7 +1303,7 @@ pinhole camera model is shown in figure \ref{fg:pin}.
 From figure \ref{fg:pin}, we can see that the image plane is located at $Z=f$
 where $f$ is the focal length. The coordinates of the projection of $X$ can
 therefore be calculated using similar triangles to obtain $-x/f = X/Z$.
-If the image plane were to be place in front of the camera then the ratio given
+If the image plane were to be placed in front of the camera then the ratio given
 by the similar triangles will stay the same but the new coordinate will no
 longer be negative.
 
@@ -1286,7 +1315,7 @@ length is $f$, then the projection $(x,y)^T$ of the point $\mathbf{X} = (X,Y,Z)^
 
 
 The perspective projection is a non-linear transformation which cannot be written
-as a multiplication of a 3D points in Cartesian coordinates with a matrix. To obtain a matrix formulation, we must
+as a multiplication of a 3D point in Cartesian coordinates with a matrix. To obtain a matrix formulation, we must
 use homogeneous coordinates. The homogeneous coordinates of a point are $P_h =
 [p_x,p_y,p_z,s]^T$. The fourth coordinate component $s$ is called
 \textit{scale}. We transform a point in homogeneous coordinates into Cartesian
@@ -1300,7 +1329,7 @@ camera model has the form
 where $\gamma = 1/s$ is responsible for converting the homogeneous result of the
 multiplication to Cartesian coordinates. In equation \ref{eq:projective} two
 different focal lengths have been used. This is due to the fact that with any
-camera equipment the image plane will have dimensions in millimeters. The values
+camera equipment the image plane will usually have dimensions specified in millimeters. The values
 $f_x$ and $f_y$ therefore incorporate the focal length as well as the conversion
 from units of the imaging equipment to pixels.
 
@@ -1311,7 +1340,7 @@ these rays with the image plane. The $Z$ component is thereby dropped
 entirely. The projected point is thus given by $x = X$ and $y = Y$. The geometry
 of the orthogonal projection is shown in figure \ref{fg:weakOrtho}. Orthographic
 projection is sometimes called parallel projection, since unlike in perspective
-projection, parallel lines remain after being projected into the image plane.
+projection, parallel lines remain parallel after being projected into the image plane.
 
 \subsubsection{Weak Perspective Camera Model}\label{s:weak}
 The weak perspective camera model is in essence just a scaled orthographic
@@ -1324,7 +1353,7 @@ transformation under the following conditions.
   center of projection.
 \end{itemize}
 Since the depths of the different points on the object are close to each other,
-we make the assumption all these depths are equal. Then a perspective projection
+we make the assumption that all these depths are equal. Then a perspective projection
 of any object point $(X,Y,Z)$ can be approximated as
 \begin{equation}
 \begin{pmatrix}x\\y\end{pmatrix} = \frac{f}{Z_{avg}}\begin{pmatrix}X\\Y\end{pmatrix}
@@ -1333,10 +1362,10 @@ of any object point $(X,Y,Z)$ can be approximated as
 where $Z_{avg}$ is the average distance of the object's point from the
 camera. Geometrically, we place a plane parallel to the image plane at a
 distance $Z_{avg}$ from the center of projection. Then the object points
-orthogonally projected onto this new plane. Finally, we perspectively project
+are orthogonally projected onto this new plane. Finally, we perspectively project
 these projected points onto the image plane. The geometry of the weak perspective projection is shown in figure \ref{fg:weakOrtho}.
 
-Moreover, the weak perspective transformation is a linear
+The weak perspective transformation is a linear
 transformation unlike the strong perspective transformation, since we are
 dividing by a constant $Z_{avg}$ and not the $Z$ component of the
 point.
@@ -1422,8 +1451,8 @@ is due to the fact that we are interested in describing a left handed coordinate
   prefer to instead use the right handed coordinate system to describe an arbitrary 3D
   rotation.} system with the positive $X$ axis pointing up, the positive $Y$
 axis pointing to the right and the $Z$ axis pointing into the page. As such the
-rotation around the $(X,Z)$ plane needs to be described by the 
-Given a point $\mathbf{x} = (x,y,z)^T$ the pre-multiplication with the
+rotation around the $(X,Z)$ plane needs to be described by $R_y(\psi)$. The
+pre-multiplication of a point $\mathbf{x} = (x,y,z)^T$  with the
 Givens rotation $R_z(\theta)$ produces a new point $\mathbf{x'} = (x',y',z')^T$ such that 
 \begin{equation}\label{eq:rotated}
 R_z(\theta) \mathbf{x} = \begin{pmatrix}c_\theta&s_\theta&0\\-s_\theta&c_\theta&0\\0&0&1\end{pmatrix}\begin{pmatrix}x\\y\\z\end{pmatrix}
@@ -1433,7 +1462,7 @@ R_z(\theta) \mathbf{x} = \begin{pmatrix}c_\theta&s_\theta&0\\-s_\theta&c_\theta&
 The expressions for the $x'$ and $y'$ component of the new point correspond to a
 rotation of the $(X,Y)$ coordinate system by $\theta$ radians about the $Z$
 axis. These expressions are computed using simple trigonometrics where the point
-is decomposed into its $x$ and $y$ components which are then projected on the rotated
+is decomposed into its $x$ and $y$ components which are then projected onto the rotated
 $(X',Y')$ axes as can be seen in figure \ref{fg:rotations}. 
 
 \begin{figure}[H] 
@@ -1454,7 +1483,7 @@ remain unchanged. It is therefore apparent that the matrix $R_x(\phi)$ rotates b
 by $\psi$ about the $Y$ axis and $R_z(\theta)$ rotates by $\theta$ about the $Z$
 axis. Any arbitrary rotation in 3D space can then be
 achieved using the total \textit{rotation matrix} $R = R_x(\phi)R_y(\psi)R_z(\theta)$ with the
-appropriate angles. Since all the total rotation matrix is a product of three
+appropriate angles. Since the total rotation matrix is a product of three
 orthogonal Givens rotations it likewise orthogonal with $R^T R = RR^T =
 \mathbf{I}$, with $\mathbf{I}$ being the identity matrix. The three angles $\theta$, $\phi$ and $\psi$ represent the three
 rotational degrees of freedom (DOF) of the object.
@@ -1503,7 +1532,7 @@ two coordinate systems we therefore know that the rows $i$, $j$ and $k$ of the
 rotation matrix correspond to the unit vectors of the camera coordinate
 system expressed in the object coordinate system. 
 
-This is easy when on the
+This is easy show on the
 example of the camera system unit vector $u = (1,0,0)^T$. The rotation matrix
 $R$ transforms a vector $x$ from the object coordinate system into $u$,
 therefore $u = Rx$. The rotation matrix is orthogonal so if we turn in the
@@ -1520,7 +1549,7 @@ first two and obtain the third as the cross product of the other two.
 
 The translation vector is specified as the vector $\overrightarrow{OM_0}$ between the
 origin of the camera system $O$ and the origin of the object system $M_0$. The
-point $M_0$ can be conveniently picked as one off the known feature
+point $M_0$ can be conveniently picked as one of the known feature
 points. Unfortunately, the
 camera coordinate system equivalent of this point is unknown since we do not
 know the rotation matrix. However, the translation vector can be expressed in
@@ -1529,14 +1558,14 @@ as $t = \frac{Z_0}{f}\overrightarrow{Om_0}$ where $m_0$ is the known 2D projecti
 and $Z_0$ is the $z$-component of the translation vector. Therefore, to estimate
 the 3D pose we need to find the values of $i$, $j$ and $Z_0$.
 
-The POSIT algorithm first makes a rough estimate these values using a \textit{pose from
+The POSIT algorithm first makes a rough estimate of these values using a \textit{pose from
   orthography and scaling} (POS) step. In the POS step it is assumed that the
-points are far enough from the camera so that we can assume a weak-perspective
-camera model. Using this camera model the values $i$, $j$ and $Z_0$ all have
-closed form solutions. After this first step, the 2D image are then projected back into the object
-coordinate space with using the true perspective camera and the pose (rotation,
-translation) estimated in the POS step. These new points are then used in further
-in POS steps until the algorithm converges, hence the name POS with iterations
+points are far enough from the camera so that we can use a weak-perspective
+camera model. With this camera model the values $i$, $j$ and $Z_0$ all have
+closed form solutions. After this first step, the 2D image points are then projected back into the object
+coordinate space, this time using the true perspective camera and the pose (rotation,
+translation) estimated in the POS step. These new points are then used in
+further  POS steps until the algorithm converges, hence the name POS with iterations
 (POSIT). However, it is important to note that the convergence of the algorithm
 depends heavily on the weak-perspective assumption that the internal depth of
 the object is small compared to the distance from the pinhole camera.
@@ -1565,8 +1594,8 @@ or $J$.
 As we have seen, most model based recognition techniques rely on a number identified feature
 (landmark) points to estimate the model parameters. To be able to track a model
 between successive frames of a video recording, it is therefore necessary to
-either keep locating the points in every frame or to track the movement points
-themselves. This problem of tracking the movement points or objects between
+either keep locating the points in every frame or to track the movement of the points
+themselves. This problem of tracking the movement of points or objects between
 images has spurred the development of many algorithms. Most of these algorithms
 fall into the \textit{optical flow} category since they determine the movement
 of points based on the intensity changes at pixels. One such algorithm is the
@@ -1577,7 +1606,7 @@ Kanade and Lucas first introduced an iterative feature point registration algori
 algorithm in \cite{kanade2}, \cite{kanade3}. The derivation of the algorithm is
 given by Birchfield in \cite{kanade4}.
 
-The problem of registering a displaced image can between two images is
+The problem of registering a displacement between two images is
 formalized by assuming there are two images functions $F(\mathbf{x})$ and $G(\mathbf{x})$. The image
 functions take a vector $\mathbf{x} = (x,y)^T$ as input
 and output the pixel intensity at $\mathbf{x}$. The goal in image registration
@@ -1587,7 +1616,8 @@ interest $\mathcal{W}$. The windows is required, since it is very difficult to
 track single pixels as they can be easily confused with other pixels unless they
 have very distinct brightness. The window of interest contains a number of
 pixels and should contain sufficient texture. The feature tracking is
-illustrated in figure \ref{fg:apple} where the apple is the window of interest.
+illustrated in figure \ref{fg:apple} where the apple is the window of interest
+and we are trying to locate the displacement of the apple.
 
 \begin{figure}[H] 
 \centering
@@ -1607,10 +1637,10 @@ illustrated in figure \ref{fg:apple} where the apple is the window of interest.
 The optimal displacement vector $\mathbf{h}$ minimizes the error function $E$ which is
 given by
 \begin{equation}
-E(\mathbf{h}) = \int_{\mathcal{W}} (F(x + h) - G(x))^2 \mathop{d}x
+E(\mathbf{h}) = \int_{\mathcal{W}} (F(x + \mathbf{h}) - G(x))^2 \mathrm{d}x
 \end{equation}
 
-The naive way to locate this $h$  would be to iterate through all the possible values of $h$ and measure the $E(\mathbf{h})$ norm. A
+The naive way to locate this $\mathbf{h}$  would be to iterate through all the possible values of $\mathbf{h}$ and measure the $E(\mathbf{h})$ norm. A
 better approach was proposed by Kanade and Lucas. The behavior
 of the function $F(\mathbf{x})$ is approximated using a first order Taylor expansion as 
 \begin{equation}\label{eq:kanade1}
@@ -1627,14 +1657,14 @@ to $\mathbf{h}$ to zero. Therefore
 \begin{align}\label{eq:kanade2}
 \frac{\partial E}{\partial \mathbf{h}} = \frac{\partial}{\partial \mathbf{h}}
 \int_{\mathcal{W}} (F(x) + \mathbf{g}^T\mathbf{h} - G(x))^2 \mathrm{d}x =
-2\int_{\mathcal{W}} \mathrm{g}(F(x) + \mathbf{g}^T\mathbf{h} - G(x))
+2\int_{\mathcal{W}} \mathbf{g}(F(x) + \mathbf{g}^T\mathbf{h} - G(x))
 \mathrm{d}x
 \end{align}
 Setting the above to zero and rearranging the terms we get the fundamental
-equation which relates the spatial intensity to the optimal displacement
+equation which relates the intensity change to the optimal displacement
 $\mathbf{h}$ as
 \begin{align}\label{eq:kanade3}
-\Bigr(\int_{\mathcal{W}} \mathbf{g}\mathbf{g}^T\mathrm{d}x\Bigl)\mathbf{h} = \int_{\mathcal{W}} \mathrm{g}(F(x) - G(x))
+\Bigr(\int_{\mathcal{W}} \mathbf{g}\mathbf{g}^T\mathrm{d}x\Bigl)\mathbf{h} = \int_{\mathcal{W}} \mathbf{g}(F(x) - G(x))
 \mathrm{d}x
 \end{align}
 In matrix form the equation \ref{eq:kanade3} can be expressed as
@@ -1664,7 +1694,7 @@ algorithm which utilizes this approach was developed by Bouguet
 uses several resolution levels from highest to lowest. These resolutions
 resemble a pyramid of images, which is why this implementation is called the
 pyramid Lucas-Kanade tracker. At every level of the pyramid the iterations are
-computed to and the guess is propagated to the lower of the pyramid.
+computed and the guess is propagated to the lower of the pyramid.
 
 The algorithm can also successfully compute the $h$ even if the region of interest has been rotated or
 scaled. If the image has been rotated or scaled we express the matching problem
@@ -1707,11 +1737,11 @@ values $y_i$ and target values $t_i$ using a numeric value given by
 E(y) = \sum_i (y_i - t_i)^2
 \end{equation}
 Solving a problem in the least squares sense means minimizing this error
-function. Given is a linear system of equations defined in matrix notation by
+function. Assume we are given a linear system of equations defined in matrix notation by
 $\mathbf{A}\mathbf{x} = \mathbf{b}$ with $\mathbf{A} \in \mathbb{R}^{m\times
   n}$, $\mathbf{x} \in \mathbb{R}^{n\times 1}$ and $\mathbf{b} \in
 \mathbb{R}^{m\times 1}$. This linear system may not have an exact solution if it
-is over determined $m > n$, underdetermined $m < n$  or more generally when
+is overdetermined $m > n$, underdetermined $m < n$,  or more generally when
 $\mathbf{A}$ is not invertible. Solving this linear system in the least squares sense
 means finding a $\mathbf{\hat{x}}$ for which the following error function is
 minimized
@@ -1732,8 +1762,8 @@ singular value decomposition \cite{Press1992} if the matrix $\mathbf{A}$ is squa
 be solved by inverting $\mathbf{A}$ and pre-multiplying the equation with this
 inverse. Given the SVD $\mathbf{A} = \mathbf{U\Sigma V}^T$ we can easily invert
 $\mathbf{A}$ by inverting the right hand side to get $\mathbf{A}^{-1} =
-\mathbf{V\Sigma}^{-1}\mathbf{U}^T$. If the square $\mathbf{A}$ is not invertible it
-means that some of the diagonal elements in $\Sigma$ are 0. However, We obtain a
+\mathbf{V\Sigma}^{-1}\mathbf{U}^T$. If the square matrix $\mathbf{A}$ is not invertible it
+means that some of the diagonal elements in $\Sigma$ are 0. However, we obtain a
 least squares solution by inverting the non-zero elements of $\Sigma$ and
 pre-multiplying with $\mathbf{V\Sigma}^{-1}\mathbf{U}^T$.
 
@@ -1948,7 +1978,7 @@ In this chapter we will design an application which understands the facial
 dynamics captured in a video recording of an individual. This understanding is
 accomplished by correctly modeling the shape of this individual's face.
 
-The goal of the application is to transfer the expressions between two
+The ultimate goal of the application is to transfer the expressions between two
 subjects. Given are video recordings of two persons and a database of
 faces. One recording is the source of the expressions, henceforth just source. The
 other recording is the target. The task is to alter the target recording so that
@@ -2056,10 +2086,10 @@ An important design and implementation question when constructing a large
 application, is deciding which software application programming interfaces
 (APIs) and software frameworks the application should employ. The
 great advantages of utilizing APIs and frameworks is that they provide efficient
-implementions of algorithms. The disadvantage is that some frameworks may
+implementations of algorithms. The disadvantage is that some frameworks may
 require the user to install this framework on his machine to be able to use the
 application. Quite important is also the quality of cross-platform
-compatibility. To desing a portable application only cross-platform
+compatibility. To design a portable application only cross-platform
 frameworks and APIs should be chosen.
 
 \subsection{OpenCV}
@@ -3435,10 +3465,15 @@ expression model parameters at every iteration of the coordinate descent
 algorithm using the Sequential Coordinate-wise Non-negativity
 Least Squares Algorithm introduced in \ref{a:sca}. 
 
-The reason why only non-negative parameters produce unrealistic faces is most
-likely due to the fact that during the linear combination only a subtraction of
-faces can produce the zero vector. The null space of the data tensor thus spans only the negative
-parameter space. 
+The explanation we found for why only non-negative parameters produce
+unrealistic faces is based on the fact that all points on a face scan expand
+when the face is moved in the
+positive direction. Some points may expand faster, others slower, but this ratio
+stays constant meaning that points will not escape no matter how much the face
+is scaled. A positive linear combination of the original face
+scans thus leads to larger faces which are still realistic. On the other hand,
+when the faces are subtracted from each other during linear combination, then
+some points may expand and others may shrink which causes unrealistic face shapes.
 
 It is entirely possible to generate some realistic
 faces even when the non-negativity conditions are violated, so by enforcing
@@ -3957,9 +3992,9 @@ seen in figure \ref{fg:featureinter}.
 \caption{The movement of feature points (designated by red spheres).}\label{fg:featureinter}
 \end{figure}
 
-In summary, the tensor based shape model allows the user to easily synthesise
+In summary, the tensor based shape model allows the user to easily synthesize
 realistic expressions. Thereby, it is made possible for casual users and
-begininng animators to generate believable 3D models of faces. These models then
+beginner animators to generate believable 3D models of faces. These models then
 allow the user to manipulate identity and expression separately. The only
 requirement is that a database of face scans is necessary to construct the
 model. The generative power of the model depends only on the variance of
@@ -3969,7 +4004,7 @@ the faces used to build to model.
 \section{Tracking Results}
 The most important part of the fitting algorithm is feature point
 tracking. Without identifying how the feature points are moving in the image, it
-is impossible to determine the correct expression and 3D pose during using the
+is impossible to determine the correct expression and 3D pose using the
 fitting algorithm. The task of tracking points becomes more difficult if there
 are changes in lighting in the image or if the object is moving very
 quickly. Likewise, points located in large areas of constant texture often drift
@@ -3985,8 +4020,9 @@ a $3 \times 3$ window size around every feature point.
 
 If, on the other hand, the window size is chosen too large then small movements of
 points will be subdued. This happens because even though textures close to the
-point change, the ones far from the point may not and the evidence from the far
-off textures will outweigh the small contribution from the nearby
+point change, the ones far from the point may not and the evidence from the many
+far
+off textures will outweigh the small contribution from the few nearby
 textures. Figure \ref{fg:50opt} shows tracking with a $50 \times 50$ window
 size. It can be seen that although points are not jumping anymore, the smile and
 the eyebrows do not move as much as the actual pixels of the image.
@@ -4027,8 +4063,7 @@ videos. An example is shown in figure \ref{fg:8opt}.
 \label{fg:8opt}
 \end{figure}
 \section{Fitting Algorithm Results}
-The performance of the fitting algorithm is determined primarily by the four
-following factors
+The performance of the fitting algorithm is determined primarily by the following four factors
 \begin{itemize}
 \item The quality of the user provided feature points.
 \item The number of newly generated points and the correctness of their
@@ -4051,13 +4086,13 @@ dynamic expressions in the recording. On the other hand, the user cannot be expe
 feature points and an automatic algorithm is likewise only effective for a small
 number of unique features such as the mouth corners, eye corners etc. 
 
-The more points the fitting algorithm utilizes the more information it will have about the
+The more points the fitting algorithm utilizes, the more information it will have about the
 movement of the facial features. Using more points also helps avoid
 overfitting. However, the more points are generated the more biased the result
 is toward the first frame alignment parameters. Figures
 \ref{fg:nonep} and \ref{fg:manypoints} illustrate this trade-off between bias
-and improved optimization result on an interesting frames of a 100 frame video
-sequence optimized using a coonstrained non-negativty minimization scheme.
+and improved optimization result on an interesting frame of a 100 frame video
+sequence optimized using a constrained non-negativity minimization scheme.
 
 \begin{figure}[H]
 \centering
@@ -4076,8 +4111,8 @@ From figure \ref{fg:points} we see that when the first frame alignment is
 very different from the true identity, expression and 3D pose of the subject,
 the fitting algorithm also returns an incorrect estimate of the face. However,
 to obtain a good estimate of a person's identity a large number of points is
-necessary. The identity depends small details such as the width of the nose, the
-fullness of lips and others. A user cannot manually select all these these features.
+necessary. The identity depends on a large quantity of small details such as the width of the nose, the
+fullness of lips and others. A user cannot manually select all these features.
 
 \paragraph{Optimization scheme.}
 The two optimization approaches to finding model parameters which generate
@@ -4087,9 +4122,8 @@ parameter $\lambda$ to control the distance from the mean. Reasonable values of
 this parameter can be obtained through trail and error. The regularization
 parameter also needs to be increased when more frames or more points are
 utilized. This is due to the fact that the error function generally increases when more
-frames or points are used, making the penalty value of the regularization
-parameter smaller by comparison. Constrained optimization is easier to use,
-however, a fitting algorithm using constrained optimization has a weaker
+frames or points are used, making the penalty value caused by the regularization
+parameter smaller by comparison. Constrained optimization is easier to use. However, a fitting algorithm utilizing constrained optimization has weaker
 expressive power since it prohibits parameter vectors with negative
 components. 
 
@@ -4102,7 +4136,7 @@ they are also more likely to overfit if the regularization parameter is poorly c
 \includegraphics[scale=0.75]{images/convergence.png}
 \par\end{centering}
 
-\caption{The convergence behaviour of the two fitting algorithm
+\caption{The convergence behavior of the two fitting algorithm
   variations. Regularization converges to a lower error value faster but often
   produces unrealistic face scans for low values of the regularization parameter
 $\lambda$.}
@@ -4110,22 +4144,22 @@ $\lambda$.}
 \end{figure}
 The results of applying the various optimization schemes to a fitting problem is
 shown in figure \ref{fg:optimization}. An almost inhuman face is generated with
-$\lambda = 100$. On the other hand, the best result was obtained with
+a small $\lambda = 20$. On the other hand, the best result was obtained with
 constrained optimization. 
 
 \begin{figure}[H]
 \centering
-\subfloat[Regularization $\lambda=100$.]{\includegraphics[scale=0.23]{images/angry_reg20.png}}$\;$
+\subfloat[Regularization $\lambda=20$.]{\includegraphics[scale=0.23]{images/angry_reg20.png}}$\;$
 \subfloat[Regularization $\lambda=60$.]{\includegraphics[scale=0.23]{images/angry_reg60.png}}\\
-\subfloat[Regularization $\lambda=20$.]{\includegraphics[scale=0.23]{images/angry_reg100.png}}$\;$
+\subfloat[Regularization $\lambda=100$.]{\includegraphics[scale=0.23]{images/angry_reg100.png}}$\;$
 \subfloat[Constrained Optimization.]{\includegraphics[scale=0.23]{images/angry_sca.png}}
 \caption{The result of fitting the model to an image using the various fitting algorithms.}\label{fg:optimization}
 \end{figure}
 
 Experiments with regularization have shown that the this approach tends to
-keep the mouth on the model open when fitting the model to image. This is due to
+keep the mouth on the model open when fitting the model to an image. This is due to
 the fact that the mean face from the Binghamton database has an open mouth. Since the regularization algorithm
-penalizes any large discrepancy from the mean face, it therefore often falsly
+penalizes any large discrepancy from the mean face, it therefore often falsely
 approximates the face in the image with an open mouthed model instance, as can be seen in figure \ref{fg:meanface}. The
 results for fitting faces with the regularized fitting algorithm are
 shown in figures \ref{fg:regularization1} and \ref{fg:regularization2}.
@@ -4135,7 +4169,7 @@ shown in figures \ref{fg:regularization1} and \ref{fg:regularization2}.
 \centering
 \subfloat[Regularization with $\lambda=500$ matches the identity and expression
   very well.]{\includegraphics[scale=0.38]{images/reg_good.png}}\\
-\subfloat[The regularized fitting algorithm falsly assumes the mouth is open, since this minimizes error better than an open mouth.]{\label{fg:meanface}\includegraphics[scale=0.35]{images/reg_mouth_open.png}}\\
+\subfloat[The regularized fitting algorithm falsely assumes the mouth is open, since this minimizes error better than an open mouth.]{\label{fg:meanface}\includegraphics[scale=0.35]{images/reg_mouth_open.png}}\\
 \subfloat[Regularization with $\lambda=400$ correctly identifies a happy expression.]{\label{fg:inhuman}\includegraphics[scale=0.40]{images/reg_res1.png}}
 \caption{Results obtained from applying the regularized fitting algorithm.}\label{fg:regularization1}
 \end{figure}
@@ -4150,7 +4184,7 @@ shown in figures \ref{fg:regularization1} and \ref{fg:regularization2}.
 From \ref{fg:inhuman}, we can see that the regularized algorithm even matches face shapes which
 are very different from the shapes in the database. However, there are two
 significant disadvantages. Firstly, the choice of the regularization parameter $\lambda$
-has to be done by trial and error. Secondly, the fitting algorithm often falsly
+has to be done by trial and error. Secondly, the fitting algorithm often falsely
 identifies subjects as having their mouth open, since this enables the algorithm
 to achieve a better error function minimum.
 
@@ -4183,36 +4217,34 @@ available to us. Results for constrained fitting are shown in figures
   misidentifies the expression as fear.}\label{fg:constrained2}
 \end{figure}
 
-In summary, we have discussed and explored two approaches to avoiding
+In summary, we have discussed and explored two approaches to avoid
 overfitting in the fitting algorithm. This overfitting is exemplified by
 unrealistic face shapes. 
 
 The regularization approach yields realistic face
-shapes for certain values of a regularization parameter $\lambda$. However, this
-parameter must often be found by trial and error. The parameter's magintude
+shapes for only certain values of the regularization parameter $\lambda$. However, this
+parameter must often be found by trial and error. The parameter's magnitude
 controls the attraction to the mean and can cause the algorithm to recover
 incorrect shapes, such as ones with an open mouth even when the mouth in the
 image is closed.
 
 With the constrained optimization approach we exchange a significant portion of
 the expressive power of the model for being able to only recover realistic
-faces. The constrained fitting algorithm does not require any input parmaters
+faces. The constrained fitting algorithm does not require any input parameters
 which makes the application more accessible to the casual user.
 
 \paragraph{Video Length.}
 In the expression transfer algorithm (section \ref{s:exptranalgo}), we require
 that the identity of the person will not change during the video recording. This
-means that the mult-frame coordinate descent algorithm has to find an expression
+means that the multi-frame coordinate descent algorithm has to find an expression
 parameter vector for each frame but just one identity parameter vector for the
 entire video sequence. This is essentially a constraint on the fitting
-algorithm. This constraint also limits the algorithm's performance. It first of all
-it necessitates that the solution of a large linear system, obtained by
-collecting the feature points from all frames. Secondly, some identities in the database did produce certain expressions. 
-
+algorithm. This constraint limits the algorithm's performance, since it requires that we solve a large linear system, obtained by
+collecting the feature points from all frames. 
 
 \section{Expression Transfer Results}
 Given a 3D model of the source subject and a 3D model of the target subject, the
-final task is transfer the source expression to the target and then reanimate
+final task is to transfer the source expression to the target and then reanimate
 the target in the target video recording. Transferring the expression between
 the two models is trivial since we only need to input the source expression
 parameters along with the target identity parameters into the generative
@@ -4223,14 +4255,13 @@ than the source individual for example.
 On the other hand, the second step is a very challenging one. As discussed in section
 \ref{s:exptranalgo}, since we only have a model of a face shape and not a model
 of the texture, we cannot directly use the tensor model to synthesize the
-correct appearence. We therefore must utilize shape information to transfer
+correct appearance. We therefore must utilize shape information to transfer
 texture. 
 
-This can be done by finding the texture coordinates by
-projecting the newly generated face into target the image and using the image as
+This can be done by finding the texture coordinates through projection of the newly generated face into target the image and using the image as
 a texture. This leads to decent results as seen in figure
 \ref{fg:transfer}. However, certain expressions such as a strong smile may stretch the
-texture in an unrealstic way. 
+texture in an unrealistic way. 
 
 \begin{figure}[H]
 \centering
@@ -4243,7 +4274,7 @@ texture in an unrealstic way.
 \end{figure}
 
 In figure \ref{fg:transfer2} a smiling expression is transferred causing a
-noticably skewed texture in the target image.
+noticeably skewed texture in the target image.
 
 \begin{figure}[H]
 \centering
@@ -4253,8 +4284,9 @@ noticably skewed texture in the target image.
 \end{figure}
 
 The other approach to reanimating faces is to exploit the knowledge of the shape of both faces to
-clone the features from the source texture into the target texture. So that the
-result seems realistic this is done with seamless blending to produce results
+clone the features from the source texture into the target texture. In order for
+the
+result to seem realistic, this is done with seamless blending to produce results
 depicted in figures \ref{fg:poisson1} and \ref{fg:poisson2}
 \begin{figure}[H]
 \centering
@@ -4264,13 +4296,14 @@ depicted in figures \ref{fg:poisson1} and \ref{fg:poisson2}
 \begin{figure}[H]
 \centering
 \includegraphics[scale=0.40]{images/poisson1.png}
-\caption{Another example of using poisson cloning to achieve a somewhat realistic
+\caption{Another example of using Poisson cloning to achieve a somewhat realistic
   expression transfer result.}\label{fg:poisson2}
 \end{figure}
  
-Since the geometry of both 3D models is known from fitting algorithm, the
-transfer is done by simply taking smile texture from the source image and cloning it
-over the mouth on the target image. This approach was also utlized by Vlasic et
+Since the geometry of both 3D models is known from the parameters obtained using
+the fitting algorithm, the
+transfer is done by simply taking the smile texture from the source image and cloning it
+over the mouth on the target image. This approach was also utilized by Vlasic et
 al \cite{faceTransfer05} in their expression transfer application. It produces
 good results when both faces are the same size. Figure \ref{poisson3}
 illustrates the case when one face is considerably larger than the other. Note
@@ -4280,9 +4313,9 @@ the target image was larger than mouth of the source.
 \begin{figure}[H]
 \centering
 \subfloat[Step 1: Transfer of a neutral expression.]{\includegraphics[scale=0.38]{images/poisson2.png}}\\
-\subfloat[Step 2: Transfer of the begininngs of a smile.]{\includegraphics[scale=0.35]{images/poisson4.png}}
-\caption{Texture transfer using poisson cloning. Depicted is a case where the
-  techinque does not work well due to the discrepancy in size.}\label{poisson3}
+\subfloat[Step 2: Transfer of the beginnings of a smile.]{\includegraphics[scale=0.35]{images/poisson4.png}}
+\caption{Texture transfer using Poisson cloning. Depicted is a case where the
+  technique does not work well due to the discrepancy in size.}\label{poisson3}
 \end{figure}
 
 \section{Performance}
@@ -4309,40 +4342,43 @@ non-negativity least squares algorithm is around 53 seconds for 100
 frames and around 29 seconds for 50 frames for 500 feature points, thus
 averaging a little under 0.2 of a seconds per frame. 
 
-The performance of either version of the fitting algorithm is thus fast enough
-to make the application accessible for casual users. The slower runtime of the non-negativity least squares algorithm is due to the
+The performance of both versions of the fitting algorithm is therefore good enough
+to make the application accessible for casual users. The slower, per frame runtime of the non-negativity least squares algorithm is due to the
 fact that it performs a sequence of iterations until convergence during every parameter update step in the
-coordinate descent expression transfer fitting algoritm. The linear
+coordinate-descent expression transfer algorithm. The linear
 combination fitting algorithm, on the other hand, updates parameters using a
 closed form solution, which is computationally much more effective. The regularized linear combination algorithm
 decreases faster than the constrained algorithm. However, if the maximum number
-of iterations is not constrained it may take the regularized algorithm longer to
+of iterations is not constrained it may sometimes take the regularized algorithm longer to
 converge to a stable solution.
 
 
 \chapter{Conclusion}
-We developed the expression transfer application which allows a
+We developed an expression transfer application which allows a
 casual user to construct and explore a tensor based 3D model of faces shapes. The user
-can use the application to synthesize generate novel faces or to manipulate and
-change the expression or identity of an existing face using a simple 3D OpenGL
-based GUI. 
+can use the application to either synthesize novel faces or to manipulate and
+change the expression and identity of an existing face using a simple OpenGL
+based GUI.
 
 The tensor based shape model is constructed using the Binghamton database of 3D face
-scans. This is done by first aligining the face scans into a data tensor and
+scans. This is done by first aligning the face scans into a data tensor and
 then performing the high order singular value decomposition (HOSVD) on this
-tensor. With the HOSVD the tensor can be broken down into a multilinear model
+tensor. With the HOSVD, the tensor can be broken down into a multilinear model
 tensor and two orthonormal mode matrices. We have shown how a generative model
 can be obtained using the multilinear model tensor. The idea behind the
 generative model is that it produces new face shapes as linear combinations of
 the original shapes from the data tensor. To generate any arbitrarily moved face
-shape the generative function may include 3D pose data in form of a rotation
+shape the generative function may include 3D pose parameters in form of a rotation
 matrix and a translation vector.
 
 The tensor model has the very important property of separability. The user can
 therefore easily manipulate the expression or the identity of a 3D face shape
-independently.
+independently. Using sliders in the GUI a user can create new 3D faces and
+change their identity or expression. When a more complex expression is required
+it may become difficult to correctly adjust all the sliders to generate this
+expression.
 
-The application also utilizes a fitting algorithm to support
+To find complex expression and identity parameters, application utilizes a fitting algorithm to support
 recognition and extraction of a 3D model from a 2D image. We have derived this
 algorithm from the generative model using matrix calculus by minimizing an error
 between the projected 3D model and the 2D image. To combat overfitting
@@ -4356,27 +4392,28 @@ the positions of these feature points in the rest of the video sequence frames.
 
 Given the fitting algorithm we formalized an expression transfer procedure to
 transfer an expression from a source video recording of a performer to a subject
-in a target video recording. Since the tensor model only encapsulated shape
-information, the face transfer algorithm utilizes poisson image
+in a target video recording. Since the tensor model only encapsulates shape
+information, the face transfer algorithm utilizes Poisson image
 editing to transfer the textures in order to reanimate the target
 recording. However, the reanimation results are not realistic enough to create a
 smooth and believable video sequence of the target individual with a new
 expression. 
 
 The expression transfer application was designed to obey the model-view-controller (MVC) design
-pattern. It supports multi-threading so that multiple fitting algorithm invocations may
+pattern. Since performance is key to a user, the expression transfer application
+makes use of multi-threading so that multiple fitting algorithm invocations may
 be computed in parallel without blocking the application.
 
 \section{Future Work}
 As part of the expression transfer application, we constructed a deformable model from a simple database of 3D face scans displaying
 expressions. An intriguing prospect for future work would be to perform data
 gathering and construct larger, more powerful 3D databases,
-with more attributes than identity and expression. For example it would be
-interesting to build an appearence tensor model with attributes for expressions,
+with more attributes than just the identity and expression. For example it would be
+interesting to build an appearance tensor model with attributes for expressions,
 identities, lighting and texture of the faces as well. Tensor based shape models of other objects
 such as hands and entire bodies are an area which has not been researched as
 thoroughly as face models by the computer vision community. It would therefore
-be possible to contribute to the deformable modelling field by exploring tensor models
+be possible to contribute to the deformable modeling field by exploring tensor models
 of such objects. Constructing and fitting the model using a new database would not necessitate the reworking of the algorithms derived in the
 paper. The HOSVD and the fitting algorithm could be easily adapted to work with
 databases not consisting of face scans by simply adapting the number of
@@ -4384,40 +4421,41 @@ parameters and mode matrices.
 
 Of course, to build a new database it would be necessary to perform 3D data
 gathering. It should, however, be possible to perform this gathering without the
-need for expensive equipement. Structured light based scanning equipment and other 3D shape recovery approaches
+need for expensive equipment. Structured light based scanning equipment and other 3D shape recovery approaches
 such as computational or photometric stereo are increasingly becoming more readily
 available to casual users and they would lend themselves well for data gathering
 purposes. The application could for instance be extended to allow the user to
 perform their own data gathering on an object of their choosing and then to
 construct a tensor model from it. If it were not possible to gather 3D despite the availability of data gathering techniques,
-more variablity could be introduced to existing databases by utilizing a FEM based
-model to generate new faces and using these to expand the database.
+more variability could be introduced to an existing databases by utilizing a FEM based
+model to generate new faces from the ones in the database and using these to expand the database.
 
 To improve the usability of the application it would also be intriguing to link
 an feature point detection algorithm into the expression transfer algorithm. An
 automatic feature detection framework such as the Viola-Jones feature tracker
 \cite{viola} would make the application more accessible to casual users. The automatic detector could be trained to locate corners of the
 mouth, eyebrows or the tip of the nose. These points are easily distinguishable
-and are conveniently already utilized as feature points in the application. Even an external feature point tracker could therefore be
+and they are already being utilized as feature points in the application. Even an external feature point tracker could therefore be
 seamlessly linked with the application if it produced a set of 2D feature
 point coordinates which would then be used by the expression transfer fitting algorithm.
 
 The main limitation we encountered with the shape tensor-based model is the need for
 correspondences between feature and model points. Correspondences are not
 elegant and weaken the power of the model fitting approaches. This limitation
-could be overcome by utilizing an appearence based tensor model. Since this
+could be overcome by utilizing an appearance model. Since this
 model generates a textured representation of the face its projection into
-2D is a textured image of the face. It therefore is less constrained in how the
-error is computed meaning that more elegant and flexible fitting algorithms
-could be developed. To construct such a model it would be necessary to known the
-RGB values at every vertex so a database with texture maps and texture
-coordinates would be required. A tensor-based model of appearence would also
+2D is a textured image of the face. It is, therefore, less constrained in how the
+error is computed. An intriguing future project could thus involve deriving a
+fitting algorithm which would not require point to point correspondences. To
+construct a tensor-based appearance model it would be necessary to known the
+RGB values at every vertex, which means that a database with texture maps and texture
+coordinates would be required. A tensor-based model of appearance would also
 be able to reanimate faces without having to resort to Poisson image editing
 techniques.
 
 Lastly, a future project could explore the performance of Newton and quasi-Newton fitting
 algorithms for the tensor model of shape. Section \ref{s:minerror} provides the starting point of such
-approahces and the derives two of the four optimal parameters non-linear equations.
+approaches and derives formulas for two of the four optimal parameters.
 \bibliographystyle{plain}
 \bibliography{references}
 

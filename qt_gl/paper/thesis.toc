@@ -67,7 +67,7 @@
 \contentsline {paragraph}{Regularization.}{54}{section*.19}
 \contentsline {paragraph}{Constrained Optimization.}{54}{section*.20}
 \contentsline {subsection}{\numberline {3.5.6}Fitting Algorithm}{55}{subsection.3.5.6}
-\contentsline {paragraph}{Multi-Frame Coordinate Descent.}{55}{section*.21}
+\contentsline {paragraph}{Multi-Frame Coordinate Descent.}{56}{section*.21}
 \contentsline {paragraph}{Feature point generation.}{56}{section*.22}
 \contentsline {paragraph}{Expression Transfer Fitting Algorithm. }{56}{section*.23}
 \contentsline {section}{\numberline {3.6}Expression Transfer}{57}{section.3.6}
@@ -93,4 +93,4 @@
 \contentsline {section}{\numberline {4.4}Expression Transfer Results}{73}{section.4.4}
 \contentsline {section}{\numberline {4.5}Performance}{76}{section.4.5}
 \contentsline {chapter}{\numberline {5}Conclusion}{77}{chapter.5}
-\contentsline {section}{\numberline {5.1}Future Work}{77}{section.5.1}
+\contentsline {section}{\numberline {5.1}Future Work}{78}{section.5.1}
