@@ -53,6 +53,7 @@ public slots:
     void calibrate();
     void setCameraParameters();
     void processingFinished();
+    void detect();
 
     //settings
     void setOptNelder(bool);
@@ -60,6 +61,7 @@ public slots:
     void setOptType(int);
     void setFrameNum(int);
     void setIterNum(int);
+    void setGenPoints(int);
     void setConstID(bool);
     void setPointGen2D(bool);
     void setPointGen3D(bool);
@@ -76,6 +78,7 @@ private:
     double regParam;
     int frame_num;
     int iter_num;
+    int gen_point_num;
     bool projModel;
     bool withFirstFrame;
 

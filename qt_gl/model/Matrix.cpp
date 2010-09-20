@@ -3,6 +3,7 @@
 #include <cstdlib>
 #include <iostream>
 #include <cmath>
+#include <limits>
 
 Matrix::Matrix(int m,int n) : m(m), n(n)
 {
@@ -127,7 +128,55 @@ int Matrix::getM() const
 
 int Matrix::getN() const
 {
-    return n;
+    return n;    
+}
+
+void Matrix::jacobi(const cv::Mat& matrix, const cv::Mat&b, cv::Mat&x)
+{
+    cv::Mat_<double> x_k(x.rows,1);
+    cv::Mat_<double> x_k1(x.rows,1);
+    int iter = 0;
+    double sub_sum;
+    x_k = cv::Mat_<double>::ones(x.rows,1);
+    // For each row we are responsible for
+    while(iter < 500)
+    {
+        iter++;
+        for(int i=0; i<matrix.rows; i++)
+        {
+            sub_sum = 0.0; // The sum of all element on the row, multiplicated by the current value of the corresponding x
+
+            /*we iterate through the entries in the row and build the sum*/
+            for(int j=0; j<matrix.cols; j++)
+            {
+                if(i != j)
+                    sub_sum += matrix.at<double>(i,j)*x_k(j,0);
+            }
+
+            /*Updated value of the kth unknown*/
+            x_k1(i,0) = (b.at<double>(i,0) - sub_sum )/matrix.at<double>(i,i);
+
+        }
+        if(Matrix::convergence(x_k,x_k1) == true)
+            break;
+
+        x_k1.copyTo(x_k);
+    }
+    x_k1.copyTo(x);
+}
+
+bool Matrix::convergence(const cv::Mat&x_k,const cv::Mat&x_k1)
+{
+    double eps = 1e-6;
+    double max_k, max_k1,min;
+    cv::Mat_<double> x_sub;
+    x_sub = x_k1 - x_k;
+
+    cv::minMaxLoc(cv::abs(x_sub),&min,&max_k);
+    cv::minMaxLoc(cv::abs(x_k1),&min,&max_k1);
+
+    if((max_k/max_k1) < eps)return true;
+    return false;
 }
 
 //static is only in the declaration
@@ -662,4 +711,16 @@ void Matrix::test(void)
         std::cout << result;
 
         A = Matrix::matrix_mult(Matrix::eye(2),Matrix::matrix_mult(Matrix::eye(2),Matrix::eye(2)));
+
+        cv::Mat_<double> aj(2,2);
+        cv::Mat_<double> bj(2,1);
+        aj(0,0) = 2;
+        aj(0,1) = 1;
+        aj(1,0) = 5;
+        aj(1,1) = 7;
+        bj(0,0) = 11;
+        bj(1,0) = 13;
+        cv::Mat_<double> xj(2,1);
+        Matrix::jacobi(aj,bj,xj);
+        std::cout << "jacobi " << Matrix(xj);
     }

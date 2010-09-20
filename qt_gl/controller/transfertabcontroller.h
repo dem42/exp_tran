@@ -44,6 +44,7 @@ public slots:
     void setOptType(int);
     void setFrameNum(int);
     void setIterNum(int);
+    void setGenPoints(int);
     void setTexture(bool);
     void setPoisson(bool);
     void setUsingBackground(bool);
@@ -68,6 +69,7 @@ private:
     double regParam;
     int frame_num;
     int iter_num;
+    int gen_point_num;
     bool projModel;
     bool withFirstFrame;
 

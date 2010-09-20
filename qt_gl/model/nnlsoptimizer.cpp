@@ -164,14 +164,14 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
     for(int i=0;i<exr_size;i++)
         x_t(0,i) = x(i,0) = w_exp[i];
 
-    Mat_<double> temp = (A_ex*x - f);
-    Mat_<double> e = temp.t()*temp;
-    cout << "exp, error before " << e(0,0)<<endl;
+//    Mat_<double> temp = (A_ex*x - f);
+//    Mat_<double> e = temp.t()*temp;
+//    cout << "exp, error before " << e(0,0)<<endl;
     //op .. lets see if we get here
     this->scannls(A_ex,f,x);
-    temp = (A_ex*x - f);
-    e = temp.t()*temp;
-    cout << "exp, error after " << e(0,0)<<endl;
+//    temp = (A_ex*x - f);
+//    e = temp.t()*temp;
+//    cout << "exp, error after " << e(0,0)<<endl;
 
 
     for(int i=0;i<exr_size;i++){
@@ -321,14 +321,14 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
     for(int i=0;i<id_size;i++)
         y_t(0,i) = y(i,0) = w_id[i];
 
-    Mat_<double> temp = (A_id*y - f);
-    Mat_<double> e = temp.t()*temp;
-    cout << "id, error before " << e(0,0)<<endl;
+//    Mat_<double> temp = (A_id*y - f);
+//    Mat_<double> e = temp.t()*temp;
+//    cout << "id, error before " << e(0,0)<<endl;
     //optimize using sequential coordinate descent
     this->scannls(A_id,f,y);    
-    temp = (A_id*y - f);
-    e = temp.t()*temp;
-    cout << "id, error after " << e(0,0)<<endl;
+//    temp = (A_id*y - f);
+//    e = temp.t()*temp;
+//    cout << "id, error after " << e(0,0)<<endl;
 
 
     for(int i=0;i<id_size;i++){
@@ -489,13 +489,13 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
 
         A_id = PRM*ZU;
 
-        Mat_<double> temp = (A_id*y - f);
-        Mat_<double> e = temp.t()*temp;
-        cout << "id, error before " << e(0,0)<<endl;
+//        Mat_<double> temp = (A_id*y - f);
+//        Mat_<double> e = temp.t()*temp;
+//        cout << "id, error before " << e(0,0)<<endl;
         this->scannls(A_id,f,y);
-        temp = (A_id*y - f);
-        e = temp.t()*temp;
-        cout << "id, error after " << e(0,0)<<endl;
+//        temp = (A_id*y - f);
+//        e = temp.t()*temp;
+//        cout << "id, error after " << e(0,0)<<endl;
     }
 
 

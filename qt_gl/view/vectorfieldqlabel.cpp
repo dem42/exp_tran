@@ -1,6 +1,5 @@
 #include "vectorfieldqlabel.h"
 #include "clickableqlabel.h"
-#include "utility.h"
 
 #include <QPainter>
 #include <QPointF>

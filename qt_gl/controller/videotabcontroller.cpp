@@ -6,6 +6,7 @@
 #include <fstream>
 #include <QImage>
 #include <QTimer>
+#include <QPainter>
 #include <cv.h>
 #include <highgui.h>
 #include <cstdlib>
@@ -49,8 +50,9 @@ VideoTabController::VideoTabController(QString fileName, ClickableQLabel *picLab
     idconstype = VideoProcessor::IdConstraintType_CONST;
     projtype = VideoProcessor::PointGenerationType_2D;
     regParam = 2000.0;
-    frame_num = 10;
+    frame_num = 50;
     iter_num = 30;
+    gen_point_num = 400;
     projModel = false;
     withFirstFrame = true;
 
@@ -123,8 +125,8 @@ void VideoTabController::calcIntrinsicParams()
 {    
     vector<Mat> imgs;
 
-    imgs.push_back(imread("../../camera2.jpg"));
-    imgs.push_back(imread("../../camera1.jpg"));
+    imgs.push_back(imread("camera2.jpg"));
+    imgs.push_back(imread("camera1.jpg"));
 
 
     //the size here is very important .. it cannot be a subset
@@ -271,7 +273,7 @@ void VideoTabController::processingFinished()
         //after processing is complete start the timer
         timerReplay = new QTimer(this);
         connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
-        timerReplay->start(500);
+        timerReplay->start(200);
     }
     else
     {
@@ -310,7 +312,8 @@ void VideoTabController::playBack()
     if(counter < frame_num) frame_num = counter;
 
     videoProcessor = new VideoProcessor(picLabel->getMarked(),frameData,cameraMatrix,lensDist,opttype,
-                                        regParam,idconstype,projtype,frame_num,iter_num,withFirstFrame);
+                                        regParam,idconstype,projtype,frame_num,iter_num,withFirstFrame,
+                                        gen_point_num);
 
     connect(videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
 
@@ -612,6 +615,10 @@ void VideoTabController::setIterNum(int n)
 {
     iter_num = n;
 }
+void VideoTabController::setGenPoints(int n)
+{
+    gen_point_num = n;
+}
 void VideoTabController::setConstID(bool b)
 {
     if(b == true)
@@ -646,6 +653,59 @@ void VideoTabController::setProjModel(bool b)
 void VideoTabController::setWithFirstFrame(bool b)
 {
     this->withFirstFrame = b;
+}
+
+void VideoTabController::detect()
+{
+
+    cv::CascadeClassifier classifier1, classifier2;
+    classifier1.load("/home/martin/project/faces_neg/negatives/trainout.xml");
+    classifier2.load("/home/martin/project/faces_neg/negatives/trainout2.xml");
+
+    vector<Rect> rectangles;
+    vector<Point2f> newPoints;
+    Rect re;
+    QRect req;
+    QPixmap result = Utility::mat2QPixmap(*(frames.end()-1));
+    QPainter paint(&result);
+    int mx;
+    int my;
+
+    classifier1.detectMultiScale(*(frames.end()-1),rectangles);
+
+    cout << "mouth" << endl;
+    for(uint i=0; i<rectangles.size();i++)
+    {
+        mx = rectangles[i].x +  rectangles[i].width/2;
+        my = rectangles[i].y +  rectangles[i].height/2;
+        //Utility::pointSamplingNormal(Point2f(mx,my),50,mx,my,newPoints);
+        newPoints.push_back(Point2f(mx,my));
+        cout << rectangles[i].x << " " << rectangles[i].y << endl;
+        cout << rectangles[i].height << " " << rectangles[i].width << endl;
+        req.setTopLeft(QPoint(rectangles[i].x,rectangles[i].y));
+        req.setBottomRight(QPoint(rectangles[i].x+rectangles[i].width,rectangles[i].y+rectangles[i].height));
+        paint.drawRect(req);
+    }
+
+    classifier2.detectMultiScale(*(frames.end()-1),rectangles);
+
+    cout << "eyes" << endl;
+    for(uint i=0; i<rectangles.size();i++)
+    {
+        mx = rectangles[i].x +  rectangles[i].width/2;
+        my = rectangles[i].y +  rectangles[i].height/2;
+        //Utility::pointSamplingNormal(Point2f(mx,my),50,mx,my,newPoints);
+        newPoints.push_back(Point2f(mx,my));
+        cout << rectangles[i].x << " " << rectangles[i].y << endl;
+        cout << rectangles[i].height << " " << rectangles[i].width << endl;
+        req.setTopLeft(QPoint(rectangles[i].x,rectangles[i].y));
+        req.setBottomRight(QPoint(rectangles[i].x+rectangles[i].width,rectangles[i].y+rectangles[i].height));
+        paint.drawRect(req);
+    }
+
+    picLabel->setPixmap(result);
+    picLabel->setMarked(newPoints);
+
 }
 
 VideoTabController::~VideoTabController()

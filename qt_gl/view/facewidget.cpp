@@ -110,8 +110,6 @@ void FaceWidget::render()
   vector<int>fP;
   fP.assign(Face::fPoints,Face::fPoints+Face::fPoints_size);
 
-
-  glEnable(GL_TEXTURE_2D);
   glEnable(GL_COLOR_MATERIAL);
   glColorMaterial(GL_FRONT, GL_AMBIENT_AND_DIFFUSE);
 
@@ -192,9 +190,7 @@ void FaceWidget::render()
       glVertex3f(vertexes[v3].x,vertexes[v3].y,vertexes[v3].z);
       glEnd();
 
-    }
-
-  glDisable(GL_TEXTURE_2D);
+    }  
   glDisable(GL_COLOR_MATERIAL);
 }
 
@@ -391,8 +387,7 @@ void FaceWidget::setWireFrame(bool on)
 }
 
 void FaceWidget::resizeGL(int width, int height)
-{
-  cout << "in resize" << endl;
+{  
   GLdouble left,right,bottom,top,near,far;
 
   //coordinates of 2D plane (the one we're projecting to)
@@ -462,9 +457,6 @@ void FaceWidget::setTexture(uchar *img_data, int img_height, int img_width)
 
     //get a texture name
     glGenTextures(1, &texture);
-
-    cout << "in set texture with texture " << texture << endl;
-
     //bind to the texture name
     glBindTexture (GL_TEXTURE_2D, texture);
     glPixelStorei (GL_UNPACK_ALIGNMENT, 1);
@@ -481,7 +473,13 @@ void FaceWidget::setTexture(uchar *img_data, int img_height, int img_width)
 
     delete[] img_data;
 
+    glEnable(GL_TEXTURE_2D);
     texture_id = texture;
+}
+
+void FaceWidget::disableTexture()
+{
+    glDisable(GL_TEXTURE_2D);
 }
 
 void FaceWidget::setLabeled(bool b)

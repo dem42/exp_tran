@@ -24,11 +24,6 @@ Face::Face()
     EXP = model->getExpSize();
     VER = model->getPointNum();
 
-    cout << "params sizes " << ID << " " << EXP << " " << VER << endl;
-
-    cout << " point num " << point_num << endl;
-    cout << " poly num " << poly_num << endl;
-
     //after we load polygonal data we can allocate memory for vertexes
     vertexes = new (nothrow) Point3[point_num];
     if(vertexes == NULL)
@@ -58,14 +53,10 @@ Face::~Face()
   delete[] vertexes;  
   delete[] vertex_normals;
   delete[] triangles;
-  cout << "face destroyed" << endl;
   delete[] w_exp;
   delete[] w_id;
   //singleton so we do not explicitly call its destructor
   //delete model
-
-  //delete[] vertex_texture;
-  //delete[] texture_2d_coord;
 }
   
 const int Face::fPoints[16] = {4925,/*4609,261,*/3878,702,4733,4632,/*3285,*/3828,/*4147,*/
@@ -272,9 +263,7 @@ int Face::getPointNum() const
 }
 
 int Face::getPointIndexFromPolygon(int index)
-{
-    cout << "points in polygon are" << triangles[index][0] << " "
-         << triangles[index][1] << " " << triangles[index][2] << endl;
+{    
     return triangles[index][0];
 }
 
@@ -307,7 +296,6 @@ void Face::calculateBoundingSphere(float &cx,float &cy,float &cz, float &diamete
 
     bx_u = bx_d = by_u = by_d = bz_u = bz_d = 0;
 
-    cout << poly_num << endl;
     for(int i=0; i<poly_num; i++)
     {
         v1 = triangles[i][0];
@@ -469,8 +457,6 @@ void Face::loadPolygonDataFromModel()
     point_num = model->getPointNum();
     poly_num = model->getPolyNum();
 
-    if(!triangles)
-        delete[] triangles;
     triangles = new (nothrow) float[poly_num][3];
     if(triangles == NULL)
     {

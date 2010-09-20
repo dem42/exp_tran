@@ -158,7 +158,7 @@ void Utility::poissonClone(const Mat &src, const Mat &mask, Mat &target, int o_x
         }
     }
 
-    solve(A,b1,u1);    
+    solve(A,b1,u1);
     solve(A,b2,u2);
     solve(A,b3,u3);
 

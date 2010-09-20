@@ -11,8 +11,7 @@ CustomizableFaceWidget::CustomizableFaceWidget(QGLWidget *parent) : FaceWidget(p
 
 
 void CustomizableFaceWidget::resizeGL(int width, int height)
-{
-  cout << "in resize custom" << endl;
+{ 
   //switch to projection matrix
   glMatrixMode(GL_PROJECTION);  
   glViewport(0, 0, 2*viewport_width, 2*viewport_height);

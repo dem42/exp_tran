@@ -62,6 +62,8 @@ public:
 
     void test(void);
 
+    static void jacobi(const cv::Mat& matrix, const cv::Mat&b, cv::Mat&x);
+    static bool convergence(const cv::Mat&x_k,const cv::Mat&x_k1);
 
     /********************************************/
     /*      STATIC FUNCTIONS                    */

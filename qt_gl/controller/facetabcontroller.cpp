@@ -7,13 +7,16 @@ FaceTabController::FaceTabController(QSlider *exp_slider, QSlider *ident_slider,
     this->ident_slider = ident_slider;
     this->face_widget = face_widget;
 
+    id_inter = false;
+    exp_inter = false;
+
     face_ptr = new Face();
 
     //initialize weight vectors
-    w_id = new double[56];
-    w_exp = new double[7];
+    w_id = new double[face_ptr->getIdNum()];
+    w_exp = new double[face_ptr->getExpNum()];
 
-    for(int i=0;i<56;i++)
+    for(int i=0;i<face_ptr->getIdNum();i++)
     {
         if(i==33)w_id[i] = 0.0;
         else if(i==7)w_id[i] = 1.0;
@@ -28,33 +31,12 @@ FaceTabController::FaceTabController(QSlider *exp_slider, QSlider *ident_slider,
     w_exp[5] = 0;
     w_exp[6] = 0;
 
-//    w_exp[0] = 0.021423;
-//    w_exp[1] = 0.00498108;
-//    w_exp[2] = 0.00829062;
-//    w_exp[3] = -0.00608236;
-//    w_exp[4] = 0.00763084;
-//    w_exp[5] = -0.0193017;
-//    w_exp[6] = -0.021784;
-
-//    w_exp[0] = 0.00883634;
-//    w_exp[1] = -0.0029592;
-//    w_exp[2] = -0.00662942;
-//    w_exp[3] = 0.000328165;
-//    w_exp[4] = -0.00611554;
-//    w_exp[5] = 0.00532823;
-//    w_exp[6] = 0.00375425;
-
-    //Vector3::normalize(w_exp,7);
-
-    for(int i=0;i<7;i++)
-        cout << w_exp[i] << endl;
-
     face_ptr->setNewIdentityAndExpression(w_id,w_exp,getInterType());
 
     face_widget->setFace(face_ptr);
 
-    current_expr = 0;
-    current_ident = 33;
+    current_expr = 4;
+    current_ident = 7;
 
 
     expr_map.insert(std::pair<QString,ExprType>("Angry",ANGRY));
@@ -65,8 +47,6 @@ FaceTabController::FaceTabController(QSlider *exp_slider, QSlider *ident_slider,
     expr_map.insert(std::pair<QString,ExprType>("Sad",SAD));
     expr_map.insert(std::pair<QString,ExprType>("Surprise",SURPRISE));
 
-    id_inter = false;
-    exp_inter = false;
 }
 
 FaceTabController::~FaceTabController()

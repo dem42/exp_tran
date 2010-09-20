@@ -22,11 +22,12 @@ TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, Click
     idconstype = VideoProcessor::IdConstraintType_CONST;
     projtype = VideoProcessor::PointGenerationType_2D;
     regParam = 2000.0;
-    frame_num = 10;
+    frame_num = 50;
     iter_num = 30;
+    gen_point_num = 400;
 
-    srcFileSelected("/home/martin/project/TrackedSmiles/S003-024.avi");
-    targetFileSelected("/home/martin/project/TrackedSmiles/S008-005.avi");
+    srcFileSelected("S003-024.avi");
+    targetFileSelected("S008-005.avi");
 
     srcDia = new QFileDialog();
     targetDia = new QFileDialog();
@@ -183,7 +184,8 @@ void TransferTabController::beginTransfer()
     }
     if(counter < frame_num) frame_num = counter;
     src_videoProcessor = new VideoProcessor(sourceLabel->getMarked(),s_frameData, cameraSrc, lensDist,opttype,
-                                            regParam,idconstype,projtype,frame_num,iter_num,withFirstFrame);
+                                            regParam,idconstype,projtype,frame_num,iter_num,withFirstFrame,
+                                            gen_point_num);
     connect(src_videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
     src_videoProcessor->start();
 
@@ -202,7 +204,8 @@ void TransferTabController::beginTransfer()
     }
     if(counter < frame_num) frame_num = counter;
     target_videoProcessor = new VideoProcessor(targetLabel->getMarked(),t_frameData, cameraSrc, lensDist,opttype,
-                                               regParam,idconstype,projtype,frame_num,iter_num,withFirstFrame);
+                                               regParam,idconstype,projtype,frame_num,iter_num,withFirstFrame,
+                                               gen_point_num);
     connect(target_videoProcessor,SIGNAL(finished()),this,SLOT(processingFinished()));
     target_videoProcessor->start();
 
@@ -225,15 +228,11 @@ void TransferTabController::getClonedMouth(const Mat& img, unsigned int frame_in
    Point2f tb = genPointsSrc[tl];
    Point2f tc = genPointsSrc[rmc];
    Point2f td = genPointsSrc[bl];
-   cout << "src points are " << ta.x << " " << ta.y << " " << tb.x << " " << tb.y
-        << " " << tc.x << " " << tc.y << " " << td.x << " " << td.y << endl;
 
    Point2f pa = genPointsTarget[lmc];
    Point2f pb = genPointsTarget[tl];
    Point2f pc = genPointsTarget[rmc];
    Point2f pd = genPointsTarget[bl];
-   cout << "target points are " << pa.x << " " << pa.y << " " << pb.x << " " << pb.y
-        << " " << pc.x << " " << pc.y << " " << pd.x << " " << pd.y << endl;
 
    int hx = (pc.x >= pa.x)?pc.x:pa.x;
    int lx = (pc.x >= pa.x)?pa.x:pc.x;
@@ -249,17 +248,16 @@ void TransferTabController::getClonedMouth(const Mat& img, unsigned int frame_in
    int ly2 = (td.y >= tb.y)?tb.y:td.y;
    int nx2 = (hx2 - lx2)/2.;
    int ny2 = (hy2 - ly2)/2.;
-   cout << "nums are " << nx << " " << ny << " " << nx2 << " " << ny2 << endl;
+
    Mat_<double> mask_mouth = Mat_<double>::zeros(img.size());
 
-   for(int i=ny-ny2;i<=(ny+ny2);i++)
-       for(int j=nx-nx2;j<=(nx+nx2);j++)
+   for(int i=ny-ny2-8;i<=(ny+ny2+8);i++)
+       for(int j=nx-nx2-10;j<=(nx+nx2+10);j++)
            mask_mouth(i,j) = 1.0;
 
 
    int shift_x = ta.x - (nx-nx2);
 
-   cout << " the shift is " << ta.x - pa.x << " " << ta.y - pa.y << endl;
    Utility::poissonClone(img,mask_mouth,target,shift_x,ta.y - pa.y);
 
 }
@@ -290,7 +288,7 @@ void TransferTabController::processingFinished()
     {        
         timerReplay = new QTimer(this);
         connect(timerReplay,SIGNAL(timeout()),this,SLOT(replayFrame()));
-        timerReplay->start(500);
+        timerReplay->start(200);
     }
     else
     {
@@ -336,23 +334,37 @@ void TransferTabController::replayFrame()
         sourceLabel->setMarked(points);
     }
 
-    //transfer texture
-    for(int j=0;j<target_face_ptr->getPointNum();j++)
-        objectPoints.push_back(target_face_ptr->vertexes[j]);
-
-    cv::projectPoints(Mat(objectPoints),rot,tran,cameraSrc,lensDist,imagePoints);
-    textureData = new Point2[imagePoints.size()];
-    //    img_width = srcFrames[i].size().width;
-    //    img_height = srcFrames[i].size().height;
-    img_width = Utility::closestLargetPowerOf2(t_frameData[i].size().width);
-    img_height = Utility::closestLargetPowerOf2(t_frameData[i].size().height);
-
-    for(unsigned int j=0;j<imagePoints.size();j++)
+    if(textured3D && i == 10)
     {
-        textureData[j].x = imagePoints[j].x / img_width;
-        //our texture coordinate sysem is 0,0 top left corner ..
-        //bingTexture doesnt do this
-        textureData[j].y = imagePoints[j].y / img_height;
+        //transfer texture
+        for(int j=0;j<target_face_ptr->getPointNum();j++)
+            objectPoints.push_back(target_face_ptr->vertexes[j]);
+
+        cv::projectPoints(Mat(objectPoints),rot,tran,cameraSrc,lensDist,imagePoints);
+        textureData = new Point2[imagePoints.size()];
+        //    img_width = srcFrames[i].size().width;
+        //    img_height = srcFrames[i].size().height;
+        img_width = Utility::closestLargetPowerOf2(t_frameData[i].size().width);
+        img_height = Utility::closestLargetPowerOf2(t_frameData[i].size().height);
+
+        for(unsigned int j=0;j<imagePoints.size();j++)
+        {
+            textureData[j].x = imagePoints[j].x / img_width;
+            //our texture coordinate sysem is 0,0 top left corner ..
+            //bingTexture doesnt do this
+            textureData[j].y = imagePoints[j].y / img_height;
+        }
+
+
+        cout << "in text " << i << " " << textured3D << endl;
+        convertFrameIntoTexture(t_frameData[i]);
+        face_widget->setFace(target_face_ptr,textureData);
+
+        delete[] textureData;
+    }
+    else if(!textured3D)
+    {
+        face_widget->disableTexture();
     }
 
     //create the 4x4 proj matrix for the face widget
@@ -385,16 +397,8 @@ void TransferTabController::replayFrame()
 
     if(!show3D)
     {
-        if(textured3D)
-        {
-            convertFrameIntoTexture(t_frameData[0]);
-            face_widget->setFace(target_face_ptr,textureData);
-        }
-        else
-            face_widget->setFace(target_face_ptr);
-    }
-
-    delete[] textureData;
+         face_widget->setFace(target_face_ptr);
+    }    
 
     if(textureInterpolate && !show3D)
     {
@@ -547,6 +551,10 @@ void TransferTabController::setFrameNum(int n)
 void TransferTabController::setIterNum(int n)
 {
     iter_num = n;
+}
+void TransferTabController::setGenPoints(int n)
+{
+    gen_point_num = n;
 }
 void TransferTabController::setTexture(bool tex)
 {

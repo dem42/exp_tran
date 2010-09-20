@@ -72,7 +72,7 @@
 \contentsline {paragraph}{Expression Transfer Fitting Algorithm. }{56}{section*.23}
 \contentsline {section}{\numberline {3.6}Expression Transfer}{57}{section.3.6}
 \contentsline {paragraph}{Poisson Cloning.}{58}{section*.24}
-\contentsline {paragraph}{Expression transfer algorithm.}{58}{section*.25}
+\contentsline {paragraph}{Expression transfer algorithm.}{59}{section*.25}
 \contentsline {section}{\numberline {3.7}System Architecture}{59}{section.3.7}
 \contentsline {subsection}{\numberline {3.7.1}View Layer}{59}{subsection.3.7.1}
 \contentsline {paragraph}{OpenGL widget}{59}{section*.26}

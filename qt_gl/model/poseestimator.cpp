@@ -105,7 +105,8 @@ void PoseEstimator::generatePoints(const Mat &rotation, const Mat &translation,
 {
     int random;
     double low = 0;
-    double high = face_ptr->getPointNum();
+    //dont go up to pointNum itself
+    double high = face_ptr->getPointNum()-1;
 
     vector<Point3f> objectPoints;
 

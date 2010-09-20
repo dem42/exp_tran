@@ -30,7 +30,7 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
 
     ui.videoTabProgressBar->setVisible(false);
     //intialize transfer widget    
-    v_controller = new VideoTabController("/home/martin/project/TrackedSmiles/S003-024.avi",
+    v_controller = new VideoTabController("S003-024.avi",
                                           picLabelV, flowLabelV, this, face_widget2);
 
     //ui.verticalLayoutWidget->setGeometry(10,10,650,650);
@@ -91,6 +91,8 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(ui.modelButton,SIGNAL(clicked()),v_controller,SLOT(playBack()));
     connect(ui.cameraButton,SIGNAL(clicked()),v_controller,SLOT(calibrate()));
 
+    connect(ui.detect,SIGNAL(clicked()),v_controller,SLOT(detect()));
+
     //transfer controller connects
     connect(ui.browseS,SIGNAL(clicked()),t_controller,SLOT(srcBrowse()));
     connect(ui.browseD,SIGNAL(clicked()),t_controller,SLOT(targetBrowse()));
@@ -121,6 +123,7 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(sUi.none,SIGNAL(toggled(bool)),v_controller,SLOT(setNone(bool)));
     connect(sUi.projModel,SIGNAL(toggled(bool)),v_controller,SLOT(setProjModel(bool)));
     connect(sUi.firstFrame,SIGNAL(toggled(bool)),v_controller,SLOT(setWithFirstFrame(bool)));
+    connect(sUi.pointsBox,SIGNAL(valueChanged(int)),v_controller,SLOT(setGenPoints(int)));
 
     //settings t_cont
     connect(sUi.poisson,SIGNAL(toggled(bool)),t_controller,SLOT(setPoisson(bool)));
@@ -136,6 +139,7 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
     connect(sUi.projModel,SIGNAL(toggled(bool)),t_controller,SLOT(setProjModel(bool)));
     connect(sUi.none,SIGNAL(toggled(bool)),t_controller,SLOT(setNone(bool)));
     connect(sUi.firstFrame,SIGNAL(toggled(bool)),t_controller,SLOT(setWithFirstFrame(bool)));
+    connect(sUi.pointsBox,SIGNAL(valueChanged(int)),t_controller,SLOT(setGenPoints(int)));
 }
 
 
@@ -159,6 +163,7 @@ void ExpTranWindow::setAllVideoTabButtonsDisabled(bool disabled)
     ui.dropButton->setDisabled(disabled);
     ui.flowButton->setDisabled(disabled);
     ui.extractBtn->setDisabled(disabled);
+    ui.cameraButton->setDisabled(disabled);
 }
 
 void ExpTranWindow::setAllTransferTabButtonsDisabled(bool disabled)
@@ -169,6 +174,8 @@ void ExpTranWindow::setAllTransferTabButtonsDisabled(bool disabled)
     ui.dropT->setDisabled(disabled);
     ui.restartTransferButton->setDisabled(disabled);
     ui.startT->setDisabled(disabled);
+    ui.srcFeat->setDisabled(disabled);
+    ui.targetFeat->setDisabled(disabled);
 }
 
 void ExpTranWindow::incrementTransferProgress()

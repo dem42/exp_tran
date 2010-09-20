@@ -25,7 +25,7 @@ public:
                    VideoProcessor::IdConstraintType idconst = IdConstraintType_CONST,
                    VideoProcessor::PointGenerationType pgtype = PointGenerationType_3D,
                    const unsigned int fmax=5, const unsigned int imax=3,
-                   bool withFirstFrame = true);
+                   bool withFirstFrame = true, unsigned int gen_point_num=400);
     VideoProcessor(Optimizer *paramOptimizer, OpticalFlowEngine *flowEngine,
                    const unsigned int fmax=5, const unsigned int imax=3);
     ~VideoProcessor();

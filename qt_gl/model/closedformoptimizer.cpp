@@ -167,7 +167,7 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
         
         cv::solve(W,B_ex,x);
 
-        for(unsigned int k=0;k<exr_size;k++)
+        for(int k=0;k<exr_size;k++)
             x_t(0,k) = x(k,0);
         lin_comb_x = (x_t*u_ex).t();
         Z_id = Matrix::kronecker(Mat_<double>::eye(id_size,id_size),lin_comb_x);
@@ -342,15 +342,15 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
 
     B = A_ext*f;
     B = B + Z_avg*leftTerm_exp;
-
-    Mat_<double> temp = ((1.0/Z_avg)*A_ex*x - f);
-    Mat_<double> e = temp.t()*temp;
-    cout << "exp, error before " << e(0,0)<<endl;
+//
+//    Mat_<double> temp = ((1.0/Z_avg)*A_ex*x - f);
+//    Mat_<double> e = temp.t()*temp;
+//    cout << "exp, error before " << e(0,0)<<endl;
     cv::solve(W,B,x);
     //x = Matrix::solveLinSysSvd(W,B);
-    temp = ((1.0/Z_avg)*A_ex*x - f);
-    e = temp.t()*temp;
-    cout << "exp, error after " << e(0,0)<<endl;
+//    temp = ((1.0/Z_avg)*A_ex*x - f);
+//    e = temp.t()*temp;
+//    cout << "exp, error after " << e(0,0)<<endl;
 
 
 
@@ -518,16 +518,16 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
 
     B = A_idt*f;
     B = B + Z_avg*leftTerm_id;
-
-    Mat_<double> temp = ((1./Z_avg)*A_id*y - f);
-    Mat_<double> e1 = temp.t()*temp ,e2;
-    cout << "id, error before " << e1(0,0)<<endl;
+//
+//    Mat_<double> temp = ((1./Z_avg)*A_id*y - f);
+//    Mat_<double> e1 = temp.t()*temp ,e2;
+//    cout << "id, error before " << e1(0,0)<<endl;
     cv::solve(W,B,y);
-    temp = ((1./Z_avg)*A_id*y - f);
-    e2 = temp.t()*temp;
-    cout << "id, error after " << e2(0,0)<<endl;
-    if(e1(0,0) < e2(0,0))
-        cout << "!!!! " << Matrix(y);
+//    temp = ((1./Z_avg)*A_id*y - f);
+//    e2 = temp.t()*temp;
+//    cout << "id, error after " << e2(0,0)<<endl;
+//    if(e1(0,0) < e2(0,0))
+//        cout << "!!!! " << Matrix(y);
 
 
     for(int i=0;i<id_size;i++){

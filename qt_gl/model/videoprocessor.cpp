@@ -20,7 +20,7 @@ VideoProcessor::VideoProcessor(const vector<cv::Point2f> &featurePoints, const v
                                VideoProcessor::OptType type, double regParam,
                                VideoProcessor::IdConstraintType idconst, VideoProcessor::PointGenerationType pgtype,
                                const unsigned int fmax,const unsigned int imax,
-                               bool withFirstFrame) : FRAME_MAX(fmax), ITER_MAX(imax), NEW_POINT_SIZE(400)
+                               bool withFirstFrame, unsigned int gen_point_num) : FRAME_MAX(fmax), ITER_MAX(imax), NEW_POINT_SIZE(gen_point_num)
 {
     fPoints.assign(featurePoints.begin(),featurePoints.end());
     fData.assign(frameData.begin(),frameData.end());

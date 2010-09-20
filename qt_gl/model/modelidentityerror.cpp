@@ -21,7 +21,7 @@ void ModelIdentityError::setWeights(const vector<vector<double> >& w)
 void ModelIdentityError::setTransformations(const vector<Mat>&rot, const vector<Mat>&tran)
 {
     Mat_<double> rmatrix;
-    for(int i=0;i<rot.size();i++)
+    for(unsigned int i=0;i<rot.size();i++)
     {
         Rodrigues(rot[i],rmatrix);
         rotations.push_back(rmatrix.clone());
@@ -76,7 +76,7 @@ double ModelIdentityError::operator()(vector<double>& x)
 
     //here inside of operator() if error is identity then the parameter w is identity weights
     linear_combination_exp = Mat_<double>(x)*u_ex;
-    for(int j=0;j<indices.size();j++)
+    for(unsigned int j=0;j<indices.size();j++)
     {
 
         linear_combination_id = Mat_<double>(weights[j])*u_id;

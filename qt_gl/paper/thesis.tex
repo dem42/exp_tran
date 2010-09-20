@@ -73,7 +73,7 @@
 \textsc{\LARGE Department Of Computing}\\[5.5cm]
 
 
-{ \huge \bfseries Tensor-based Modelling of Deformable Face Shapes}\\[1cm]
+{ \huge \bfseries Tensor-based Deformable Models for the Recognition, Synthesis and Transfer of Facial Expressions}\\[1cm]
 \LARGE by\\[1cm]
 \LARGE Martin Papanek\\[7.5cm]
 
@@ -209,7 +209,7 @@ movements of the model through successive images.
 The area where deformable models are applicable is quite large. We will focus on one very interesting application of dynamical
 models and model extraction which is
 \textit{expression transfer}. The primary purpose of expression transfer is to change the expression of a subject independent of other attributes
-that define the shape or texture of his or her face. The ultimate goal is to be
+that define the shape or texture of his or her face. The goal is to be
 able to capture
 the expressions from a video recording of one individual and
 generate a video of another individual mimicking these
@@ -222,7 +222,8 @@ create very realistic animations without too much user intervention.
 
 This paper describes the development of an expression transfer application, which combines motion tracking and a deformable
 model to gain understanding of the face deformations present in the input video
-recording. The application allows the user to separately manipulate the identity and
+recording. Using this understanding, the deformations can then be transferred to
+another instance of the model. The application allows the user to separately manipulate the identity and
 expression of a face shape. Furthermore, the user can locate the parameters of
 the face shape model using the model fitting algorithms provided by the application.
 
@@ -3611,6 +3612,15 @@ the the Sequential Coordinate-wise Non-negativity Least Squares Algorithm given
 in \ref{a:sca}.
 
 \section{Expression Transfer}\label{s:exptranalgo}
+To transfer an expression given two instances of the tensor-based shape model,
+we take the expression parameters of the source instance and the identity
+parameters of the target instance and generate a face with the transferred
+expression. However, it is important to note that the model accounts for the
+fact that different individuals may perform a certain type of expression
+differently. This means that the transferred frown may look different in the
+newly generated face. For the purpose of this application, the new expression
+is however very good approximation.
+
 Ideally, the expression transfer application should be able to seamlessly change
 the expressions of the individual in the target video with the expressions from
 the source video. This of course involves correctly generating the texture for
@@ -4358,7 +4368,10 @@ We developed an expression transfer application which allows a
 casual user to construct and explore a tensor based 3D model of faces shapes. The user
 can use the application to either synthesize novel faces or to manipulate and
 change the expression and identity of an existing face using a simple OpenGL
-based GUI.
+based GUI. The most important feature of the application is to transfer the
+expressions from one video sequence to another. The functionality of the
+application enables the user to easily generate and manipulate 3D face shapes
+and video sequences, making it useful for 3D animators and for casual users alike.
 
 The tensor based shape model is constructed using the Binghamton database of 3D face
 scans. This is done by first aligning the face scans into a data tensor and

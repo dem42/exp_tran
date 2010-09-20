@@ -35,6 +35,7 @@ public:
    void setCameraParameters(double cameraZPosition, double upVector, double cameraDistance);
 
    void setTexture(uchar *img_data, int img_height, int img_width);
+   void disableTexture();
    void setLabeled(bool);
 
    void refreshGL();

@@ -14,11 +14,26 @@ FaceModel * FaceModel::getInstance()
 {
     //lazy initialization
     if(instance == NULL)
-    {
-        instance = new FaceModel("svd_result_object_5",
-                                 "/home/martin/project/JaceyBinghamtonVTKFiles",
-                                 "out_here.txt",
-                                  56,7,5090);
+    {        
+        cout << "here" << endl;
+        ifstream fstr("model.properties",ifstream::in);
+        string result_object;
+        string database_location;
+        string db_out_listing;
+        int id;
+        int exp;
+        int pts;
+        if(fstr.fail() == true)
+        {
+            cerr << "please provide a model.properties file" << endl;
+            abort();
+        }
+        fstr >> result_object >> database_location >> db_out_listing >> id >> exp >> pts;
+
+        instance = new FaceModel(result_object.c_str(),
+                                 database_location,
+                                 db_out_listing,
+                                  id,exp,pts);
     }
     return instance;
 }
@@ -68,7 +83,8 @@ FaceModel::FaceModel(string filename,string dir,string db_list,int f,int e,int v
     for(int i=0;i<uex.rows;i++)
         for(int j=0;j<uex.cols;j++)
             uex(i,j) = U_ex.mat[i][j];
-    core.test();
+    //test of matrix functions
+    //core.test();
 }
 
 //we do not explicitly call this .. rather we rely on the OS
@@ -144,6 +160,11 @@ void FaceModel::initializeDbStrings()
     const char *dir = dir_name.c_str();
 
     fid = fopen(file_list,"r");
+    if(fid == NULL)
+    {
+        cerr << "critical error file list : " << file_list << " does not exist" << endl;
+        abort();
+    }
 
     fscanf(fid,"%d",&num);
     if(num != n_f * n_e) printf("problem\n");
@@ -254,6 +275,11 @@ void FaceModel::computeMean(int first_dim, int second_dim, int n, double &m_x, d
             cout << filename <<" " << i << " " << j <<  endl;
 
             fid = fopen(filename,"r");
+            if(fid == NULL)
+            {
+                cerr << "critical error db file : " << filename << " does not exist" << endl;
+                abort();
+            }
             fgets(str_dont_care,50,fid);
             fgets(str_dont_care,50,fid);
             fgets(str_dont_care,50,fid);
@@ -503,6 +529,11 @@ void FaceModel::read_flat(double **a, int m, int n,
              default: std::cerr << "unknown flag type" << std:: endl; exit(0);
              }
             fid = fopen(filename,"r");
+            if(fid == NULL)
+            {
+                cerr << "critical error db file : " << filename << " does not exist" << endl;
+                abort();
+            }
             fgets(str_dont_care,50,fid);
             fgets(str_dont_care,50,fid);
             fgets(str_dont_care,50,fid);
@@ -547,6 +578,11 @@ void FaceModel::read_flat_vertex(double **a, int m, int n,
             sprintf(filename,"%s/%s",dir_name.c_str(),strs[i][j].c_str());
 
             fid = fopen(filename,"r");
+            if(fid == NULL)
+            {
+                cerr << "critical error db file : " << filename << " does not exist" << endl;
+                abort();
+            }
             fgets(str_dont_care,50,fid);
             fgets(str_dont_care,50,fid);
             fgets(str_dont_care,50,fid);
