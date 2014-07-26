@@ -1,7 +1,7 @@
 #ifndef VIDEOTABCONTROLLER_H
 #define VIDEOTABCONTROLLER_H
 
-#include <highgui.h>
+#include <opencv/highgui.h>
 #include <QWidget>
 #include <QString>
 #include <QTimer>
@@ -18,7 +18,7 @@
 #include "view/exptranabstractview.h"
 #include "ui_cameraDialog.h"
 
-#include <cv.h>
+#include <opencv/cv.hpp>
 #include <vector>
 #include <string>
 

@@ -1,5 +1,6 @@
 #include <GL/gl.h>
 #include <GL/glut.h>
+#include "Face.h"
 
 GLfloat angle = 0.0;
 
@@ -28,7 +29,7 @@ void rotatingCube(void)
   
   glColor3f(1.0f, 1.0f, 0.0f);
     
-  glutWireCube(2);
+  glutSolidCube(2);
 }
 
 
@@ -36,9 +37,9 @@ void display(void)
 {
   glClearColor(0.f, 0.f, 0.f, 1.f);
   
-  //Clear the colour buffer (more buffers later on)  
-  glClear (GL_COLOR_BUFFER_BIT);
-  // Load the Identity Matrix to reset our drawing locations    
+  //Clear the colour buffer and the depth buffer (holds z info)
+  glClear (GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  // Load the Identity Matrix to reset our drawing locations   
   glLoadIdentity();
   gluLookAt(0.0, 0.0, 5.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
   
@@ -71,27 +72,43 @@ void reshape(int width, int height)
 }
 
 
+void initEnables(void)
+{
+  //depth test also known as z-buffer
+  glEnable(GL_DEPTH_TEST);
+  glEnable(GL_LIGHTING);
+  glEnable(GL_LIGHT0);
+}
+  
+
 int main(int argc, char** argv)
 {
   //initialize GLUT
   glutInit(&argc, argv);
   
-  //single or double buffering (stores a buffer)
-  glutInitDisplayMode(GLUT_DOUBLE);
+  //single or double buffering (stores a buffer) , 
+  //whether we want alpha blending or just rbg 
+  //and if depth buffer too (z-buffering)
+  glutInitDisplayMode(GLUT_DOUBLE | GLUT_RGB | GLUT_DEPTH);
   
   glutInitWindowSize(500, 500);
   glutInitWindowPosition(100, 100);
   
   glutCreateWindow("Window title");
 
+  initEnables();
+  
   //tell glut what to run in the main loop
   glutDisplayFunc(display);
   
   //idle func called when something changes i think
   glutIdleFunc(display);
-  
   glutReshapeFunc(reshape);
-    
+
+  Face f;
+  f.load("test_file.txt");
+  f.test();
+        
   glutMainLoop();
   
 }

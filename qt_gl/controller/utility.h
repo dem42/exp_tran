@@ -2,14 +2,14 @@
 #define UTILITY_H
 
 
-#include <highgui.h>
+#include <opencv/highgui.h>
 #include <QWidget>
 #include <QString>
 #include <QLabel>
 #include <QPixmap>
 #include "view/clickableqlabel.h"
 
-#include <cv.h>
+#include <opencv/cv.hpp>
 #include <vector>
 #include <string>
 

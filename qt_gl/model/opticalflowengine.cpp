@@ -7,6 +7,9 @@ OpticalFlowEngine::OpticalFlowEngine()
 {
 }
 
+OpticalFlowEngine::~OpticalFlowEngine()
+{
+}
 
 void OpticalFlowEngine::computeFlow(const Mat& prevImg, const Mat& nextImg,
                                     const vector<Point2f>& prevPoints, vector<Point2f>& nextPoints)

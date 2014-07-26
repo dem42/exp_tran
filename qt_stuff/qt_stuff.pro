@@ -9,3 +9,6 @@ INCLUDEPATH += .
 
 # Input
 SOURCES += qt_hello_world.cpp
+
+#enable openGL
+QT += opengl

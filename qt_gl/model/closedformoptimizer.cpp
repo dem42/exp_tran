@@ -113,8 +113,8 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
         fi(0,0) = featurePoints[i].x;
         fi(1,0) = featurePoints[i].y;
         fi = fi - Pt;     
-        f.row(2*i) = fi.row(0) + 0;
-        f.row(2*i+1) = fi.row(1) + 0;     
+        f.row(2*i) = fi.row(0) + 0.0;
+        f.row(2*i+1) = fi.row(1) + 0.0;
     }
 
     pr = (1.0/Z_avg)*weakCamera*rmatrix;
@@ -125,8 +125,8 @@ void ClosedFormOptimizer::estimateModelParameters(const vector<Point2f> &feature
     {
         index = point_indices[i];        
         prm = pr*M[index];
-        PRM.row(2*i) = prm.row(0) + 0;
-        PRM.row(2*i+1) = prm.row(1) + 0;
+        PRM.row(2*i) = prm.row(0) + 0.0;
+        PRM.row(2*i+1) = prm.row(1) + 0.0;
     }
 
 
@@ -299,8 +299,8 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
         fi(1,0) = featurePoints[i].y;
 
         fi = fi - Pt;
-        f.row(2*i) = fi.row(0) + 0;
-        f.row(2*i+1) = fi.row(1) + 0;
+        f.row(2*i) = fi.row(0) + 0.0;
+        f.row(2*i+1) = fi.row(1) + 0.0;
     }
 
     pr = weakCamera*rmatrix;
@@ -325,8 +325,8 @@ void ClosedFormOptimizer::estimateExpressionParameters(const vector<Point2f> &fe
         index = point_indices[i];
 
         seg_A_ex = pr*M[index]*ZU;
-        A_ex.row(2*i) = seg_A_ex.row(0) + 0;
-        A_ex.row(2*i+1) = seg_A_ex.row(1) + 0;
+        A_ex.row(2*i) = seg_A_ex.row(0) + 0.0;
+        A_ex.row(2*i+1) = seg_A_ex.row(1) + 0.0;
     }
 
 
@@ -455,8 +455,8 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
             fi(1,0) = featurePointsVector[i][j].y;
 
             fi = fi - Pt;
-            f.row(count + 2*j) = fi.row(0) + 0;
-            f.row(count + 2*j+1) = fi.row(1) + 0;
+            f.row(count + 2*j) = fi.row(0) + 0.0;
+            f.row(count + 2*j+1) = fi.row(1) + 0.0;
         }
         count += 2*featurePointsVector[i].size();
     }
@@ -500,8 +500,8 @@ void ClosedFormOptimizer::estimateIdentityParameters(const vector<vector<Point2f
             index = point_indices_vector[i][j];
 
             seg_A_id = pr*M[index]*ZU;
-            A_id.row(count + 2*j) = seg_A_id.row(0) + 0;
-            A_id.row(count + 2*j+1) = seg_A_id.row(1) + 0;
+            A_id.row(count + 2*j) = seg_A_id.row(0) + 0.0;
+            A_id.row(count + 2*j+1) = seg_A_id.row(1) + 0.0;
         }
         count += 2*point_indices_vector[i].size();
     }

@@ -80,39 +80,41 @@ for j=1:NUMBER_OF_FACES
         flat_exp = [flat_exp exp];
     end
 end
-
-for j=1:NUMBER_OF_EXPRES
-    for k=1:NUMBER_OF_FACES
-        
-        filename_face = sprintf('%s/%s',dirname,cell_a{k,j});
-
-        disp(filename_face);
-    
-        fid = fopen(filename_face,'rt');
-        tline = fgetl(fid);
-        tline = fgetl(fid);
-        tline = fgetl(fid);
-        tline = fgetl(fid);
-    
-        str = fscanf(fid,'%s',1);
-        number = fscanf(fid,'%i');
-        str = fscanf(fid,'%s',1);
-
-        %we'll be making a big assumption here that they are all the same
-        ident(j,:) = zeros(1,3*number);
-        ident(j,:) = fscanf(fid, '%f', [1,3*number]);
-        fclose(fid);
-    end
-    if j==1
-        flat_ident = ident;
-    else
-        flat_ident = [flat_ident ident];
-    end
-end
+% 
+% for j=1:NUMBER_OF_EXPRES
+%     for k=1:NUMBER_OF_FACES
+%         
+%         filename_face = sprintf('%s/%s',dirname,cell_a{k,j});
+% 
+%         disp(filename_face);
+%     
+%         fid = fopen(filename_face,'rt');
+%         tline = fgetl(fid);
+%         tline = fgetl(fid);
+%         tline = fgetl(fid);
+%         tline = fgetl(fid);
+%     
+%         str = fscanf(fid,'%s',1);
+%         number = fscanf(fid,'%i');
+%         str = fscanf(fid,'%s',1);
+% 
+%         we'll be making a big assumption here that they are all the same
+%         ident(j,:) = zeros(1,3*number);
+%         ident(j,:) = fscanf(fid, '%f', [1,3*number]);
+%         fclose(fid);
+%     end
+%     if j==1
+%         flat_ident = ident;
+%     else
+%         flat_ident = [flat_ident ident];
+%     end
+% end
 size(flat_exp)
-size(flat_ident)
+%size(flat_ident)
 
-[U1,S1,V1] = svd(flat_ident');
-[U2,S2,V2] = svd(flat_exp');
+%[U1,S1,V1] = svd(flat_ident');
+[U2,S2,V2] = svd(flat_exp);
+
+save('u2','u2');
 
 end

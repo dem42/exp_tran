@@ -2,8 +2,8 @@
 #define OPTICALFLOWFARNEBACK_H
 
 #include "opticalflowengine.h"
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.hpp>
+#include <opencv/highgui.h>
 #include <vector>
 #include <iostream>
 

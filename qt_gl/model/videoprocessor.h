@@ -5,7 +5,7 @@
 #include "optimizer.h"
 #include "nnlsoptimizer.h"
 #include "poseestimator.h"
-#include <cv.h>
+#include <opencv/cv.hpp>
 #include <vector>
 #include <QThread>
 #include "exptranexception.h"

@@ -3,7 +3,7 @@
 
 #include "optimizer.h"
 #include <vector>
-#include <cv.h>
+#include <opencv/cv.hpp>
 #include "model/Face.h"
 
 using namespace std;

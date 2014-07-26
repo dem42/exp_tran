@@ -3,7 +3,7 @@
 
 #include "errorfunction.h"
 #include <vector>
-#include <cv.h>
+#include <opencv/cv.hpp>
 #include "model/FaceModel.h"
 
 using namespace std;

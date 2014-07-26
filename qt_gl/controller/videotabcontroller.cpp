@@ -7,8 +7,8 @@
 #include <QImage>
 #include <QTimer>
 #include <QPainter>
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
 #include <cstdlib>
 #include <cmath>
 #include <ctime>
@@ -659,8 +659,8 @@ void VideoTabController::detect()
 {
 
     cv::CascadeClassifier classifier1, classifier2;
-    classifier1.load("/home/martin/project/faces_neg/negatives/trainout.xml");
-    classifier2.load("/home/martin/project/faces_neg/negatives/trainout2.xml");
+    classifier1.load("/home/martin/project/result/trainout.xml");
+    classifier2.load("/home/martin/project/result/trainout_eyes.xml");
 
     vector<Rect> rectangles;
     vector<Point2f> newPoints;

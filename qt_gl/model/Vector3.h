@@ -2,7 +2,7 @@
 #define VECTOR3_H
 
 #include <iostream>
-#include <cv.h>
+#include <cv.hpp>
 
 using namespace std;
 

@@ -138,8 +138,8 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
         fi(1,0) = featurePoints[i].y;
 
         fi = fi - Pt;
-        f.row(2*i) = fi.row(0) + 0;
-        f.row(2*i+1) = fi.row(1) + 0;
+        f.row(2*i) = fi.row(0) + 0.0;
+        f.row(2*i+1) = fi.row(1) + 0.0;
     }    
 
     pr = (1.0/Z_avg)*weakCamera*rmatrix;
@@ -156,8 +156,8 @@ void NNLSOptimizer::estimateExpressionParameters(const vector<Point2f> &featureP
     {
         index = point_indices[i];
         seg_A_ex = pr*M[index]*ZU;
-        A_ex.row(2*i) = seg_A_ex.row(0) + 0;
-        A_ex.row(2*i+1) = seg_A_ex.row(1) + 0;
+        A_ex.row(2*i) = seg_A_ex.row(0) + 0.0;
+        A_ex.row(2*i+1) = seg_A_ex.row(1) + 0.0;
     }
 
     //do not use the guess in the first frame but do for every following frame
@@ -272,8 +272,8 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
             fi(1,0) = featurePointsVector[i][j].y;
 
             fi = fi - Pt;
-            f.row(count + 2*j) = fi.row(0) + 0;
-            f.row(count + 2*j+1) = fi.row(1) + 0;
+            f.row(count + 2*j) = fi.row(0) + 0.0;
+            f.row(count + 2*j+1) = fi.row(1) + 0.0;
         }
         count += 2*featurePointsVector[i].size();
     }
@@ -310,8 +310,8 @@ void NNLSOptimizer::estimateIdentityParameters(const vector<vector<Point2f> >&fe
             index = point_indices_vector[i][j];
 
             seg_A_id = pr*M[index]*ZU;
-            A_id.row(count + 2*j) = seg_A_id.row(0) + 0;
-            A_id.row(count + 2*j+1) = seg_A_id.row(1) + 0;
+            A_id.row(count + 2*j) = seg_A_id.row(0) + 0.0;
+            A_id.row(count + 2*j+1) = seg_A_id.row(1) + 0.0;
         }
         count += 2*point_indices_vector[i].size();
     }
@@ -434,8 +434,8 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
         fi(1,0) = featurePoints[i].y;
 
         fi = fi - Pt;
-        f.row(2*i) = fi.row(0) + 0;
-        f.row(2*i+1) = fi.row(1) + 0;        
+        f.row(2*i) = fi.row(0) + 0.0;
+        f.row(2*i+1) = fi.row(1) + 0.0;
     }
 
     pr = (1.0/Z_avg)*weakCamera*rmatrix;
@@ -446,8 +446,8 @@ void NNLSOptimizer::estimateModelParameters(const vector<Point2f> &featurePoints
     {
         index = point_indices[i];        
         prm = pr*M[index];
-        PRM.row(2*i) = prm.row(0) + 0;
-        PRM.row(2*i+1) = prm.row(1) + 0;
+        PRM.row(2*i) = prm.row(0) + 0.0;
+        PRM.row(2*i+1) = prm.row(1) + 0.0;
     }
 
 

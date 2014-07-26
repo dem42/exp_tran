@@ -1,7 +1,7 @@
 #ifndef TRANSFERTABCONTROLLER_H
 #define TRANSFERTABCONTROLLER_H
 
-#include <cv.h>
+#include <opencv/cv.hpp>
 #include "view/clickableqlabel.h"
 #include "model/videoprocessor.h"
 #include <QString>

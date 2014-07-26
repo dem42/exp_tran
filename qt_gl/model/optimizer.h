@@ -3,7 +3,7 @@
 
 #include <vector>
 #include <map>
-#include <cv.h>
+#include <opencv/cv.hpp>
 #include "model/Face.h"
 #include "model/FaceModel.h"
 

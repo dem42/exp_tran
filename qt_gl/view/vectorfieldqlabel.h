@@ -3,8 +3,8 @@
 
 #include "clickableqlabel.h"
 
-#include <cv.h>
-#include <highgui.h>
+#include <opencv/cv.h>
+#include <opencv/highgui.h>
 #include <vector>
 #include <iostream>
 

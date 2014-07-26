@@ -4,6 +4,7 @@
 #include <cmath>
 #include <QGLFormat>
 #include <QFileDialog>
+#include <GL/glu.h>
 
 #include "model/Vector3.h"
 

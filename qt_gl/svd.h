@@ -1,7 +1,7 @@
 #ifndef SVD_H
 #define SVD_H
 
-#include "Vector3.h"
+#include "model/Vector3.h"
 #include <string>
 
 //make it save its state so that we dont have to recompute this

@@ -1,7 +1,7 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
-#include <cv.h>
+#include <opencv/cv.hpp>
 #include <vector>
 #include <iostream>
 

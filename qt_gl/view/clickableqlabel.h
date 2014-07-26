@@ -6,7 +6,7 @@
 #include <QPaintEvent>
 #include <iostream>
 #include <vector>
-#include <cv.h>
+#include <opencv/cv.h>
 
 
 class ClickableQLabel : public QLabel

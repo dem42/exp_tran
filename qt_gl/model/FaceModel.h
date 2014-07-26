@@ -4,7 +4,7 @@
 #include "Vector3.h"
 #include "Matrix.h"
 #include <string>
-#include <cv.h>
+#include <opencv/cv.hpp>
 
 using namespace cv;
 

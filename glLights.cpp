@@ -10,7 +10,7 @@ GLfloat redDiffuseMaterial[] =
 //set the material to red
 GLfloat whiteSpecularMaterial[] = 
   {
-    1.0, 1.0, 1.0
+    0.0, 0.0, 1.0
   };
 //set the material to white
 GLfloat greenEmissiveMaterial[] = 

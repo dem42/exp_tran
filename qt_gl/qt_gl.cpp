@@ -2,20 +2,23 @@
 #include <QApplication>
 #include <QGLFormat>
 
-#include "my_main_window.h"
+#include "view/exptranwindow.h"
+#include "view/exptranapplication.h"
+
+using namespace std;
 
 int main(int argc, char** argv)
 {
 
-  QApplication appl(argc, argv);
-  
+  ExpTranApplication appl(argc, argv);
+
   if(!QGLFormat::hasOpenGL())
     {
       cerr << "No support for OpenGL" << endl;
       return 1;
     }
-  MyMainWindow m;
-  m.show();
-  
-  return appl.exec();  
+//  ExpTranWindow m;
+//  m.show();
+
+  return appl.exec();
 }

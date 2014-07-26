@@ -4,70 +4,75 @@
 TEMPLATE = app
 TARGET = 
 DEPENDPATH += .
-INCLUDEPATH += . \
-    /usr/local/include/opencv
 CONFIG += qt \
     debug
 
 # Input
 SOURCES += qt_gl.cpp \
-    Face.cpp \
-    Vector3.cpp \
-    my_main_window.cpp \
-    face_widget.cpp \
-    svd.cpp \
-    Tensor.cpp \
-    FaceModel.cpp \
-    Matrix.cpp \
-    clickableqlabel.cpp \
-    opticalflowengine.cpp \
-    opticalflowfarneback.cpp \
-    vectorfieldqlabel.cpp \
-    featurepointqlabel.cpp \
-    mysimplex.cpp \
-    rosenerror.cpp \
-    modelimageerror.cpp \
-    facetabcontroller.cpp \
-    optimizer.cpp \
-    neldermeadoptimizer.cpp \
-    closedformoptimizer.cpp \
-    nnlsoptimizer.cpp \
-    videotabcontroller.cpp \
-    videoprocessor.cpp \
-    transfertabcontroller.cpp \
-    utility.cpp
+    model/rosenerror.cpp \
+    model/Tensor.cpp \
+    model/Face.cpp \
+    model/FaceModel.cpp \
+    model/Matrix.cpp \
+    model/Vector3.cpp \
+    view/clickableqlabel.cpp \
+    view/featurepointqlabel.cpp \
+    view/vectorfieldqlabel.cpp \
+    model/closedformoptimizer.cpp \
+    model/neldermeadoptimizer.cpp \
+    model/nnlsoptimizer.cpp \
+    model/opticalflowengine.cpp \
+    model/opticalflowfarneback.cpp \
+    model/videoprocessor.cpp \
+    model/modelimageerror.cpp \
+    controller/facetabcontroller.cpp \
+    controller/transfertabcontroller.cpp \
+    controller/utility.cpp \
+    controller/videotabcontroller.cpp \
+    view/facewidget.cpp \
+    view/exptranwindow.cpp \
+    view/customizablefacewidget.cpp \
+    model/poseestimator.cpp \
+    model/optimizer.cpp \
+    model/modelidentityerror.cpp
 QT += opengl
-FORMS += applform.ui \
-    cameraDialog.ui
-HEADERS += my_main_window.h \
-    Face.h \
-    Vector3.h \
-    face_widget.h \
-    svd.h \
-    Tensor.h \
-    FaceModel.h \
-    Matrix.h \
-    clickableqlabel.h \
-    opticalflowengine.h \
-    opticalflowfarneback.h \
-    vectorfieldqlabel.h \
-    featurepointqlabel.h \
-    mysimplex.h \
-    errorfunction.h \
-    rosenerror.h \
-    modelimageerror.h \
-    facetabcontroller.h \
-    optimizer.h \
-    neldermeadoptimizer.h \
-    closedformoptimizer.h \
-    nnlsoptimizer.h \
-    videotabcontroller.h \
-    videoprocessor.h \
-    transfertabcontroller.h \
-    utility.h
-LIBS += -L/usr/local/lib \
-    -lml \
-    -lcvaux \
-    -lhighgui \
-    -lcv \
-    -lcxcore
+FORMS += view/applform.ui \
+    view/cameraDialog.ui \
+    view/settingsDialog.ui
+HEADERS += model/rosenerror.h \
+    model/Tensor.h \
+    model/Face.h \
+    model/FaceModel.h \
+    model/Matrix.h \
+    model/Vector3.h \
+    view/clickableqlabel.h \
+    view/featurepointqlabel.h \
+    view/vectorfieldqlabel.h \
+    model/closedformoptimizer.h \
+    model/neldermeadoptimizer.h \
+    model/nnlsoptimizer.h \
+    model/opticalflowengine.h \
+    model/opticalflowfarneback.h \
+    model/optimizer.h \
+    model/videoprocessor.h \
+    model/errorfunction.h \
+    model/modelimageerror.h \
+    controller/facetabcontroller.h \
+    controller/transfertabcontroller.h \
+    controller/utility.h \
+    controller/videotabcontroller.h \
+    view/facewidget.h \
+    view/exptranwindow.h \
+    view/customizablefacewidget.h \
+    model/poseestimator.h \
+    view/exptranapplication.h \
+    model/exptranexception.h \
+    view/exptranabstractview.h \
+    model/modelidentityerror.h
+
+OTHER_FILES += model.properties
+
+
+INCLUDEPATH += . /usr/include/opencv
+LIBS += /usr/lib/i386-linux-gnu/libopencv_calib3d.so /usr/lib/i386-linux-gnu/libopencv_contrib.so /usr/lib/i386-linux-gnu/libopencv_core.so /usr/lib/i386-linux-gnu/libopencv_features2d.so /usr/lib/i386-linux-gnu/libopencv_flann.so /usr/lib/i386-linux-gnu/libopencv_gpu.so /usr/lib/i386-linux-gnu/libopencv_highgui.so /usr/lib/i386-linux-gnu/libopencv_imgproc.so /usr/lib/i386-linux-gnu/libopencv_legacy.so /usr/lib/i386-linux-gnu/libopencv_ml.so /usr/lib/i386-linux-gnu/libopencv_objdetect.so /usr/lib/i386-linux-gnu/libopencv_ocl.so /usr/lib/i386-linux-gnu/libopencv_photo.so /usr/lib/i386-linux-gnu/libopencv_stitching.so /usr/lib/i386-linux-gnu/libopencv_superres.so /usr/lib/i386-linux-gnu/libopencv_ts.so /usr/lib/i386-linux-gnu/libopencv_video.so /usr/lib/i386-linux-gnu/libopencv_videostab.so -lopencv_calib3d -lopencv_contrib -lopencv_core -lopencv_features2d -lopencv_flann -lopencv_gpu -lopencv_highgui -lopencv_imgproc -lopencv_legacy -lopencv_ml -lopencv_objdetect -lopencv_ocl -lopencv_photo -lopencv_stitching -lopencv_superres -lopencv_ts -lopencv_video -lopencv_videostab
+LIBS += -lglut -lGL -lGLU

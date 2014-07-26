@@ -2,7 +2,7 @@
 #define POSEESTIMATOR_H
 
 #include <vector>
-#include <cv.h>
+#include <opencv/cv.hpp>
 #include "model/Face.h"
 
 using namespace std;
