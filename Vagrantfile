@@ -16,6 +16,14 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   # doesn't already exist on the user's system.
   config.vm.box_url = "https://cloud-images.ubuntu.com/vagrant/trusty/current/trusty-server-cloudimg-i386-vagrant-disk1.box"
 
+  # prepare x11 forwarding so that we can run the gui on inside vagrant
+  config.ssh.forward_x11 = true
+  # config.vm.provider "virtualbox" do |v|
+  #   v.gui = true
+  # end
+
+  config.vm.provision :shell, path: "provision-vagrant.sh"
+  
   # Create a forwarded port mapping which allows access to a specific port
   # within the machine from a port on the host machine. In the example below,
   # accessing "localhost:8080" will access port 80 on the guest machine.
