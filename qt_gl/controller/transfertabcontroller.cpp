@@ -26,8 +26,8 @@ TransferTabController::TransferTabController(ClickableQLabel *sourceLabel, Click
     iter_num = 30;
     gen_point_num = 400;
 
-    srcFileSelected("S003-024.avi");
-    targetFileSelected("S008-005.avi");
+    srcFileSelected("obama.avi");
+    targetFileSelected("clinton.avi");
 
     srcDia = new QFileDialog();
     targetDia = new QFileDialog();

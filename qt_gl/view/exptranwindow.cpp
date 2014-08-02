@@ -30,7 +30,7 @@ ExpTranWindow::ExpTranWindow(QMainWindow *window)
 
     ui.videoTabProgressBar->setVisible(false);
     //intialize transfer widget    
-    v_controller = new VideoTabController("S003-024.avi",
+    v_controller = new VideoTabController("obama.avi",
                                           picLabelV, flowLabelV, this, face_widget2);
 
     //ui.verticalLayoutWidget->setGeometry(10,10,650,650);
